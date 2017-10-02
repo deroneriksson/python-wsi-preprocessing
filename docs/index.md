@@ -34,7 +34,9 @@ limitations under the License.
 
 ## Project Introduction
 
+
 ## Whole Slide Imaging Background
+
 
 ## Setup
 
@@ -76,14 +78,66 @@ and [scipy](https://pypi.python.org/pypi/scipy).
 
     pip3 install -U ipython jupyter matplotlib numpy opencv-python openslide-python pandas scikit-image scikit-learn scipy
 
+We will utilize scikit-image filters in this tutorial that currently are not present in the
+latest released version of scikit-image. Therefore, we can install scikit-image
+from source, as described in the README at [https://github.com/scikit-image/scikit-image]().
+
+    git clone https://github.com/scikit-image/scikit-image.git
+    cd scikit-image
+    pip3 install -r requirements.txt
+    pip3 install .
+
 
 ## View Individual Whole Slide Images
 
+A fairly unusual feature of whole slide images is very large image size. As an example,
+for our training data set of 500 images, the width varied from x pixels to y pixels, with
+an average of z pixels, and the height varied from x pixels to y pixels, with an average
+of z pixels. The images consisted of x total pixels to y total pixels, with an average of
+z total pixels.
+
+The [OpenSlide](http://openslide.org/) project can be used to read a variety of whole-slide
+image formats, including the [Aperio *.svs slide format](http://openslide.org/formats/aperio/)
+of our image set. This is a pyramidal, tiled format, where the massive slide is composed of
+a large number of constituent tiles.
+
+To use the OpenSlide Python interface to view whole slide images, we can clone the
+[OpenSlide Python interface from GitHub](https://github.com/openslide/openslide-python)
+and utilize the included DeepZoom `deepzoom_multiserver.py` script.
+
+    git clone https://github.com/openslide/openslide-python.git
+    cd openslide-python/examples/deepzoom
+    python3 deepzoom_multiserver.py -Q 100 WSI_DIRECTORY
+
+The `deepzoom_multiserver.py` script starts a web interface on port 5000 and displays
+the image files at the specified file system location (the `WSI_DIRECTORY` value above,
+which could be a location such as `~/git/python-wsi-preprocessing/data/`). If image
+files exist in subdirectories, they will also be displayed in the list of available
+slides.
+
+![OpenSlide Available Images](./slides/openslide-available-slides.png "OpenSlide Available Slides")
+
+
+Here we can see the initial view of one of the whole-slide images.
+
+![OpenSlide Whole Slide Image](./slides/openslide-whole-slide-image.png "OpenSlide Whole Slide Image")
+
+
+The whole-slide image can be zoomed to the highest magnification, revealing fine details at the
+tile level. Zooming and scrolling operations make it relatively easy to visually peruse the
+whole slide image.
+
+![OpenSlide Whole Slide Image Zoomed](./slides/openslide-whole-slide-image-zoomed.png "OpenSlide Whole Slide Image Zoomed")
+
+
 ## View Multiple Images
+
 
 ## Image Filtering
 
+
 ## View Filter Results for Individual Images
+
 
 ## View Filter Results for Multiple Images
 
