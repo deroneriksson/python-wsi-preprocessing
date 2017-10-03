@@ -80,7 +80,7 @@ and [scipy](https://pypi.python.org/pypi/scipy).
 
 We will utilize scikit-image filters in this tutorial that currently are not present in the
 latest released version of scikit-image. Therefore, we can install scikit-image
-from source, as described in the README at [https://github.com/scikit-image/scikit-image]().
+from source, as described in the README at [https://github.com/scikit-image/scikit-image](https://github.com/scikit-image/scikit-image).
 
     git clone https://github.com/scikit-image/scikit-image.git
     cd scikit-image
