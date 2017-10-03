@@ -149,8 +149,12 @@ def singleprocess_convert_training_slides_to_thumbs():
   """
   Convert all WSI training slides to thumbnails using a single process.
   """
+  t = Time()
+
   num_train_images = get_num_training_slides()
   training_slide_range_to_thumbs(1, num_train_images)
+
+  t.elapsed()
 
 
 def multiprocess_convert_training_slides_to_thumbs():
@@ -158,6 +162,8 @@ def multiprocess_convert_training_slides_to_thumbs():
   Convert all WSI training slides to thumbnails using multiple processes (one process per core).
   Each process will process a range of slide numbers.
   """
+  timer = Time()
+
   # how many processes to use
   num_processes = multiprocessing.cpu_count()
   pool = multiprocessing.Pool(num_processes)
@@ -195,11 +201,15 @@ def multiprocess_convert_training_slides_to_thumbs():
     else:
       print("Done converting slides %d through %d" % (start_ind, end_ind))
 
+  timer.elapsed()
+
 
 def slide_stats():
   """
   Display statistics/graphs about training slides.
   """
+  t = Time()
+
   num_train_images = get_num_training_slides()
   slide_stats = []
   for slide_num in range(1, num_train_images + 1):
@@ -315,6 +325,8 @@ def slide_stats():
   plt.title("Image shapes (height to width)")
   plt.show()
 
+  t.elapsed()
+
 
 def slide_info(display_all_properties=False):
   """
@@ -323,6 +335,8 @@ def slide_info(display_all_properties=False):
   Args:
     display_all_properties: If True, display all available slide properties.
   """
+  t = Time()
+
   num_train_images = get_num_training_slides()
   obj_pow_20_list = []
   obj_pow_40_list = []
@@ -355,14 +369,22 @@ def slide_info(display_all_properties=False):
   print("\n\nSlide Magnifications:")
   print("  20x Slides: " + str(obj_pow_20_list))
   print("  40x Slides: " + str(obj_pow_40_list))
-  print("  ??x Slides: " + str(obj_pow_other_list))
+  print("  ??x Slides: " + str(obj_pow_other_list) + "\n")
+
+  t.elapsed()
 
 
-start = datetime.datetime.now()
+class Time:
+  def __init__(self):
+    self.start = datetime.datetime.now()
+
+  def elapsed(self):
+    self.end = datetime.datetime.now()
+    time_elapsed = self.end - self.start
+    print("Time elapsed: " + str(time_elapsed))
+
+
 singleprocess_convert_training_slides_to_thumbs()
 # multiprocess_convert_training_slides_to_thumbs()
 # slide_stats()
 # slide_info(display_all_properties=True)
-end = datetime.datetime.now()
-time_elapsed = end - start
-print("Time elapsed: " + str(time_elapsed))
