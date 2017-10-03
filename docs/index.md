@@ -90,11 +90,22 @@ from source, as described in the README at [https://github.com/scikit-image/scik
 
 ## View Individual Whole Slide Images
 
-A fairly unusual feature of whole slide images is very large image size. As an example,
-for our training data set of 500 images, the width varied from x pixels to y pixels, with
-an average of z pixels, and the height varied from x pixels to y pixels, with an average
-of z pixels. The images consisted of x total pixels to y total pixels, with an average of
-z total pixels.
+A fairly unusual feature of whole slide images is the very large image size. As an example,
+for our training data set of 500 images, the width varied from 19,920 pixels to 198,220 pixels,
+with an average of 101,688 pixels. The height varied from 13,347 pixels to 256,256 pixels,
+with an average of 73,154 pixels. The images sizes varied from
+369,356,640 to 35,621,634,048 pixels (352 to 33,971 megapixels), with an average of
+7,670,709,628 pixels (7,315 megapixels).
+
+![Training Image Sizes](./slides/graph-image-sizes.png "Training Image Sizes")
+TODO: Clean up image size graph.
+
+
+Here we see a histogram distribution of the training image sizes in megapixels.
+
+![Distribution of Image Sizes](./slides/distribution-of-image-sizes.png "Distribution of Image Sizes")
+TODO: Clean up graph, change millions of pixels to megapixels.
+
 
 The [OpenSlide](http://openslide.org/) project can be used to read a variety of whole-slide
 image formats, including the [Aperio *.svs slide format](http://openslide.org/formats/aperio/)
