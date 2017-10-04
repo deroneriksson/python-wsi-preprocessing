@@ -22,6 +22,7 @@
 import numpy as np
 import PIL
 import wsi.slide as slide
+import skimage.filters as sk_filters
 
 
 def pil_to_np(pil_img):
@@ -110,6 +111,28 @@ def np_info(np_arr, name=None):
     print("%s:" % name, np_arr.shape, np_arr.dtype, "Max:", max, "Min:", min, "Mean:", mean, "Std:", std)
 
 
+def filter_hysteresis_threshold(np_img, low, high, output_type="uint8"):
+  """
+  Apply two-level (hysteresis) threshold to an image as a NumPy array.
+
+  Args:
+    np_img: Image as a NumPy array.
+    low: Low threshold.
+    high: High threshold.
+    output_type: Type of array to return (bool, float, or uint8).
+
+  Returns:
+    NumPy array (bool, float, or uint8) where True, 1.0, and 255 represent a pixel above hysteresis threshold.
+  """
+  result = sk_filters.apply_hysteresis_threshold(np_img, low, high)
+  if output_type == "bool":
+    return result
+  elif output_type == "float":
+    return result.astype(float)
+  else:
+    return (255 * result).astype("uint8")
+
+
 img_path = slide.get_training_thumb_path(4)
 pil_img = PIL.Image.open(img_path)
 pil_img.show()
@@ -121,3 +144,6 @@ np_to_pil(gray_np_img).show()
 complement_np_img = filter_complement(gray_np_img)
 np_info(complement_np_img, "Complement Image")
 np_to_pil(complement_np_img).show()
+hyst_np_img = filter_hysteresis_threshold(complement_np_img, 50, 100)
+np_info(hyst_np_img, "Hysteresis Threshold Image")
+np_to_pil(hyst_np_img).show()
