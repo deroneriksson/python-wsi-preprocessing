@@ -118,13 +118,13 @@ def np_info(np_arr, name=None, elapsed=None):
     name = "NumPy Array"
   if elapsed is None:
     elapsed = "---"
-  print("%-20s | Time: %-14s Max: %5.2f  Min: %5.2f  Mean: %7.2f  Std: %7.2f Type: %-6s Shape: %s" % (
+  print("%-20s | Time: %-14s Max: %6.2f  Min: %6.2f  Mean: %6.2f  Std: %6.2f Type: %-6s Shape: %s" % (
     name, str(elapsed), max, min, mean, std, np_arr.dtype, np_arr.shape))
 
 
 def filter_hysteresis_threshold(np_img, low=50, high=100, output_type="uint8"):
   """
-  Apply two-level (hysteresis) threshold to an image as a NumPy array.
+  Apply two-level (hysteresis) threshold to an image as a NumPy array, returning a binary image.
 
   Args:
     np_img: Image as a NumPy array.
@@ -145,6 +145,30 @@ def filter_hysteresis_threshold(np_img, low=50, high=100, output_type="uint8"):
     hyst = (255 * hyst).astype("uint8")
   np_info(hyst, "Hysteresis Threshold", t.elapsed())
   return hyst
+
+
+def filter_otsu_threshold(np_img, output_type="uint8"):
+  """
+  Compute Otsu threshold on image as a NumPy array and return binary image based on pixels above threshold.
+
+  Args:
+    np_img: Image as a NumPy array.
+    output_type: Type of array to return (bool, float, or uint8).
+
+  Returns:
+    NumPy array (bool, float, or uint8) where True, 1.0, and 255 represent a pixel above Otsu threshold.
+  """
+  t = Time()
+  otsu_thresh_value = sk_filters.threshold_otsu(np_img)
+  otsu = (np_img > otsu_thresh_value)
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    otsu = otsu.astype(float)
+  else:
+    otsu = otsu.astype("uint8") * 255
+  np_info(otsu, "Otsu Threshold", t.elapsed())
+  return otsu
 
 
 def filter_entropy(np_img, neighborhood=9, threshold=5, output_type="uint8"):
@@ -211,5 +235,7 @@ np_to_pil(hyst).show()
 # np_to_pil(entr).show()
 # entr = filter_entropy(complement, neighborhood=6, threshold=4)
 # np_to_pil(entr).show()
-rem_small = filter_remove_small_objects(hyst)
-np_to_pil(rem_small).show()
+# rem_small = filter_remove_small_objects(hyst)
+# np_to_pil(rem_small).show()
+otsu = filter_otsu_threshold(complement)
+np_to_pil(otsu).show()
