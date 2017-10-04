@@ -68,15 +68,56 @@ def filter_rgb_to_grayscale(np_img, output_type="uint8"):
 
   # Another common RGB ratio possibility: [0.299, 0.587, 0.114]
   result = np.dot(np_img[..., :3], [0.2125, 0.7154, 0.0721])
-  if type == "float":
+  if output_type == "float":
     return result
   else:
     return result.astype("uint8")
 
 
+def filter_complement(np_img, output_type="uint8"):
+  """
+  Obtain the complement of an image as a NumPy array.
+
+  Args:
+    np_img: Image as a NumPy array.
+    type: Type of array to return (float or uint8).
+
+  Returns:
+    Complement image as Numpy array.
+  """
+  if output_type == "float":
+    return 1.0 - np_img
+  else:
+    return 255 - np_img
+
+
+def np_info(np_arr, name=None):
+  """
+  Display information (shape, type, max, min, etc) about a NumPy array.
+
+  Args:
+    np_arr: The NumPy array.
+    name: The (optional) name of the array.
+  """
+  np_arr = np.asarray(np_arr)
+  max = np_arr.max()
+  min = np_arr.min()
+  mean = np_arr.mean()
+  std = np_arr.std()
+  if name is None:
+    print("NumPy Array:", np_arr.shape, np_arr.dtype, "Max:", max, "Min:", min, "Mean:", mean, "Std:", std)
+  else:
+    print("%s:" % name, np_arr.shape, np_arr.dtype, "Max:", max, "Min:", min, "Mean:", mean, "Std:", std)
+
+
 img_path = slide.get_training_thumb_path(4)
 pil_img = PIL.Image.open(img_path)
 pil_img.show()
-np_img = filter_rgb_to_grayscale(pil_to_np(pil_img))
-gray_img = np_to_pil(np_img)
-gray_img.show()
+rgb_np_img = pil_to_np(pil_img)
+np_info(rgb_np_img, "RGB Image")
+gray_np_img = filter_rgb_to_grayscale(pil_to_np(pil_img))
+np_info(gray_np_img, "Gray Image")
+np_to_pil(gray_np_img).show()
+complement_np_img = filter_complement(gray_np_img)
+np_info(complement_np_img, "Complement Image")
+np_to_pil(complement_np_img).show()
