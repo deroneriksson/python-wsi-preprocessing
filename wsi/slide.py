@@ -384,7 +384,7 @@ class Time:
     print("Time elapsed: " + str(time_elapsed))
 
 
-singleprocess_convert_training_slides_to_thumbs()
+# singleprocess_convert_training_slides_to_thumbs()
 # multiprocess_convert_training_slides_to_thumbs()
 # slide_stats()
 # slide_info(display_all_properties=True)
