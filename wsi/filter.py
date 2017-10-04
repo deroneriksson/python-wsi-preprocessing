@@ -22,6 +22,7 @@
 import numpy as np
 import PIL
 import wsi.slide as slide
+from wsi.slide import Time
 import skimage.filters as sk_filters
 
 
@@ -37,7 +38,10 @@ def pil_to_np(pil_img):
   Returns:
     The PIL image converted to a NumPy array.
   """
-  return np.asarray(pil_img)
+  t = Time()
+  rgb = np.asarray(pil_img)
+  np_info(rgb, "RGB", t.elapsed())
+  return rgb
 
 
 def np_to_pil(np_img):
@@ -66,13 +70,13 @@ def filter_rgb_to_grayscale(np_img, output_type="uint8"):
   Returns:
     Grayscale image as NumPy array with shape (h, w).
   """
-
+  t = Time()
   # Another common RGB ratio possibility: [0.299, 0.587, 0.114]
-  result = np.dot(np_img[..., :3], [0.2125, 0.7154, 0.0721])
-  if output_type == "float":
-    return result
-  else:
-    return result.astype("uint8")
+  grayscale = np.dot(np_img[..., :3], [0.2125, 0.7154, 0.0721])
+  if output_type != "float":
+    grayscale = grayscale.astype("uint8")
+  np_info(grayscale, "Gray", t.elapsed())
+  return grayscale
 
 
 def filter_complement(np_img, output_type="uint8"):
@@ -86,19 +90,23 @@ def filter_complement(np_img, output_type="uint8"):
   Returns:
     Complement image as Numpy array.
   """
+  t = Time()
   if output_type == "float":
-    return 1.0 - np_img
+    complement = 1.0 - np_img
   else:
-    return 255 - np_img
+    complement = 255 - np_img
+  np_info(complement, "Complement", t.elapsed())
+  return complement
 
 
-def np_info(np_arr, name=None):
+def np_info(np_arr, name=None, elapsed=None):
   """
   Display information (shape, type, max, min, etc) about a NumPy array.
 
   Args:
     np_arr: The NumPy array.
     name: The (optional) name of the array.
+    elapsed: The (optional) time elapsed to perform a filtering operation.
   """
   np_arr = np.asarray(np_arr)
   max = np_arr.max()
@@ -107,8 +115,10 @@ def np_info(np_arr, name=None):
   std = np_arr.std()
   if name is None:
     name = "NumPy Array"
-  print("%-20s | Shape: %-15s Type: %-6s Max: %5.2f  Min: %5.2f  Mean: %7.2f  Std: %7.2f" % (
-  name, np_arr.shape, np_arr.dtype, max, min, mean, std))
+  if elapsed is None:
+    elapsed = "---"
+  print("%-20s | Time: %-14s Max: %5.2f  Min: %5.2f  Mean: %7.2f  Std: %7.2f Type: %-6s Shape: %s" % (
+    name, str(elapsed), max, min, mean, std, np_arr.dtype, np_arr.shape))
 
 
 def filter_hysteresis_threshold(np_img, low, high, output_type="uint8"):
@@ -124,26 +134,25 @@ def filter_hysteresis_threshold(np_img, low, high, output_type="uint8"):
   Returns:
     NumPy array (bool, float, or uint8) where True, 1.0, and 255 represent a pixel above hysteresis threshold.
   """
-  result = sk_filters.apply_hysteresis_threshold(np_img, low, high)
+  t = Time()
+  hyst = sk_filters.apply_hysteresis_threshold(np_img, low, high)
   if output_type == "bool":
-    return result
+    pass
   elif output_type == "float":
-    return result.astype(float)
+    hyst = hyst.astype(float)
   else:
-    return (255 * result).astype("uint8")
+    hyst = (255 * hyst).astype("uint8")
+  np_info(hyst, "Hysteresis Threshold", t.elapsed())
+  return hyst
 
 
 img_path = slide.get_training_thumb_path(4)
 pil_img = PIL.Image.open(img_path)
 pil_img.show()
 rgb_np_img = pil_to_np(pil_img)
-np_info(rgb_np_img, "RGB")
 gray_np_img = filter_rgb_to_grayscale(rgb_np_img)
-np_info(gray_np_img, "Gray")
 np_to_pil(gray_np_img).show()
 complement_np_img = filter_complement(gray_np_img)
-np_info(complement_np_img, "Complement")
 np_to_pil(complement_np_img).show()
 hyst_np_img = filter_hysteresis_threshold(complement_np_img, 50, 100)
-np_info(hyst_np_img, "Hysteresis Threshold")
 np_to_pil(hyst_np_img).show()

@@ -154,7 +154,7 @@ def singleprocess_convert_training_slides_to_thumbs():
   num_train_images = get_num_training_slides()
   training_slide_range_to_thumbs(1, num_train_images)
 
-  t.elapsed()
+  t.elapsed_display()
 
 
 def multiprocess_convert_training_slides_to_thumbs():
@@ -201,7 +201,7 @@ def multiprocess_convert_training_slides_to_thumbs():
     else:
       print("Done converting slides %d through %d" % (start_ind, end_ind))
 
-  timer.elapsed()
+  timer.elapsed_display()
 
 
 def slide_stats():
@@ -325,7 +325,7 @@ def slide_stats():
   plt.title("Image shapes (height to width)")
   plt.show()
 
-  t.elapsed()
+  t.elapsed_display()
 
 
 def slide_info(display_all_properties=False):
@@ -371,18 +371,21 @@ def slide_info(display_all_properties=False):
   print("  40x Slides: " + str(obj_pow_40_list))
   print("  ??x Slides: " + str(obj_pow_other_list) + "\n")
 
-  t.elapsed()
+  t.elapsed_display()
 
 
 class Time:
   def __init__(self):
     self.start = datetime.datetime.now()
 
+  def elapsed_display(self):
+    time_elapsed = self.elapsed()
+    print("Time elapsed: " + str(time_elapsed))
+
   def elapsed(self):
     self.end = datetime.datetime.now()
     time_elapsed = self.end - self.start
-    print("Time elapsed: " + str(time_elapsed))
-
+    return time_elapsed
 
 # singleprocess_convert_training_slides_to_thumbs()
 # multiprocess_convert_training_slides_to_thumbs()
