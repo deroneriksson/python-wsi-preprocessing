@@ -24,6 +24,7 @@ import PIL
 import wsi.slide as slide
 from wsi.slide import Time
 import skimage.filters as sk_filters
+import skimage.morphology as sk_morphology
 
 
 def pil_to_np_rgb(pil_img):
@@ -146,21 +147,69 @@ def filter_hysteresis_threshold(np_img, low=50, high=100, output_type="uint8"):
   return hyst
 
 
-def filter_entropy(np_img, neigh=9, thresh=5):
+def filter_entropy(np_img, neighborhood=9, threshold=5, output_type="uint8"):
+  """
+  Filter image based on entropy (complexity).
+
+  Args:
+    np_img: Image as a NumPy array.
+    neighborhood: Neighborhood size (defines height and width of 2D array of 1's).
+    threshold: Threshold value.
+    output_type: Type of array to return (bool, float, or uint8).
+
+  Returns:
+    NumPy array (bool, float, or uint8) where True, 1.0, and 255 represent a measure of complexity.
+  """
   t = Time()
-  np_img = (sk_filters.rank.entropy(np_img, np.ones((neigh, neigh))) > thresh).astype("uint8") * 255
-  np_info(np_img, "Entropy", t.elapsed())
-  return np_img
+  entr = sk_filters.rank.entropy(np_img, np.ones((neighborhood, neighborhood))) > threshold
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    entr = entr.astype(float)
+  else:
+    entr = entr.astype("uint8") * 255
+  np_info(entr, "Entropy", t.elapsed())
+  return entr
+
+
+def filter_remove_small_objects(np_img, min_size=3000, output_type="uint8"):
+  """
+  Filter image to remove small objects (connected components) less than a particular minimum size.
+
+  Args:
+    np_img: Image as a NumPy array of type bool.
+    min_size: Minimum size of small object to remove.
+    output_type: Type of array to return (bool, float, or uint8).
+
+  Returns:
+     NumPy array (bool, float, or uint8).
+  """
+  t = Time()
+  rem_sm = np_img.astype(bool)  # make sure mask is boolean
+  rem_sm = sk_morphology.remove_small_objects(rem_sm, min_size=min_size)
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    rem_sm = rem_sm.astype(float)
+  else:
+    rem_sm = rem_sm.astype("uint8") * 255
+  np_info(rem_sm, "Remove Small Objs", t.elapsed())
+  return rem_sm
+
 
 img_path = slide.get_training_thumb_path(4)
 img = slide.open_image(img_path)
 img.show()
 rgb = pil_to_np_rgb(img)
 gray = filter_rgb_to_grayscale(rgb)
-np_to_pil(gray).show()
+# np_to_pil(gray).show()
 complement = filter_complement(gray)
 np_to_pil(complement).show()
 hyst = filter_hysteresis_threshold(complement)
 np_to_pil(hyst).show()
-entr = filter_entropy(complement)
-np_to_pil(entr).show()
+# entr = filter_entropy(complement)
+# np_to_pil(entr).show()
+# entr = filter_entropy(complement, neighborhood=6, threshold=4)
+# np_to_pil(entr).show()
+rem_small = filter_remove_small_objects(hyst)
+np_to_pil(rem_small).show()
