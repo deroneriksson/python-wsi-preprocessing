@@ -106,9 +106,9 @@ def np_info(np_arr, name=None):
   mean = np_arr.mean()
   std = np_arr.std()
   if name is None:
-    print("NumPy Array:", np_arr.shape, np_arr.dtype, "Max:", max, "Min:", min, "Mean:", mean, "Std:", std)
-  else:
-    print("%s:" % name, np_arr.shape, np_arr.dtype, "Max:", max, "Min:", min, "Mean:", mean, "Std:", std)
+    name = "NumPy Array"
+  print("%-20s | Shape: %-15s Type: %-6s Max: %5.2f  Min: %5.2f  Mean: %7.2f  Std: %7.2f" % (
+  name, np_arr.shape, np_arr.dtype, max, min, mean, std))
 
 
 def filter_hysteresis_threshold(np_img, low, high, output_type="uint8"):
@@ -137,13 +137,13 @@ img_path = slide.get_training_thumb_path(4)
 pil_img = PIL.Image.open(img_path)
 pil_img.show()
 rgb_np_img = pil_to_np(pil_img)
-np_info(rgb_np_img, "RGB Image")
-gray_np_img = filter_rgb_to_grayscale(pil_to_np(pil_img))
-np_info(gray_np_img, "Gray Image")
+np_info(rgb_np_img, "RGB")
+gray_np_img = filter_rgb_to_grayscale(rgb_np_img)
+np_info(gray_np_img, "Gray")
 np_to_pil(gray_np_img).show()
 complement_np_img = filter_complement(gray_np_img)
-np_info(complement_np_img, "Complement Image")
+np_info(complement_np_img, "Complement")
 np_to_pil(complement_np_img).show()
 hyst_np_img = filter_hysteresis_threshold(complement_np_img, 50, 100)
-np_info(hyst_np_img, "Hysteresis Threshold Image")
+np_info(hyst_np_img, "Hysteresis Threshold")
 np_to_pil(hyst_np_img).show()
