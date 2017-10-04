@@ -26,7 +26,7 @@ from wsi.slide import Time
 import skimage.filters as sk_filters
 
 
-def pil_to_np(pil_img):
+def pil_to_np_rgb(pil_img):
   """
   Convert a PIL Image to a NumPy array.
 
@@ -121,7 +121,7 @@ def np_info(np_arr, name=None, elapsed=None):
     name, str(elapsed), max, min, mean, std, np_arr.dtype, np_arr.shape))
 
 
-def filter_hysteresis_threshold(np_img, low, high, output_type="uint8"):
+def filter_hysteresis_threshold(np_img, low=50, high=100, output_type="uint8"):
   """
   Apply two-level (hysteresis) threshold to an image as a NumPy array.
 
@@ -146,13 +146,21 @@ def filter_hysteresis_threshold(np_img, low, high, output_type="uint8"):
   return hyst
 
 
+def filter_entropy(np_img, neigh=9, thresh=5):
+  t = Time()
+  np_img = (sk_filters.rank.entropy(np_img, np.ones((neigh, neigh))) > thresh).astype("uint8") * 255
+  np_info(np_img, "Entropy", t.elapsed())
+  return np_img
+
 img_path = slide.get_training_thumb_path(4)
-pil_img = PIL.Image.open(img_path)
-pil_img.show()
-rgb_np_img = pil_to_np(pil_img)
-gray_np_img = filter_rgb_to_grayscale(rgb_np_img)
-np_to_pil(gray_np_img).show()
-complement_np_img = filter_complement(gray_np_img)
-np_to_pil(complement_np_img).show()
-hyst_np_img = filter_hysteresis_threshold(complement_np_img, 50, 100)
-np_to_pil(hyst_np_img).show()
+img = slide.open_image(img_path)
+img.show()
+rgb = pil_to_np_rgb(img)
+gray = filter_rgb_to_grayscale(rgb)
+np_to_pil(gray).show()
+complement = filter_complement(gray)
+np_to_pil(complement).show()
+hyst = filter_hysteresis_threshold(complement)
+np_to_pil(hyst).show()
+entr = filter_entropy(complement)
+np_to_pil(entr).show()

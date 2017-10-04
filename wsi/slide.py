@@ -28,6 +28,7 @@ import openslide
 from openslide import OpenSlideError
 import os
 import PIL
+from PIL import Image
 import sys
 
 BASE_DIR = ".." + os.sep + "data"
@@ -43,7 +44,7 @@ DEST_TRAIN_THUMB_DIR = BASE_DIR + os.sep + "training_thumbs_" + str(THUMB_SIZE)
 
 def open_slide(filename):
   """
-  Open a whole-slide image.
+  Open a whole-slide image (*.svs, etc).
 
   Args:
     filename: Name of the slide file.
@@ -59,6 +60,19 @@ def open_slide(filename):
     slide = None
   return slide
 
+
+def open_image(filename):
+  """
+  Open an image (*.jpg, *.png, etc).
+
+  Args:
+    filename: Name of the image file.
+
+  returns:
+    A PIL.Image.Image object representing an image.
+  """
+  image = Image.open(filename)
+  return image
 
 def get_training_slide_path(slide_number):
   """
