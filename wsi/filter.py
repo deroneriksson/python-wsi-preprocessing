@@ -19,12 +19,14 @@
 #
 # -------------------------------------------------------------
 
+import matplotlib.pyplot as plt
 import numpy as np
 import PIL
-import wsi.slide as slide
-from wsi.slide import Time
+import skimage.feature as sk_feature
 import skimage.filters as sk_filters
 import skimage.morphology as sk_morphology
+import wsi.slide as slide
+from wsi.slide import Time
 
 
 def pil_to_np_rgb(pil_img):
@@ -196,6 +198,32 @@ def filter_entropy(np_img, neighborhood=9, threshold=5, output_type="uint8"):
   return entr
 
 
+def filter_canny(np_img, sigma=1, low_threshold=0, high_threshold=25, output_type="uint8"):
+  """
+  Filter image based on Canny algorithm edges.
+
+  Args:
+    np_img: Image as a NumPy array.
+    sigma: Width (std dev) of Gaussian.
+    low_threshold: Low hysteresis threshold value.
+    high_threshold: High hysteresis threshold value.
+    output_type: Type of array to return (bool, float, or uint8).
+
+  Returns:
+    NumPy array (bool, float, or uint8) representing Canny edge map (binary image).
+  """
+  t = Time()
+  can = sk_feature.canny(np_img, sigma=sigma, low_threshold=low_threshold, high_threshold=high_threshold)
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    can = can.astype(float)
+  else:
+    can = can.astype("uint8") * 255
+  np_info(can, "Canny Edges", t.elapsed())
+  return can
+
+
 def filter_remove_small_objects(np_img, min_size=3000, output_type="uint8"):
   """
   Filter image to remove small objects (connected components) less than a particular minimum size.
@@ -226,16 +254,20 @@ img = slide.open_image(img_path)
 img.show()
 rgb = pil_to_np_rgb(img)
 gray = filter_rgb_to_grayscale(rgb)
-# np_to_pil(gray).show()
+np_to_pil(gray).show()
 complement = filter_complement(gray)
 np_to_pil(complement).show()
 hyst = filter_hysteresis_threshold(complement)
 np_to_pil(hyst).show()
-# entr = filter_entropy(complement)
-# np_to_pil(entr).show()
-# entr = filter_entropy(complement, neighborhood=6, threshold=4)
-# np_to_pil(entr).show()
+entr = filter_entropy(complement)
+np_to_pil(entr).show()
+entr = filter_entropy(complement, neighborhood=6, threshold=4)
+np_to_pil(entr).show()
 # rem_small = filter_remove_small_objects(hyst)
 # np_to_pil(rem_small).show()
-otsu = filter_otsu_threshold(complement)
-np_to_pil(otsu).show()
+# otsu = filter_otsu_threshold(complement)
+# np_to_pil(otsu).show()
+# can = filter_canny(gray, sigma=7) # interesting WRT pen ink edges
+# np_to_pil(can).show()
+# plt.imshow(can)
+# plt.show()
