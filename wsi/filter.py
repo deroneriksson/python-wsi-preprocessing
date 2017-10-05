@@ -173,6 +173,32 @@ def filter_otsu_threshold(np_img, output_type="uint8"):
   return otsu
 
 
+def filter_local_otsu_threshold(np_img, disk_size=3, output_type="uint8"):
+  """
+  Compute local Otsu threshold for each pixel and return binary image based on pixels being less than the
+  local Otsu threshold.
+
+  Args:
+    np_img: Image as a NumPy array.
+    disk_size: Radius of the disk structuring element used to compute the Otsu threshold for each pixel.
+    output_type: Type of array to return (bool, float, or uint8).
+
+  Returns:
+    NumPy array (bool, float, or uint8) where local Otsu threshold values have been applied to original image.
+  """
+  t = Time()
+  local_otsu = sk_filters.rank.otsu(np_img, sk_morphology.disk(disk_size))
+  local_otsu = (np_img <= local_otsu)
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    local_otsu = local_otsu.astype(float)
+  else:
+    local_otsu = local_otsu.astype("uint8") * 255
+  np_info(local_otsu, "Otsu Local Threshold", t.elapsed())
+  return local_otsu
+
+
 def filter_entropy(np_img, neighborhood=9, threshold=5, output_type="uint8"):
   """
   Filter image based on entropy (complexity).
@@ -259,15 +285,17 @@ complement = filter_complement(gray)
 np_to_pil(complement).show()
 hyst = filter_hysteresis_threshold(complement)
 np_to_pil(hyst).show()
-entr = filter_entropy(complement)
-np_to_pil(entr).show()
-entr = filter_entropy(complement, neighborhood=6, threshold=4)
-np_to_pil(entr).show()
+# entr = filter_entropy(complement)
+# np_to_pil(entr).show()
+# entr = filter_entropy(complement, neighborhood=6, threshold=4)
+# np_to_pil(entr).show()
 # rem_small = filter_remove_small_objects(hyst)
 # np_to_pil(rem_small).show()
-# otsu = filter_otsu_threshold(complement)
-# np_to_pil(otsu).show()
+otsu = filter_otsu_threshold(complement)
+np_to_pil(otsu).show()
 # can = filter_canny(gray, sigma=7) # interesting WRT pen ink edges
 # np_to_pil(can).show()
 # plt.imshow(can)
 # plt.show()
+local_otsu = filter_local_otsu_threshold(complement)
+np_to_pil(local_otsu).show()
