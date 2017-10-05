@@ -22,6 +22,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import PIL
+import skimage.exposure as sk_exposure
 import skimage.feature as sk_feature
 import skimage.filters as sk_filters
 import skimage.morphology as sk_morphology
@@ -275,27 +276,112 @@ def filter_remove_small_objects(np_img, min_size=3000, output_type="uint8"):
   return rem_sm
 
 
-img_path = slide.get_training_thumb_path(4)
+def filter_contrast_stretch(np_img, low=40, high=60):
+  """
+  Filter image (gray or RGB) using contrast stretching to increase contrast in image based on the intensities in
+  a specified range.
+
+  Args:
+    np_img: Image as a NumPy array (gray or RGB).
+    low: Range percentage low value.
+    high: Range percentage high value.
+
+  Returns:
+    Image with contrast enhanced.
+  """
+  t = Time()
+  low_p, high_p = np.percentile(np_img, (low, high))
+  contrast_stretch = sk_exposure.rescale_intensity(np_img, in_range=(low_p, high_p))
+  np_info(contrast_stretch, "Contrast Stretch", t.elapsed())
+  return contrast_stretch
+
+
+def filter_histogram_equalization(np_img, nbins=256, output_type="uint8"):
+  """
+  Filter image (gray or RGB) using histogram equalization to increase contrast in image.
+
+  Args:
+    np_img: Image as a NumPy array (gray or RGB).
+    nbins: Number of histogram bins.
+    output_type: Type of array to return (float or uint8).
+
+  Returns:
+     NumPy array (float or uint8) with contrast enhanced by histogram equalization.
+  """
+  t = Time()
+  # if uint8 type and nbins is specified, convert to float so that nbins can be a value besides 256
+  if np_img.dtype == "uint8" and nbins != 256:
+    np_img = np_img / 255
+  hist_equ = sk_exposure.equalize_hist(np_img, nbins=nbins)
+  if output_type == "float":
+    pass
+  else:
+    hist_equ = (hist_equ * 255).astype("uint8")
+  np_info(hist_equ, "Hist Equalization", t.elapsed())
+  return hist_equ
+
+
+def filter_adaptive_equalization(np_img, nbins=256, clip_limit=0.01, output_type="uint8"):
+  """
+  Filter image (gray or RGB) using adaptive equalization to increase contrast in image, where contrast in local regions
+  is enhanced.
+
+  Args:
+    np_img: Image as a NumPy array (gray or RGB).
+    nbins: Number of histogram bins.
+    clip_limit: Clipping limit where higher value increases contrast.
+    output_type: Type of array to return (float or uint8).
+
+  Returns:
+     NumPy array (float or uint8) with contrast enhanced by adaptive equalization.
+  """
+  t = Time()
+  adapt_equ = sk_exposure.equalize_adapthist(np_img, nbins=nbins, clip_limit=clip_limit)
+  if output_type == "float":
+    pass
+  else:
+    adapt_equ = (adapt_equ * 255).astype("uint8")
+  np_info(adapt_equ, "Adapt Equalization", t.elapsed())
+  return adapt_equ
+
+
+img_path = slide.get_training_thumb_path(2)
 img = slide.open_image(img_path)
-img.show()
+# img.show()
 rgb = pil_to_np_rgb(img)
 gray = filter_rgb_to_grayscale(rgb)
-np_to_pil(gray).show()
-complement = filter_complement(gray)
-np_to_pil(complement).show()
-hyst = filter_hysteresis_threshold(complement)
-np_to_pil(hyst).show()
+# np_to_pil(gray).show()
+# complement = filter_complement(gray)
+# np_to_pil(complement).show()
+# hyst = filter_hysteresis_threshold(complement)
+# np_to_pil(hyst).show()
 # entr = filter_entropy(complement)
 # np_to_pil(entr).show()
 # entr = filter_entropy(complement, neighborhood=6, threshold=4)
 # np_to_pil(entr).show()
 # rem_small = filter_remove_small_objects(hyst)
 # np_to_pil(rem_small).show()
-otsu = filter_otsu_threshold(complement)
-np_to_pil(otsu).show()
+# otsu = filter_otsu_threshold(complement)
+# np_to_pil(otsu).show()
 # can = filter_canny(gray, sigma=7) # interesting WRT pen ink edges
 # np_to_pil(can).show()
 # plt.imshow(can)
 # plt.show()
-local_otsu = filter_local_otsu_threshold(complement)
-np_to_pil(local_otsu).show()
+# local_otsu = filter_local_otsu_threshold(complement)
+# np_to_pil(local_otsu).show()
+# contrast_stretch = filter_contrast_stretch(gray, low=40, high=60)
+# np_to_pil(contrast_stretch).show()
+# complement = filter_complement(gray)
+# np_to_pil(complement).show()
+# hyst = filter_hysteresis_threshold(complement)
+# np_to_pil(hyst).show()
+# hist_equ = filter_histogram_equalization(rgb)
+# np_to_pil(hist_equ).show()
+# hist_equ = filter_histogram_equalization(gray, nbins=2)
+# np_to_pil(hist_equ).show()
+# hist_equ = filter_histogram_equalization(gray, nbins=64)
+# np_to_pil(hist_equ).show()
+# hist_equ = filter_histogram_equalization(gray, nbins=32)
+# np_to_pil(hist_equ).show()
+adapt_equ = filter_adaptive_equalization(gray)
+np_to_pil(adapt_equ).show()
