@@ -362,13 +362,61 @@ def filter_local_equalization(np_img, disk_size=50):
   return local_equ
 
 
+def filter_autolevel(np_img, disk_size=1, output_type="uint8"):
+  t = Time()
+  autolevel = sk_filters.rank.autolevel(np_img, selem=sk_morphology.disk(disk_size))
+  autolevel = np_img > autolevel
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    autolevel = autolevel.astype(float)
+  else:
+    autolevel = autolevel.astype("uint8") * 255
+  np_info(autolevel, "Auto Level", t.elapsed())
+  return autolevel
+
+
+def filter_subtract_mean(np_img, neigh=50, output_type="uint8"):
+  t = Time()
+  subtract_mean = sk_filters.rank.subtract_mean(np_img, selem=np.ones((neigh, neigh)))
+  subtract_mean = np_img > subtract_mean
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    subtract_mean = subtract_mean.astype(float)
+  else:
+    subtract_mean = subtract_mean.astype("uint8") * 255
+  np_info(subtract_mean, "Subtract Mean", t.elapsed())
+  return subtract_mean
+
+
+def filter_modal(np_img, neigh=50, output_type="uint8"):
+  t = Time()
+  modal = sk_filters.rank.modal(np_img, selem=np.ones((neigh, neigh)))
+  np_info(modal, "Modal", t.elapsed())
+  return modal
+
+
+# def filter_try(np_img, neigh=50, output_type="uint8"):
+#   t = Time()
+#   tryit = sk_filters.rank.pop_bilateral(np_img, selem=np.ones((neigh, neigh)))
+#   # tryit = np_img < tryit
+#   if output_type == "bool":
+#     pass
+#   elif output_type == "float":
+#     tryit = tryit.astype(float)
+#   else:
+#     tryit = tryit.astype("uint8") * 255
+#   np_info(tryit, "Try It", t.elapsed())
+#   return tryit
+
 img_path = slide.get_training_thumb_path(2)
 img = slide.open_image(img_path)
 # img.show()
 rgb = pil_to_np_rgb(img)
 gray = filter_rgb_to_grayscale(rgb)
-# np_to_pil(gray).show()
-# complement = filter_complement(gray)
+np_to_pil(gray).show()
+complement = filter_complement(gray)
 # np_to_pil(complement).show()
 # hyst = filter_hysteresis_threshold(complement)
 # np_to_pil(hyst).show()
@@ -400,7 +448,16 @@ gray = filter_rgb_to_grayscale(rgb)
 # np_to_pil(hist_equ).show()
 # hist_equ = filter_histogram_equalization(gray, nbins=32)
 # np_to_pil(hist_equ).show()
-adapt_equ = filter_adaptive_equalization(gray)
-np_to_pil(adapt_equ).show()
-local_equ = filter_local_equalization(gray)
-np_to_pil(local_equ).show()
+# adapt_equ = filter_adaptive_equalization(gray)
+# np_to_pil(adapt_equ).show()
+# local_equ = filter_local_equalization(gray)
+# np_to_pil(local_equ).show()
+# autolevel = filter_autolevel(complement)
+# np_to_pil(autolevel).show()
+# sub = filter_subtract_mean(complement)
+# np_to_pil(sub).show()
+# modal = filter_modal(complement)
+# np_to_pil(modal).show()
+
+tryit = filter_try(gray)
+# np_to_pil(tryit).show()
