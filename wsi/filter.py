@@ -345,6 +345,23 @@ def filter_adaptive_equalization(np_img, nbins=256, clip_limit=0.01, output_type
   return adapt_equ
 
 
+def filter_local_equalization(np_img, disk_size=50):
+  """
+  Filter image (gray) using local equalization, which uses local histograms based on the disk structuring element.
+
+  Args:
+    np_img: Image as a NumPy array.
+    disk_size: Radius of the disk structuring element used for the local histograms
+
+  Returns:
+    NumPy array with contrast enhanced using local equalization.
+  """
+  t = Time()
+  local_equ = sk_filters.rank.equalize(np_img, selem=sk_morphology.disk(disk_size))
+  np_info(local_equ, "Local Equalization", t.elapsed())
+  return local_equ
+
+
 img_path = slide.get_training_thumb_path(2)
 img = slide.open_image(img_path)
 # img.show()
@@ -385,3 +402,5 @@ gray = filter_rgb_to_grayscale(rgb)
 # np_to_pil(hist_equ).show()
 adapt_equ = filter_adaptive_equalization(gray)
 np_to_pil(adapt_equ).show()
+local_equ = filter_local_equalization(gray)
+np_to_pil(local_equ).show()
