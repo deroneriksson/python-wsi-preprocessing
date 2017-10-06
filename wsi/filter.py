@@ -418,13 +418,30 @@ def filter_hed_to_eosin(np_img):
   return eosin
 
 
+def mask_rgb(rgb, mask):
+  """
+  Apply a binary (T/F, 1/0) mask to a 3-channel RGB image and output the result.
+
+  Args:
+    rgb: RGB image as a NumPy array.
+    mask: An image mask to determine which pixels in the original image should be displayed.
+
+  Returns:
+    NumPy array representing an RGB image with mask applied.
+  """
+  t = Time()
+  result = rgb * np.dstack([mask, mask, mask])
+  np_info(result, "Mask RGB", t.elapsed())
+  return result
+
+
 img_path = slide.get_training_thumb_path(2)
 img = slide.open_image(img_path)
 # img.show()
 rgb = pil_to_np_rgb(img)
 gray = filter_rgb_to_grayscale(rgb)
 # np_to_pil(gray).show()
-# complement = filter_complement(gray)
+complement = filter_complement(gray)
 # np_to_pil(complement).show()
 # hyst = filter_hysteresis_threshold(complement)
 # np_to_pil(hyst).show()
@@ -460,8 +477,11 @@ gray = filter_rgb_to_grayscale(rgb)
 # np_to_pil(adapt_equ).show()
 # local_equ = filter_local_equalization(gray)
 # np_to_pil(local_equ).show()
-hed = filter_rgb_to_hed(rgb)
-hema = filter_hed_to_hematoxylin(hed)
-np_to_pil(hema).show()
-eosin = filter_hed_to_eosin(hed)
-np_to_pil(eosin).show()
+# hed = filter_rgb_to_hed(rgb)
+# hema = filter_hed_to_hematoxylin(hed)
+# np_to_pil(hema).show()
+# eosin = filter_hed_to_eosin(hed)
+# np_to_pil(eosin).show()
+hyst_mask = filter_hysteresis_threshold(complement, output_type="bool")
+rgb_hyst = mask_rgb(rgb, hyst_mask)
+np_to_pil(rgb_hyst).show()
