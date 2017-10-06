@@ -22,6 +22,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import PIL
+import skimage.color as sk_color
 import skimage.exposure as sk_exposure
 import skimage.feature as sk_feature
 import skimage.filters as sk_filters
@@ -121,7 +122,7 @@ def np_info(np_arr, name=None, elapsed=None):
     name = "NumPy Array"
   if elapsed is None:
     elapsed = "---"
-  print("%-20s | Time: %-14s Max: %6.2f  Min: %6.2f  Mean: %6.2f  Std: %6.2f Type: %-6s Shape: %s" % (
+  print("%-20s | Time: %-14s Max: %6.2f  Min: %6.2f  Mean: %6.2f  Std: %6.2f Type: %-7s Shape: %s" % (
     name, str(elapsed), max, min, mean, std, np_arr.dtype, np_arr.shape))
 
 
@@ -362,53 +363,59 @@ def filter_local_equalization(np_img, disk_size=50):
   return local_equ
 
 
-def filter_autolevel(np_img, disk_size=1, output_type="uint8"):
+def filter_rgb_to_hed(np_img, output_type="uint8"):
+  """
+  Filter RGB channels to HED (Hematoxylin - Eosin - Diaminobenzidine) channels.
+
+  Args:
+    np_img: RGB image as a NumPy array.
+    output_type: Type of array to return (float or uint8).
+
+  Returns:
+    NumPy array (float or uint8) with HED channels.
+  """
   t = Time()
-  autolevel = sk_filters.rank.autolevel(np_img, selem=sk_morphology.disk(disk_size))
-  autolevel = np_img > autolevel
-  if output_type == "bool":
-    pass
-  elif output_type == "float":
-    autolevel = autolevel.astype(float)
+  hed = sk_color.rgb2hed(np_img)
+  if output_type == "float":
+    hed = sk_exposure.rescale_intensity(hed, out_range=(0.0, 1.0))
   else:
-    autolevel = autolevel.astype("uint8") * 255
-  np_info(autolevel, "Auto Level", t.elapsed())
-  return autolevel
+    hed = (sk_exposure.rescale_intensity(hed, out_range=(0, 255))).astype("uint8")
+
+  np_info(hed, "RGB to HED", t.elapsed())
+  return hed
 
 
-def filter_subtract_mean(np_img, neigh=50, output_type="uint8"):
+def filter_hed_to_hematoxylin(np_img):
+  """
+  Obtain Hematoxylin channel from HED NumPy array.
+
+  Args:
+    np_img: HED image as a NumPy array.
+
+  Returns:
+    NumPy array for Hematoxylin channel.
+  """
   t = Time()
-  subtract_mean = sk_filters.rank.subtract_mean(np_img, selem=np.ones((neigh, neigh)))
-  subtract_mean = np_img > subtract_mean
-  if output_type == "bool":
-    pass
-  elif output_type == "float":
-    subtract_mean = subtract_mean.astype(float)
-  else:
-    subtract_mean = subtract_mean.astype("uint8") * 255
-  np_info(subtract_mean, "Subtract Mean", t.elapsed())
-  return subtract_mean
+  hema = hed[:, :, 0]
+  np_info(hema, "HED to Hematoxylin", t.elapsed())
+  return hema
 
 
-def filter_modal(np_img, neigh=50, output_type="uint8"):
+def filter_hed_to_eosin(np_img):
+  """
+  Obtain Eosin channel from HED NumPy array.
+
+  Args:
+    np_img: HED image as a NumPy array.
+
+  Returns:
+    NumPy array for Eosin channel.
+  """
   t = Time()
-  modal = sk_filters.rank.modal(np_img, selem=np.ones((neigh, neigh)))
-  np_info(modal, "Modal", t.elapsed())
-  return modal
+  eosin = hed[:, :, 1]
+  np_info(eosin, "HED to Eosin", t.elapsed())
+  return eosin
 
-
-# def filter_try(np_img, neigh=50, output_type="uint8"):
-#   t = Time()
-#   tryit = sk_filters.rank.pop_bilateral(np_img, selem=np.ones((neigh, neigh)))
-#   # tryit = np_img < tryit
-#   if output_type == "bool":
-#     pass
-#   elif output_type == "float":
-#     tryit = tryit.astype(float)
-#   else:
-#     tryit = tryit.astype("uint8") * 255
-#   np_info(tryit, "Try It", t.elapsed())
-#   return tryit
 
 img_path = slide.get_training_thumb_path(2)
 img = slide.open_image(img_path)
@@ -416,7 +423,7 @@ img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 gray = filter_rgb_to_grayscale(rgb)
 np_to_pil(gray).show()
-complement = filter_complement(gray)
+# complement = filter_complement(gray)
 # np_to_pil(complement).show()
 # hyst = filter_hysteresis_threshold(complement)
 # np_to_pil(hyst).show()
@@ -452,12 +459,8 @@ complement = filter_complement(gray)
 # np_to_pil(adapt_equ).show()
 # local_equ = filter_local_equalization(gray)
 # np_to_pil(local_equ).show()
-# autolevel = filter_autolevel(complement)
-# np_to_pil(autolevel).show()
-# sub = filter_subtract_mean(complement)
-# np_to_pil(sub).show()
-# modal = filter_modal(complement)
-# np_to_pil(modal).show()
-
-tryit = filter_try(gray)
-# np_to_pil(tryit).show()
+hed = filter_rgb_to_hed(rgb)
+hema = filter_hed_to_hematoxylin(hed)
+np_to_pil(hema).show()
+eosin = filter_hed_to_eosin(hed)
+np_to_pil(eosin).show()
