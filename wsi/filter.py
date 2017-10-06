@@ -435,6 +435,20 @@ def mask_rgb(rgb, mask):
   return result
 
 
+def uint8_to_bool(np_img):
+  """
+  Convert NumPy array of uint8 (255,0) values to bool (True,False) values
+
+  Args:
+    np_img: Binary image as NumPy array of uint8 (255,0) values.
+
+  Returns:
+    NumPy array of bool (True,False) values.
+  """
+  result = (np_img / 255).astype(bool)
+  return result
+
+
 img_path = slide.get_training_thumb_path(2)
 img = slide.open_image(img_path)
 # img.show()
