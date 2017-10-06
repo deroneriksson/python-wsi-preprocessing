@@ -118,12 +118,13 @@ def np_info(np_arr, name=None, elapsed=None):
   min = np_arr.min()
   mean = np_arr.mean()
   std = np_arr.std()
+  is_binary = "T" if (np.unique(np_arr).size == 2) else "F"
   if name is None:
     name = "NumPy Array"
   if elapsed is None:
     elapsed = "---"
-  print("%-20s | Time: %-14s Max: %6.2f  Min: %6.2f  Mean: %6.2f  Std: %6.2f Type: %-7s Shape: %s" % (
-    name, str(elapsed), max, min, mean, std, np_arr.dtype, np_arr.shape))
+  print("%-20s | Time: %-14s Min: %6.2f  Max: %6.2f  Mean: %6.2f  Binary: %s  Type: %-7s Shape: %s" % (
+    name, str(elapsed), min, max, mean, is_binary, np_arr.dtype, np_arr.shape))
 
 
 def filter_hysteresis_threshold(np_img, low=50, high=100, output_type="uint8"):
@@ -423,7 +424,7 @@ img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 gray = filter_rgb_to_grayscale(rgb)
 np_to_pil(gray).show()
-# complement = filter_complement(gray)
+complement = filter_complement(gray)
 # np_to_pil(complement).show()
 # hyst = filter_hysteresis_threshold(complement)
 # np_to_pil(hyst).show()
@@ -445,7 +446,7 @@ np_to_pil(gray).show()
 # np_to_pil(contrast_stretch).show()
 # complement = filter_complement(gray)
 # np_to_pil(complement).show()
-# hyst = filter_hysteresis_threshold(complement)
+hyst = filter_hysteresis_threshold(complement)
 # np_to_pil(hyst).show()
 # hist_equ = filter_histogram_equalization(rgb)
 # np_to_pil(hist_equ).show()
