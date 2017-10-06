@@ -397,7 +397,7 @@ def filter_hed_to_hematoxylin(np_img):
     NumPy array for Hematoxylin channel.
   """
   t = Time()
-  hema = hed[:, :, 0]
+  hema = np_img[:, :, 0]
   np_info(hema, "HED to Hematoxylin", t.elapsed())
   return hema
 
@@ -413,7 +413,7 @@ def filter_hed_to_eosin(np_img):
     NumPy array for Eosin channel.
   """
   t = Time()
-  eosin = hed[:, :, 1]
+  eosin = np_img[:, :, 1]
   np_info(eosin, "HED to Eosin", t.elapsed())
   return eosin
 
@@ -423,8 +423,8 @@ img = slide.open_image(img_path)
 # img.show()
 rgb = pil_to_np_rgb(img)
 gray = filter_rgb_to_grayscale(rgb)
-np_to_pil(gray).show()
-complement = filter_complement(gray)
+# np_to_pil(gray).show()
+# complement = filter_complement(gray)
 # np_to_pil(complement).show()
 # hyst = filter_hysteresis_threshold(complement)
 # np_to_pil(hyst).show()
@@ -446,7 +446,7 @@ complement = filter_complement(gray)
 # np_to_pil(contrast_stretch).show()
 # complement = filter_complement(gray)
 # np_to_pil(complement).show()
-hyst = filter_hysteresis_threshold(complement)
+# hyst = filter_hysteresis_threshold(complement)
 # np_to_pil(hyst).show()
 # hist_equ = filter_histogram_equalization(rgb)
 # np_to_pil(hist_equ).show()
