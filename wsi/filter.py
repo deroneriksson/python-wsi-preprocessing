@@ -22,6 +22,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import PIL
+import scipy.ndimage.morphology as sc_morph
 import skimage.color as sk_color
 import skimage.exposure as sk_exposure
 import skimage.feature as sk_feature
@@ -418,6 +419,31 @@ def filter_hed_to_eosin(np_img):
   return eosin
 
 
+def filter_binary_fill_holes(np_img, output_type="bool"):
+  """
+  Fill holes in a binary object (bool, float, or uint8).
+
+  Args:
+    np_img: Binary image as a NumPy array.
+    output_type: Type of array to return (bool, float, or uint8).
+
+  Returns:
+    NumPy array (bool, float, or uint8) where holes have been filled.
+  """
+  t = Time()
+  if np_img.dtype == "uint8":
+    np_img = np_img / 255
+  result = sc_morph.binary_fill_holes(np_img)
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    result = result.astype(float)
+  else:
+    result = result.astype("uint8") * 255
+  np_info(result, "Binary Fill Holes", t.elapsed())
+  return result
+
+
 def mask_rgb(rgb, mask):
   """
   Apply a binary (T/F, 1/0) mask to a 3-channel RGB image and output the result.
@@ -499,3 +525,6 @@ complement = filter_complement(gray)
 hyst_mask = filter_hysteresis_threshold(complement, output_type="bool")
 rgb_hyst = mask_rgb(rgb, hyst_mask)
 np_to_pil(rgb_hyst).show()
+fill_holes = filter_binary_fill_holes(hyst_mask)
+rgb_fill_holes = mask_rgb(rgb, fill_holes)
+np_to_pil(rgb_fill_holes).show()
