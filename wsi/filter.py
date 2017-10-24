@@ -444,6 +444,60 @@ def filter_binary_fill_holes(np_img, output_type="bool"):
   return result
 
 
+def filter_binary_erosion(np_img, disk_size=5, iterations=1, output_type="uint8"):
+  """
+  Erode a binary object (bool, float, or uint8).
+
+  Args:
+    np_img: Binary image as a NumPy array.
+    disk_size: Radius of the disk structuring element used for erosion.
+    iterations: How many times to repeat the erosion.
+    output_type: Type of array to return (bool, float, or uint8).
+
+  Returns:
+    NumPy array (bool, float, or uint8) where edges have been eroded.
+  """
+  t = Time()
+  if np_img.dtype == "uint8":
+    np_img = np_img / 255
+  result = sc_morph.binary_erosion(np_img, sk_morphology.disk(disk_size), iterations=iterations)
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    result = result.astype(float)
+  else:
+    result = result.astype("uint8") * 255
+  np_info(result, "Binary Erosion", t.elapsed())
+  return result
+
+
+def filter_binary_dilation(np_img, disk_size=5, iterations=1, output_type="uint8"):
+  """
+  Dilate a binary object (bool, float, or uint8).
+
+  Args:
+    np_img: Binary image as a NumPy array.
+    disk_size: Radius of the disk structuring element used for dilation.
+    iterations: How many times to repeat the dilation.
+    output_type: Type of array to return (bool, float, or uint8).
+
+  Returns:
+    NumPy array (bool, float, or uint8) where edges have been dilated.
+  """
+  t = Time()
+  if np_img.dtype == "uint8":
+    np_img = np_img / 255
+  result = sc_morph.binary_dilation(np_img, sk_morphology.disk(disk_size), iterations=iterations)
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    result = result.astype(float)
+  else:
+    result = result.astype("uint8") * 255
+  np_info(result, "Binary Dilation", t.elapsed())
+  return result
+
+
 def mask_rgb(rgb, mask):
   """
   Apply a binary (T/F, 1/0) mask to a 3-channel RGB image and output the result.
@@ -525,6 +579,23 @@ complement = filter_complement(gray)
 hyst_mask = filter_hysteresis_threshold(complement, output_type="bool")
 rgb_hyst = mask_rgb(rgb, hyst_mask)
 np_to_pil(rgb_hyst).show()
-fill_holes = filter_binary_fill_holes(hyst_mask)
-rgb_fill_holes = mask_rgb(rgb, fill_holes)
-np_to_pil(rgb_fill_holes).show()
+# fill_holes = filter_binary_fill_holes(hyst_mask)
+# rgb_fill_holes = mask_rgb(rgb, fill_holes)
+# np_to_pil(rgb_fill_holes).show()
+
+erosion = filter_binary_erosion(hyst_mask)
+np_to_pil(erosion).show()
+
+erosion = filter_binary_erosion(hyst_mask, iterations=5)
+np_to_pil(erosion).show()
+
+erosion_mask = uint8_to_bool(erosion)
+rgb_erosion = mask_rgb(rgb, erosion_mask)
+np_to_pil(rgb_erosion).show()
+
+dilation = filter_binary_dilation(hyst_mask, iterations=3)
+np_to_pil(dilation).show()
+
+dilation_mask = uint8_to_bool(dilation)
+rgb_dilation = mask_rgb(rgb, dilation_mask)
+np_to_pil(rgb_dilation).show()
