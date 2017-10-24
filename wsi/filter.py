@@ -498,6 +498,62 @@ def filter_binary_dilation(np_img, disk_size=5, iterations=1, output_type="uint8
   return result
 
 
+def filter_binary_opening(np_img, disk_size=3, iterations=1, output_type="uint8"):
+  """
+  Open a binary object (bool, float, or uint8). Opening is an erosion followed by a dilation.
+  Opening can be used to remove small objects.
+
+  Args:
+    np_img: Binary image as a NumPy array.
+    disk_size: Radius of the disk structuring element used for opening.
+    iterations: How many times to repeat.
+    output_type: Type of array to return (bool, float, or uint8).
+
+  Returns:
+    NumPy array (bool, float, or uint8) following binary opening.
+  """
+  t = Time()
+  if np_img.dtype == "uint8":
+    np_img = np_img / 255
+  result = sc_morph.binary_opening(np_img, sk_morphology.disk(disk_size), iterations=iterations)
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    result = result.astype(float)
+  else:
+    result = result.astype("uint8") * 255
+  np_info(result, "Binary Opening", t.elapsed())
+  return result
+
+
+def filter_binary_closing(np_img, disk_size=3, iterations=1, output_type="uint8"):
+  """
+  Close a binary object (bool, float, or uint8). Closing is a dilation followed by an erosion.
+  Closing can be used to remove small holes.
+
+  Args:
+    np_img: Binary image as a NumPy array.
+    disk_size: Radius of the disk structuring element used for closing.
+    iterations: How many times to repeat.
+    output_type: Type of array to return (bool, float, or uint8).
+
+  Returns:
+    NumPy array (bool, float, or uint8) following binary closing.
+  """
+  t = Time()
+  if np_img.dtype == "uint8":
+    np_img = np_img / 255
+  result = sc_morph.binary_closing(np_img, sk_morphology.disk(disk_size), iterations=iterations)
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    result = result.astype(float)
+  else:
+    result = result.astype("uint8") * 255
+  np_info(result, "Binary Closing", t.elapsed())
+  return result
+
+
 def mask_rgb(rgb, mask):
   """
   Apply a binary (T/F, 1/0) mask to a 3-channel RGB image and output the result.
@@ -583,19 +639,33 @@ np_to_pil(rgb_hyst).show()
 # rgb_fill_holes = mask_rgb(rgb, fill_holes)
 # np_to_pil(rgb_fill_holes).show()
 
-erosion = filter_binary_erosion(hyst_mask)
-np_to_pil(erosion).show()
+# erosion = filter_binary_erosion(hyst_mask)
+# np_to_pil(erosion).show()
+#
+# erosion = filter_binary_erosion(hyst_mask, iterations=5)
+# np_to_pil(erosion).show()
+#
+# erosion_mask = uint8_to_bool(erosion)
+# rgb_erosion = mask_rgb(rgb, erosion_mask)
+# np_to_pil(rgb_erosion).show()
+#
+# dilation = filter_binary_dilation(hyst_mask, iterations=3)
+# np_to_pil(dilation).show()
 
-erosion = filter_binary_erosion(hyst_mask, iterations=5)
-np_to_pil(erosion).show()
+# dilation_mask = uint8_to_bool(dilation)
+# rgb_dilation = mask_rgb(rgb, dilation_mask)
+# np_to_pil(rgb_dilation).show()
 
-erosion_mask = uint8_to_bool(erosion)
-rgb_erosion = mask_rgb(rgb, erosion_mask)
-np_to_pil(rgb_erosion).show()
+opening = filter_binary_opening(hyst_mask)
+np_to_pil(opening).show()
 
-dilation = filter_binary_dilation(hyst_mask, iterations=3)
-np_to_pil(dilation).show()
+opening_mask = uint8_to_bool(opening)
+rgb_opening = mask_rgb(rgb, opening_mask)
+np_to_pil(rgb_opening).show()
 
-dilation_mask = uint8_to_bool(dilation)
-rgb_dilation = mask_rgb(rgb, dilation_mask)
-np_to_pil(rgb_dilation).show()
+closing = filter_binary_closing(hyst_mask)
+np_to_pil(closing).show()
+
+closing_mask = uint8_to_bool(closing)
+rgb_closing = mask_rgb(rgb, closing_mask)
+np_to_pil(rgb_closing).show()
