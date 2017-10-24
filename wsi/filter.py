@@ -27,7 +27,9 @@ import skimage.color as sk_color
 import skimage.exposure as sk_exposure
 import skimage.feature as sk_feature
 import skimage.filters as sk_filters
+import skimage.future as sk_future
 import skimage.morphology as sk_morphology
+import skimage.segmentation as sk_segmentation
 import wsi.slide as slide
 from wsi.slide import Time
 
@@ -554,6 +556,52 @@ def filter_binary_closing(np_img, disk_size=3, iterations=1, output_type="uint8"
   return result
 
 
+# NOTE: Potentially could feed in RGB image with mask (such as hysteresis threshold) applied. Then, in a following
+# step, could filter out segments that aren't pink or purple enough.
+def filter_kmeans_segmentation(np_img, compactness=10, n_segments=800):
+  """
+  Use Kmeans segmentation (color/space proximity) to segment RGB image where each segment is
+  colored based on the average color for that segment.
+
+  Args:
+    np_img: Binary image as a NumPy array.
+    compactness: Color proximity versus space proximity factor.
+    n_segments: The number of segments.
+
+  Returns:
+    NumPy array (uint8) representing 3-channel RGB image where each segment has been colored based on the average
+    color for that segment.
+  """
+  t = Time()
+  labels = sk_segmentation.slic(np_img, compactness=compactness, n_segments=n_segments)
+  result = sk_color.label2rgb(labels, np_img, kind='avg')
+  np_info(result, "Kmeans Segmentation", t.elapsed())
+  return result
+
+
+def filter_rag_threshold(np_img, compactness=10, n_segments=800):
+  """
+  Use Kmeans segmentation to segment RGB image, build region adjacency graph based on the segments, combine
+  similar regions based on threshold value, and then output these resulting region segments.
+
+  Args:
+    np_img: Binary image as a NumPy array.
+    compactness: Color proximity versus space proximity factor.
+    n_segments: The number of segments.
+
+  Returns:
+    NumPy array (uint8) representing 3-channel RGB image where each segment has been colored based on the average
+    color for that segment (and similar segments have been combined).
+  """
+  t = Time()
+  labels = sk_segmentation.slic(np_img, compactness=compactness, n_segments=n_segments)
+  g = sk_future.graph.rag_mean_color(np_img, labels)
+  labels2 = sk_future.graph.cut_threshold(labels, g, 9)
+  result = sk_color.label2rgb(labels2, np_img, kind='avg')
+  np_info(result, "RAG Threshold", t.elapsed())
+  return result
+
+
 def mask_rgb(rgb, mask):
   """
   Apply a binary (T/F, 1/0) mask to a 3-channel RGB image and output the result.
@@ -656,16 +704,23 @@ np_to_pil(rgb_hyst).show()
 # rgb_dilation = mask_rgb(rgb, dilation_mask)
 # np_to_pil(rgb_dilation).show()
 
-opening = filter_binary_opening(hyst_mask)
-np_to_pil(opening).show()
+# opening = filter_binary_opening(hyst_mask)
+# np_to_pil(opening).show()
+#
+# opening_mask = uint8_to_bool(opening)
+# rgb_opening = mask_rgb(rgb, opening_mask)
+# np_to_pil(rgb_opening).show()
+#
+# closing = filter_binary_closing(hyst_mask)
+# np_to_pil(closing).show()
+#
+# closing_mask = uint8_to_bool(closing)
+# rgb_closing = mask_rgb(rgb, closing_mask)
+# np_to_pil(rgb_closing).show()
 
-opening_mask = uint8_to_bool(opening)
-rgb_opening = mask_rgb(rgb, opening_mask)
-np_to_pil(rgb_opening).show()
+kmeans_seg = filter_kmeans_segmentation(rgb_hyst)
+# kmeans_seg = (kmeans_seg * 255).astype("uint8")
+np_to_pil(kmeans_seg).show()
 
-closing = filter_binary_closing(hyst_mask)
-np_to_pil(closing).show()
-
-closing_mask = uint8_to_bool(closing)
-rgb_closing = mask_rgb(rgb, closing_mask)
-np_to_pil(rgb_closing).show()
+rag_thresh = filter_rag_threshold(rgb_hyst)
+np_to_pil(rag_thresh).show()
