@@ -63,6 +63,8 @@ def np_to_pil(np_img):
   Returns:
      The NumPy array converted to a PIL Image.
   """
+  if np_img.dtype == "bool":
+    np_img = np_img.astype("uint8") * 255
   return PIL.Image.fromarray(np_img)
 
 
@@ -659,6 +661,7 @@ img_path = slide.get_training_thumb_path(2)
 img = slide.open_image(img_path)
 # img.show()
 rgb = pil_to_np_rgb(img)
+addTextAndDisplay(rgb, "RGB")
 gray = filter_rgb_to_grayscale(rgb)
 addTextAndDisplay(gray, "Grayscale")
 # np_to_pil(gray).show()
@@ -705,8 +708,10 @@ addTextAndDisplay(complement, "Complement")
 # eosin = filter_hed_to_eosin(hed)
 # np_to_pil(eosin).show()
 hyst_mask = filter_hysteresis_threshold(complement, output_type="bool")
-rgb_hyst = mask_rgb(rgb, hyst_mask)
-np_to_pil(rgb_hyst).show()
+# hyst_mask = filter_hysteresis_threshold(complement)
+addTextAndDisplay(hyst_mask, "Hysteresis Threshold Mask", color=(255, 0, 0))
+# rgb_hyst = mask_rgb(rgb, hyst_mask)
+# addTextAndDisplay(rgb_hyst, "RGB with Hysteresis Threshold Mask")
 
 # fill_holes = filter_binary_fill_holes(hyst_mask)
 # rgb_fill_holes = mask_rgb(rgb, fill_holes)
@@ -748,6 +753,3 @@ np_to_pil(rgb_hyst).show()
 #
 # rag_thresh = filter_rag_threshold(rgb_hyst)
 # np_to_pil(rag_thresh).show()
-
-addTextAndDisplay(rgb_hyst, "RGB with Hysteresis Threshold Mask")
-
