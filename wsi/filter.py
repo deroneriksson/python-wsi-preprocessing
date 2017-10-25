@@ -32,6 +32,7 @@ import skimage.morphology as sk_morphology
 import skimage.segmentation as sk_segmentation
 import wsi.slide as slide
 from wsi.slide import Time
+from PIL import ImageDraw, ImageFont
 
 
 def pil_to_np_rgb(pil_img):
@@ -633,6 +634,24 @@ def uint8_to_bool(np_img):
   return result
 
 
+def addTextAndDisplay(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf", size=48, color=(255, 255, 255)):
+  """
+  Convert a NumPy array to a PIL image, add text to the image, and display the image.
+
+  Args:
+    np_img: Image as a NumPy array.
+    text: The text to add to the image.
+    font_path: The path to the font to use.
+    size: The font size
+    color: The font color
+  """
+  result = np_to_pil(np_img)
+  draw = ImageDraw.Draw(result)
+  font = ImageFont.truetype(font_path, size)
+  draw.text((0, 0), text, color, font=font)
+  result.show()
+
+
 img_path = slide.get_training_thumb_path(2)
 img = slide.open_image(img_path)
 # img.show()
@@ -683,6 +702,7 @@ complement = filter_complement(gray)
 hyst_mask = filter_hysteresis_threshold(complement, output_type="bool")
 rgb_hyst = mask_rgb(rgb, hyst_mask)
 np_to_pil(rgb_hyst).show()
+
 # fill_holes = filter_binary_fill_holes(hyst_mask)
 # rgb_fill_holes = mask_rgb(rgb, fill_holes)
 # np_to_pil(rgb_fill_holes).show()
@@ -717,10 +737,12 @@ np_to_pil(rgb_hyst).show()
 # closing_mask = uint8_to_bool(closing)
 # rgb_closing = mask_rgb(rgb, closing_mask)
 # np_to_pil(rgb_closing).show()
+#
+# kmeans_seg = filter_kmeans_segmentation(rgb_hyst)
+# np_to_pil(kmeans_seg).show()
+#
+# rag_thresh = filter_rag_threshold(rgb_hyst)
+# np_to_pil(rag_thresh).show()
 
-kmeans_seg = filter_kmeans_segmentation(rgb_hyst)
-# kmeans_seg = (kmeans_seg * 255).astype("uint8")
-np_to_pil(kmeans_seg).show()
+addTextAndDisplay(rgb_hyst, "RGB with Hysteresis Threshold Mask")
 
-rag_thresh = filter_rag_threshold(rgb_hyst)
-np_to_pil(rag_thresh).show()
