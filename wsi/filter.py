@@ -646,6 +646,9 @@ def addTextAndDisplay(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf", s
     color: The font color
   """
   result = np_to_pil(np_img)
+  # if gray, convert to RGB for display
+  if result.mode == 'L':
+    result = result.convert('RGB')
   draw = ImageDraw.Draw(result)
   font = ImageFont.truetype(font_path, size)
   draw.text((0, 0), text, color, font=font)
@@ -657,8 +660,10 @@ img = slide.open_image(img_path)
 # img.show()
 rgb = pil_to_np_rgb(img)
 gray = filter_rgb_to_grayscale(rgb)
+addTextAndDisplay(gray, "Grayscale")
 # np_to_pil(gray).show()
 complement = filter_complement(gray)
+addTextAndDisplay(complement, "Complement")
 # np_to_pil(complement).show()
 # hyst = filter_hysteresis_threshold(complement)
 # np_to_pil(hyst).show()
