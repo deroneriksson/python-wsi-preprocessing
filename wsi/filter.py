@@ -605,6 +605,31 @@ def filter_rag_threshold(np_img, compactness=10, n_segments=800):
   return result
 
 
+def filter_threshold(np_img, threshold, output_type="bool"):
+  """
+  Return mask where a pixel has a value if it exceeds the threshold value.
+
+  Args:
+    np_img: Binary image as a NumPy array.
+    threshold: The threshold value to exceed.
+    output_type: Type of array to return (bool, float, or uint8).
+
+  Returns:
+    NumPy array representing a mask where a pixel has a value (T, 1.0, or 255) if the corresponding input array
+    pixel exceeds the threshold value.
+  """
+  t = Time()
+  result = (np_img > threshold)
+  np_info(result, "Threshold", t.elapsed())
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    result = result.astype(float)
+  else:
+    result = result.astype("uint8") * 255
+  return result
+
+
 def mask_rgb(rgb, mask):
   """
   Apply a binary (T/F, 1/0) mask to a 3-channel RGB image and output the result.
@@ -663,10 +688,10 @@ img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 addTextAndDisplay(rgb, "RGB")
 gray = filter_rgb_to_grayscale(rgb)
-addTextAndDisplay(gray, "Grayscale")
+# addTextAndDisplay(gray, "Grayscale")
 # np_to_pil(gray).show()
 complement = filter_complement(gray)
-addTextAndDisplay(complement, "Complement")
+# addTextAndDisplay(complement, "Complement")
 # np_to_pil(complement).show()
 # hyst = filter_hysteresis_threshold(complement)
 # np_to_pil(hyst).show()
@@ -709,10 +734,29 @@ addTextAndDisplay(complement, "Complement")
 # np_to_pil(eosin).show()
 hyst_mask = filter_hysteresis_threshold(complement, output_type="bool")
 # hyst_mask = filter_hysteresis_threshold(complement)
-addTextAndDisplay(hyst_mask, "Hysteresis Threshold Mask", color=(255, 0, 0))
-# rgb_hyst = mask_rgb(rgb, hyst_mask)
-# addTextAndDisplay(rgb_hyst, "RGB with Hysteresis Threshold Mask")
+# addTextAndDisplay(hyst_mask, "Hysteresis Threshold Mask", color=(255, 0, 0))
+entropy_mask = filter_entropy(complement, output_type="bool")
+hyst_and_entropy_mask = hyst_mask & entropy_mask
 
+addTextAndDisplay(mask_rgb(rgb, hyst_mask), "RGB with Hysteresis Threshold Mask")
+addTextAndDisplay(mask_rgb(rgb, entropy_mask), "RGB with Entropy Mask")
+addTextAndDisplay(mask_rgb(rgb, hyst_and_entropy_mask), "RGB with Hyst and Entropy Masks")
+
+rem_small = filter_remove_small_objects(hyst_and_entropy_mask, output_type="bool")
+addTextAndDisplay(mask_rgb(rgb, rem_small), "RGB with Small Objects Removed")
+
+hed = filter_rgb_to_hed(rgb)
+addTextAndDisplay(rgb, "RGB")
+hema = filter_hed_to_hematoxylin(hed)
+# hist_eq = filter_histogram_equalization(hema)
+# addTextAndDisplay(hist_eq, "Hist Eq")
+hema_thresh = filter_threshold(hema, 25)
+addTextAndDisplay(hema_thresh, "Hema Threshold", color=(255, 0, 0))
+
+rem_small_and_hema_thresh = rem_small & hema_thresh
+addTextAndDisplay(mask_rgb(rgb, rem_small_and_hema_thresh), "RGB with Remove Small and Hema Thresh")
+# addTextAndDisplay(hema, "Hematoxylin")
+# np_to_pil(hema).show()
 # fill_holes = filter_binary_fill_holes(hyst_mask)
 # rgb_fill_holes = mask_rgb(rgb, fill_holes)
 # np_to_pil(rgb_fill_holes).show()
