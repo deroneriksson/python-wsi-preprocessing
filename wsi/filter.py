@@ -671,7 +671,6 @@ def filter_out_grays(rgb, tolerance=15, output_type="bool"):
     NumPy array representing a mask where pixels with similar red, green, and blue values have been masked out.
   """
   t = Time()
-  # rgb = np.asarray(rgb)
   (h, w, c) = rgb.shape
 
   rgb = rgb.astype(np.int)
@@ -680,16 +679,6 @@ def filter_out_grays(rgb, tolerance=15, output_type="bool"):
   gb_diff = abs(rgb[:, :, 1] - rgb[:, :, 2]) <= tolerance
   result = ~(rg_diff & rb_diff & gb_diff)
 
-  # result = np.ones((h, w), dtype=np.bool)
-  # for i in range(0, h):
-  #   for j in range(0, w):
-  #     r = rgb[i, j, 0]
-  #     g = rgb[i, j, 1]
-  #     b = rgb[i, j, 2]
-  #     rg_diff = abs(int(r) - int(g))
-  #     rb_diff = abs(int(r) - int(b))
-  #     if (rg_diff <= tolerance) and (rb_diff <= tolerance):
-  #       result[i, j] = False
   if output_type == "bool":
     pass
   elif output_type == "float":
@@ -731,7 +720,7 @@ def uint8_to_bool(np_img):
   return result
 
 
-def addTextAndDisplay(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf", size=48, color=(255, 0, 0)):
+def add_text_and_display(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf", size=48, color=(255, 0, 0)):
   """
   Convert a NumPy array to a PIL image, add text to the image, and display the image.
 
@@ -752,61 +741,72 @@ def addTextAndDisplay(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf", s
   result.show()
 
 
-img_path = slide.get_training_thumb_path(2)
-img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-addTextAndDisplay(rgb, "RGB")
+def level_1_filters(slide_num):
+  img_path = slide.get_training_thumb_path(slide_num)
+  img = slide.open_image(img_path)
+  rgb = pil_to_np_rgb(img)
+  # add_text_and_display(rgb, "#%d RGB" % slide_num)
+  mask_not_green = filter_out_green(rgb, green_thresh=200)
+  # add_text_and_display(mask_rgb(rgb, mask_not_green), "#%d RGB Not Green" % slide_num)
+  mask_not_gray = filter_out_grays(rgb)
+  # add_text_and_display(mask_rgb(rgb, mask_not_gray), "#%d RGB Not Gray" % slide_num)
+  # add_text_and_display(mask_rgb(rgb, ~mask_not_gray), "#%d RGB Not Gray, Inverse" % slide_num)
+  mask_not_gray_and_not_green = mask_not_gray & mask_not_green
+  add_text_and_display(mask_rgb(rgb, mask_not_gray_and_not_green), "#%d RGB Not Gray and Not Green" % slide_num)
+  add_text_and_display(mask_rgb(rgb, ~mask_not_gray_and_not_green), "#%d RGB Not Gray and Not Green, Inverse" % slide_num)
+
+
+for sl_num in range(1, 16):
+    level_1_filters(sl_num)
+
+# level_1_filters(1)
+# level_1_filters(2)
+# level_1_filters(3)
+# level_1_filters(4)
+# level_1_filters(5)
+
+# img_path = slide.get_training_thumb_path(2)
+# img = slide.open_image(img_path)
+# rgb = pil_to_np_rgb(img)
+# add_text_and_display(rgb, "RGB")
 # gray = filter_rgb_to_grayscale(rgb)
-# addTextAndDisplay(gray, "Grayscale")
+# add_text_and_display(gray, "Grayscale")
 # complement = filter_complement(gray)
-# addTextAndDisplay(complement, "Complement")
+# add_text_and_display(complement, "Complement")
 # hyst_mask = filter_hysteresis_threshold(complement, output_type="bool")
 # entropy_mask = filter_entropy(complement, output_type="bool")
 # hyst_and_entropy_mask = hyst_mask & entropy_mask
-# addTextAndDisplay(mask_rgb(rgb, hyst_mask), "RGB with Hysteresis Threshold Mask")
-# addTextAndDisplay(mask_rgb(rgb, entropy_mask), "RGB with Entropy Mask")
-# addTextAndDisplay(mask_rgb(rgb, hyst_and_entropy_mask), "RGB with Hyst and Entropy Masks")
+# add_text_and_display(mask_rgb(rgb, hyst_mask), "RGB with Hysteresis Threshold Mask")
+# add_text_and_display(mask_rgb(rgb, entropy_mask), "RGB with Entropy Mask")
+# add_text_and_display(mask_rgb(rgb, hyst_and_entropy_mask), "RGB with Hyst and Entropy Masks")
 # rem_small_mask = filter_remove_small_objects(hyst_and_entropy_mask, output_type="bool")
-# addTextAndDisplay(mask_rgb(rgb, rem_small_mask), "RGB with Small Objects Removed")
+# add_text_and_display(mask_rgb(rgb, rem_small_mask), "RGB with Small Objects Removed")
 # hed = filter_rgb_to_hed(rgb)
 # hema = filter_hed_to_hematoxylin(hed)
 # hema_thresh_mask = filter_threshold(hema, 25)
-# addTextAndDisplay(hema_thresh_mask, "Hema Threshold")
+# add_text_and_display(hema_thresh_mask, "Hema Threshold")
 # rem_small_and_hema_thresh_mask = rem_small_mask & hema_thresh_mask
-# addTextAndDisplay(mask_rgb(rgb, rem_small_and_hema_thresh_mask), "RGB with Remove Small and Hema Thresh")
-# addTextAndDisplay(mask_rgb(rgb, ~rem_small_and_hema_thresh_mask), "RGB with Remove Small and Hema Thresh, Inverse")
+# add_text_and_display(mask_rgb(rgb, rem_small_and_hema_thresh_mask), "RGB with Remove Small and Hema Thresh")
+# add_text_and_display(mask_rgb(rgb, ~rem_small_and_hema_thresh_mask), "RGB with Remove Small and Hema Thresh, Inverse")
 
-mask_not_green = filter_out_green(rgb, green_thresh=200)
-addTextAndDisplay(mask_rgb(rgb, mask_not_green), "RGB Not Green")
-# addTextAndDisplay(mask_rgb(rgb, ~mask_not_green), "RGB Not Green, Inverse")
+# mask_not_green = filter_out_green(rgb, green_thresh=200)
+# add_text_and_display(mask_rgb(rgb, mask_not_green), "RGB Not Green")
+# add_text_and_display(mask_rgb(rgb, ~mask_not_green), "RGB Not Green, Inverse")
 
-mask_not_gray = filter_out_grays(rgb)
-addTextAndDisplay(mask_rgb(rgb, mask_not_gray), "RGB Not Gray")
-# addTextAndDisplay(mask_rgb(rgb, ~mask_not_gray), "RGB Not Gray, Inverse")
+# mask_not_gray = filter_out_grays(rgb)
+# add_text_and_display(mask_rgb(rgb, mask_not_gray), "RGB Not Gray")
+# add_text_and_display(mask_rgb(rgb, ~mask_not_gray), "RGB Not Gray, Inverse")
 
 # mask_not_gray_or_green = filter_out_grays(mask_rgb(rgb, mask_not_green))
-# addTextAndDisplay(mask_rgb(rgb, mask_not_gray_or_green), "RGB Not Gray or Green")
-# addTextAndDisplay(mask_rgb(rgb, ~mask_not_gray_or_green), "RGB Not Gray or Green, Inverse")
+# add_text_and_display(mask_rgb(rgb, mask_not_gray_or_green), "RGB Not Gray or Green")
+# add_text_and_display(mask_rgb(rgb, ~mask_not_gray_or_green), "RGB Not Gray or Green, Inverse")
 
-mask_not_gray_and_not_green = mask_not_gray & mask_not_green
-addTextAndDisplay(mask_rgb(rgb, mask_not_gray_and_not_green), "RGB Not Gray and Not Green")
-# addTextAndDisplay(mask_rgb(rgb, ~mask_not_gray_and_not_green), "RGB Not Gray and Not Green, Inverse")
-
-# blah = sk_filters.gaussian(rgb, multichannel=True)
-# addTextAndDisplay(blah, "Blah")
-
-
-# from skimage.restoration import denoise_tv_chambolle
-#
-# denoise = denoise_tv_chambolle(rgb, weight=0.1, multichannel=True)
-# np_info(denoise, "Denoise")
-# addTextAndDisplay(denoise, "Testing")
-
-
-# blurred = filter.gaussian_filter(rgb, 10)
+# mask_not_gray_and_not_green = mask_not_gray & mask_not_green
+# add_text_and_display(mask_rgb(rgb, mask_not_gray_and_not_green), "RGB Not Gray and Not Green")
+# add_text_and_display(mask_rgb(rgb, ~mask_not_gray_and_not_green), "RGB Not Gray and Not Green, Inverse")
 
 # hist_eq = filter_histogram_equalization(hema)
-# addTextAndDisplay(hist_eq, "Hist Eq")
+# add_text_and_display(hist_eq, "Hist Eq")
 # hyst = filter_hysteresis_threshold(complement)
 # np_to_pil(hyst).show()
 # entr = filter_entropy(complement)
@@ -847,7 +847,7 @@ addTextAndDisplay(mask_rgb(rgb, mask_not_gray_and_not_green), "RGB Not Gray and 
 # eosin = filter_hed_to_eosin(hed)
 # np_to_pil(eosin).show()
 
-# addTextAndDisplay(hema, "Hematoxylin")
+# add_text_and_display(hema, "Hematoxylin")
 # np_to_pil(hema).show()
 # fill_holes = filter_binary_fill_holes(hyst_mask)
 # rgb_fill_holes = mask_rgb(rgb, fill_holes)
