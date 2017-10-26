@@ -65,6 +65,8 @@ def np_to_pil(np_img):
   """
   if np_img.dtype == "bool":
     np_img = np_img.astype("uint8") * 255
+  elif np_img.dtype == "float64":
+    np_img = (np_img * 255).astype("uint8")
   return PIL.Image.fromarray(np_img)
 
 
@@ -638,6 +640,7 @@ def filter_out_green(rgb, green_thresh=200, output_type="bool"):
   Args:
     np_img: RGB image as a NumPy array.
     green_thresh: Green channel threshold value. If green channel value is greater than green_thresh, mask out pixel.
+    output_type: Type of array to return (bool, float, or uint8).
 
   Returns:
     NumPy array representing a mask where pixels above a particular green channel threshold have been masked out.
@@ -652,6 +655,43 @@ def filter_out_green(rgb, green_thresh=200, output_type="bool"):
   else:
     result = result.astype("uint8") * 255
   np_info(result, "Filter out Green", t.elapsed())
+  return result
+
+
+def filter_out_grays(rgb, tolerance=15, output_type="bool"):
+  """
+  Create a mask to filter out pixels where the red, green, and blue channel values are similar.
+
+  Args:
+    np_img: RGB image as a NumPy array.
+    tolerance: Tolerance value to determine how similar the values must be in order to be filtered out
+    output_type: Type of array to return (bool, float, or uint8).
+
+  Returns:
+    NumPy array representing a mask where pixels with similar red, green, and blue values have been masked out.
+  """
+  t = Time()
+  # rgb = np.asarray(rgb)
+  (h, w, c) = rgb.shape
+
+  result = np.ones((h, w), dtype=np.bool)
+
+  for i in range(0, h):
+    for j in range(0, w):
+      r = rgb[i, j, 0]
+      g = rgb[i, j, 1]
+      b = rgb[i, j, 2]
+      rg_diff = abs(int(r) - int(g))
+      rb_diff = abs(int(r) - int(b))
+      if (rg_diff <= tolerance) and (rb_diff <= tolerance):
+        result[i, j] = False
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    result = result.astype(float)
+  else:
+    result = result.astype("uint8") * 255
+  np_info(result, "Filter out Grays", t.elapsed())
   return result
 
 
@@ -707,7 +747,7 @@ def addTextAndDisplay(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf", s
   result.show()
 
 
-img_path = slide.get_training_thumb_path(13)
+img_path = slide.get_training_thumb_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 addTextAndDisplay(rgb, "RGB")
@@ -731,9 +771,34 @@ addTextAndDisplay(rgb, "RGB")
 # addTextAndDisplay(mask_rgb(rgb, rem_small_and_hema_thresh_mask), "RGB with Remove Small and Hema Thresh")
 # addTextAndDisplay(mask_rgb(rgb, ~rem_small_and_hema_thresh_mask), "RGB with Remove Small and Hema Thresh, Inverse")
 
-mask_not_green = filter_out_green(rgb)
-addTextAndDisplay(mask_rgb(rgb, mask_not_green), "RGB Less Green")
-addTextAndDisplay(mask_rgb(rgb, ~mask_not_green), "RGB Less Green, Inverse")
+mask_not_green = filter_out_green(rgb, green_thresh=200)
+addTextAndDisplay(mask_rgb(rgb, mask_not_green), "RGB Not Green")
+# addTextAndDisplay(mask_rgb(rgb, ~mask_not_green), "RGB Not Green, Inverse")
+
+mask_not_gray = filter_out_grays(rgb)
+addTextAndDisplay(mask_rgb(rgb, mask_not_gray), "RGB Not Gray")
+# addTextAndDisplay(mask_rgb(rgb, ~mask_not_gray), "RGB Not Gray, Inverse")
+
+# mask_not_gray_or_green = filter_out_grays(mask_rgb(rgb, mask_not_green))
+# addTextAndDisplay(mask_rgb(rgb, mask_not_gray_or_green), "RGB Not Gray or Green")
+# addTextAndDisplay(mask_rgb(rgb, ~mask_not_gray_or_green), "RGB Not Gray or Green, Inverse")
+
+mask_not_gray_and_not_green = mask_not_gray & mask_not_green
+addTextAndDisplay(mask_rgb(rgb, mask_not_gray_and_not_green), "RGB Not Gray and Not Green")
+# addTextAndDisplay(mask_rgb(rgb, ~mask_not_gray_and_not_green), "RGB Not Gray and Not Green, Inverse")
+
+# blah = sk_filters.gaussian(rgb, multichannel=True)
+# addTextAndDisplay(blah, "Blah")
+
+
+# from skimage.restoration import denoise_tv_chambolle
+#
+# denoise = denoise_tv_chambolle(rgb, weight=0.1, multichannel=True)
+# np_info(denoise, "Denoise")
+# addTextAndDisplay(denoise, "Testing")
+
+
+# blurred = filter.gaussian_filter(rgb, 10)
 
 # hist_eq = filter_histogram_equalization(hema)
 # addTextAndDisplay(hist_eq, "Hist Eq")
