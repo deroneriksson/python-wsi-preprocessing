@@ -674,17 +674,21 @@ def filter_out_grays(rgb, tolerance=15, output_type="bool"):
   # rgb = np.asarray(rgb)
   (h, w, c) = rgb.shape
 
-  result = np.ones((h, w), dtype=np.bool)
+  rgb = rgb.astype(np.int)
+  rg_diff = abs(rgb[:, :, 0] - rgb[:, :, 1]) <= tolerance
+  rb_diff = abs(rgb[:, :, 0] - rgb[:, :, 2]) <= tolerance
+  result = ~(rg_diff & rb_diff)
 
-  for i in range(0, h):
-    for j in range(0, w):
-      r = rgb[i, j, 0]
-      g = rgb[i, j, 1]
-      b = rgb[i, j, 2]
-      rg_diff = abs(int(r) - int(g))
-      rb_diff = abs(int(r) - int(b))
-      if (rg_diff <= tolerance) and (rb_diff <= tolerance):
-        result[i, j] = False
+  # result = np.ones((h, w), dtype=np.bool)
+  # for i in range(0, h):
+  #   for j in range(0, w):
+  #     r = rgb[i, j, 0]
+  #     g = rgb[i, j, 1]
+  #     b = rgb[i, j, 2]
+  #     rg_diff = abs(int(r) - int(g))
+  #     rb_diff = abs(int(r) - int(b))
+  #     if (rg_diff <= tolerance) and (rb_diff <= tolerance):
+  #       result[i, j] = False
   if output_type == "bool":
     pass
   elif output_type == "float":
