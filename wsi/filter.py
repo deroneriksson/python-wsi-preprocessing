@@ -677,7 +677,8 @@ def filter_out_grays(rgb, tolerance=15, output_type="bool"):
   rgb = rgb.astype(np.int)
   rg_diff = abs(rgb[:, :, 0] - rgb[:, :, 1]) <= tolerance
   rb_diff = abs(rgb[:, :, 0] - rgb[:, :, 2]) <= tolerance
-  result = ~(rg_diff & rb_diff)
+  gb_diff = abs(rgb[:, :, 1] - rgb[:, :, 2]) <= tolerance
+  result = ~(rg_diff & rb_diff & gb_diff)
 
   # result = np.ones((h, w), dtype=np.bool)
   # for i in range(0, h):
