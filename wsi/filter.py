@@ -742,62 +742,55 @@ def add_text_and_display(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf"
   result.show()
 
 
-def level_1_filters(slide_num):
-  img_path = slide.get_training_thumb_path(slide_num)
-  img = slide.open_image(img_path)
-  rgb = pil_to_np_rgb(img)
-  add_text_and_display(rgb, "#%d RGB" % slide_num)
-  mask_not_green = filter_out_green(rgb, green_thresh=200)
-  # add_text_and_display(mask_rgb(rgb, mask_not_green), "#%d RGB Not Green" % slide_num)
-  mask_not_gray = filter_out_grays(rgb)
-  # add_text_and_display(mask_rgb(rgb, mask_not_gray), "#%d RGB Not Gray" % slide_num)
-  # add_text_and_display(mask_rgb(rgb, ~mask_not_gray), "#%d RGB Not Gray, Inverse" % slide_num)
-  mask_not_gray_and_not_green = mask_not_gray & mask_not_green
-  add_text_and_display(mask_rgb(rgb, mask_not_gray_and_not_green), "#%d RGB Not Gray and Not Green" % slide_num)
-  add_text_and_display(mask_rgb(rgb, ~mask_not_gray_and_not_green),
-                       "#%d RGB Not Gray and Not Green, Inverse" % slide_num)
+def apply_filters_to_image(slide_num, save=True, display=False):
+  t = Time()
+  print("Processing slide #%d" % slide_num)
 
-
-# num_training_slides = slide.get_num_training_slides()
-# for sl_num in range(1, num_training_slides + 1):
-#   t = Time()
-#   print("Processing slide #%d" % sl_num)
-#   level_1_filters(sl_num)
-#   print("Slide #%d processing time: %s" % (sl_num, str(t.elapsed())))
-
-# level_1_filters(1)
-
-def filter_image_and_save(slide_num):
-  if not os.path.exists(slide.FILTER_DIR):
+  if save and not os.path.exists(slide.FILTER_DIR):
     os.makedirs(slide.FILTER_DIR)
   img_path = slide.get_training_thumb_path(slide_num)
   img = slide.open_image(img_path)
   rgb = pil_to_np_rgb(img)
-  np_to_pil(rgb).save(slide.get_filter_thumb_path(slide_num, "rgb"))
+  if save: do_save(rgb, slide_num, "rgb")
+  if display: add_text_and_display(rgb, "#%d Original" % slide_num)
+
   mask_not_green = filter_out_green(rgb, green_thresh=200)
   rgb_not_green = mask_rgb(rgb, mask_not_green)
-  np_to_pil(rgb_not_green).save(slide.get_filter_thumb_path(slide_num, "rgb-not-green"))
+  if save: do_save(rgb_not_green, slide_num, "rgb-not-green")
+  if display: add_text_and_display(rgb_not_green, "#%d Not Green" % slide_num)
+
   mask_not_gray = filter_out_grays(rgb)
   rgb_not_gray = mask_rgb(rgb, mask_not_gray)
-  np_to_pil(rgb_not_gray).save(slide.get_filter_thumb_path(slide_num, "rgb-not-gray"))
+  if save: do_save(rgb_not_gray, slide_num, "rgb-not-gray")
+  if display: add_text_and_display(rgb_not_gray, "#%d Not Gray" % slide_num)
+
   mask_not_gray_and_not_green = mask_not_gray & mask_not_green
   rgb_not_gray_and_not_green = mask_rgb(rgb, mask_not_gray_and_not_green)
-  np_to_pil(rgb_not_gray_and_not_green).save(slide.get_filter_thumb_path(slide_num, "rgb-not-green-and-not-gray"))
+  if save: do_save(rgb_not_gray_and_not_green, slide_num, "rgb-not-green-and-not-gray")
+  if display: add_text_and_display(rgb_not_gray_and_not_green, "#%d Not Gray and Not Green" % slide_num)
+
   mask_remove_small = filter_remove_small_objects(mask_not_gray_and_not_green, min_size=500, output_type="bool")
   rgb_remove_small = mask_rgb(rgb, mask_remove_small)
-  np_to_pil(rgb_remove_small).save(slide.get_filter_thumb_path(slide_num, "rgb-not-green-and-not-gray-remove-small"))
+  if save: do_save(rgb_remove_small, slide_num, "rgb-not-green-and-not-gray-remove-small")
+  if display: add_text_and_display(rgb_remove_small, "#%d Not Gray and Not Green,\nRemove Small Objects" % slide_num)
+
+  print("Slide #%d processing time: %s\n" % (slide_num, str(t.elapsed())))
 
 
-def filter_images_and_save():
+def do_save(np_img, slide_num, filter_text):
+  np_to_pil(np_img).save(slide.get_filter_thumb_path(slide_num, filter_text))
+
+
+def apply_filters_to_images(save=True, display=False):
   num_training_slides = slide.get_num_training_slides()
   for sl_num in range(1, num_training_slides + 1):
-    t = Time()
-    print("Processing slide #%d" % sl_num)
-    filter_image_and_save(sl_num)
-    print("Slide #%d processing time: %s" % (sl_num, str(t.elapsed())))
+    apply_filters_to_image(sl_num, save=save, display=display)
 
 
-filter_images_and_save()
+# apply_filters_to_image(3, display=True, save=True)
+
+apply_filters_to_images(display=True, save=False)
+
 
 # img_path = slide.get_training_thumb_path(2)
 # img = slide.open_image(img_path)
