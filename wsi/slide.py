@@ -41,6 +41,9 @@ THUMB_EXT = ".jpg"
 THUMB_SIZE = 2048
 DEST_TRAIN_THUMB_DIR = BASE_DIR + os.sep + "training_thumbs_" + str(THUMB_SIZE)
 
+FILTER_DIR = BASE_DIR + os.sep + "filter_level_1_" + str(THUMB_SIZE)
+FILTER_THUMB_SUFFIX = "filter-"
+
 
 def open_slide(filename):
   """
@@ -73,6 +76,7 @@ def open_image(filename):
   """
   image = Image.open(filename)
   return image
+
 
 def get_training_slide_path(slide_number):
   """
@@ -108,6 +112,13 @@ def get_training_thumb_path(slide_number):
   padded_sl_num = str(slide_number).zfill(3)
   thumb_path = DEST_TRAIN_THUMB_DIR + os.sep + TRAIN_IMG_PREFIX + padded_sl_num + "-" + TRAIN_THUMB_SUFFIX + str(
     THUMB_SIZE) + THUMB_EXT
+  return thumb_path
+
+
+def get_filter_thumb_path(slide_number, filter_name_info):
+  padded_sl_num = str(slide_number).zfill(3)
+  thumb_path = FILTER_DIR + os.sep + TRAIN_IMG_PREFIX + padded_sl_num + "-" + FILTER_THUMB_SUFFIX + str(
+    THUMB_SIZE) + "-" + filter_name_info + THUMB_EXT
   return thumb_path
 
 

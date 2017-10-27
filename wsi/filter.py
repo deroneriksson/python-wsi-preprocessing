@@ -21,6 +21,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 import PIL
 import scipy.ndimage.morphology as sc_morph
 import skimage.color as sk_color
@@ -745,7 +746,7 @@ def level_1_filters(slide_num):
   img_path = slide.get_training_thumb_path(slide_num)
   img = slide.open_image(img_path)
   rgb = pil_to_np_rgb(img)
-  # add_text_and_display(rgb, "#%d RGB" % slide_num)
+  add_text_and_display(rgb, "#%d RGB" % slide_num)
   mask_not_green = filter_out_green(rgb, green_thresh=200)
   # add_text_and_display(mask_rgb(rgb, mask_not_green), "#%d RGB Not Green" % slide_num)
   mask_not_gray = filter_out_grays(rgb)
@@ -753,17 +754,50 @@ def level_1_filters(slide_num):
   # add_text_and_display(mask_rgb(rgb, ~mask_not_gray), "#%d RGB Not Gray, Inverse" % slide_num)
   mask_not_gray_and_not_green = mask_not_gray & mask_not_green
   add_text_and_display(mask_rgb(rgb, mask_not_gray_and_not_green), "#%d RGB Not Gray and Not Green" % slide_num)
-  add_text_and_display(mask_rgb(rgb, ~mask_not_gray_and_not_green), "#%d RGB Not Gray and Not Green, Inverse" % slide_num)
+  add_text_and_display(mask_rgb(rgb, ~mask_not_gray_and_not_green),
+                       "#%d RGB Not Gray and Not Green, Inverse" % slide_num)
 
 
-for sl_num in range(1, 16):
-    level_1_filters(sl_num)
+# num_training_slides = slide.get_num_training_slides()
+# for sl_num in range(1, num_training_slides + 1):
+#   t = Time()
+#   print("Processing slide #%d" % sl_num)
+#   level_1_filters(sl_num)
+#   print("Slide #%d processing time: %s" % (sl_num, str(t.elapsed())))
 
 # level_1_filters(1)
-# level_1_filters(2)
-# level_1_filters(3)
-# level_1_filters(4)
-# level_1_filters(5)
+
+def filter_image_and_save(slide_num):
+  if not os.path.exists(slide.FILTER_DIR):
+    os.makedirs(slide.FILTER_DIR)
+  img_path = slide.get_training_thumb_path(slide_num)
+  img = slide.open_image(img_path)
+  rgb = pil_to_np_rgb(img)
+  np_to_pil(rgb).save(slide.get_filter_thumb_path(slide_num, "rgb"))
+  mask_not_green = filter_out_green(rgb, green_thresh=200)
+  rgb_not_green = mask_rgb(rgb, mask_not_green)
+  np_to_pil(rgb_not_green).save(slide.get_filter_thumb_path(slide_num, "rgb-not-green"))
+  mask_not_gray = filter_out_grays(rgb)
+  rgb_not_gray = mask_rgb(rgb, mask_not_gray)
+  np_to_pil(rgb_not_gray).save(slide.get_filter_thumb_path(slide_num, "rgb-not-gray"))
+  mask_not_gray_and_not_green = mask_not_gray & mask_not_green
+  rgb_not_gray_and_not_green = mask_rgb(rgb, mask_not_gray_and_not_green)
+  np_to_pil(rgb_not_gray_and_not_green).save(slide.get_filter_thumb_path(slide_num, "rgb-not-green-and-not-gray"))
+  mask_remove_small = filter_remove_small_objects(mask_not_gray_and_not_green, min_size=500, output_type="bool")
+  rgb_remove_small = mask_rgb(rgb, mask_remove_small)
+  np_to_pil(rgb_remove_small).save(slide.get_filter_thumb_path(slide_num, "rgb-not-green-and-not-gray-remove-small"))
+
+
+def filter_images_and_save():
+  num_training_slides = slide.get_num_training_slides()
+  for sl_num in range(1, num_training_slides + 1):
+    t = Time()
+    print("Processing slide #%d" % sl_num)
+    filter_image_and_save(sl_num)
+    print("Slide #%d processing time: %s" % (sl_num, str(t.elapsed())))
+
+
+filter_images_and_save()
 
 # img_path = slide.get_training_thumb_path(2)
 # img = slide.open_image(img_path)
@@ -788,23 +822,18 @@ for sl_num in range(1, 16):
 # rem_small_and_hema_thresh_mask = rem_small_mask & hema_thresh_mask
 # add_text_and_display(mask_rgb(rgb, rem_small_and_hema_thresh_mask), "RGB with Remove Small and Hema Thresh")
 # add_text_and_display(mask_rgb(rgb, ~rem_small_and_hema_thresh_mask), "RGB with Remove Small and Hema Thresh, Inverse")
-
 # mask_not_green = filter_out_green(rgb, green_thresh=200)
 # add_text_and_display(mask_rgb(rgb, mask_not_green), "RGB Not Green")
 # add_text_and_display(mask_rgb(rgb, ~mask_not_green), "RGB Not Green, Inverse")
-
 # mask_not_gray = filter_out_grays(rgb)
 # add_text_and_display(mask_rgb(rgb, mask_not_gray), "RGB Not Gray")
 # add_text_and_display(mask_rgb(rgb, ~mask_not_gray), "RGB Not Gray, Inverse")
-
 # mask_not_gray_or_green = filter_out_grays(mask_rgb(rgb, mask_not_green))
 # add_text_and_display(mask_rgb(rgb, mask_not_gray_or_green), "RGB Not Gray or Green")
 # add_text_and_display(mask_rgb(rgb, ~mask_not_gray_or_green), "RGB Not Gray or Green, Inverse")
-
 # mask_not_gray_and_not_green = mask_not_gray & mask_not_green
 # add_text_and_display(mask_rgb(rgb, mask_not_gray_and_not_green), "RGB Not Gray and Not Green")
 # add_text_and_display(mask_rgb(rgb, ~mask_not_gray_and_not_green), "RGB Not Gray and Not Green, Inverse")
-
 # hist_eq = filter_histogram_equalization(hema)
 # add_text_and_display(hist_eq, "Hist Eq")
 # hyst = filter_hysteresis_threshold(complement)
@@ -846,46 +875,34 @@ for sl_num in range(1, 16):
 # np_to_pil(hema).show()
 # eosin = filter_hed_to_eosin(hed)
 # np_to_pil(eosin).show()
-
 # add_text_and_display(hema, "Hematoxylin")
 # np_to_pil(hema).show()
 # fill_holes = filter_binary_fill_holes(hyst_mask)
 # rgb_fill_holes = mask_rgb(rgb, fill_holes)
 # np_to_pil(rgb_fill_holes).show()
-
 # erosion = filter_binary_erosion(hyst_mask)
 # np_to_pil(erosion).show()
-#
 # erosion = filter_binary_erosion(hyst_mask, iterations=5)
 # np_to_pil(erosion).show()
-#
 # erosion_mask = uint8_to_bool(erosion)
 # rgb_erosion = mask_rgb(rgb, erosion_mask)
 # np_to_pil(rgb_erosion).show()
-#
 # dilation = filter_binary_dilation(hyst_mask, iterations=3)
 # np_to_pil(dilation).show()
-
 # dilation_mask = uint8_to_bool(dilation)
 # rgb_dilation = mask_rgb(rgb, dilation_mask)
 # np_to_pil(rgb_dilation).show()
-
 # opening = filter_binary_opening(hyst_mask)
 # np_to_pil(opening).show()
-#
 # opening_mask = uint8_to_bool(opening)
 # rgb_opening = mask_rgb(rgb, opening_mask)
 # np_to_pil(rgb_opening).show()
-#
 # closing = filter_binary_closing(hyst_mask)
 # np_to_pil(closing).show()
-#
 # closing_mask = uint8_to_bool(closing)
 # rgb_closing = mask_rgb(rgb, closing_mask)
 # np_to_pil(rgb_closing).show()
-#
 # kmeans_seg = filter_kmeans_segmentation(rgb_hyst)
 # np_to_pil(kmeans_seg).show()
-#
 # rag_thresh = filter_rag_threshold(rgb_hyst)
 # np_to_pil(rag_thresh).show()
