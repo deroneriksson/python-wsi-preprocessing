@@ -35,6 +35,9 @@ import wsi.slide as slide
 from wsi.slide import Time
 from PIL import ImageDraw, ImageFont
 
+# If True, display NumPy array stats for filters (min, max, mean, is_binary).
+DISPLAY_FILTER_STATS = True
+
 
 def pil_to_np_rgb(pil_img):
   """
@@ -122,18 +125,23 @@ def np_info(np_arr, name=None, elapsed=None):
     name: The (optional) name of the array.
     elapsed: The (optional) time elapsed to perform a filtering operation.
   """
-  np_arr = np.asarray(np_arr)
-  max = np_arr.max()
-  min = np_arr.min()
-  mean = np_arr.mean()
-  std = np_arr.std()
-  is_binary = "T" if (np.unique(np_arr).size == 2) else "F"
+
   if name is None:
     name = "NumPy Array"
   if elapsed is None:
     elapsed = "---"
-  print("%-20s | Time: %-14s Min: %6.2f  Max: %6.2f  Mean: %6.2f  Binary: %s  Type: %-7s Shape: %s" % (
-    name, str(elapsed), min, max, mean, is_binary, np_arr.dtype, np_arr.shape))
+
+  if DISPLAY_FILTER_STATS == False:
+    print("%-20s | Time: %-14s  Type: %-7s Shape: %s" % (name, str(elapsed), np_arr.dtype, np_arr.shape))
+  else:
+    # np_arr = np.asarray(np_arr)
+    max = np_arr.max()
+    min = np_arr.min()
+    mean = np_arr.mean()
+    std = np_arr.std()
+    is_binary = "T" if (np.unique(np_arr).size == 2) else "F"
+    print("%-20s | Time: %-14s Min: %6.2f  Max: %6.2f  Mean: %6.2f  Binary: %s  Type: %-7s Shape: %s" % (
+      name, str(elapsed), min, max, mean, is_binary, np_arr.dtype, np_arr.shape))
 
 
 def filter_hysteresis_threshold(np_img, low=50, high=100, output_type="uint8"):
@@ -743,6 +751,14 @@ def add_text_and_display(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf"
 
 
 def apply_filters_to_image(slide_num, save=True, display=False):
+  """
+  Apply a set of filters to an image and optionally save and/or display filtered images.
+
+  Args:
+    slide_num: The slide number.
+    save: If True, save filtered images.
+    display: If True, display filtered images to screen.
+  """
   t = Time()
   print("Processing slide #%d" % slide_num)
 
@@ -751,45 +767,62 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   img_path = slide.get_training_thumb_path(slide_num)
   img = slide.open_image(img_path)
   rgb = pil_to_np_rgb(img)
-  if save: do_save(rgb, slide_num, "rgb")
+  if save: save_filtered_image(rgb, slide_num, "rgb")
   if display: add_text_and_display(rgb, "#%d Original" % slide_num)
 
   mask_not_green = filter_out_green(rgb, green_thresh=200)
   rgb_not_green = mask_rgb(rgb, mask_not_green)
-  if save: do_save(rgb_not_green, slide_num, "rgb-not-green")
+  if save: save_filtered_image(rgb_not_green, slide_num, "rgb-not-green")
   if display: add_text_and_display(rgb_not_green, "#%d Not Green" % slide_num)
 
   mask_not_gray = filter_out_grays(rgb)
   rgb_not_gray = mask_rgb(rgb, mask_not_gray)
-  if save: do_save(rgb_not_gray, slide_num, "rgb-not-gray")
+  if save: save_filtered_image(rgb_not_gray, slide_num, "rgb-not-gray")
   if display: add_text_and_display(rgb_not_gray, "#%d Not Gray" % slide_num)
 
   mask_not_gray_and_not_green = mask_not_gray & mask_not_green
   rgb_not_gray_and_not_green = mask_rgb(rgb, mask_not_gray_and_not_green)
-  if save: do_save(rgb_not_gray_and_not_green, slide_num, "rgb-not-green-and-not-gray")
+  if save: save_filtered_image(rgb_not_gray_and_not_green, slide_num, "rgb-not-green-and-not-gray")
   if display: add_text_and_display(rgb_not_gray_and_not_green, "#%d Not Gray and Not Green" % slide_num)
 
   mask_remove_small = filter_remove_small_objects(mask_not_gray_and_not_green, min_size=500, output_type="bool")
   rgb_remove_small = mask_rgb(rgb, mask_remove_small)
-  if save: do_save(rgb_remove_small, slide_num, "rgb-not-green-and-not-gray-remove-small")
+  if save: save_filtered_image(rgb_remove_small, slide_num, "rgb-not-green-and-not-gray-remove-small")
   if display: add_text_and_display(rgb_remove_small, "#%d Not Gray and Not Green,\nRemove Small Objects" % slide_num)
 
   print("Slide #%d processing time: %s\n" % (slide_num, str(t.elapsed())))
 
 
-def do_save(np_img, slide_num, filter_text):
+def save_filtered_image(np_img, slide_num, filter_text):
+  """
+  Save a filtered image to the file system.
+  Args:
+    np_img: Image as a NumPy array.
+    slide_num:  The slide number.
+    filter_text: Descriptive text to add to the image filename.
+  """
   np_to_pil(np_img).save(slide.get_filter_thumb_path(slide_num, filter_text))
 
 
 def apply_filters_to_images(save=True, display=False):
+  """
+  Apply a set of filters to training images and optionally save and/or display the filtered images.
+
+  Args:
+    save: If True, save filtered images.
+    display: If True, display filtered images to screen.
+  """
+  t = Time()
+  print("Applying filters to images\n")
   num_training_slides = slide.get_num_training_slides()
   for sl_num in range(1, num_training_slides + 1):
     apply_filters_to_image(sl_num, save=save, display=display)
+  print("Time to apply filters to all images: %s\n" % str(t.elapsed()))
 
 
 # apply_filters_to_image(3, display=True, save=True)
 
-apply_filters_to_images(display=True, save=False)
+apply_filters_to_images(save=True, display=False)
 
 
 # img_path = slide.get_training_thumb_path(2)
