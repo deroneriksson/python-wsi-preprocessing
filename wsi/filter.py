@@ -36,7 +36,7 @@ from wsi.slide import Time
 from PIL import ImageDraw, ImageFont
 
 # If True, display NumPy array stats for filters (min, max, mean, is_binary).
-DISPLAY_FILTER_STATS = True
+DISPLAY_FILTER_STATS = False
 
 
 def pil_to_np_rgb(pil_img):
@@ -138,7 +138,6 @@ def np_info(np_arr, name=None, elapsed=None):
     max = np_arr.max()
     min = np_arr.min()
     mean = np_arr.mean()
-    std = np_arr.std()
     is_binary = "T" if (np.unique(np_arr).size == 2) else "F"
     print("%-20s | Time: %-14s Min: %6.2f  Max: %6.2f  Mean: %6.2f  Binary: %s  Type: %-7s Shape: %s" % (
       name, str(elapsed), min, max, mean, is_binary, np_arr.dtype, np_arr.shape))
@@ -750,7 +749,7 @@ def add_text_and_display(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf"
   result.show()
 
 
-def apply_filters_to_image(slide_num, save=True, display=False):
+def apply_filters_to_image(slide_num, save=True, display=False, page=False):
   """
   Apply a set of filters to an image and optionally save and/or display filtered images.
 
@@ -762,35 +761,85 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   t = Time()
   print("Processing slide #%d" % slide_num)
 
+  html = ""
+
+  if page:
+    html += "  <tr>\n"
+
   if save and not os.path.exists(slide.FILTER_DIR):
     os.makedirs(slide.FILTER_DIR)
   img_path = slide.get_training_thumb_path(slide_num)
   img = slide.open_image(img_path)
   rgb = pil_to_np_rgb(img)
-  if save: save_filtered_image(rgb, slide_num, "rgb")
-  if display: add_text_and_display(rgb, "#%d Original" % slide_num)
+  display_text = "#%d Original" % slide_num
+  file_text = "rgb"
+  if save: save_filtered_image(rgb, slide_num, file_text)
+  if display: add_text_and_display(rgb, display_text)
+  if page: html += image_cell(slide_num, display_text, file_text)
 
   mask_not_green = filter_out_green(rgb, green_thresh=200)
   rgb_not_green = mask_rgb(rgb, mask_not_green)
-  if save: save_filtered_image(rgb_not_green, slide_num, "rgb-not-green")
-  if display: add_text_and_display(rgb_not_green, "#%d Not Green" % slide_num)
+  display_text = "#%d Not Green" % slide_num
+  file_text = "rgb-not-green"
+  if save: save_filtered_image(rgb_not_green, slide_num, file_text)
+  if display: add_text_and_display(rgb_not_green, display_text)
+  if page: html += image_cell(slide_num, display_text, file_text)
 
   mask_not_gray = filter_out_grays(rgb)
   rgb_not_gray = mask_rgb(rgb, mask_not_gray)
-  if save: save_filtered_image(rgb_not_gray, slide_num, "rgb-not-gray")
-  if display: add_text_and_display(rgb_not_gray, "#%d Not Gray" % slide_num)
+  display_text = "#%d Not Gray" % slide_num
+  file_text = "rgb-not-gray"
+  if save: save_filtered_image(rgb_not_gray, slide_num, file_text)
+  if display: add_text_and_display(rgb_not_gray, display_text)
+  if page: html += image_cell(slide_num, display_text, file_text)
 
   mask_not_gray_and_not_green = mask_not_gray & mask_not_green
   rgb_not_gray_and_not_green = mask_rgb(rgb, mask_not_gray_and_not_green)
-  if save: save_filtered_image(rgb_not_gray_and_not_green, slide_num, "rgb-not-green-and-not-gray")
-  if display: add_text_and_display(rgb_not_gray_and_not_green, "#%d Not Gray and Not Green" % slide_num)
+  display_text = "#%d Not Gray and Not Green" % slide_num
+  file_text = "rgb-not-green-and-not-gray"
+  if save: save_filtered_image(rgb_not_gray_and_not_green, slide_num, file_text)
+  if display: add_text_and_display(rgb_not_gray_and_not_green, display_text)
+  if page: html += image_cell(slide_num, display_text, file_text)
 
   mask_remove_small = filter_remove_small_objects(mask_not_gray_and_not_green, min_size=500, output_type="bool")
   rgb_remove_small = mask_rgb(rgb, mask_remove_small)
+  display_text = "#%d Not Gray and Not Green,\nRemove Small Objects" % slide_num
+  file_text = "rgb-not-green-and-not-gray-remove-small"
   if save: save_filtered_image(rgb_remove_small, slide_num, "rgb-not-green-and-not-gray-remove-small")
   if display: add_text_and_display(rgb_remove_small, "#%d Not Gray and Not Green,\nRemove Small Objects" % slide_num)
+  if page: html += image_cell(slide_num, display_text, file_text)
 
   print("Slide #%d processing time: %s\n" % (slide_num, str(t.elapsed())))
+
+  if page:
+    html += "  </tr>\n"
+
+  return html
+
+
+def image_cell(slide_num, display_text, file_text):
+  return "    <td>\n      <a href=\"" + slide.get_filter_thumb_path(slide_num, file_text) + "\">\n        " \
+         + display_text \
+         + "<br/>\n        " \
+         + slide.get_filter_thumb_filename(slide_num, file_text) \
+         + "<br/>\n" \
+         + "        <img src=\"" + slide.get_filter_thumb_path(slide_num, file_text) + "\">\n" \
+         + "      </a>\n    </td>\n"
+
+
+def html_header():
+  html = "<html>\n  <head>\n    <title>Image Processing</title>\n" + \
+         "    <style type=\"text/css\">\n" + \
+         "     img { max-width: 400px; max-height: 400px; border: 2px solid black; }\n" + \
+         "     td { border: 2px solid black; }\n" + \
+         "    </style>\n" + \
+         "  </head>\n  <body>\n  <table>\n"
+  return html
+
+
+def html_footer():
+  html = "</table>\n</body>\n</html>\n"
+  return html
 
 
 def save_filtered_image(np_img, slide_num, filter_text):
@@ -804,7 +853,7 @@ def save_filtered_image(np_img, slide_num, filter_text):
   np_to_pil(np_img).save(slide.get_filter_thumb_path(slide_num, filter_text))
 
 
-def apply_filters_to_images(save=True, display=False):
+def apply_filters_to_images(save=True, display=False, page=True):
   """
   Apply a set of filters to training images and optionally save and/or display the filtered images.
 
@@ -814,15 +863,31 @@ def apply_filters_to_images(save=True, display=False):
   """
   t = Time()
   print("Applying filters to images\n")
+
+  html = ""
+
+  if page:
+    html += html_header()
+
   num_training_slides = slide.get_num_training_slides()
   for sl_num in range(1, num_training_slides + 1):
-    apply_filters_to_image(sl_num, save=save, display=display)
+    if page:
+      html += apply_filters_to_image(sl_num, save=save, display=display, page=page)
+    else:
+      apply_filters_to_image(sl_num, save=save, display=display)
+
   print("Time to apply filters to all images: %s\n" % str(t.elapsed()))
+
+  if page:
+    html += html_footer()
+    text_file = open("filters.html", "w")
+    text_file.write(html)
+    text_file.close()
 
 
 # apply_filters_to_image(3, display=True, save=True)
 
-apply_filters_to_images(save=True, display=False)
+apply_filters_to_images(save=True, display=False, page=True)
 
 
 # img_path = slide.get_training_thumb_path(2)

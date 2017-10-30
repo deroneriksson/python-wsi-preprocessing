@@ -117,9 +117,15 @@ def get_training_thumb_path(slide_number):
 
 def get_filter_thumb_path(slide_number, filter_name_info):
   padded_sl_num = str(slide_number).zfill(3)
-  thumb_path = FILTER_DIR + os.sep + TRAIN_IMG_PREFIX + padded_sl_num + "-" + FILTER_THUMB_SUFFIX + str(
-    THUMB_SIZE) + "-" + filter_name_info + THUMB_EXT
+  thumb_path = FILTER_DIR + os.sep + get_filter_thumb_filename(slide_number, filter_name_info)
   return thumb_path
+
+
+def get_filter_thumb_filename(slide_number, filter_name_info):
+  padded_sl_num = str(slide_number).zfill(3)
+  thumb_filename = TRAIN_IMG_PREFIX + padded_sl_num + "-" + FILTER_THUMB_SUFFIX + str(
+    THUMB_SIZE) + "-" + filter_name_info + THUMB_EXT
+  return thumb_filename
 
 
 def training_slide_to_thumb(slide_number):
