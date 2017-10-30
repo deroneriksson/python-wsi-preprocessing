@@ -757,6 +757,7 @@ def apply_filters_to_image(slide_num, save=True, display=False, page=False):
     slide_num: The slide number.
     save: If True, save filtered images.
     display: If True, display filtered images to screen.
+    page: If True, generate HTML for viewing filter results
   """
   t = Time()
   print("Processing slide #%d" % slide_num)
@@ -770,44 +771,28 @@ def apply_filters_to_image(slide_num, save=True, display=False, page=False):
     os.makedirs(slide.FILTER_DIR)
   img_path = slide.get_training_thumb_path(slide_num)
   img = slide.open_image(img_path)
+
   rgb = pil_to_np_rgb(img)
-  display_text = "#%d Original" % slide_num
-  file_text = "rgb"
-  if save: save_filtered_image(rgb, slide_num, file_text)
-  if display: add_text_and_display(rgb, display_text)
-  if page: html += image_cell(slide_num, display_text, file_text)
+  html += save_display_page(save, display, page, rgb, slide_num, "#%d Original" % slide_num, "rgb")
 
   mask_not_green = filter_out_green(rgb, green_thresh=200)
   rgb_not_green = mask_rgb(rgb, mask_not_green)
-  display_text = "#%d Not Green" % slide_num
-  file_text = "rgb-not-green"
-  if save: save_filtered_image(rgb_not_green, slide_num, file_text)
-  if display: add_text_and_display(rgb_not_green, display_text)
-  if page: html += image_cell(slide_num, display_text, file_text)
+  html += save_display_page(save, display, page, rgb_not_green, slide_num, "#%d Not Green" % slide_num, "rgb-not-green")
 
   mask_not_gray = filter_out_grays(rgb)
   rgb_not_gray = mask_rgb(rgb, mask_not_gray)
-  display_text = "#%d Not Gray" % slide_num
-  file_text = "rgb-not-gray"
-  if save: save_filtered_image(rgb_not_gray, slide_num, file_text)
-  if display: add_text_and_display(rgb_not_gray, display_text)
-  if page: html += image_cell(slide_num, display_text, file_text)
+  html += save_display_page(save, display, page, rgb_not_gray, slide_num, "#%d Not Gray" % slide_num, "rgb-not-gray")
 
   mask_not_gray_and_not_green = mask_not_gray & mask_not_green
   rgb_not_gray_and_not_green = mask_rgb(rgb, mask_not_gray_and_not_green)
-  display_text = "#%d Not Gray and Not Green" % slide_num
-  file_text = "rgb-not-green-and-not-gray"
-  if save: save_filtered_image(rgb_not_gray_and_not_green, slide_num, file_text)
-  if display: add_text_and_display(rgb_not_gray_and_not_green, display_text)
-  if page: html += image_cell(slide_num, display_text, file_text)
+  html += save_display_page(save, display, page, rgb_not_gray_and_not_green, slide_num,
+                            "#%d Not Gray and Not Green" % slide_num, "rgb-not-green-and-not-gray")
 
   mask_remove_small = filter_remove_small_objects(mask_not_gray_and_not_green, min_size=500, output_type="bool")
   rgb_remove_small = mask_rgb(rgb, mask_remove_small)
-  display_text = "#%d Not Gray and Not Green,\nRemove Small Objects" % slide_num
-  file_text = "rgb-not-green-and-not-gray-remove-small"
-  if save: save_filtered_image(rgb_remove_small, slide_num, "rgb-not-green-and-not-gray-remove-small")
-  if display: add_text_and_display(rgb_remove_small, "#%d Not Gray and Not Green,\nRemove Small Objects" % slide_num)
-  if page: html += image_cell(slide_num, display_text, file_text)
+  html += save_display_page(save, display, page, rgb_remove_small, slide_num,
+                            "#%d Not Gray and Not Green,\nRemove Small Objects" % slide_num,
+                            "rgb-not-green-and-not-gray-remove-small")
 
   print("Slide #%d processing time: %s\n" % (slide_num, str(t.elapsed())))
 
@@ -817,7 +802,40 @@ def apply_filters_to_image(slide_num, save=True, display=False, page=False):
   return html
 
 
+def save_display_page(save, display, page, img, slide_num, display_text, file_text):
+  """
+  Optionally save an image, display the image, and generate HTML for viewing an image.
+
+  Apply a set of filters to an image and optionally save and/or display filtered images.
+
+  Args:
+    save: If True, save filtered images.
+    display: If True, display filtered images to screen.
+    page: If True, generate HTML for viewing filter results
+    slide_num: The slide number.
+    display_text: Filter display name.
+    file_text: Filter name for file.
+
+  Returns:
+    Optionally return HTML for viewing a processed image.
+  """
+  if save: save_filtered_image(img, slide_num, file_text)
+  if display: add_text_and_display(img, display_text)
+  if page: return image_cell(slide_num, display_text, file_text)
+
+
 def image_cell(slide_num, display_text, file_text):
+  """
+  Generate HTML for viewing a processed image.
+
+  Args:
+    slide_num: The slide number.
+    display_text: Filter display name.
+    file_text: Filter name for file.
+
+  Returns:
+    HTML for viewing a processed image.
+  """
   return "    <td>\n      <a href=\"" + slide.get_filter_thumb_path(slide_num, file_text) + "\">\n        " \
          + display_text \
          + "<br/>\n        " \
@@ -828,6 +846,12 @@ def image_cell(slide_num, display_text, file_text):
 
 
 def html_header():
+  """
+  Generate an HTML header for previewing filtered images.
+
+  Returns:
+    HTML header for viewing processed images.
+  """
   html = "<html>\n  <head>\n    <title>Image Processing</title>\n" + \
          "    <style type=\"text/css\">\n" + \
          "     img { max-width: 400px; max-height: 400px; border: 2px solid black; }\n" + \
@@ -838,6 +862,12 @@ def html_header():
 
 
 def html_footer():
+  """
+  Generate an HTML footer for previewing filtered images.
+
+  Returns:
+    HTML footer for viewing processed images.
+  """
   html = "</table>\n</body>\n</html>\n"
   return html
 
@@ -845,6 +875,7 @@ def html_footer():
 def save_filtered_image(np_img, slide_num, filter_text):
   """
   Save a filtered image to the file system.
+
   Args:
     np_img: Image as a NumPy array.
     slide_num:  The slide number.
@@ -860,6 +891,7 @@ def apply_filters_to_images(save=True, display=False, page=True):
   Args:
     save: If True, save filtered images.
     display: If True, display filtered images to screen.
+    page: If True, generate HTML for viewing filter results
   """
   t = Time()
   print("Applying filters to images\n")
