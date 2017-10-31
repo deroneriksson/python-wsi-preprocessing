@@ -757,7 +757,7 @@ def apply_filters_to_image(slide_num, save=True, display=False, page=False):
     slide_num: The slide number.
     save: If True, save filtered images.
     display: If True, display filtered images to screen.
-    page: If True, generate HTML for viewing filter results
+    page: If True, generate HTML for viewing filter results.
   """
   t = Time()
   print("Processing slide #%d" % slide_num)
@@ -811,7 +811,7 @@ def save_display_page(save, display, page, img, slide_num, display_text, file_te
   Args:
     save: If True, save filtered images.
     display: If True, display filtered images to screen.
-    page: If True, generate HTML for viewing filter results
+    page: If True, generate HTML for viewing filter results.
     slide_num: The slide number.
     display_text: Filter display name.
     file_text: Filter name for file.
@@ -822,6 +822,7 @@ def save_display_page(save, display, page, img, slide_num, display_text, file_te
   if save: save_filtered_image(img, slide_num, file_text)
   if display: add_text_and_display(img, display_text)
   if page: return image_cell(slide_num, display_text, file_text)
+  else: return ""
 
 
 def image_cell(slide_num, display_text, file_text):
@@ -891,7 +892,7 @@ def apply_filters_to_images(save=True, display=False, page=True):
   Args:
     save: If True, save filtered images.
     display: If True, display filtered images to screen.
-    page: If True, generate HTML for viewing filter results
+    page: If True, generate HTML for viewing filter results.
   """
   t = Time()
   print("Applying filters to images\n")
@@ -919,7 +920,7 @@ def apply_filters_to_images(save=True, display=False, page=True):
 
 # apply_filters_to_image(3, display=True, save=True)
 
-apply_filters_to_images(save=True, display=False, page=True)
+apply_filters_to_images(save=False, display=True, page=True)
 
 
 # img_path = slide.get_training_thumb_path(2)
