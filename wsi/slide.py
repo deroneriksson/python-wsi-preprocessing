@@ -31,8 +31,8 @@ import PIL
 from PIL import Image
 import sys
 
-BASE_DIR = ".." + os.sep + "data"
-# BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
+# BASE_DIR = ".." + os.sep + "data"
+BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
 SRC_TRAIN_IMG_DIR = BASE_DIR + os.sep + "training_slides"
 TRAIN_THUMB_SUFFIX = "thumb-"
 TRAIN_IMG_PREFIX = "TUPAC-TR-"
@@ -42,7 +42,7 @@ THUMB_SIZE = 2048
 DEST_TRAIN_THUMB_DIR = BASE_DIR + os.sep + "training_thumbs_" + str(THUMB_SIZE)
 
 FILTER_DIR = BASE_DIR + os.sep + "filter_level_1_" + str(THUMB_SIZE)
-FILTER_THUMB_SUFFIX = "filter-"
+FILTER_THUMB_SUFFIX = ""  # ""filter-"
 
 
 def open_slide(filename):
@@ -115,15 +115,15 @@ def get_training_thumb_path(slide_number):
   return thumb_path
 
 
-def get_filter_thumb_path(slide_number, filter_name_info):
-  padded_sl_num = str(slide_number).zfill(3)
-  thumb_path = FILTER_DIR + os.sep + get_filter_thumb_filename(slide_number, filter_name_info)
+def get_filter_thumb_path(slide_number, filter_number, filter_name_info):
+  thumb_path = FILTER_DIR + os.sep + get_filter_thumb_filename(slide_number, filter_number, filter_name_info)
   return thumb_path
 
 
-def get_filter_thumb_filename(slide_number, filter_name_info):
+def get_filter_thumb_filename(slide_number, filter_number, filter_name_info):
   padded_sl_num = str(slide_number).zfill(3)
-  thumb_filename = TRAIN_IMG_PREFIX + padded_sl_num + "-" + FILTER_THUMB_SUFFIX + str(
+  padded_fi_num = str(filter_number).zfill(3)
+  thumb_filename = TRAIN_IMG_PREFIX + padded_sl_num + "-" + padded_fi_num + "-" + FILTER_THUMB_SUFFIX + str(
     THUMB_SIZE) + "-" + filter_name_info + THUMB_EXT
   return thumb_filename
 
