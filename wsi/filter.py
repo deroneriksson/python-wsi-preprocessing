@@ -846,7 +846,7 @@ def image_cell(slide_num, filter_num, display_text, file_text):
          "      <a href=\"" + slide.get_filter_thumb_path(slide_num, filter_num, file_text) + "\">\n" + \
          "        " + display_text + "<br/>\n" + \
          "        " + slide.get_filter_thumb_filename(slide_num, filter_num, file_text) + "<br/>\n" + \
-         "        <img src=\"" + slide.get_filter_thumb_path(slide_num, filter_num, file_text) + "\">\n" + \
+         "        <img src=\"" + slide.get_filter_thumb_path(slide_num, filter_num, file_text) + "\" />\n" + \
          "      </a>\n" + \
          "    </td>\n"
 
@@ -858,7 +858,9 @@ def html_header():
   Returns:
     HTML header for viewing processed images.
   """
-  html = "<html>\n" + \
+  html = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" " + \
+         "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" + \
+         "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n" + \
          "  <head>\n" + \
          "    <title>Image Processing</title>\n" + \
          "    <style type=\"text/css\">\n" + \
@@ -1027,8 +1029,8 @@ def multiprocess_apply_filters_to_images(save=True, display=False):
 
 
 # apply_filters_to_image(3, display=True, save=False)
-# singleprocess_apply_filters_to_images(save=True, display=False)
-multiprocess_apply_filters_to_images(save=True, display=False)
+singleprocess_apply_filters_to_images(save=True, display=False)
+#multiprocess_apply_filters_to_images(save=True, display=False)
 
 # img_path = slide.get_training_thumb_path(2)
 # img = slide.open_image(img_path)
