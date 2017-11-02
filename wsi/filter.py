@@ -874,11 +874,18 @@ def image_cell(slide_num, filter_num, display_text, file_text):
   Returns:
     HTML for viewing a processed image.
   """
+  # return "    <td>\n" + \
+  #        "      <a href=\"" + slide.get_filter_thumb_path(slide_num, filter_num, file_text) + "\">\n" + \
+  #        "        " + display_text + "<br/>\n" + \
+  #        "        " + slide.get_filter_thumb_filename(slide_num, filter_num, file_text) + "<br/>\n" + \
+  #        "        <img src=\"" + slide.get_filter_thumb_path(slide_num, filter_num, file_text) + "\" />\n" + \
+  #        "      </a>\n" + \
+  #        "    </td>\n"
   return "    <td>\n" + \
          "      <a href=\"" + slide.get_filter_thumb_path(slide_num, filter_num, file_text) + "\">\n" + \
          "        " + display_text + "<br/>\n" + \
          "        " + slide.get_filter_thumb_filename(slide_num, filter_num, file_text) + "<br/>\n" + \
-         "        <img src=\"" + slide.get_filter_thumb_path(slide_num, filter_num, file_text) + "\" />\n" + \
+         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + slide.get_filter_thumb_path(slide_num, filter_num, file_text) + "\" />\n" + \
          "      </a>\n" + \
          "    </td>\n"
 
@@ -901,6 +908,7 @@ def html_header():
          "    </style>\n" + \
          "  </head>\n" + \
          "  <body>\n" + \
+         "  <script src=\"../js/lazyload.js\"></script>\n" + \
          "  <table>\n"
   return html
 
@@ -913,6 +921,7 @@ def html_footer():
     HTML footer for viewing processed images.
   """
   html = "</table>\n" + \
+         "<script>lazyload();</script>\n" + \
          "</body>\n" + \
          "</html>\n"
   return html
