@@ -700,13 +700,34 @@ def filter_out_red_pen(rgb, output_type="bool"):
   return result
 
 
-def filter_out_bluegreen_pen(rgb, red_upper_thresh=150, green_lower_thresh=160, blue_lower_thresh=140,
-                             output_type="bool"):
-  t = Time()
+def filter_out_bluegreen(rgb, red_upper_thresh, green_lower_thresh, blue_lower_thresh, output_type="bool",
+                         display_np_info=False):
+  if display_np_info:
+    t = Time()
   r = rgb[:, :, 0] < red_upper_thresh
   g = rgb[:, :, 1] > green_lower_thresh
   b = rgb[:, :, 2] > blue_lower_thresh
   result = ~(r & g & b)
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    result = result.astype(float)
+  else:
+    result = result.astype("uint8") * 255
+  if display_np_info:
+    np_info(result, "Filter out BlueGreen", t.elapsed())
+  return result
+
+
+def filter_out_green_pen(rgb, output_type="bool"):
+  t = Time()
+  result = filter_out_bluegreen(rgb, red_upper_thresh=150, green_lower_thresh=160, blue_lower_thresh=140) & \
+           filter_out_bluegreen(rgb, red_upper_thresh=70, green_lower_thresh=110, blue_lower_thresh=110) & \
+           filter_out_bluegreen(rgb, red_upper_thresh=45, green_lower_thresh=115, blue_lower_thresh=100) & \
+           filter_out_bluegreen(rgb, red_upper_thresh=30, green_lower_thresh=75, blue_lower_thresh=60) & \
+           filter_out_bluegreen(rgb, red_upper_thresh=195, green_lower_thresh=220, blue_lower_thresh=210) & \
+           filter_out_bluegreen(rgb, red_upper_thresh=225, green_lower_thresh=230, blue_lower_thresh=225) & \
+           filter_out_bluegreen(rgb, red_upper_thresh=170, green_lower_thresh=210, blue_lower_thresh=200)
   if output_type == "bool":
     pass
   elif output_type == "float":
@@ -881,17 +902,7 @@ def apply_filters_to_image(slide_num, save=True, display=False):
                      "rgb-no-red-pen")
   if save: html_page_info[k_v[0]] = k_v[1]
 
-  mask_no_green_pen = filter_out_bluegreen_pen(rgb) & \
-                      filter_out_bluegreen_pen(rgb, red_upper_thresh=70, green_lower_thresh=110,
-                                               blue_lower_thresh=110) & \
-                      filter_out_bluegreen_pen(rgb, red_upper_thresh=45, green_lower_thresh=115,
-                                               blue_lower_thresh=100) & \
-                      filter_out_bluegreen_pen(rgb, red_upper_thresh=30, green_lower_thresh=75, blue_lower_thresh=60) & \
-                      filter_out_bluegreen_pen(rgb, red_upper_thresh=195, green_lower_thresh=220,
-                                               blue_lower_thresh=210) & \
-                      filter_out_bluegreen_pen(rgb, red_upper_thresh=225, green_lower_thresh=230,
-                                               blue_lower_thresh=225) & \
-                      filter_out_bluegreen_pen(rgb, red_upper_thresh=170, green_lower_thresh=210, blue_lower_thresh=200)
+  mask_no_green_pen = filter_out_green_pen(rgb)
   rgb_no_green_pen = mask_rgb(rgb, mask_no_green_pen)
   k_v = save_display(save, display, rgb_no_green_pen, slide_num, 5, "S%03d-F%03d No Green Pen" % (slide_num, 5),
                      "rgb-no-green-pen")
@@ -1186,11 +1197,11 @@ def multiprocess_apply_filters_to_images(save=True, display=False):
 # singleprocess_apply_filters_to_images(save=True, display=False)
 # multiprocess_apply_filters_to_images(save=True, display=False)
 
-red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
-                  336, 349, 357, 380, 450, 482]
-singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=red_pen_slides)
-# green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
-# singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
+# red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
+#                   336, 349, 357, 380, 450, 482]
+# singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=red_pen_slides)
+green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
+singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
 # blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
 
