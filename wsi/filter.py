@@ -683,7 +683,6 @@ def filter_out_red_pen(rgb, red_lower_thresh=150, green_upper_thresh=80, blue_up
   return result
 
 
-# def filter_out_green_pen(rgb, red_upper_thresh=90, green_lower_thresh=180, blue_upper_thresh=160, output_type="bool"):
 def filter_out_bluegreen_pen(rgb, red_upper_thresh=150, green_lower_thresh=160, blue_lower_thresh=140,
                              output_type="bool"):
   t = Time()
@@ -698,6 +697,22 @@ def filter_out_bluegreen_pen(rgb, red_upper_thresh=150, green_lower_thresh=160, 
   else:
     result = result.astype("uint8") * 255
   np_info(result, "Filter out Green Pen", t.elapsed())
+  return result
+
+
+def filter_out_blue_pen(rgb, red_upper_thresh=60, green_upper_thresh=120, blue_lower_thresh=190, output_type="bool"):
+  t = Time()
+  r = rgb[:, :, 0] < red_upper_thresh
+  g = rgb[:, :, 1] < green_upper_thresh
+  b = rgb[:, :, 2] > blue_lower_thresh
+  result = ~(r & g & b)
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    result = result.astype(float)
+  else:
+    result = result.astype("uint8") * 255
+  np_info(result, "Filter out Blue Pen", t.elapsed())
   return result
 
 
@@ -827,12 +842,6 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   k_v = save_display(save, display, rgb_no_red_pen, slide_num, 4, "S%03d-F%03d No Red Pen" % (slide_num, 4),
                      "rgb-no-red-pen")
   if save: html_page_info[k_v[0]] = k_v[1]
-  #
-  # mask_no_red_pen_2 = filter_out_red_pen(rgb, red_lower_thresh=120, green_upper_thresh=10, blue_upper_thresh=10)
-  # rgb_no_red_pen_2 = mask_rgb(rgb, mask_no_red_pen_2)
-  # k_v = save_display(save, display, rgb_no_red_pen_2, slide_num, 5, "S%03d-F%03d No Red Pen 2" % (slide_num, 5),
-  #                    "rgb-no-red-pen-2")
-  # if save: html_page_info[k_v[0]] = k_v[1]
 
   mask_no_green_pen = filter_out_bluegreen_pen(rgb) & \
                       filter_out_bluegreen_pen(rgb, red_upper_thresh=70, green_lower_thresh=110,
@@ -850,16 +859,22 @@ def apply_filters_to_image(slide_num, save=True, display=False):
                      "rgb-no-green-pen")
   if save: html_page_info[k_v[0]] = k_v[1]
 
-  # mask_no_green_pen_2 = filter_out_green_pen(rgb, red_upper_thresh=45, green_lower_thresh=135, blue_lower_thresh=110)
-  # rgb_no_green_pen_2 = mask_rgb(rgb, mask_no_green_pen_2)
-  # k_v = save_display(save, display, rgb_no_green_pen_2, slide_num, 5, "S%03d-F%03d No Green Pen 2" % (slide_num, 5),
-  #                    "rgb-no-green-pen-2")
-  # if save: html_page_info[k_v[0]] = k_v[1]
+  mask_no_blue_pen = filter_out_blue_pen(rgb) & filter_out_blue_pen(rgb, red_upper_thresh=120, green_upper_thresh=170,
+                                                                    blue_lower_thresh=200) & \
+                     filter_out_blue_pen(rgb, red_upper_thresh=175, green_upper_thresh=210, blue_lower_thresh=230) & \
+                     filter_out_blue_pen(rgb, red_upper_thresh=145, green_upper_thresh=180, blue_lower_thresh=210) & \
+                     filter_out_blue_pen(rgb, red_upper_thresh=37, green_upper_thresh=95, blue_lower_thresh=160) & \
+                     filter_out_blue_pen(rgb, red_upper_thresh=30, green_upper_thresh=65, blue_lower_thresh=130) & \
+                     filter_out_blue_pen(rgb, red_upper_thresh=130, green_upper_thresh=155, blue_lower_thresh=180)
+  rgb_no_blue_pen = mask_rgb(rgb, mask_no_blue_pen)
+  k_v = save_display(save, display, rgb_no_blue_pen, slide_num, 6, "S%03d-F%03d No Blue Pen" % (slide_num, 6),
+                     "rgb-no-blue-pen")
+  if save: html_page_info[k_v[0]] = k_v[1]
 
-  mask_gray_green_pens = mask_not_gray & mask_not_green & mask_no_red_pen & mask_no_green_pen
+  mask_gray_green_pens = mask_not_gray & mask_not_green & mask_no_red_pen & mask_no_green_pen & mask_no_blue_pen
   rgb_gray_green_pens = mask_rgb(rgb, mask_gray_green_pens)
-  k_v = save_display(save, display, rgb_gray_green_pens, slide_num, 6,
-                     "S%03d-F%03d Not Gray, Not Green, No Pens" % (slide_num, 6), "rgb-no-gray-no-green-no-pens")
+  k_v = save_display(save, display, rgb_gray_green_pens, slide_num, 7,
+                     "S%03d-F%03d Not Gray, Not Green, No Pens" % (slide_num, 7), "rgb-no-gray-no-green-no-pens")
   if save: html_page_info[k_v[0]] = k_v[1]
 
   # mask_not_gray_and_not_green = mask_not_gray & mask_not_green
@@ -871,7 +886,7 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   mask_remove_small = filter_remove_small_objects(mask_gray_green_pens, min_size=500, output_type="bool")
   rgb_remove_small = mask_rgb(rgb, mask_remove_small)
   k_v = save_display(save, display, rgb_remove_small, slide_num, 7,
-                     "S%03d-F%03d Not Gray, Not Green, No Pens\nRemove Small Objects" % (slide_num, 7),
+                     "S%03d-F%03d Not Gray, Not Green, No Pens,\nRemove Small Objects" % (slide_num, 7),
                      "rgb-not-green-not-gray-no-pens-remove-small")
   if save: html_page_info[k_v[0]] = k_v[1]
 
@@ -1137,13 +1152,15 @@ def multiprocess_apply_filters_to_images(save=True, display=False):
 
 # apply_filters_to_image(3, display=True, save=False)
 # singleprocess_apply_filters_to_images(save=True, display=False)
-# multiprocess_apply_filters_to_images(save=True, display=False)
+multiprocess_apply_filters_to_images(save=True, display=False)
 
 # red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
 #                   336, 349, 357, 380, 450, 482]
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=red_pen_slides)
-green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
-singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
+# green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
+# singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
+# blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
+# singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
 
 # img_path = slide.get_training_thumb_path(2)
 # img = slide.open_image(img_path)
