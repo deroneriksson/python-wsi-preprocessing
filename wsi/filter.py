@@ -927,6 +927,25 @@ def generate_filter_html_page(html_page_info):
   text_file.close()
 
 
+def apply_filters_to_image_list(image_num_list, save, display):
+  """
+  Apply filters to a list of images.
+
+  Args:
+    image_num_list: List of image numbers.
+    save: If True, save filtered images.
+    display: If True, display filtered images to screen.
+
+  Returns:
+    The starting index and the ending index of the slides that were converted to thumbnails.
+  """
+  html_page_info = dict()
+  for slide_num in image_num_list:
+    result = apply_filters_to_image(slide_num, save=save, display=display)
+    html_page_info.update(result)
+  return html_page_info
+
+
 def apply_filters_to_image_range(start_ind, end_ind, save, display):
   """
   Apply filters to a range of images.
@@ -943,24 +962,27 @@ def apply_filters_to_image_range(start_ind, end_ind, save, display):
   html_page_info = dict()
   for slide_num in range(start_ind, end_ind + 1):
     result = apply_filters_to_image(slide_num, save=save, display=display)
-    # html_page_info = dict(html_page_info.items() + result.items())
     html_page_info.update(result)
   return (start_ind, end_ind, html_page_info)
 
 
-def singleprocess_apply_filters_to_images(save=True, display=False):
+def singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=None):
   """
   Apply a set of filters to training images and optionally save and/or display the filtered images.
 
   Args:
     save: If True, save filtered images.
     display: If True, display filtered images to screen.
+    image_num_list: Optionally specify a list of image slide numbers.
   """
   t = Time()
   print("Applying filters to images\n")
 
-  num_training_slides = slide.get_num_training_slides()
-  (s, e, html_page_info) = apply_filters_to_image_range(1, num_training_slides, save, display)
+  if image_num_list is not None:
+    html_page_info = apply_filters_to_image_list(image_num_list, save, display)
+  else:
+    num_training_slides = slide.get_num_training_slides()
+    (s, e, html_page_info) = apply_filters_to_image_range(1, num_training_slides, save, display)
 
   print("Time to apply filters to all images: %s\n" % str(t.elapsed()))
 
@@ -1029,8 +1051,12 @@ def multiprocess_apply_filters_to_images(save=True, display=False):
 
 
 # apply_filters_to_image(3, display=True, save=False)
-singleprocess_apply_filters_to_images(save=True, display=False)
-#multiprocess_apply_filters_to_images(save=True, display=False)
+# singleprocess_apply_filters_to_images(save=True, display=False)
+# multiprocess_apply_filters_to_images(save=True, display=False)
+
+red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
+                  336, 349, 357, 380, 450, 482]
+singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=red_pen_slides)
 
 # img_path = slide.get_training_thumb_path(2)
 # img = slide.open_image(img_path)
