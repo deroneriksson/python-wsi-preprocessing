@@ -641,7 +641,7 @@ def filter_threshold(np_img, threshold, output_type="bool"):
   return result
 
 
-def filter_out_green(rgb, green_thresh=200, output_type="bool"):
+def filter_out_green_channel(rgb, green_thresh=200, output_type="bool"):
   """
   Create a mask to filter out pixels with a green channel value greater than a particular threshold, since hematoxylin
   and eosin are purplish and pinkish, which do not have much green to them.
@@ -667,12 +667,29 @@ def filter_out_green(rgb, green_thresh=200, output_type="bool"):
   return result
 
 
-def filter_out_red_pen(rgb, red_lower_thresh=150, green_upper_thresh=80, blue_upper_thresh=90, output_type="bool"):
-  t = Time()
+def filter_out_red(rgb, red_lower_thresh, green_upper_thresh, blue_upper_thresh, output_type="bool",
+                   display_np_info=False):
+  if display_np_info:
+    t = Time()
   r = rgb[:, :, 0] > red_lower_thresh
   g = rgb[:, :, 1] < green_upper_thresh
   b = rgb[:, :, 2] < blue_upper_thresh
   result = ~(r & g & b)
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    result = result.astype(float)
+  else:
+    result = result.astype("uint8") * 255
+  if display_np_info:
+    np_info(result, "Filter out Red", t.elapsed())
+  return result
+
+
+def filter_out_red_pen(rgb, output_type="bool"):
+  t = Time()
+  result = filter_out_red(rgb, red_lower_thresh=150, green_upper_thresh=80, blue_upper_thresh=90) & \
+           filter_out_red(rgb, red_lower_thresh=120, green_upper_thresh=10, blue_upper_thresh=10)
   if output_type == "bool":
     pass
   elif output_type == "float":
@@ -847,7 +864,7 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   k_v = save_display(save, display, rgb, slide_num, 1, "S%03d-F%03d Original" % (slide_num, 1), "rgb")
   if save: html_page_info[k_v[0]] = k_v[1]
 
-  mask_not_green = filter_out_green(rgb, green_thresh=200)
+  mask_not_green = filter_out_green_channel(rgb, green_thresh=200)
   rgb_not_green = mask_rgb(rgb, mask_not_green)
   k_v = save_display(save, display, rgb_not_green, slide_num, 2, "S%03d-F%03d Not Green" % (slide_num, 2),
                      "rgb-not-green")
@@ -858,8 +875,7 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   k_v = save_display(save, display, rgb_not_gray, slide_num, 3, "S%03d-F%03d Not Gray" % (slide_num, 3), "rgb-not-gray")
   if save: html_page_info[k_v[0]] = k_v[1]
 
-  mask_no_red_pen = filter_out_red_pen(rgb) & filter_out_red_pen(rgb, red_lower_thresh=120, green_upper_thresh=10,
-                                                                 blue_upper_thresh=10)
+  mask_no_red_pen = filter_out_red_pen(rgb)
   rgb_no_red_pen = mask_rgb(rgb, mask_no_red_pen)
   k_v = save_display(save, display, rgb_no_red_pen, slide_num, 4, "S%03d-F%03d No Red Pen" % (slide_num, 4),
                      "rgb-no-red-pen")
@@ -1170,13 +1186,13 @@ def multiprocess_apply_filters_to_images(save=True, display=False):
 # singleprocess_apply_filters_to_images(save=True, display=False)
 # multiprocess_apply_filters_to_images(save=True, display=False)
 
-# red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
-#                   336, 349, 357, 380, 450, 482]
-# singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=red_pen_slides)
+red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
+                  336, 349, 357, 380, 450, 482]
+singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=red_pen_slides)
 # green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
-blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
-singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
+# blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
+# singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
 
 # img_path = slide.get_training_thumb_path(2)
 # img = slide.open_image(img_path)
