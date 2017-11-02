@@ -882,54 +882,44 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   img = slide.open_image(img_path)
 
   rgb = pil_to_np_rgb(img)
-  k_v = save_display(save, display, rgb, slide_num, 1, "S%03d-F%03d Original" % (slide_num, 1), "rgb")
+  k_v = save_display(save, display, rgb, slide_num, 1, "Original", "rgb")
   if save: html_page_info[k_v[0]] = k_v[1]
 
   mask_not_green = filter_out_green_channel(rgb, green_thresh=200)
   rgb_not_green = mask_rgb(rgb, mask_not_green)
-  k_v = save_display(save, display, rgb_not_green, slide_num, 2, "S%03d-F%03d Not Green" % (slide_num, 2),
-                     "rgb-not-green")
+  k_v = save_display(save, display, rgb_not_green, slide_num, 2, "Not Green", "rgb-not-green")
   if save: html_page_info[k_v[0]] = k_v[1]
 
   mask_not_gray = filter_out_grays(rgb)
   rgb_not_gray = mask_rgb(rgb, mask_not_gray)
-  k_v = save_display(save, display, rgb_not_gray, slide_num, 3, "S%03d-F%03d Not Gray" % (slide_num, 3), "rgb-not-gray")
+  k_v = save_display(save, display, rgb_not_gray, slide_num, 3, "Not Gray", "rgb-not-gray")
   if save: html_page_info[k_v[0]] = k_v[1]
 
   mask_no_red_pen = filter_out_red_pen(rgb)
   rgb_no_red_pen = mask_rgb(rgb, mask_no_red_pen)
-  k_v = save_display(save, display, rgb_no_red_pen, slide_num, 4, "S%03d-F%03d No Red Pen" % (slide_num, 4),
-                     "rgb-no-red-pen")
+  k_v = save_display(save, display, rgb_no_red_pen, slide_num, 4, "No Red Pen", "rgb-no-red-pen")
   if save: html_page_info[k_v[0]] = k_v[1]
 
   mask_no_green_pen = filter_out_green_pen(rgb)
   rgb_no_green_pen = mask_rgb(rgb, mask_no_green_pen)
-  k_v = save_display(save, display, rgb_no_green_pen, slide_num, 5, "S%03d-F%03d No Green Pen" % (slide_num, 5),
-                     "rgb-no-green-pen")
+  k_v = save_display(save, display, rgb_no_green_pen, slide_num, 5, "No Green Pen", "rgb-no-green-pen")
   if save: html_page_info[k_v[0]] = k_v[1]
 
   mask_no_blue_pen = filter_out_blue_pen(rgb)
   rgb_no_blue_pen = mask_rgb(rgb, mask_no_blue_pen)
-  k_v = save_display(save, display, rgb_no_blue_pen, slide_num, 6, "S%03d-F%03d No Blue Pen" % (slide_num, 6),
-                     "rgb-no-blue-pen")
+  k_v = save_display(save, display, rgb_no_blue_pen, slide_num, 6, "No Blue Pen", "rgb-no-blue-pen")
   if save: html_page_info[k_v[0]] = k_v[1]
 
   mask_gray_green_pens = mask_not_gray & mask_not_green & mask_no_red_pen & mask_no_green_pen & mask_no_blue_pen
   rgb_gray_green_pens = mask_rgb(rgb, mask_gray_green_pens)
-  k_v = save_display(save, display, rgb_gray_green_pens, slide_num, 7,
-                     "S%03d-F%03d Not Gray, Not Green, No Pens" % (slide_num, 7), "rgb-no-gray-no-green-no-pens")
+  k_v = save_display(save, display, rgb_gray_green_pens, slide_num, 7, "Not Gray, Not Green, No Pens",
+                     "rgb-no-gray-no-green-no-pens")
   if save: html_page_info[k_v[0]] = k_v[1]
-
-  # mask_not_gray_and_not_green = mask_not_gray & mask_not_green
-  # rgb_not_gray_and_not_green = mask_rgb(rgb, mask_not_gray_and_not_green)
-  # k_v = save_display(save, display, rgb_not_gray_and_not_green, slide_num, 4,
-  #                    "S%03d-F%03d Not Gray and Not Green" % (slide_num, 4), "rgb-not-green-and-not-gray")
-  # if save: html_page_info[k_v[0]] = k_v[1]
 
   mask_remove_small = filter_remove_small_objects(mask_gray_green_pens, min_size=500, output_type="bool")
   rgb_remove_small = mask_rgb(rgb, mask_remove_small)
-  k_v = save_display(save, display, rgb_remove_small, slide_num, 7,
-                     "S%03d-F%03d Not Gray, Not Green, No Pens,\nRemove Small Objects" % (slide_num, 7),
+  k_v = save_display(save, display, rgb_remove_small, slide_num, 8,
+                     "Not Gray, Not Green, No Pens,\nRemove Small Objects",
                      "rgb-not-green-not-gray-no-pens-remove-small")
   if save: html_page_info[k_v[0]] = k_v[1]
 
@@ -954,6 +944,12 @@ def save_display(save, display, np_img, slide_num, filter_num, display_text, fil
   Returns:
     Image information as a key/value tuple.
   """
+  if slide_num is None and filter_num is None:
+    pass
+  elif filter_num is None:
+    display_text = "S%03d " % slide_num + display_text
+  else:
+    display_text = "S%03d-F%03d " % (slide_num, filter_num) + display_text
   if display: add_text_and_display(np_img, display_text)
   if save:
     save_filtered_image(np_img, slide_num, filter_num, file_text)
