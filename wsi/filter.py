@@ -683,6 +683,24 @@ def filter_out_red_pen(rgb, red_lower_thresh=150, green_upper_thresh=80, blue_up
   return result
 
 
+# def filter_out_green_pen(rgb, red_upper_thresh=90, green_lower_thresh=180, blue_upper_thresh=160, output_type="bool"):
+def filter_out_bluegreen_pen(rgb, red_upper_thresh=150, green_lower_thresh=160, blue_lower_thresh=140,
+                             output_type="bool"):
+  t = Time()
+  r = rgb[:, :, 0] < red_upper_thresh
+  g = rgb[:, :, 1] > green_lower_thresh
+  b = rgb[:, :, 2] > blue_lower_thresh
+  result = ~(r & g & b)
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    result = result.astype(float)
+  else:
+    result = result.astype("uint8") * 255
+  np_info(result, "Filter out Green Pen", t.elapsed())
+  return result
+
+
 def filter_out_grays(rgb, tolerance=15, output_type="bool"):
   """
   Create a mask to filter out pixels where the red, green, and blue channel values are similar.
@@ -803,20 +821,45 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   k_v = save_display(save, display, rgb_not_gray, slide_num, 3, "S%03d-F%03d Not Gray" % (slide_num, 3), "rgb-not-gray")
   if save: html_page_info[k_v[0]] = k_v[1]
 
-  mask_no_red_pen = filter_out_red_pen(rgb)
+  mask_no_red_pen = filter_out_red_pen(rgb) & filter_out_red_pen(rgb, red_lower_thresh=120, green_upper_thresh=10,
+                                                                 blue_upper_thresh=10)
   rgb_no_red_pen = mask_rgb(rgb, mask_no_red_pen)
-  k_v = save_display(save, display, rgb_no_red_pen, slide_num, 4, "S%03d-F%03d No Red Pen" % (slide_num, 4), "rgb-no-red-pen")
+  k_v = save_display(save, display, rgb_no_red_pen, slide_num, 4, "S%03d-F%03d No Red Pen" % (slide_num, 4),
+                     "rgb-no-red-pen")
+  if save: html_page_info[k_v[0]] = k_v[1]
+  #
+  # mask_no_red_pen_2 = filter_out_red_pen(rgb, red_lower_thresh=120, green_upper_thresh=10, blue_upper_thresh=10)
+  # rgb_no_red_pen_2 = mask_rgb(rgb, mask_no_red_pen_2)
+  # k_v = save_display(save, display, rgb_no_red_pen_2, slide_num, 5, "S%03d-F%03d No Red Pen 2" % (slide_num, 5),
+  #                    "rgb-no-red-pen-2")
+  # if save: html_page_info[k_v[0]] = k_v[1]
+
+  mask_no_green_pen = filter_out_bluegreen_pen(rgb) & \
+                      filter_out_bluegreen_pen(rgb, red_upper_thresh=70, green_lower_thresh=110,
+                                               blue_lower_thresh=110) & \
+                      filter_out_bluegreen_pen(rgb, red_upper_thresh=45, green_lower_thresh=115,
+                                               blue_lower_thresh=100) & \
+                      filter_out_bluegreen_pen(rgb, red_upper_thresh=30, green_lower_thresh=75, blue_lower_thresh=60) & \
+                      filter_out_bluegreen_pen(rgb, red_upper_thresh=195, green_lower_thresh=220,
+                                               blue_lower_thresh=210) & \
+                      filter_out_bluegreen_pen(rgb, red_upper_thresh=225, green_lower_thresh=230,
+                                               blue_lower_thresh=225) & \
+                      filter_out_bluegreen_pen(rgb, red_upper_thresh=170, green_lower_thresh=210, blue_lower_thresh=200)
+  rgb_no_green_pen = mask_rgb(rgb, mask_no_green_pen)
+  k_v = save_display(save, display, rgb_no_green_pen, slide_num, 5, "S%03d-F%03d No Green Pen" % (slide_num, 5),
+                     "rgb-no-green-pen")
   if save: html_page_info[k_v[0]] = k_v[1]
 
-  mask_no_red_pen_2 = filter_out_red_pen(rgb, red_lower_thresh=120, green_upper_thresh=10, blue_upper_thresh=10)
-  rgb_no_red_pen_2 = mask_rgb(rgb, mask_no_red_pen_2)
-  k_v = save_display(save, display, rgb_no_red_pen_2, slide_num, 5, "S%03d-F%03d No Red Pen 2" % (slide_num, 5), "rgb-no-red-pen-2")
-  if save: html_page_info[k_v[0]] = k_v[1]
+  # mask_no_green_pen_2 = filter_out_green_pen(rgb, red_upper_thresh=45, green_lower_thresh=135, blue_lower_thresh=110)
+  # rgb_no_green_pen_2 = mask_rgb(rgb, mask_no_green_pen_2)
+  # k_v = save_display(save, display, rgb_no_green_pen_2, slide_num, 5, "S%03d-F%03d No Green Pen 2" % (slide_num, 5),
+  #                    "rgb-no-green-pen-2")
+  # if save: html_page_info[k_v[0]] = k_v[1]
 
-  mask_gray_green_red_pen = mask_not_gray & mask_not_green & mask_no_red_pen & mask_no_red_pen_2
-  rgb_gray_green_red_pen = mask_rgb(rgb, mask_gray_green_red_pen)
-  k_v = save_display(save, display, rgb_gray_green_red_pen, slide_num, 6,
-                     "S%03d-F%03d Not Gray, Not Green, No Red Pen" % (slide_num, 6), "rgb-no-gray-no-green-no-red-pen")
+  mask_gray_green_pens = mask_not_gray & mask_not_green & mask_no_red_pen & mask_no_green_pen
+  rgb_gray_green_pens = mask_rgb(rgb, mask_gray_green_pens)
+  k_v = save_display(save, display, rgb_gray_green_pens, slide_num, 6,
+                     "S%03d-F%03d Not Gray, Not Green, No Pens" % (slide_num, 6), "rgb-no-gray-no-green-no-pens")
   if save: html_page_info[k_v[0]] = k_v[1]
 
   # mask_not_gray_and_not_green = mask_not_gray & mask_not_green
@@ -825,11 +868,11 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   #                    "S%03d-F%03d Not Gray and Not Green" % (slide_num, 4), "rgb-not-green-and-not-gray")
   # if save: html_page_info[k_v[0]] = k_v[1]
 
-  mask_remove_small = filter_remove_small_objects(mask_gray_green_red_pen, min_size=500, output_type="bool")
+  mask_remove_small = filter_remove_small_objects(mask_gray_green_pens, min_size=500, output_type="bool")
   rgb_remove_small = mask_rgb(rgb, mask_remove_small)
   k_v = save_display(save, display, rgb_remove_small, slide_num, 7,
-                     "S%03d-F%03d Not Gray, Not Green, No Red Pen\nRemove Small Objects" % (slide_num, 7),
-                     "rgb-not-green-and-not-gray-remove-small")
+                     "S%03d-F%03d Not Gray, Not Green, No Pens\nRemove Small Objects" % (slide_num, 7),
+                     "rgb-not-green-not-gray-no-pens-remove-small")
   if save: html_page_info[k_v[0]] = k_v[1]
 
   print("Slide #%03d processing time: %s\n" % (slide_num, str(t.elapsed())))
@@ -885,7 +928,8 @@ def image_cell(slide_num, filter_num, display_text, file_text):
          "      <a href=\"" + slide.get_filter_thumb_path(slide_num, filter_num, file_text) + "\">\n" + \
          "        " + display_text + "<br/>\n" + \
          "        " + slide.get_filter_thumb_filename(slide_num, filter_num, file_text) + "<br/>\n" + \
-         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + slide.get_filter_thumb_path(slide_num, filter_num, file_text) + "\" />\n" + \
+         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + slide.get_filter_thumb_path(
+    slide_num, filter_num, file_text) + "\" />\n" + \
          "      </a>\n" + \
          "    </td>\n"
 
@@ -1093,11 +1137,13 @@ def multiprocess_apply_filters_to_images(save=True, display=False):
 
 # apply_filters_to_image(3, display=True, save=False)
 # singleprocess_apply_filters_to_images(save=True, display=False)
-multiprocess_apply_filters_to_images(save=True, display=False)
+# multiprocess_apply_filters_to_images(save=True, display=False)
 
 # red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
 #                   336, 349, 357, 380, 450, 482]
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=red_pen_slides)
+green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
+singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
 
 # img_path = slide.get_training_thumb_path(2)
 # img = slide.open_image(img_path)
