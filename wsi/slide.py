@@ -37,7 +37,7 @@ SRC_TRAIN_IMG_DIR = BASE_DIR + os.sep + "training_slides"
 TRAIN_THUMB_SUFFIX = "thumb-"
 TRAIN_IMG_PREFIX = "TUPAC-TR-"
 TRAIN_IMG_EXT = ".svs"
-THUMB_EXT = ".jpg"
+THUMB_EXT = ".png"
 THUMB_SIZE = 2048
 DEST_TRAIN_THUMB_DIR = BASE_DIR + os.sep + "training_thumbs_" + str(THUMB_SIZE)
 
