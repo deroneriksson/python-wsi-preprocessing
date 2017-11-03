@@ -641,7 +641,7 @@ def filter_threshold(np_img, threshold, output_type="bool"):
   return result
 
 
-def filter_out_green_channel(rgb, green_thresh=200, output_type="bool"):
+def filter_green_channel(rgb, green_thresh=200, output_type="bool"):
   """
   Create a mask to filter out pixels with a green channel value greater than a particular threshold, since hematoxylin
   and eosin are purplish and pinkish, which do not have much green to them.
@@ -663,12 +663,27 @@ def filter_out_green_channel(rgb, green_thresh=200, output_type="bool"):
     result = result.astype(float)
   else:
     result = result.astype("uint8") * 255
-  np_info(result, "Filter out Green", t.elapsed())
+  np_info(result, "Filter Green", t.elapsed())
   return result
 
 
-def filter_out_red(rgb, red_lower_thresh, green_upper_thresh, blue_upper_thresh, output_type="bool",
-                   display_np_info=False):
+def filter_red(rgb, red_lower_thresh, green_upper_thresh, blue_upper_thresh, output_type="bool",
+               display_np_info=False):
+  """
+  Create a mask to filter out reddish colors, where the mask is based on a pixel being above a
+  red channel threshold value, below a green channel threshold value, and below a blue channel threshold value.
+
+  Args:
+    rgb: RGB image as a NumPy array.
+    red_lower_thresh: Red channel lower threshold value.
+    green_upper_thresh: Green channel upper threshold value.
+    blue_upper_thresh: Blue channel upper threshold value.
+    output_type: Type of array to return (bool, float, or uint8).
+    display_np_info: If True, display NumPy array info an filter time.
+
+  Returns:
+    NumPy array representing the mask.
+  """
   if display_np_info:
     t = Time()
   r = rgb[:, :, 0] > red_lower_thresh
@@ -682,26 +697,41 @@ def filter_out_red(rgb, red_lower_thresh, green_upper_thresh, blue_upper_thresh,
   else:
     result = result.astype("uint8") * 255
   if display_np_info:
-    np_info(result, "Filter out Red", t.elapsed())
+    np_info(result, "Filter Red", t.elapsed())
   return result
 
 
-def filter_out_red_pen(rgb, output_type="bool"):
+def filter_red_pen(rgb, output_type="bool"):
   t = Time()
-  result = filter_out_red(rgb, red_lower_thresh=150, green_upper_thresh=80, blue_upper_thresh=90) & \
-           filter_out_red(rgb, red_lower_thresh=120, green_upper_thresh=10, blue_upper_thresh=10)
+  result = filter_red(rgb, red_lower_thresh=150, green_upper_thresh=80, blue_upper_thresh=90) & \
+           filter_red(rgb, red_lower_thresh=120, green_upper_thresh=10, blue_upper_thresh=10)
   if output_type == "bool":
     pass
   elif output_type == "float":
     result = result.astype(float)
   else:
     result = result.astype("uint8") * 255
-  np_info(result, "Filter out Red Pen", t.elapsed())
+  np_info(result, "Filter Red Pen", t.elapsed())
   return result
 
 
-def filter_out_bluegreen(rgb, red_upper_thresh, green_lower_thresh, blue_lower_thresh, output_type="bool",
-                         display_np_info=False):
+def filter_bluegreen(rgb, red_upper_thresh, green_lower_thresh, blue_lower_thresh, output_type="bool",
+                     display_np_info=False):
+  """
+  Create a mask to filter out blueish/greenish colors, where the mask is based on a pixel being below a
+  red channel threshold value, above a green channel threshold value, and above a blue channel threshold value.
+
+  Args:
+    rgb: RGB image as a NumPy array.
+    red_upper_thresh: Red channel upper threshold value.
+    green_lower_thresh: Green channel lower threshold value.
+    blue_lower_thresh: Blue channel lower threshold value.
+    output_type: Type of array to return (bool, float, or uint8).
+    display_np_info: If True, display NumPy array info an filter time.
+
+  Returns:
+    NumPy array representing the mask.
+  """
   if display_np_info:
     t = Time()
   r = rgb[:, :, 0] < red_upper_thresh
@@ -715,31 +745,46 @@ def filter_out_bluegreen(rgb, red_upper_thresh, green_lower_thresh, blue_lower_t
   else:
     result = result.astype("uint8") * 255
   if display_np_info:
-    np_info(result, "Filter out BlueGreen", t.elapsed())
+    np_info(result, "Filter BlueGreen", t.elapsed())
   return result
 
 
-def filter_out_green_pen(rgb, output_type="bool"):
+def filter_green_pen(rgb, output_type="bool"):
   t = Time()
-  result = filter_out_bluegreen(rgb, red_upper_thresh=150, green_lower_thresh=160, blue_lower_thresh=140) & \
-           filter_out_bluegreen(rgb, red_upper_thresh=70, green_lower_thresh=110, blue_lower_thresh=110) & \
-           filter_out_bluegreen(rgb, red_upper_thresh=45, green_lower_thresh=115, blue_lower_thresh=100) & \
-           filter_out_bluegreen(rgb, red_upper_thresh=30, green_lower_thresh=75, blue_lower_thresh=60) & \
-           filter_out_bluegreen(rgb, red_upper_thresh=195, green_lower_thresh=220, blue_lower_thresh=210) & \
-           filter_out_bluegreen(rgb, red_upper_thresh=225, green_lower_thresh=230, blue_lower_thresh=225) & \
-           filter_out_bluegreen(rgb, red_upper_thresh=170, green_lower_thresh=210, blue_lower_thresh=200)
+  result = filter_bluegreen(rgb, red_upper_thresh=150, green_lower_thresh=160, blue_lower_thresh=140) & \
+           filter_bluegreen(rgb, red_upper_thresh=70, green_lower_thresh=110, blue_lower_thresh=110) & \
+           filter_bluegreen(rgb, red_upper_thresh=45, green_lower_thresh=115, blue_lower_thresh=100) & \
+           filter_bluegreen(rgb, red_upper_thresh=30, green_lower_thresh=75, blue_lower_thresh=60) & \
+           filter_bluegreen(rgb, red_upper_thresh=195, green_lower_thresh=220, blue_lower_thresh=210) & \
+           filter_bluegreen(rgb, red_upper_thresh=225, green_lower_thresh=230, blue_lower_thresh=225) & \
+           filter_bluegreen(rgb, red_upper_thresh=170, green_lower_thresh=210, blue_lower_thresh=200)
   if output_type == "bool":
     pass
   elif output_type == "float":
     result = result.astype(float)
   else:
     result = result.astype("uint8") * 255
-  np_info(result, "Filter out Green Pen", t.elapsed())
+  np_info(result, "Filter Green Pen", t.elapsed())
   return result
 
 
-def filter_out_blue(rgb, red_upper_thresh, green_upper_thresh, blue_lower_thresh, output_type="bool",
-                    display_np_info=False):
+def filter_blue(rgb, red_upper_thresh, green_upper_thresh, blue_lower_thresh, output_type="bool",
+                display_np_info=False):
+  """
+  Create a mask to filter out blueish colors, where the mask is based on a pixel being below a
+  red channel threshold value, below a green channel threshold value, and above a blue channel threshold value.
+
+  Args:
+    rgb: RGB image as a NumPy array.
+    red_upper_thresh: Red channel upper threshold value.
+    green_upper_thresh: Green channel upper threshold value.
+    blue_lower_thresh: Blue channel lower threshold value.
+    output_type: Type of array to return (bool, float, or uint8).
+    display_np_info: If True, display NumPy array info an filter time.
+
+  Returns:
+    NumPy array representing the mask.
+  """
   if display_np_info:
     t = Time()
   r = rgb[:, :, 0] < red_upper_thresh
@@ -753,30 +798,30 @@ def filter_out_blue(rgb, red_upper_thresh, green_upper_thresh, blue_lower_thresh
   else:
     result = result.astype("uint8") * 255
   if display_np_info:
-    np_info(result, "Filter out Blue", t.elapsed())
+    np_info(result, "Filter Blue", t.elapsed())
   return result
 
 
-def filter_out_blue_pen(rgb, output_type="bool"):
+def filter_blue_pen(rgb, output_type="bool"):
   t = Time()
-  result = filter_out_blue(rgb, red_upper_thresh=60, green_upper_thresh=120, blue_lower_thresh=190) & \
-           filter_out_blue(rgb, red_upper_thresh=120, green_upper_thresh=170, blue_lower_thresh=200) & \
-           filter_out_blue(rgb, red_upper_thresh=175, green_upper_thresh=210, blue_lower_thresh=230) & \
-           filter_out_blue(rgb, red_upper_thresh=145, green_upper_thresh=180, blue_lower_thresh=210) & \
-           filter_out_blue(rgb, red_upper_thresh=37, green_upper_thresh=95, blue_lower_thresh=160) & \
-           filter_out_blue(rgb, red_upper_thresh=30, green_upper_thresh=65, blue_lower_thresh=130) & \
-           filter_out_blue(rgb, red_upper_thresh=130, green_upper_thresh=155, blue_lower_thresh=180)
+  result = filter_blue(rgb, red_upper_thresh=60, green_upper_thresh=120, blue_lower_thresh=190) & \
+           filter_blue(rgb, red_upper_thresh=120, green_upper_thresh=170, blue_lower_thresh=200) & \
+           filter_blue(rgb, red_upper_thresh=175, green_upper_thresh=210, blue_lower_thresh=230) & \
+           filter_blue(rgb, red_upper_thresh=145, green_upper_thresh=180, blue_lower_thresh=210) & \
+           filter_blue(rgb, red_upper_thresh=37, green_upper_thresh=95, blue_lower_thresh=160) & \
+           filter_blue(rgb, red_upper_thresh=30, green_upper_thresh=65, blue_lower_thresh=130) & \
+           filter_blue(rgb, red_upper_thresh=130, green_upper_thresh=155, blue_lower_thresh=180)
   if output_type == "bool":
     pass
   elif output_type == "float":
     result = result.astype(float)
   else:
     result = result.astype("uint8") * 255
-  np_info(result, "Filter out Blue Pen", t.elapsed())
+  np_info(result, "Filter Blue Pen", t.elapsed())
   return result
 
 
-def filter_out_grays(rgb, tolerance=15, output_type="bool"):
+def filter_grays(rgb, tolerance=15, output_type="bool"):
   """
   Create a mask to filter out pixels where the red, green, and blue channel values are similar.
 
@@ -803,7 +848,7 @@ def filter_out_grays(rgb, tolerance=15, output_type="bool"):
     result = result.astype(float)
   else:
     result = result.astype("uint8") * 255
-  np_info(result, "Filter out Grays", t.elapsed())
+  np_info(result, "Filter Grays", t.elapsed())
   return result
 
 
@@ -884,23 +929,23 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   rgb = pil_to_np_rgb(img)
   save_display(save, display, info, rgb, slide_num, 1, "Original", "rgb")
 
-  mask_not_green = filter_out_green_channel(rgb, green_thresh=200)
+  mask_not_green = filter_green_channel(rgb, green_thresh=200)
   rgb_not_green = mask_rgb(rgb, mask_not_green)
   save_display(save, display, info, rgb_not_green, slide_num, 2, "Not Green", "rgb-not-green")
 
-  mask_not_gray = filter_out_grays(rgb)
+  mask_not_gray = filter_grays(rgb)
   rgb_not_gray = mask_rgb(rgb, mask_not_gray)
   save_display(save, display, info, rgb_not_gray, slide_num, 3, "Not Gray", "rgb-not-gray")
 
-  mask_no_red_pen = filter_out_red_pen(rgb)
+  mask_no_red_pen = filter_red_pen(rgb)
   rgb_no_red_pen = mask_rgb(rgb, mask_no_red_pen)
   save_display(save, display, info, rgb_no_red_pen, slide_num, 4, "No Red Pen", "rgb-no-red-pen")
 
-  mask_no_green_pen = filter_out_green_pen(rgb)
+  mask_no_green_pen = filter_green_pen(rgb)
   rgb_no_green_pen = mask_rgb(rgb, mask_no_green_pen)
   save_display(save, display, info, rgb_no_green_pen, slide_num, 5, "No Green Pen", "rgb-no-green-pen")
 
-  mask_no_blue_pen = filter_out_blue_pen(rgb)
+  mask_no_blue_pen = filter_blue_pen(rgb)
   rgb_no_blue_pen = mask_rgb(rgb, mask_no_blue_pen)
   save_display(save, display, info, rgb_no_blue_pen, slide_num, 6, "No Blue Pen", "rgb-no-blue-pen")
 
@@ -1214,13 +1259,13 @@ multiprocess_apply_filters_to_images(save=True, display=False)
 # rem_small_and_hema_thresh_mask = rem_small_mask & hema_thresh_mask
 # add_text_and_display(mask_rgb(rgb, rem_small_and_hema_thresh_mask), "RGB with Remove Small and Hema Thresh")
 # add_text_and_display(mask_rgb(rgb, ~rem_small_and_hema_thresh_mask), "RGB with Remove Small and Hema Thresh, Inverse")
-# mask_not_green = filter_out_green(rgb, green_thresh=200)
+# mask_not_green = filter_green(rgb, green_thresh=200)
 # add_text_and_display(mask_rgb(rgb, mask_not_green), "RGB Not Green")
 # add_text_and_display(mask_rgb(rgb, ~mask_not_green), "RGB Not Green, Inverse")
-# mask_not_gray = filter_out_grays(rgb)
+# mask_not_gray = filter_grays(rgb)
 # add_text_and_display(mask_rgb(rgb, mask_not_gray), "RGB Not Gray")
 # add_text_and_display(mask_rgb(rgb, ~mask_not_gray), "RGB Not Gray, Inverse")
-# mask_not_gray_or_green = filter_out_grays(mask_rgb(rgb, mask_not_green))
+# mask_not_gray_or_green = filter_grays(mask_rgb(rgb, mask_not_green))
 # add_text_and_display(mask_rgb(rgb, mask_not_gray_or_green), "RGB Not Gray or Green")
 # add_text_and_display(mask_rgb(rgb, ~mask_not_gray_or_green), "RGB Not Gray or Green, Inverse")
 # mask_not_gray_and_not_green = mask_not_gray & mask_not_green
