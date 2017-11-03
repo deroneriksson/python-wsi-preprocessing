@@ -702,6 +702,16 @@ def filter_red(rgb, red_lower_thresh, green_upper_thresh, blue_upper_thresh, out
 
 
 def filter_red_pen(rgb, output_type="bool"):
+  """
+  Create a mask to filter out red pen marks from a slide.
+
+  Args:
+    rgb: RGB image as a NumPy array.
+    output_type: Type of array to return (bool, float, or uint8).
+
+  Returns:
+    NumPy array representing the mask.
+  """
   t = Time()
   result = filter_red(rgb, red_lower_thresh=150, green_upper_thresh=80, blue_upper_thresh=90) & \
            filter_red(rgb, red_lower_thresh=120, green_upper_thresh=10, blue_upper_thresh=10)
@@ -750,6 +760,16 @@ def filter_bluegreen(rgb, red_upper_thresh, green_lower_thresh, blue_lower_thres
 
 
 def filter_green_pen(rgb, output_type="bool"):
+  """
+  Create a mask to filter out green (actually blue-green) pen marks from a slide.
+
+  Args:
+    rgb: RGB image as a NumPy array.
+    output_type: Type of array to return (bool, float, or uint8).
+
+  Returns:
+    NumPy array representing the mask.
+  """
   t = Time()
   result = filter_bluegreen(rgb, red_upper_thresh=150, green_lower_thresh=160, blue_lower_thresh=140) & \
            filter_bluegreen(rgb, red_upper_thresh=70, green_lower_thresh=110, blue_lower_thresh=110) & \
@@ -803,6 +823,16 @@ def filter_blue(rgb, red_upper_thresh, green_upper_thresh, blue_lower_thresh, ou
 
 
 def filter_blue_pen(rgb, output_type="bool"):
+  """
+  Create a mask to filter out blue pen marks from a slide.
+
+  Args:
+    rgb: RGB image as a NumPy array.
+    output_type: Type of array to return (bool, float, or uint8).
+
+  Returns:
+    NumPy array representing the mask.
+  """
   t = Time()
   result = filter_blue(rgb, red_upper_thresh=60, green_upper_thresh=120, blue_lower_thresh=190) & \
            filter_blue(rgb, red_upper_thresh=120, green_upper_thresh=170, blue_lower_thresh=200) & \
