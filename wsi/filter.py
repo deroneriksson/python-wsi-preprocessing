@@ -874,7 +874,7 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   t = Time()
   print("Processing slide #%d" % slide_num)
 
-  html_page_info = dict()
+  info = dict()
 
   if save and not os.path.exists(slide.FILTER_DIR):
     os.makedirs(slide.FILTER_DIR)
@@ -882,67 +882,57 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   img = slide.open_image(img_path)
 
   rgb = pil_to_np_rgb(img)
-  k_v = save_display(save, display, rgb, slide_num, 1, "Original", "rgb")
-  if save: html_page_info[k_v[0]] = k_v[1]
+  save_display(save, display, info, rgb, slide_num, 1, "Original", "rgb")
 
   mask_not_green = filter_out_green_channel(rgb, green_thresh=200)
   rgb_not_green = mask_rgb(rgb, mask_not_green)
-  k_v = save_display(save, display, rgb_not_green, slide_num, 2, "Not Green", "rgb-not-green")
-  if save: html_page_info[k_v[0]] = k_v[1]
+  save_display(save, display, info, rgb_not_green, slide_num, 2, "Not Green", "rgb-not-green")
 
   mask_not_gray = filter_out_grays(rgb)
   rgb_not_gray = mask_rgb(rgb, mask_not_gray)
-  k_v = save_display(save, display, rgb_not_gray, slide_num, 3, "Not Gray", "rgb-not-gray")
-  if save: html_page_info[k_v[0]] = k_v[1]
+  save_display(save, display, info, rgb_not_gray, slide_num, 3, "Not Gray", "rgb-not-gray")
 
   mask_no_red_pen = filter_out_red_pen(rgb)
   rgb_no_red_pen = mask_rgb(rgb, mask_no_red_pen)
-  k_v = save_display(save, display, rgb_no_red_pen, slide_num, 4, "No Red Pen", "rgb-no-red-pen")
-  if save: html_page_info[k_v[0]] = k_v[1]
+  save_display(save, display, info, rgb_no_red_pen, slide_num, 4, "No Red Pen", "rgb-no-red-pen")
 
   mask_no_green_pen = filter_out_green_pen(rgb)
   rgb_no_green_pen = mask_rgb(rgb, mask_no_green_pen)
-  k_v = save_display(save, display, rgb_no_green_pen, slide_num, 5, "No Green Pen", "rgb-no-green-pen")
-  if save: html_page_info[k_v[0]] = k_v[1]
+  save_display(save, display, info, rgb_no_green_pen, slide_num, 5, "No Green Pen", "rgb-no-green-pen")
 
   mask_no_blue_pen = filter_out_blue_pen(rgb)
   rgb_no_blue_pen = mask_rgb(rgb, mask_no_blue_pen)
-  k_v = save_display(save, display, rgb_no_blue_pen, slide_num, 6, "No Blue Pen", "rgb-no-blue-pen")
-  if save: html_page_info[k_v[0]] = k_v[1]
+  save_display(save, display, info, rgb_no_blue_pen, slide_num, 6, "No Blue Pen", "rgb-no-blue-pen")
 
   mask_gray_green_pens = mask_not_gray & mask_not_green & mask_no_red_pen & mask_no_green_pen & mask_no_blue_pen
   rgb_gray_green_pens = mask_rgb(rgb, mask_gray_green_pens)
-  k_v = save_display(save, display, rgb_gray_green_pens, slide_num, 7, "Not Gray, Not Green, No Pens",
-                     "rgb-no-gray-no-green-no-pens")
-  if save: html_page_info[k_v[0]] = k_v[1]
+  save_display(save, display, info, rgb_gray_green_pens, slide_num, 7, "Not Gray, Not Green, No Pens",
+               "rgb-no-gray-no-green-no-pens")
 
   mask_remove_small = filter_remove_small_objects(mask_gray_green_pens, min_size=500, output_type="bool")
   rgb_remove_small = mask_rgb(rgb, mask_remove_small)
-  k_v = save_display(save, display, rgb_remove_small, slide_num, 8,
-                     "Not Gray, Not Green, No Pens,\nRemove Small Objects",
-                     "rgb-not-green-not-gray-no-pens-remove-small")
-  if save: html_page_info[k_v[0]] = k_v[1]
+  save_display(save, display, info, rgb_remove_small, slide_num, 8,
+               "Not Gray, Not Green, No Pens,\nRemove Small Objects",
+               "rgb-not-green-not-gray-no-pens-remove-small")
 
   print("Slide #%03d processing time: %s\n" % (slide_num, str(t.elapsed())))
 
-  return html_page_info
+  return info
 
 
-def save_display(save, display, np_img, slide_num, filter_num, display_text, file_text):
+def save_display(save, display, info, np_img, slide_num, filter_num, display_text, file_text):
   """
   Optionally save an image and/or display the image.
 
   Args:
     save: If True, save filtered images.
     display: If True, display filtered images to screen.
+    info: Dictionary to store filter information.
     np_img: Image as a NumPy array.
     slide_num: The slide number.
     filter_num: The filter number.
     display_text: Filter display name.
     file_text: Filter name for file.
-
-  Returns:
-    Image information as a key/value tuple.
   """
   if slide_num is None and filter_num is None:
     pass
@@ -955,7 +945,7 @@ def save_display(save, display, np_img, slide_num, filter_num, display_text, fil
     save_filtered_image(np_img, slide_num, filter_num, file_text)
     key = slide_num * 1000 + filter_num
     value = (slide_num, filter_num, display_text, file_text)
-    return (key, value)
+    info[key] = value
 
 
 def image_cell(slide_num, filter_num, display_text, file_text):
@@ -1191,13 +1181,13 @@ def multiprocess_apply_filters_to_images(save=True, display=False):
 
 # apply_filters_to_image(3, display=True, save=False)
 # singleprocess_apply_filters_to_images(save=True, display=False)
-# multiprocess_apply_filters_to_images(save=True, display=False)
+multiprocess_apply_filters_to_images(save=True, display=False)
 
 # red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
 #                   336, 349, 357, 380, 450, 482]
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=red_pen_slides)
-green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
-singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
+# green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
+# singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
 # blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
 
