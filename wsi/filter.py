@@ -784,7 +784,12 @@ def filter_green_pen(rgb, output_type="bool"):
            filter_bluegreen(rgb, red_upper_thresh=30, green_lower_thresh=75, blue_lower_thresh=60) & \
            filter_bluegreen(rgb, red_upper_thresh=195, green_lower_thresh=220, blue_lower_thresh=210) & \
            filter_bluegreen(rgb, red_upper_thresh=225, green_lower_thresh=230, blue_lower_thresh=225) & \
-           filter_bluegreen(rgb, red_upper_thresh=170, green_lower_thresh=210, blue_lower_thresh=200)
+           filter_bluegreen(rgb, red_upper_thresh=170, green_lower_thresh=210, blue_lower_thresh=200) & \
+           filter_bluegreen(rgb, red_upper_thresh=20, green_lower_thresh=30, blue_lower_thresh=20) & \
+           filter_bluegreen(rgb, red_upper_thresh=50, green_lower_thresh=60, blue_lower_thresh=40) & \
+           filter_bluegreen(rgb, red_upper_thresh=30, green_lower_thresh=50, blue_lower_thresh=35) & \
+           filter_bluegreen(rgb, red_upper_thresh=65, green_lower_thresh=70, blue_lower_thresh=60) & \
+           filter_bluegreen(rgb, red_upper_thresh=100, green_lower_thresh=110, blue_lower_thresh=105)
   if output_type == "bool":
     pass
   elif output_type == "float":
@@ -1274,10 +1279,10 @@ def multiprocess_apply_filters_to_images(save=True, display=False):
 #                   336, 349, 357, 380, 450, 482]
 # red_pen_slides = [4]
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=red_pen_slides)
-# green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
-# singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
-blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
-singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
+green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
+singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
+# blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
+# singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
 
 # img_path = slide.get_training_thumb_path(2)
 # img = slide.open_image(img_path)
