@@ -38,6 +38,7 @@ from PIL import ImageDraw, ImageFont
 
 # If True, display NumPy array stats for filters (min, max, mean, is_binary).
 DISPLAY_FILTER_STATS = False
+DISPLAY_MASK_PERCENTAGE = True
 
 
 def pil_to_np_rgb(pil_img):
@@ -1026,6 +1027,9 @@ def save_display(save, display, info, np_img, slide_num, filter_num, display_tex
     display_text: Filter display name.
     file_text: Filter name for file.
   """
+  if DISPLAY_MASK_PERCENTAGE:
+    mask_percentage = 100 - np.count_nonzero(np_img) / np_img.size * 100
+    display_text = display_text + "\n(%3.2f%% masked)" % mask_percentage
   if slide_num is None and filter_num is None:
     pass
   elif filter_num is None:
@@ -1271,16 +1275,16 @@ def multiprocess_apply_filters_to_images(save=True, display=False):
   print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
 
 
-# apply_filters_to_image(3, display=True, save=False)
+# apply_filters_to_image(4, display=False, save=True)
 # singleprocess_apply_filters_to_images(save=True, display=False)
-# multiprocess_apply_filters_to_images(save=True, display=False)
+multiprocess_apply_filters_to_images(save=True, display=False)
 
 # red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
 #                   336, 349, 357, 380, 450, 482]
-# red_pen_slides = [4]
-# singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=red_pen_slides)
-green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
-singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
+# red_pen_slides = [1,2,3]
+# singleprocess_apply_filters_to_images(save=True, display=True, image_num_list=red_pen_slides)
+# green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
+# singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
 # blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
 
