@@ -1168,7 +1168,7 @@ def apply_filters_to_image_list(image_num_list, save, display):
   for slide_num in image_num_list:
     result = apply_filters_to_image(slide_num, save=save, display=display)
     html_page_info.update(result)
-  return html_page_info
+  return (image_num_list, html_page_info)
 
 
 def apply_filters_to_image_range(start_ind, end_ind, save, display):
@@ -1215,14 +1215,14 @@ def singleprocess_apply_filters_to_images(save=True, display=False, image_num_li
     generate_filter_html_page(html_page_info)
 
 
-def multiprocess_apply_filters_to_images(save=True, display=False):
+def multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=None):
   """
   Apply a set of filters to all training images using multiple processes (one process per core).
-  Each process will process a range of slide numbers.
 
   Args:
     save: If True, save filtered images.
     display: If True, display filtered images to screen (multiprocessed display not recommended).
+    image_num_list: Optionally specify a list of image slide numbers.
   """
   timer = Time()
   print("Applying filters to images (multiprocess)\n")
@@ -1234,7 +1234,10 @@ def multiprocess_apply_filters_to_images(save=True, display=False):
   num_processes = multiprocessing.cpu_count()
   pool = multiprocessing.Pool(num_processes)
 
-  num_train_images = slide.get_num_training_slides()
+  if image_num_list is not None:
+    num_train_images = len(image_num_list)
+  else:
+    num_train_images = slide.get_num_training_slides()
   if num_processes > num_train_images:
     num_processes = num_train_images
   images_per_process = num_train_images / num_processes
@@ -1242,32 +1245,44 @@ def multiprocess_apply_filters_to_images(save=True, display=False):
   print("Number of processes: " + str(num_processes))
   print("Number of training images: " + str(num_train_images))
 
-  # each task specifies a range of slides
   tasks = []
   for num_process in range(1, num_processes + 1):
     start_index = (num_process - 1) * images_per_process + 1
     end_index = num_process * images_per_process
     start_index = int(start_index)
     end_index = int(end_index)
-    tasks.append((start_index, end_index, save, display))
-    if start_index == end_index:
-      print("Task #" + str(num_process) + ": Process slide " + str(start_index))
+    if image_num_list is not None:
+      sublist = image_num_list[start_index - 1:end_index]
+      tasks.append((sublist, save, display))
+      print("Task #" + str(num_process) + ": Process slides " + str(sublist))
     else:
-      print("Task #" + str(num_process) + ": Process slides " + str(start_index) + " to " + str(end_index))
+      tasks.append((start_index, end_index, save, display))
+      if start_index == end_index:
+        print("Task #" + str(num_process) + ": Process slide " + str(start_index))
+      else:
+        print("Task #" + str(num_process) + ": Process slides " + str(start_index) + " to " + str(end_index))
 
   # start tasks
   results = []
   for t in tasks:
-    results.append(pool.apply_async(apply_filters_to_image_range, t))
+    if image_num_list is not None:
+      results.append(pool.apply_async(apply_filters_to_image_list, t))
+    else:
+      results.append(pool.apply_async(apply_filters_to_image_range, t))
 
   html_page_info = dict()
   for result in results:
-    (start_ind, end_ind, html_page_info_res) = result.get()
-    html_page_info.update(html_page_info_res)
-    if (start_ind == end_ind):
-      print("Done filtering slide %d" % start_ind)
+    if image_num_list is not None:
+      (image_nums, html_page_info_res) = result.get()
+      html_page_info.update(html_page_info_res)
+      print("Done filtering slides: %s" % image_nums)
     else:
-      print("Done filtering slides %d through %d" % (start_ind, end_ind))
+      (start_ind, end_ind, html_page_info_res) = result.get()
+      html_page_info.update(html_page_info_res)
+      if (start_ind == end_ind):
+        print("Done filtering slide %d" % start_ind)
+      else:
+        print("Done filtering slides %d through %d" % (start_ind, end_ind))
 
   if save:
     generate_filter_html_page(html_page_info)
@@ -1277,7 +1292,7 @@ def multiprocess_apply_filters_to_images(save=True, display=False):
 
 # apply_filters_to_image(4, display=False, save=True)
 # singleprocess_apply_filters_to_images(save=True, display=False)
-multiprocess_apply_filters_to_images(save=True, display=False)
+# multiprocess_apply_filters_to_images(save=True, display=False)
 
 # red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
 #                   336, 349, 357, 380, 450, 482]
@@ -1287,6 +1302,9 @@ multiprocess_apply_filters_to_images(save=True, display=False)
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
 # blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
+overmasked_slides = [1, 21, 29, 37, 43, 88, 116, 126, 127, 142, 145, 173, 196, 220, 225, 234, 238, 284, 292, 294, 304,
+                     316, 401, 403, 424, 448, 452, 472, 494]
+multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=overmasked_slides)
 
 # img_path = slide.get_training_thumb_path(2)
 # img = slide.open_image(img_path)
