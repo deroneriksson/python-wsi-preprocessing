@@ -829,7 +829,10 @@ def filter_green_pen(rgb, output_type="bool"):
            filter_bluegreen(rgb, red_upper_thresh=50, green_lower_thresh=60, blue_lower_thresh=40) & \
            filter_bluegreen(rgb, red_upper_thresh=30, green_lower_thresh=50, blue_lower_thresh=35) & \
            filter_bluegreen(rgb, red_upper_thresh=65, green_lower_thresh=70, blue_lower_thresh=60) & \
-           filter_bluegreen(rgb, red_upper_thresh=100, green_lower_thresh=110, blue_lower_thresh=105)
+           filter_bluegreen(rgb, red_upper_thresh=100, green_lower_thresh=110, blue_lower_thresh=105) & \
+           filter_bluegreen(rgb, red_upper_thresh=165, green_lower_thresh=180, blue_lower_thresh=180) & \
+           filter_bluegreen(rgb, red_upper_thresh=140, green_lower_thresh=140, blue_lower_thresh=150) & \
+           filter_bluegreen(rgb, red_upper_thresh=185, green_lower_thresh=195, blue_lower_thresh=195)
   if output_type == "bool":
     pass
   elif output_type == "float":
@@ -1332,14 +1335,15 @@ def multiprocess_apply_filters_to_images(save=True, display=False, image_num_lis
 # red_pen_slides = [1,2,3]
 # singleprocess_apply_filters_to_images(save=True, display=True, image_num_list=red_pen_slides)
 # green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
-# singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
+green_pen_slides = [74]
+multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
 # blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
 # overmasked_slides = [1, 21, 29, 37, 43, 88, 116, 126, 127, 142, 145, 173, 196, 220, 225, 234, 238, 284, 292, 294, 304,
 #                      316, 401, 403, 424, 448, 452, 472, 494]
-overmasked_slides = [1, 2, 3, 4, 5, 21, 37, 294, 401, 424, 472]
+# overmasked_slides = [1, 2, 3, 4, 5, 21, 37, 294, 401, 424, 472]
 # overmasked_slides = [21]
-multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=overmasked_slides)
+# multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=overmasked_slides)
 
 # img_path = slide.get_training_thumb_path(2)
 # img = slide.open_image(img_path)
