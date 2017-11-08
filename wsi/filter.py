@@ -295,7 +295,7 @@ def filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=True, over
     np_img: Image as a NumPy array of type bool.
     min_size: Minimum size of small object to remove.
     avoid_overmask: If True, avoid masking above the overmask_thresh percentage.
-    overmask_thresh: If avoid_overmask is True, avoid masking above this threshold value.
+    overmask_thresh: If avoid_overmask is True, avoid masking above this threshold percentage value.
     output_type: Type of array to return (bool, float, or uint8).
 
   Returns:
@@ -315,7 +315,7 @@ def filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=True, over
     mask_percentage = mask_percent(rem_sm)
     if (mask_percentage >= overmask_thresh):
       new_min_size = min_size / 2
-      print("Mask percentage %3.2f%% >= threshold %3.2f%% for Remove Small Objs size %d, so trying %d" % (
+      print("Mask percentage %3.2f%% >= threshold %3.2f%% for Remove Small Objs size %d, so try %d" % (
         mask_percentage, overmask_thresh, min_size, new_min_size))
       rem_sm = filter_remove_small_objects(np_img, new_min_size, avoid_overmask, overmask_thresh, output_type)
     np_img = rem_sm
@@ -681,30 +681,54 @@ def filter_threshold(np_img, threshold, output_type="bool"):
   return result
 
 
-def filter_green_channel(rgb, green_thresh=200, output_type="bool"):
+def filter_green_channel(np_img, green_thresh=200, avoid_overmask=True, overmask_thresh=90, output_type="bool"):
   """
   Create a mask to filter out pixels with a green channel value greater than a particular threshold, since hematoxylin
   and eosin are purplish and pinkish, which do not have much green to them.
 
   Args:
     np_img: RGB image as a NumPy array.
-    green_thresh: Green channel threshold value. If green channel value is greater than green_thresh, mask out pixel.
+    green_thresh: Green channel threshold value (0 to 255). If value is greater than green_thresh, mask out pixel.
+    avoid_overmask: If True, avoid masking above the overmask_thresh percentage.
+    overmask_thresh: If avoid_overmask is True, avoid masking above this threshold percentage value.
     output_type: Type of array to return (bool, float, or uint8).
 
   Returns:
     NumPy array representing a mask where pixels above a particular green channel threshold have been masked out.
   """
   t = Time()
-  g = rgb[:, :, 1]
-  result = (g < green_thresh) & (g > 0)
+
+  skip = False
+  if (avoid_overmask == True):
+    skip_mask_percent_check = mask_percent(np_img)
+    if skip_mask_percent_check >= overmask_thresh:
+      skip = True
+
+  if not skip:
+    g = np_img[:, :, 1]
+    gr_ch_mask = (g < green_thresh) & (g > 0)
+    mask_percentage = mask_percent(gr_ch_mask)
+    if (mask_percentage >= overmask_thresh):
+      new_green_thresh = (255 - green_thresh) / 2 + green_thresh
+      print(
+        "Mask percentage %3.2f%% >= overmask threshold %3.2f%% for Remove Green Channel green_thresh=%d, so try %d" % (
+          mask_percentage, overmask_thresh, green_thresh, new_green_thresh))
+      gr_ch_mask = filter_green_channel(np_img, new_green_thresh, avoid_overmask, overmask_thresh, output_type)
+    np_img = gr_ch_mask
+
   if output_type == "bool":
     pass
   elif output_type == "float":
-    result = result.astype(float)
+    np_img = np_img.astype(float)
   else:
-    result = result.astype("uint8") * 255
-  np_info(result, "Filter Green", t.elapsed())
-  return result
+    np_img = np_img.astype("uint8") * 255
+
+  if skip:
+    print("Mask percentage %3.2f%% >= threshold %3.2f%%, so Filter Green Channel skipped." % (
+      skip_mask_percent_check, overmask_thresh))
+  else:
+    np_info(np_img, "Filter Green Channel", t.elapsed())
+  return np_img
 
 
 def filter_red(rgb, red_lower_thresh, green_upper_thresh, blue_upper_thresh, output_type="bool",
