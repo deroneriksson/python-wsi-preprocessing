@@ -271,29 +271,68 @@ def filter_canny(np_img, sigma=1, low_threshold=0, high_threshold=25, output_typ
   return can
 
 
-def filter_remove_small_objects(np_img, min_size=3000, output_type="uint8"):
+def mask_percent(np_img):
   """
-  Filter image to remove small objects (connected components) less than a particular minimum size.
+  Determine the percentage of a NumPy array that is masked (how many of the values are 0 values).
+
+  Args:
+    np_img: Image as a NumPy array.
+
+  Returns:
+    The percentage of the NumPy array that is masked.
+  """
+  mask_percentage = 100 - np.count_nonzero(np_img) / np_img.size * 100
+  return mask_percentage
+
+
+def filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=True, overmask_thresh=95, output_type="uint8"):
+  """
+  Filter image to remove small objects (connected components) less than a particular minimum size. If avoid_overmask
+  is True, this function can recursively call itself with progressively smaller minimum size objects to remove to
+  reduce the amount of masking that this filter performs.
 
   Args:
     np_img: Image as a NumPy array of type bool.
     min_size: Minimum size of small object to remove.
+    avoid_overmask: If True, avoid masking above the overmask_thresh percentage.
+    overmask_thresh: If avoid_overmask is True, avoid masking above this threshold value.
     output_type: Type of array to return (bool, float, or uint8).
 
   Returns:
-     NumPy array (bool, float, or uint8).
+    NumPy array (bool, float, or uint8).
   """
   t = Time()
-  rem_sm = np_img.astype(bool)  # make sure mask is boolean
-  rem_sm = sk_morphology.remove_small_objects(rem_sm, min_size=min_size)
+
+  skip = False
+  if (avoid_overmask == True):
+    skip_mask_percent_check = mask_percent(np_img)
+    if skip_mask_percent_check >= overmask_thresh:
+      skip = True
+
+  if not skip:
+    rem_sm = np_img.astype(bool)  # make sure mask is boolean
+    rem_sm = sk_morphology.remove_small_objects(rem_sm, min_size=min_size)
+    mask_percentage = mask_percent(rem_sm)
+    if (mask_percentage >= overmask_thresh):
+      new_min_size = min_size / 2
+      print("Mask percentage %3.2f%% >= threshold %3.2f%% for Remove Small Objs size %d, so trying %d" % (
+        mask_percentage, overmask_thresh, min_size, new_min_size))
+      rem_sm = filter_remove_small_objects(np_img, new_min_size, avoid_overmask, overmask_thresh, output_type)
+    np_img = rem_sm
+
   if output_type == "bool":
     pass
   elif output_type == "float":
-    rem_sm = rem_sm.astype(float)
+    np_img = np_img.astype(float)
   else:
-    rem_sm = rem_sm.astype("uint8") * 255
-  np_info(rem_sm, "Remove Small Objs", t.elapsed())
-  return rem_sm
+    np_img = np_img.astype("uint8") * 255
+
+  if skip:
+    print("Mask percentage %3.2f%% >= threshold %3.2f%%, so Remove Small Objs skipped." % (
+      skip_mask_percent_check, overmask_thresh))
+  else:
+    np_info(np_img, "Remove Small Objs", t.elapsed())
+  return np_img
 
 
 def filter_contrast_stretch(np_img, low=40, high=60):
@@ -977,7 +1016,7 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   rgb = pil_to_np_rgb(img)
   save_display(save, display, info, rgb, slide_num, 1, "Original", "rgb")
 
-  mask_not_green = filter_green_channel(rgb, green_thresh=200)
+  mask_not_green = filter_green_channel(rgb, green_thresh=230)
   rgb_not_green = mask_rgb(rgb, mask_not_green)
   save_display(save, display, info, rgb_not_green, slide_num, 2, "Not Green", "rgb-not-green")
 
@@ -997,12 +1036,13 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   rgb_no_blue_pen = mask_rgb(rgb, mask_no_blue_pen)
   save_display(save, display, info, rgb_no_blue_pen, slide_num, 6, "No Blue Pen", "rgb-no-blue-pen")
 
-  mask_gray_green_pens = mask_not_gray & mask_not_green & mask_no_red_pen & mask_no_green_pen & mask_no_blue_pen
+  # mask_gray_green_pens = mask_not_gray & mask_not_green & mask_no_red_pen & mask_no_green_pen & mask_no_blue_pen
+  mask_gray_green_pens = mask_not_gray & mask_no_red_pen & mask_no_green_pen & mask_no_blue_pen
   rgb_gray_green_pens = mask_rgb(rgb, mask_gray_green_pens)
   save_display(save, display, info, rgb_gray_green_pens, slide_num, 7, "Not Gray, Not Green, No Pens",
                "rgb-no-gray-no-green-no-pens")
 
-  mask_remove_small = filter_remove_small_objects(mask_gray_green_pens, min_size=500, output_type="bool")
+  mask_remove_small = filter_remove_small_objects(mask_gray_green_pens, min_size=300, output_type="bool")
   rgb_remove_small = mask_rgb(rgb, mask_remove_small)
   save_display(save, display, info, rgb_remove_small, slide_num, 8,
                "Not Gray, Not Green, No Pens,\nRemove Small Objects",
@@ -1027,6 +1067,7 @@ def save_display(save, display, info, np_img, slide_num, filter_num, display_tex
     display_text: Filter display name.
     file_text: Filter name for file.
   """
+  mask_percentage = None
   if DISPLAY_MASK_PERCENTAGE:
     mask_percentage = 100 - np.count_nonzero(np_img) / np_img.size * 100
     display_text = display_text + "\n(%3.2f%% masked)" % mask_percentage
@@ -1037,10 +1078,10 @@ def save_display(save, display, info, np_img, slide_num, filter_num, display_tex
   else:
     display_text = "S%03d-F%03d " % (slide_num, filter_num) + display_text
   if display: add_text_and_display(np_img, display_text)
-  if save:
+  if save:  # and (filter_num == 8) and (mask_percentage > 95.0):
     save_filtered_image(np_img, slide_num, filter_num, file_text)
     key = slide_num * 1000 + filter_num
-    value = (slide_num, filter_num, display_text, file_text)
+    value = (slide_num, filter_num, display_text, file_text, mask_percentage)
     info[key] = value
 
 
@@ -1057,13 +1098,6 @@ def image_cell(slide_num, filter_num, display_text, file_text):
   Returns:
     HTML for viewing a processed image.
   """
-  # return "    <td>\n" + \
-  #        "      <a href=\"" + slide.get_filter_thumb_path(slide_num, filter_num, file_text) + "\">\n" + \
-  #        "        " + display_text + "<br/>\n" + \
-  #        "        " + slide.get_filter_thumb_filename(slide_num, filter_num, file_text) + "<br/>\n" + \
-  #        "        <img src=\"" + slide.get_filter_thumb_path(slide_num, filter_num, file_text) + "\" />\n" + \
-  #        "      </a>\n" + \
-  #        "    </td>\n"
   return "    <td>\n" + \
          "      <a href=\"" + slide.get_filter_thumb_path(slide_num, filter_num, file_text) + "\">\n" + \
          "        " + display_text + "<br/>\n" + \
@@ -1302,8 +1336,10 @@ def multiprocess_apply_filters_to_images(save=True, display=False, image_num_lis
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
 # blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
-overmasked_slides = [1, 21, 29, 37, 43, 88, 116, 126, 127, 142, 145, 173, 196, 220, 225, 234, 238, 284, 292, 294, 304,
-                     316, 401, 403, 424, 448, 452, 472, 494]
+# overmasked_slides = [1, 21, 29, 37, 43, 88, 116, 126, 127, 142, 145, 173, 196, 220, 225, 234, 238, 284, 292, 294, 304,
+#                      316, 401, 403, 424, 448, 452, 472, 494]
+overmasked_slides = [1, 2, 3, 4, 5, 21, 37, 294, 401, 424, 472]
+# overmasked_slides = [21]
 multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=overmasked_slides)
 
 # img_path = slide.get_training_thumb_path(2)
