@@ -1080,11 +1080,8 @@ def save_display(save, display, info, np_img, slide_num, filter_num, display_tex
   else:
     display_text = "S%03d-F%03d " % (slide_num, filter_num) + display_text
   if display: add_text_and_display(np_img, display_text)
-  if save:  # and (filter_num == 8) and (mask_percentage > 95.0):
-    save_filtered_image(np_img, slide_num, filter_num, file_text)
-    key = slide_num * 1000 + filter_num
-    value = (slide_num, filter_num, display_text, file_text, mask_percentage)
-    info[key] = value
+  if save: save_filtered_image(np_img, slide_num, filter_num, file_text)
+  info[slide_num * 1000 + filter_num] = (slide_num, filter_num, display_text, file_text, mask_percentage)
 
 
 def image_cell(slide_num, filter_num, display_text, file_text):
@@ -1227,13 +1224,14 @@ def apply_filters_to_image_range(start_ind, end_ind, save, display):
   return (start_ind, end_ind, html_page_info)
 
 
-def singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=None):
+def singleprocess_apply_filters_to_images(save=True, display=False, html=True, image_num_list=None):
   """
   Apply a set of filters to training images and optionally save and/or display the filtered images.
 
   Args:
     save: If True, save filtered images.
     display: If True, display filtered images to screen.
+    html: If True, generate HTML page to display filtered images.
     image_num_list: Optionally specify a list of image slide numbers.
   """
   t = Time()
@@ -1247,17 +1245,18 @@ def singleprocess_apply_filters_to_images(save=True, display=False, image_num_li
 
   print("Time to apply filters to all images: %s\n" % str(t.elapsed()))
 
-  if save:
+  if html:
     generate_filter_html_page(html_page_info)
 
 
-def multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=None):
+def multiprocess_apply_filters_to_images(save=False, display=False, html=True, image_num_list=None):
   """
   Apply a set of filters to all training images using multiple processes (one process per core).
 
   Args:
     save: If True, save filtered images.
     display: If True, display filtered images to screen (multiprocessed display not recommended).
+    html: If True, generate HTML page to display filtered images.
     image_num_list: Optionally specify a list of image slide numbers.
   """
   timer = Time()
@@ -1320,7 +1319,7 @@ def multiprocess_apply_filters_to_images(save=True, display=False, image_num_lis
       else:
         print("Done filtering slides %d through %d" % (start_ind, end_ind))
 
-  if save:
+  if html:
     generate_filter_html_page(html_page_info)
 
   print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
@@ -1328,15 +1327,15 @@ def multiprocess_apply_filters_to_images(save=True, display=False, image_num_lis
 
 # apply_filters_to_image(4, display=False, save=True)
 # singleprocess_apply_filters_to_images(save=True, display=False)
-# multiprocess_apply_filters_to_images(save=True, display=False)
+multiprocess_apply_filters_to_images(save=False, display=False, html=True)
 
 # red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
 #                   336, 349, 357, 380, 450, 482]
-# red_pen_slides = [1,2,3]
-# singleprocess_apply_filters_to_images(save=True, display=True, image_num_list=red_pen_slides)
+# red_pen_slides = [1, 2, 3]
+# multiprocess_apply_filters_to_images(save=False, display=False, image_num_list=red_pen_slides)
 # green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
-green_pen_slides = [74]
-multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
+# green_pen_slides = [74]
+# multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
 # blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
 # overmasked_slides = [1, 21, 29, 37, 43, 88, 116, 126, 127, 142, 145, 173, 196, 220, 225, 234, 238, 284, 292, 294, 304,
