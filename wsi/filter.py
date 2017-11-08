@@ -1036,8 +1036,7 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   rgb_no_blue_pen = mask_rgb(rgb, mask_no_blue_pen)
   save_display(save, display, info, rgb_no_blue_pen, slide_num, 6, "No Blue Pen", "rgb-no-blue-pen")
 
-  # mask_gray_green_pens = mask_not_gray & mask_not_green & mask_no_red_pen & mask_no_green_pen & mask_no_blue_pen
-  mask_gray_green_pens = mask_not_gray & mask_no_red_pen & mask_no_green_pen & mask_no_blue_pen
+  mask_gray_green_pens = mask_not_gray & mask_not_green & mask_no_red_pen & mask_no_green_pen & mask_no_blue_pen
   rgb_gray_green_pens = mask_rgb(rgb, mask_gray_green_pens)
   save_display(save, display, info, rgb_gray_green_pens, slide_num, 7, "Not Gray, Not Green, No Pens",
                "rgb-no-gray-no-green-no-pens")
