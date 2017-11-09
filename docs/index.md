@@ -58,25 +58,19 @@ License](https://raw.githubusercontent.com/openslide/openslide/master/lgpl-2.1.t
 
     brew install openslide
 
-Optionally, install OpenCV3. [OpenCV](http://opencv.org/) contains a variety of filters and other image processing
-utilities.
-
-    brew install opencv3
-
 Next, we can install a variety of useful Python packages using the [pip3](https://pip.pypa.io/en/stable/)
 package manager. These packages include:
 [ipython](https://pypi.python.org/pypi/ipython),
 [jupyter](https://pypi.python.org/pypi/jupyter),
 [matplotlib](https://pypi.python.org/pypi/matplotlib/),
 [numpy](https://pypi.python.org/pypi/numpy),
-[opencv-python](https://pypi.python.org/pypi/opencv-python),
 [openslide-python](https://pypi.python.org/pypi/openslide-python),
 [pandas](https://pypi.python.org/pypi/pandas),
 [scikit-image](https://pypi.python.org/pypi/scikit-image),
 [scikit-learn](https://pypi.python.org/pypi/scikit-learn),
 and [scipy](https://pypi.python.org/pypi/scipy).
 
-    pip3 install -U ipython jupyter matplotlib numpy opencv-python openslide-python pandas scikit-image scikit-learn scipy
+    pip3 install -U ipython jupyter matplotlib numpy openslide-python pandas scikit-image scikit-learn scipy
 
 We will utilize scikit-image filters in this tutorial that currently are not present in the
 latest released version of scikit-image. Therefore, we can install scikit-image
