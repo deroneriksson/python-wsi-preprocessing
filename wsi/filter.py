@@ -1095,7 +1095,7 @@ def save_display(save, display, info, np_img, slide_num, filter_num, display_tex
   """
   mask_percentage = None
   if DISPLAY_MASK_PERCENTAGE:
-    mask_percentage = 100 - np.count_nonzero(np_img) / np_img.size * 100
+    mask_percentage = mask_percent(np_img)
     display_text = display_text + "\n(%3.2f%% masked)" % mask_percentage
   if slide_num is None and filter_num is None:
     pass
@@ -1178,7 +1178,10 @@ def save_filtered_image(np_img, slide_num, filter_num, filter_text):
     filter_num: The filter number.
     filter_text: Descriptive text to add to the image filename.
   """
-  np_to_pil(np_img).save(slide.get_filter_thumb_path(slide_num, filter_num, filter_text))
+  t = Time()
+  filepath = slide.get_filter_thumb_path(slide_num, filter_num, filter_text)
+  np_to_pil(np_img).save(filepath)
+  print("%-20s | Time: %-14s  Name: %s" % ("Save Image", str(t.elapsed()), filepath))
 
 
 def generate_filter_html_page(html_page_info):
@@ -1351,7 +1354,7 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 
 # apply_filters_to_image(4, display=False, save=True)
 # singleprocess_apply_filters_to_images(save=True, display=False)
-# multiprocess_apply_filters_to_images(save=False, display=False, html=True)
+multiprocess_apply_filters_to_images(save=True, display=False, html=True)
 
 # red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
 #                   336, 349, 357, 380, 450, 482]
@@ -1362,11 +1365,11 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
 # blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
-overmasked_slides = [1, 21, 29, 37, 43, 88, 116, 126, 127, 142, 145, 173, 196, 220, 225, 234, 238, 284, 292, 294, 304,
-                     316, 401, 403, 424, 448, 452, 472, 494]
+# overmasked_slides = [1, 21, 29, 37, 43, 88, 116, 126, 127, 142, 145, 173, 196, 220, 225, 234, 238, 284, 292, 294, 304,
+#                      316, 401, 403, 424, 448, 452, 472, 494]
 # overmasked_slides = [1, 2, 3, 4, 5, 21, 37, 294, 401, 424, 472]
 # overmasked_slides = [21]
-multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=overmasked_slides)
+# multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=overmasked_slides)
 
 # img_path = slide.get_training_thumb_path(2)
 # img = slide.open_image(img_path)
