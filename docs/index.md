@@ -1,3 +1,6 @@
+---
+layout: default
+---
 <!--
 {% comment %}
 Licensed to the Apache Software Foundation (ASF) under one or more
@@ -72,8 +75,8 @@ and [scipy](https://pypi.python.org/pypi/scipy).
 
     pip3 install -U ipython jupyter matplotlib numpy openslide-python pandas scikit-image scikit-learn scipy
 
-We will utilize scikit-image filters in this tutorial that currently are not present in the
-latest released version of scikit-image. Therefore, we can install scikit-image
+We will utilize scikit-image filters in this tutorial that are not present in the
+latest released version of scikit-image at the time of this writing. Therefore, we can install scikit-image
 from source, as described in the README at [https://github.com/scikit-image/scikit-image](https://github.com/scikit-image/scikit-image).
 
     git clone https://github.com/scikit-image/scikit-image.git
@@ -82,22 +85,42 @@ from source, as described in the README at [https://github.com/scikit-image/scik
     pip3 install .
 
 
+## Whole Slide Imaging Background
+
+A whole-slide image is a digital representation of a microscopic slide, typically at a very high level of magnification
+such as 20X or 40X. As a result of this high magnification, whole slide images are typically very large in size. In
+the training dataset that we will examine here in relation to our breast cancer tumor proliferation prediction project,
+image sizes were as high as 34 gigapixels, with a maximum width of
+almost 200,000 pixels and a maximum height over 250,000 pixels. The maximum file size for a single whole-slide
+image in the training dataset was 3.4GB.
+
+**WSI Example Slide**<br/>
+![WSI Example Slide](images/wsi-example.png "WSI Example Slide")
+
+A whole-slide image is created by a microscope that scans a slide and combines smaller image tiles into a large image.
+Occasionally, these tiles can be seen visually, as in the upper shadow area seen below.
+
+**Tiling Smaller Images into a Whole-Slide Image**<br/>
+![Tiling Smaller Images into a Whole-Slide Image](images/slide-scan.png "Tiling Smaller Images into a Whole-Slide Image")
+
+
 ## View Individual Whole Slide Images
 
 A fairly unusual feature of whole slide images is the very large image size. As an example,
 for our training data set of 500 images, the width varied from 19,920 pixels to 198,220 pixels,
 with an average of 101,688 pixels. The height varied from 13,347 pixels to 256,256 pixels,
-with an average of 73,154 pixels. The images sizes varied from
+with an average of 73,154 pixels. The image sizes varied from
 369,356,640 to 35,621,634,048 pixels (352 to 33,971 megapixels), with an average of
-7,670,709,628 pixels (7,315 megapixels).
+7,670,709,628 pixels (7,315 megapixels). The 500 training images take up a total of 525GB of space, with
+each image averaging over 1GB in size.
 
-![Training Image Sizes](./slides/graph-image-sizes.png "Training Image Sizes")
+![Training Image Sizes](images/graph-image-sizes.png "Training Image Sizes")
 TODO: Clean up image size graph.
 
 
 Here we see a histogram distribution of the training image sizes in megapixels.
 
-![Distribution of Image Sizes](./slides/distribution-of-image-sizes.png "Distribution of Image Sizes")
+![Distribution of Image Sizes](images/distribution-of-image-sizes.png "Distribution of Image Sizes")
 TODO: Clean up graph, change millions of pixels to megapixels.
 
 
@@ -120,19 +143,19 @@ which could be a location such as `~/git/python-wsi-preprocessing/data/`). If im
 files exist in subdirectories, they will also be displayed in the list of available
 slides.
 
-![OpenSlide Available Images](./slides/openslide-available-slides.png "OpenSlide Available Slides")
+![OpenSlide Available Images](images/openslide-available-slides.png "OpenSlide Available Slides")
 
 
 Here we can see the initial view of one of the whole-slide images.
 
-![OpenSlide Whole Slide Image](./slides/openslide-whole-slide-image.png "OpenSlide Whole Slide Image")
+![OpenSlide Whole Slide Image](images/openslide-whole-slide-image.png "OpenSlide Whole Slide Image")
 
 
 The whole-slide image can be zoomed to the highest magnification, revealing fine details at the
 tile level. Zooming and scrolling operations make it relatively easy to visually peruse the
 whole slide image.
 
-![OpenSlide Whole Slide Image Zoomed](./slides/openslide-whole-slide-image-zoomed.png "OpenSlide Whole Slide Image Zoomed")
+![OpenSlide Whole Slide Image Zoomed](images/openslide-whole-slide-image-zoomed.png "OpenSlide Whole Slide Image Zoomed")
 
 
 ## View Multiple Images
