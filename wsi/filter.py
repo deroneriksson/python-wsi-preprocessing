@@ -1018,7 +1018,7 @@ def add_text_and_display(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf"
   result.show()
 
 
-def apply_filters_to_image(slide_num, save=True, display=False):
+def apply_filters_to_image(slide_num, save=True, display=False, return_image=False):
   """
   Apply a set of filters to an image and optionally save and/or display filtered images.
 
@@ -1028,7 +1028,8 @@ def apply_filters_to_image(slide_num, save=True, display=False):
     display: If True, display filtered images to screen.
 
   Returns:
-    Dictionary of image information (used for HTML page generation).
+    Dictionary of image information (used for HTML page generation), or if return_image is True, return the resulting
+    filtered image as a NumPy array.
   """
   t = Time()
   print("Processing slide #%d" % slide_num)
@@ -1076,7 +1077,11 @@ def apply_filters_to_image(slide_num, save=True, display=False):
 
   print("Slide #%03d processing time: %s\n" % (slide_num, str(t.elapsed())))
 
-  return info
+  if return_image:
+    img_result = rgb_remove_small
+    return img_result
+  else:
+    return info
 
 
 def save_display(save, display, info, np_img, slide_num, filter_num, display_text, file_text):
@@ -1096,7 +1101,7 @@ def save_display(save, display, info, np_img, slide_num, filter_num, display_tex
   mask_percentage = None
   if DISPLAY_MASK_PERCENTAGE:
     mask_percentage = mask_percent(np_img)
-    display_text = display_text + "\n(%3.2f%% masked)" % mask_percentage
+    display_text = display_text + mask_percentage_text(mask_percentage)
   if slide_num is None and filter_num is None:
     pass
   elif filter_num is None:
@@ -1106,6 +1111,19 @@ def save_display(save, display, info, np_img, slide_num, filter_num, display_tex
   if display: add_text_and_display(np_img, display_text)
   if save: save_filtered_image(np_img, slide_num, filter_num, file_text)
   info[slide_num * 1000 + filter_num] = (slide_num, filter_num, display_text, file_text, mask_percentage)
+
+
+def mask_percentage_text(mask_percentage):
+  """
+  Generate a formatted string representing the percentage that an image is masked.
+
+  Args:
+    mask_percentage: The mask percentage.
+
+  Returns:
+    The mask percentage formatted as a string.
+  """
+  return "\n(%3.2f%% masked)" % mask_percentage
 
 
 def image_cell(slide_num, filter_num, display_text, file_text):
@@ -1354,7 +1372,7 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 
 # apply_filters_to_image(4, display=False, save=True)
 # singleprocess_apply_filters_to_images(save=True, display=False)
-multiprocess_apply_filters_to_images(save=True, display=False, html=True)
+# multiprocess_apply_filters_to_images(save=True, display=False, html=True)
 
 # red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
 #                   336, 349, 357, 380, 450, 482]
@@ -1478,3 +1496,11 @@ multiprocess_apply_filters_to_images(save=True, display=False, html=True)
 # np_to_pil(kmeans_seg).show()
 # rag_thresh = filter_rag_threshold(rgb_hyst)
 # np_to_pil(rag_thresh).show()
+
+np_img = apply_filters_to_image(15, display=False, save=False, return_image=True)
+add_text_and_display(np_img, "Filtered" + mask_percentage_text(mask_percent(np_img)))
+np_info(np_img)
+np_filt = filter_rgb_to_grayscale(np_img)
+np_filt = filter_entropy(np_filt, neighborhood=5, threshold=4, output_type="bool")
+np_img = mask_rgb(np_img, np_filt)
+add_text_and_display(np_img, "Entropy" + mask_percentage_text(mask_percent(np_img)))
