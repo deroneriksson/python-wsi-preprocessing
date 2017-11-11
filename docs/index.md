@@ -44,7 +44,7 @@ limitations under the License.
 ## Setup
 
 This project makes heavy use of Python3 and various Python packages. A full
-description of Python is beyond the scope of this journey, but some quick setup steps on OS X
+description of Python is beyond the scope of this tutorial, but some quick setup steps on OS X
 follow.
 
 Install a package manager such as [Homebrew](https://brew.sh/).
@@ -97,11 +97,14 @@ image in the training dataset was 3.4GB.
 **WSI Example Slide**<br/>
 ![WSI Example Slide](images/wsi-example.png "WSI Example Slide")
 
-A whole-slide image is created by a microscope that scans a slide and combines smaller image tiles into a large image.
-Occasionally, these tiles can be seen visually, as in the upper shadow area seen below.
 
-**Tiling Smaller Images into a Whole-Slide Image**<br/>
-![Tiling Smaller Images into a Whole-Slide Image](images/slide-scan.png "Tiling Smaller Images into a Whole-Slide Image")
+A whole-slide image is created by a microscope that scans a slide and combines smaller images into a large image.
+Techniques include combining scanned square tiles into a whole-slide image, and scanning strips and combining these
+scanned strips into the resulting whole-slide image.
+Occasionally, the smaller images can clearly be seen visually, as in the upper shadow area seen below.
+
+**Combining Smaller Images into a Whole-Slide Image**<br/>
+![Combining Smaller Images into a Whole-Slide Image](images/slide-scan.png "Combining Smaller Images into a Whole-Slide Image")
 
 
 ## View Individual Whole Slide Images
