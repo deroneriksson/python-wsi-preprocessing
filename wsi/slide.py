@@ -295,21 +295,21 @@ def slide_stats():
   avg_height = total_height / num_train_images
   avg_size = total_size / num_train_images
 
-  print("Max width: %d pixels" % max_width)
-  print("Max height: %d pixels" % max_height)
-  print("Max size: %d pixels (%dMP)" % (max_size, (max_size / 1000000)))
-  print("Min width: %d pixels" % min_width)
-  print("Min height: %d pixels" % min_height)
-  print("Min size: %d pixels (%dMP)" % (min_size, (min_size / 1000000)))
-  print("Avg width: %d pixels" % avg_width)
-  print("Avg height: %d pixels" % avg_height)
-  print("Avg size: %d pixels (%dMP)" % (avg_size, (avg_size / 1000000)))
-  print("Max width slide #%d" % which_max_width)
-  print("Max height slide #%d" % which_max_height)
-  print("Max size slide #%d" % which_max_size)
-  print("Min width slide #%d" % which_min_width)
-  print("Min height slide #%d" % which_min_height)
-  print("Min size slide #%d" % which_min_size)
+  print("%-12s {:15,d} pixels".format(max_width) % "Max width:")
+  print("%-12s {:15,d} pixels".format(max_height) % "Max height:")
+  print("%-12s {:15,d} pixels ({:,d} MP)".format(max_size, round(max_size / 1000000)) % "Max size:")
+  print("%-12s {:15,d} pixels".format(min_width) % "Min width:")
+  print("%-12s {:15,d} pixels".format(min_height) % "Min height:")
+  print("%-12s {:15,d} pixels ({:,d} MP)".format(min_size, round(min_size / 1000000)) % "Min size:")
+  print("%-12s {:15,d} pixels".format(round(avg_width)) % "Avg width:")
+  print("%-12s {:15,d} pixels".format(round(avg_height)) % "Avg height:")
+  print("%-12s {:15,d} pixels ({:,d} MP)".format(round(avg_size), round(avg_size / 1000000)) % "Avg size:")
+  print("Max width slide #{:,d}".format(which_max_width))
+  print("Max height slide #{:,d}".format(which_max_height))
+  print("Max size slide #{:,d}".format(which_max_size))
+  print("Min width slide #{:,d}".format(which_min_width))
+  print("Min height slide #{:,d}".format(which_min_height))
+  print("Min size slide #{:,d}".format(which_min_size))
 
   x, y = zip(*slide_stats)
   colors = np.random.rand(num_train_images)
@@ -319,7 +319,7 @@ def slide_stats():
   plt.ylabel("height (pixels)")
   plt.title("SVS Image Sizes")
   plt.set_cmap("prism")
-  plt.show()
+  # plt.show()
 
   plt.clf()
   plt.scatter(x, y, s=sizes, c=colors, alpha=0.7)
@@ -330,7 +330,7 @@ def slide_stats():
   for i in range(num_train_images):
     snum = i + 1
     plt.annotate(str(snum), (x[i], y[i]))
-  plt.show()
+  # plt.show()
 
   plt.clf()
   area = [w * h / 1000000 for (w, h) in slide_stats]
@@ -338,7 +338,7 @@ def slide_stats():
   plt.xlabel("width x height (M of pixels)")
   plt.ylabel("# images")
   plt.title("Distribution of image sizes in millions of pixels")
-  plt.show()
+  # plt.show()
 
   plt.clf()
   whratio = [w / h for (w, h) in slide_stats]
@@ -346,7 +346,7 @@ def slide_stats():
   plt.xlabel("width to height ratio")
   plt.ylabel("# images")
   plt.title("Image shapes (width to height)")
-  plt.show()
+  # plt.show()
 
   plt.clf()
   hwratio = [h / w for (w, h) in slide_stats]
@@ -354,7 +354,7 @@ def slide_stats():
   plt.xlabel("height to width ratio")
   plt.ylabel("# images")
   plt.title("Image shapes (height to width)")
-  plt.show()
+  # plt.show()
 
   t.elapsed_display()
 
@@ -417,6 +417,7 @@ class Time:
     self.end = datetime.datetime.now()
     time_elapsed = self.end - self.start
     return time_elapsed
+
 
 # singleprocess_convert_training_slides_to_thumbs()
 # multiprocess_convert_training_slides_to_thumbs()
