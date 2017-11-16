@@ -248,7 +248,7 @@ def slide_stats():
     print("Opening Slide #%d: %s" % (slide_num, slide_filepath))
     slide = open_slide(slide_filepath)
     (width, height) = slide.dimensions
-    print("%dx%d" % (width, height))
+    print("  Dimensions: {:,d} x {:,d}".format(width, height))
     slide_stats.append((width, height))
 
   max_width = 0
@@ -295,21 +295,15 @@ def slide_stats():
   avg_height = total_height / num_train_images
   avg_size = total_size / num_train_images
 
-  print("%-12s {:15,d} pixels".format(max_width) % "Max width:")
-  print("%-12s {:15,d} pixels".format(max_height) % "Max height:")
-  print("%-12s {:15,d} pixels ({:,d} MP)".format(max_size, round(max_size / 1000000)) % "Max size:")
-  print("%-12s {:15,d} pixels".format(min_width) % "Min width:")
-  print("%-12s {:15,d} pixels".format(min_height) % "Min height:")
-  print("%-12s {:15,d} pixels ({:,d} MP)".format(min_size, round(min_size / 1000000)) % "Min size:")
-  print("%-12s {:15,d} pixels".format(round(avg_width)) % "Avg width:")
-  print("%-12s {:15,d} pixels".format(round(avg_height)) % "Avg height:")
-  print("%-12s {:15,d} pixels ({:,d} MP)".format(round(avg_size), round(avg_size / 1000000)) % "Avg size:")
-  print("Max width slide #{:,d}".format(which_max_width))
-  print("Max height slide #{:,d}".format(which_max_height))
-  print("Max size slide #{:,d}".format(which_max_size))
-  print("Min width slide #{:,d}".format(which_min_width))
-  print("Min height slide #{:,d}".format(which_min_height))
-  print("Min size slide #{:,d}".format(which_min_size))
+  print("%-11s {:14,d} pixels (slide #%d)".format(max_width) % ("Max width:", which_max_width))
+  print("%-11s {:14,d} pixels (slide #%d)".format(max_height) % ("Max height:", which_max_height))
+  print("%-11s {:14,d} pixels (slide #%d)".format(max_size) % ("Max size:", which_max_size))
+  print("%-11s {:14,d} pixels (slide #%d)".format(min_width) % ("Min width:", which_min_width))
+  print("%-11s {:14,d} pixels (slide #%d)".format(min_height) % ("Min height:", which_min_height))
+  print("%-11s {:14,d} pixels (slide #%d)".format(min_size) % ("Min size:", which_min_size))
+  print("%-11s {:14,d} pixels".format(round(avg_width)) % "Avg width:")
+  print("%-11s {:14,d} pixels".format(round(avg_height)) % "Avg height:")
+  print("%-11s {:14,d} pixels".format(round(avg_size)) % "Avg size:")
 
   x, y = zip(*slide_stats)
   colors = np.random.rand(num_train_images)
