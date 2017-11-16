@@ -297,13 +297,13 @@ def slide_stats():
 
   print("Max width: %d pixels" % max_width)
   print("Max height: %d pixels" % max_height)
-  print("Max size: %d pixels (%dMP)" % (max_size, (max_size / 1024 / 1024)))
+  print("Max size: %d pixels (%dMP)" % (max_size, (max_size / 1000000)))
   print("Min width: %d pixels" % min_width)
   print("Min height: %d pixels" % min_height)
-  print("Min size: %d pixels (%dMP)" % (min_size, (min_size / 1024 / 1024)))
+  print("Min size: %d pixels (%dMP)" % (min_size, (min_size / 1000000)))
   print("Avg width: %d pixels" % avg_width)
   print("Avg height: %d pixels" % avg_height)
-  print("Avg size: %d pixels (%dMP)" % (avg_size, (avg_size / 1024 / 1024)))
+  print("Avg size: %d pixels (%dMP)" % (avg_size, (avg_size / 1000000)))
   print("Max width slide #%d" % which_max_width)
   print("Max height slide #%d" % which_max_height)
   print("Max size slide #%d" % which_max_size)
@@ -420,5 +420,5 @@ class Time:
 
 # singleprocess_convert_training_slides_to_thumbs()
 # multiprocess_convert_training_slides_to_thumbs()
-# slide_stats()
+slide_stats()
 # slide_info(display_all_properties=True)

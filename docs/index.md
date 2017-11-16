@@ -76,7 +76,7 @@ and [scipy](https://pypi.python.org/pypi/scipy).
     pip3 install -U ipython jupyter matplotlib numpy openslide-python pandas scikit-image scikit-learn scipy
 
 We will utilize scikit-image filters in this tutorial that are not present in the
-latest released version of scikit-image at the time of this writing. Therefore, we can install scikit-image
+latest released version of scikit-image at the time of this writing. We will install scikit-image
 from source, as described in the README at [https://github.com/scikit-image/scikit-image](https://github.com/scikit-image/scikit-image).
 
     git clone https://github.com/scikit-image/scikit-image.git
@@ -88,11 +88,11 @@ from source, as described in the README at [https://github.com/scikit-image/scik
 ## Whole Slide Imaging Background
 
 A whole-slide image is a digital representation of a microscopic slide, typically at a very high level of magnification
-such as 20X or 40X. As a result of this high magnification, whole slide images are typically very large in size. In
+such as 20x or 40x. As a result of this high magnification, whole slide images are typically very large in size. In
 the training dataset that we will examine here in relation to our breast cancer tumor proliferation prediction project,
-image sizes were as high as 34 gigapixels, with a maximum width of
+image sizes were as high as 35.6 gigapixels, with a maximum width of
 almost 200,000 pixels and a maximum height over 250,000 pixels. The maximum file size for a single whole-slide
-image in the training dataset was 3.4GB.
+image in the training dataset was 3.4 GB.
 
 **WSI Example Slide**<br/>
 ![WSI Example Slide](images/wsi-example.png "WSI Example Slide")
@@ -100,8 +100,8 @@ image in the training dataset was 3.4GB.
 
 A whole-slide image is created by a microscope that scans a slide and combines smaller images into a large image.
 Techniques include combining scanned square tiles into a whole-slide image, and scanning strips and combining these
-scanned strips into the resulting whole-slide image.
-Occasionally, the smaller images can clearly be seen visually, as in the upper shadow area seen below.
+scanned strips into the resulting whole-slide image. Occasionally, the smaller images can clearly be delineated
+visually, as in the shaded area at the top of the slide seen below.
 
 **Combining Smaller Images into a Whole-Slide Image**<br/>
 ![Combining Smaller Images into a Whole-Slide Image](images/slide-scan.png "Combining Smaller Images into a Whole-Slide Image")
@@ -112,10 +112,10 @@ Occasionally, the smaller images can clearly be seen visually, as in the upper s
 A fairly unusual feature of whole slide images is the very large image size. As an example,
 for our training data set of 500 images, the width varied from 19,920 pixels to 198,220 pixels,
 with an average of 101,688 pixels. The height varied from 13,347 pixels to 256,256 pixels,
-with an average of 73,154 pixels. The image sizes varied from
-369,356,640 to 35,621,634,048 pixels (352 to 33,971 megapixels), with an average of
-7,670,709,628 pixels (7,315 megapixels). The 500 training images take up a total of 525GB of space, with
-each image averaging over 1GB in size.
+with an average of 73,154 pixels. The image pixel sizes varied from
+369,356,640 to 35,621,634,048 pixels, with an average of
+7,670,709,628 pixels. The 500 training images take up a total of 525 GB of space, with
+each image averaging over 1 GB in size.
 
 ![Training Image Sizes](images/graph-image-sizes.png "Training Image Sizes")
 TODO: Clean up image size graph.
