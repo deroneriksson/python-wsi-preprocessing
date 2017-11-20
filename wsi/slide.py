@@ -31,8 +31,8 @@ import PIL
 from PIL import Image
 import sys
 
-# BASE_DIR = ".." + os.sep + "data"
-BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
+BASE_DIR = ".." + os.sep + "data"
+# BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
 SRC_TRAIN_IMG_DIR = BASE_DIR + os.sep + "training_slides"
 TRAIN_THUMB_SUFFIX = "thumb-"
 TRAIN_IMG_PREFIX = "TUPAC-TR-"
@@ -44,6 +44,7 @@ DEST_TRAIN_THUMB_DIR = BASE_DIR + os.sep + "training_thumbs_" + str(THUMB_SIZE)
 FILTER_DIR = BASE_DIR + os.sep + "filter_level_1_" + str(THUMB_SIZE)
 FILTER_THUMB_SUFFIX = ""  # ""filter-"
 
+STATS_DIR = BASE_DIR + os.sep + "svs_stats"
 
 def open_slide(filename):
   """
@@ -241,6 +242,9 @@ def slide_stats():
   """
   t = Time()
 
+  if not os.path.exists(STATS_DIR):
+    os.makedirs(STATS_DIR)
+
   num_train_images = get_num_training_slides()
   slide_stats = []
   for slide_num in range(1, num_train_images + 1):
@@ -313,7 +317,9 @@ def slide_stats():
   plt.ylabel("height (pixels)")
   plt.title("SVS Image Sizes")
   plt.set_cmap("prism")
-  # plt.show()
+  plt.tight_layout()
+  plt.savefig(STATS_DIR + os.sep + "svs-image-sizes.png")
+  plt.show()
 
   plt.clf()
   plt.scatter(x, y, s=sizes, c=colors, alpha=0.7)
@@ -324,7 +330,9 @@ def slide_stats():
   for i in range(num_train_images):
     snum = i + 1
     plt.annotate(str(snum), (x[i], y[i]))
-  # plt.show()
+  plt.tight_layout()
+  plt.savefig(STATS_DIR + os.sep + "svs-image-sizes-slide-numbers.png")
+  plt.show()
 
   plt.clf()
   area = [w * h / 1000000 for (w, h) in slide_stats]
@@ -332,7 +340,9 @@ def slide_stats():
   plt.xlabel("width x height (M of pixels)")
   plt.ylabel("# images")
   plt.title("Distribution of image sizes in millions of pixels")
-  # plt.show()
+  plt.tight_layout()
+  plt.savefig(STATS_DIR + os.sep + "distribution-of-svs-image-sizes.png")
+  plt.show()
 
   plt.clf()
   whratio = [w / h for (w, h) in slide_stats]
@@ -340,7 +350,9 @@ def slide_stats():
   plt.xlabel("width to height ratio")
   plt.ylabel("# images")
   plt.title("Image shapes (width to height)")
-  # plt.show()
+  plt.tight_layout()
+  plt.savefig(STATS_DIR + os.sep + "w-to-h.png")
+  plt.show()
 
   plt.clf()
   hwratio = [h / w for (w, h) in slide_stats]
@@ -348,7 +360,9 @@ def slide_stats():
   plt.xlabel("height to width ratio")
   plt.ylabel("# images")
   plt.title("Image shapes (height to width)")
-  # plt.show()
+  plt.tight_layout()
+  plt.savefig(STATS_DIR + os.sep + "h-to-w.png")
+  plt.show()
 
   t.elapsed_display()
 
