@@ -145,11 +145,13 @@ which could be a location such as `~/git/python-wsi-preprocessing/data/`). If im
 files exist in subdirectories, they will also be displayed in the list of available
 slides.
 
-![OpenSlide Available Images](images/openslide-available-slides.png "OpenSlide Available Slides")
+**OpenSlide Available Slides**<br/>
+![OpenSlide Available Slides](images/openslide-available-slides.png "OpenSlide Available Slides")
 
 
-Here we can see the initial view of one of the whole-slide images.
+Here we can see the initial view of one of the whole-slide images viewed in a web browser.
 
+**OpenSlide Whole Slide Image**<br/>
 ![OpenSlide Whole Slide Image](images/openslide-whole-slide-image.png "OpenSlide Whole Slide Image")
 
 
@@ -157,6 +159,7 @@ The whole-slide image can be zoomed to the highest magnification, revealing fine
 tile level. Zooming and scrolling operations make it relatively easy to visually peruse the
 whole slide image.
 
+**OpenSlide Whole Slide Image Zoomed**<br/>
 ![OpenSlide Whole Slide Image Zoomed](images/openslide-whole-slide-image-zoomed.png "OpenSlide Whole Slide Image Zoomed")
 
 
