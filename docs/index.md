@@ -114,17 +114,16 @@ for our training data set of 500 images, the width varied from 19,920 pixels to 
 with an average of 101,688 pixels. The height varied from 13,347 pixels to 256,256 pixels,
 with an average of 73,154 pixels. The image pixel sizes varied from
 369,356,640 to 35,621,634,048 pixels, with an average of
-7,670,709,628 pixels. The 500 training images take up a total of 525 GB of space, with
-each image averaging over 1 GB in size.
+7,670,709,628 pixels. The 500 training images take up a total of 525 GB of space.
 
-![Training Image Sizes](images/graph-image-sizes.png "Training Image Sizes")
-TODO: Clean up image size graph.
+**Training Image Sizes**<br/>
+![Training Image Sizes](images/svs-image-sizes.png "Training Image Sizes")
 
 
 Here we see a histogram distribution of the training image sizes in megapixels.
 
-![Distribution of Image Sizes](images/distribution-of-image-sizes.png "Distribution of Image Sizes")
-TODO: Clean up graph, change millions of pixels to megapixels.
+**Distribution of Image Sizes**<br/>
+![Distribution of Image Sizes](images/distribution-of-svs-image-sizes.png "Distribution of Image Sizes")
 
 
 The [OpenSlide](http://openslide.org/) project can be used to read a variety of whole-slide

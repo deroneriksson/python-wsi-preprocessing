@@ -31,8 +31,8 @@ import PIL
 from PIL import Image
 import sys
 
-BASE_DIR = ".." + os.sep + "data"
-# BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
+# BASE_DIR = ".." + os.sep + "data"
+BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
 SRC_TRAIN_IMG_DIR = BASE_DIR + os.sep + "training_slides"
 TRAIN_THUMB_SUFFIX = "thumb-"
 TRAIN_IMG_PREFIX = "TUPAC-TR-"
