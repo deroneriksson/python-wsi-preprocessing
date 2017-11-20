@@ -299,15 +299,28 @@ def slide_stats():
   avg_height = total_height / num_train_images
   avg_size = total_size / num_train_images
 
-  print("%-11s {:14,d} pixels (slide #%d)".format(max_width) % ("Max width:", which_max_width))
-  print("%-11s {:14,d} pixels (slide #%d)".format(max_height) % ("Max height:", which_max_height))
-  print("%-11s {:14,d} pixels (slide #%d)".format(max_size) % ("Max size:", which_max_size))
-  print("%-11s {:14,d} pixels (slide #%d)".format(min_width) % ("Min width:", which_min_width))
-  print("%-11s {:14,d} pixels (slide #%d)".format(min_height) % ("Min height:", which_min_height))
-  print("%-11s {:14,d} pixels (slide #%d)".format(min_size) % ("Min size:", which_min_size))
-  print("%-11s {:14,d} pixels".format(round(avg_width)) % "Avg width:")
-  print("%-11s {:14,d} pixels".format(round(avg_height)) % "Avg height:")
-  print("%-11s {:14,d} pixels".format(round(avg_size)) % "Avg size:")
+  stats_string = ""
+  stats_string += "%-11s {:14,d} pixels (slide #%d)".format(max_width) % ("Max width:", which_max_width)
+  stats_string += "\n%-11s {:14,d} pixels (slide #%d)".format(max_height) % ("Max height:", which_max_height)
+  stats_string += "\n%-11s {:14,d} pixels (slide #%d)".format(max_size) % ("Max size:", which_max_size)
+  stats_string += "\n%-11s {:14,d} pixels (slide #%d)".format(min_width) % ("Min width:", which_min_width)
+  stats_string += "\n%-11s {:14,d} pixels (slide #%d)".format(min_height) % ("Min height:", which_min_height)
+  stats_string += "\n%-11s {:14,d} pixels (slide #%d)".format(min_size) % ("Min size:", which_min_size)
+  stats_string += "\n%-11s {:14,d} pixels".format(round(avg_width)) % "Avg width:"
+  stats_string += "\n%-11s {:14,d} pixels".format(round(avg_height)) % "Avg height:"
+  stats_string += "\n%-11s {:14,d} pixels".format(round(avg_size)) % "Avg size:"
+  stats_string += "\n"
+  print(stats_string)
+
+  stats_string += "\nslide number,width,height"
+  for i in range(0, len(slide_stats)):
+    (width, height) = slide_stats[i]
+    stats_string += "\n%d,%d,%d" % (i+1, width, height)
+  stats_string += "\n"
+
+  stats_file = open(STATS_DIR + os.sep + "stats.txt", "w")
+  stats_file.write(stats_string)
+  stats_file.close()
 
   x, y = zip(*slide_stats)
   colors = np.random.rand(num_train_images)
