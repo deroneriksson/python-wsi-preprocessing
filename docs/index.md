@@ -26,8 +26,8 @@ limitations under the License.
 ## Outline
 
   1. [Project Introduction](#project-introduction)
-  2. [Whole Slide Imaging Background](#whole-slide-imaging-background)
-  3. [Setup](#setup)
+  2. [Setup](#setup)
+  3. [Whole Slide Imaging Background](#whole-slide-imaging-background)
   4. [View Individual Whole Slide Images](#view-individual-whole-slide-images)
   5. [View Multiple Images](#view-multiple-images)
   6. [Image Filtering](#image-filtering)
@@ -37,8 +37,31 @@ limitations under the License.
 
 ## Project Introduction
 
+The primary goal of the [Tumor Proliferation Assessment Challenge 2016 (TUPAC16)](http://tupac.tue-image.nl/) is to
+develop algorithms to automatically predict breast cancer tumor proliferation scores. In this challenge, the training
+set we looked at consisted of 500 whole-slide images which are scored (1, 2, or 3) by pathologists based on mitosis
+counts. A higher proliferation score indicates a worse prognosis since higher tumor proliferation speeds are
+correlated with worse outcomes. The tissue samples are stained with hematoxylin and eosin (H&E).
 
-## Whole Slide Imaging Background
+One of our first approaches to this challenge was to apply deep learning to breast cancer whole-slide images,
+following an approach similar to the process used by Ertosun and Rubin in
+[Automated Grading of Gliomas using Deep Learning in Digital Pathology Images: A modular approach with ensemble of
+convolutional neural networks](https://web.stanford.edu/group/rubinlab/pubs/2243353.pdf). One important part of the
+technique described by Ertosun and Rubin involves image preprocessing, where large whole-slide images are divided into
+tiles and only tiles that consist of at least 90% tissue are further analyzed. Tissue is determined by hysteresis
+thresholding on the grayscale image complement.
+
+The three TUPAC16 challenge tasks were won by Paeng et al, described in the paper
+[A Unified Framework for Tumor Proliferation Score Prediction in Breast
+Histopathology](https://pdfs.semanticscholar.org/7d9b/ccac7a9a850cc84a980e5abeaeac2aef94e6.pdf). In their technique,
+identification of tissue regions in whole-slide images is done using Otsu thresholding, morphological operations, and
+binary dilation.
+
+Tissue identification in whole-slide images can be a very important precursor to deep learning, since accurate tissue
+identification decreases the quantity of data and increases the quality of the data that needs to be analyzed. This
+can lead to faster, more accurate model training.
+In this tutorial, we will take a look at whole-slide image processing and will describe and develop various filters
+that can be used to increase the accuracy of tissue identification.
 
 
 ## Setup
@@ -91,7 +114,7 @@ A whole-slide image is a digital representation of a microscopic slide, typicall
 such as 20x or 40x. As a result of this high magnification, whole slide images are typically very large in size. In
 the training dataset that we will examine here in relation to our breast cancer tumor proliferation prediction project,
 image sizes were as high as 35.6 gigapixels, with a maximum width of
-almost 200,000 pixels and a maximum height over 250,000 pixels. The maximum file size for a single whole-slide
+almost 200,000 pixels and a maximum height of over 250,000 pixels. The maximum file size for a single whole-slide
 image in the training dataset was 3.4 GB.
 
 **WSI Example Slide**<br/>
@@ -100,7 +123,7 @@ image in the training dataset was 3.4 GB.
 
 A whole-slide image is created by a microscope that scans a slide and combines smaller images into a large image.
 Techniques include combining scanned square tiles into a whole-slide image, and scanning strips and combining these
-scanned strips into the resulting whole-slide image. Occasionally, the smaller images can clearly be delineated
+scanned strips into the resulting whole-slide image. Occasionally, the smaller constituent images can be seen
 visually, as in the shaded area at the top of the slide seen below.
 
 **Combining Smaller Images into a Whole-Slide Image**<br/>
@@ -112,7 +135,7 @@ visually, as in the shaded area at the top of the slide seen below.
 A fairly unusual feature of whole slide images is the very large image size. As an example,
 for our training data set of 500 images, the width varied from 19,920 pixels to 198,220 pixels,
 with an average of 101,688 pixels. The height varied from 13,347 pixels to 256,256 pixels,
-with an average of 73,154 pixels. The image pixel sizes varied from
+with an average of 73,154 pixels. The image total pixel sizes varied from
 369,356,640 to 35,621,634,048 pixels, with an average of
 7,670,709,628 pixels. The 500 training images take up a total of 525 GB of space.
 
@@ -155,9 +178,8 @@ Here we can see the initial view of one of the whole-slide images viewed in a we
 ![OpenSlide Whole Slide Image](images/openslide-whole-slide-image.png "OpenSlide Whole Slide Image")
 
 
-The whole-slide image can be zoomed to the highest magnification, revealing fine details at the
-tile level. Zooming and scrolling operations make it relatively easy to visually peruse the
-whole slide image.
+Using this web interface, the whole-slide image can be zoomed to the highest magnification, revealing fine details at
+the tile level. Zooming and scrolling operations make it relatively easy to visually peruse the whole slide image.
 
 **OpenSlide Whole Slide Image Zoomed**<br/>
 ![OpenSlide Whole Slide Image Zoomed](images/openslide-whole-slide-image-zoomed.png "OpenSlide Whole Slide Image Zoomed")
