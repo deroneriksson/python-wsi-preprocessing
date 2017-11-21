@@ -28,11 +28,6 @@ limitations under the License.
   1. [Project Introduction](#project-introduction)
   2. [Setup](#setup)
   3. [Whole Slide Imaging Background](#whole-slide-imaging-background)
-  4. [View Individual Whole Slide Images](#view-individual-whole-slide-images)
-  5. [View Multiple Images](#view-multiple-images)
-  6. [Image Filtering](#image-filtering)
-  7. [View Filter Results for Individual Images](#view-filter-results-for-individual-images)
-  8. [View Filter Results for Multiple Images](#view-filter-results-for-multiple-images)
 
 
 ## Project Introduction
@@ -51,7 +46,7 @@ technique described by Ertosun and Rubin involves image preprocessing, where lar
 tiles and only tiles that consist of at least 90% tissue are further analyzed. Tissue is determined by hysteresis
 thresholding on the grayscale image complement.
 
-The three TUPAC16 challenge tasks were won by Paeng et al, described in the paper
+The three TUPAC16 challenge tasks were won by Paeng et al, described in
 [A Unified Framework for Tumor Proliferation Score Prediction in Breast
 Histopathology](https://pdfs.semanticscholar.org/7d9b/ccac7a9a850cc84a980e5abeaeac2aef94e6.pdf). In their technique,
 identification of tissue regions in whole-slide images is done using Otsu thresholding, morphological operations, and
@@ -111,33 +106,28 @@ from source, as described in the README at [https://github.com/scikit-image/scik
 ## Whole Slide Imaging Background
 
 A whole-slide image is a digital representation of a microscopic slide, typically at a very high level of magnification
-such as 20x or 40x. As a result of this high magnification, whole slide images are typically very large in size. In
-the training dataset that we will examine here in relation to our breast cancer tumor proliferation prediction project,
-image sizes were as high as 35.6 gigapixels, with a maximum width of
-almost 200,000 pixels and a maximum height of over 250,000 pixels. The maximum file size for a single whole-slide
-image in the training dataset was 3.4 GB.
+such as 20x or 40x. As a result of this high magnification, whole slide images are typically very large in size.
+The maximum file size for a single whole-slide image in our training dataset was 3.4 GB, with an average over 1 GB.
 
 **WSI Example Slide**<br/>
 ![WSI Example Slide](images/wsi-example.png "WSI Example Slide")
 
 
 A whole-slide image is created by a microscope that scans a slide and combines smaller images into a large image.
-Techniques include combining scanned square tiles into a whole-slide image, and scanning strips and combining these
-scanned strips into the resulting whole-slide image. Occasionally, the smaller constituent images can be seen
-visually, as in the shaded area at the top of the slide seen below.
+Techniques include combining scanned square tiles into a whole-slide image and combining scanned strips
+into a resulting whole-slide image. Occasionally, the smaller constituent images can be
+visually discerned, as in the shaded area at the top of the slide seen below.
 
 **Combining Smaller Images into a Whole-Slide Image**<br/>
 ![Combining Smaller Images into a Whole-Slide Image](images/slide-scan.png "Combining Smaller Images into a Whole-Slide Image")
 
 
-## View Individual Whole Slide Images
-
-A fairly unusual feature of whole slide images is the very large image size. As an example,
-for our training data set of 500 images, the width varied from 19,920 pixels to 198,220 pixels,
+A fairly unusual feature of whole-slide images is the very large image size.
+For our training data set of 500 images, the width varied from 19,920 pixels to 198,220 pixels,
 with an average of 101,688 pixels. The height varied from 13,347 pixels to 256,256 pixels,
 with an average of 73,154 pixels. The image total pixel sizes varied from
 369,356,640 to 35,621,634,048 pixels, with an average of
-7,670,709,628 pixels. The 500 training images take up a total of 525 GB of space.
+7,670,709,628 pixels. The 500 training images take up a total of 525 GB of storage space.
 
 **Training Image Sizes**<br/>
 ![Training Image Sizes](images/svs-image-sizes.png "Training Image Sizes")
@@ -145,13 +135,13 @@ with an average of 73,154 pixels. The image total pixel sizes varied from
 
 Here we see a histogram distribution of the training image sizes in megapixels.
 
-**Distribution of Image Sizes**<br/>
+**Distribution of Images Based on Number of Pixels**<br/>
 ![Distribution of Image Sizes](images/distribution-of-svs-image-sizes.png "Distribution of Image Sizes")
 
 
 The [OpenSlide](http://openslide.org/) project can be used to read a variety of whole-slide
 image formats, including the [Aperio *.svs slide format](http://openslide.org/formats/aperio/)
-of our image set. This is a pyramidal, tiled format, where the massive slide is composed of
+of our training image set. This is a pyramidal, tiled format, where the massive slide is composed of
 a large number of constituent tiles.
 
 To use the OpenSlide Python interface to view whole slide images, we can clone the
@@ -168,6 +158,9 @@ which could be a location such as `~/git/python-wsi-preprocessing/data/`). If im
 files exist in subdirectories, they will also be displayed in the list of available
 slides.
 
+If this viewing application is installed on a server that also hosts the whole-slide image repository, this
+offers a convenient mechanism for users to view the slides without requiring local storage space.
+
 **OpenSlide Available Slides**<br/>
 ![OpenSlide Available Slides](images/openslide-available-slides.png "OpenSlide Available Slides")
 
@@ -183,17 +176,4 @@ the tile level. Zooming and scrolling operations make it relatively easy to visu
 
 **OpenSlide Whole Slide Image Zoomed**<br/>
 ![OpenSlide Whole Slide Image Zoomed](images/openslide-whole-slide-image-zoomed.png "OpenSlide Whole Slide Image Zoomed")
-
-
-## View Multiple Images
-
-
-## Image Filtering
-
-
-## View Filter Results for Individual Images
-
-
-## View Filter Results for Multiple Images
-
 

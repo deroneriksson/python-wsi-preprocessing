@@ -31,8 +31,8 @@ import PIL
 from PIL import Image
 import sys
 
-# BASE_DIR = ".." + os.sep + "data"
-BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
+BASE_DIR = ".." + os.sep + "data"
+# BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
 SRC_TRAIN_IMG_DIR = BASE_DIR + os.sep + "training_slides"
 TRAIN_THUMB_SUFFIX = "thumb-"
 TRAIN_IMG_PREFIX = "TUPAC-TR-"
@@ -45,6 +45,7 @@ FILTER_DIR = BASE_DIR + os.sep + "filter_level_1_" + str(THUMB_SIZE)
 FILTER_THUMB_SUFFIX = ""  # ""filter-"
 
 STATS_DIR = BASE_DIR + os.sep + "svs_stats"
+
 
 def open_slide(filename):
   """
@@ -315,12 +316,14 @@ def slide_stats():
   stats_string += "\nslide number,width,height"
   for i in range(0, len(slide_stats)):
     (width, height) = slide_stats[i]
-    stats_string += "\n%d,%d,%d" % (i+1, width, height)
+    stats_string += "\n%d,%d,%d" % (i + 1, width, height)
   stats_string += "\n"
 
   stats_file = open(STATS_DIR + os.sep + "stats.txt", "w")
   stats_file.write(stats_string)
   stats_file.close()
+
+  t.elapsed_display()
 
   x, y = zip(*slide_stats)
   colors = np.random.rand(num_train_images)
@@ -377,8 +380,6 @@ def slide_stats():
   plt.savefig(STATS_DIR + os.sep + "h-to-w.png")
   plt.show()
 
-  t.elapsed_display()
-
 
 def slide_info(display_all_properties=False):
   """
@@ -404,7 +405,6 @@ def slide_info(display_all_properties=False):
     print("Associated images: " + str(slide.associated_images))
     print("Format: " + str(slide.detect_format(slide_filepath)))
     if display_all_properties:
-      print("Properties: " + str(slide.properties))
       propertymap = slide.properties
       keys = propertymap.keys()
       for key in keys:
@@ -442,5 +442,5 @@ class Time:
 
 # singleprocess_convert_training_slides_to_thumbs()
 # multiprocess_convert_training_slides_to_thumbs()
-slide_stats()
-# slide_info(display_all_properties=True)
+# slide_stats()
+slide_info(display_all_properties=False)
