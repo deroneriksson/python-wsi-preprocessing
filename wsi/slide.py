@@ -31,8 +31,8 @@ import PIL
 from PIL import Image
 import sys
 
-# BASE_DIR = ".." + os.sep + "data"
-BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
+BASE_DIR = ".." + os.sep + "data"
+# BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
 TRAIN_PREFIX = "TUPAC-TR-"
 SRC_TRAIN_DIR = BASE_DIR + os.sep + "training_slides"
 SRC_TRAIN_EXT = "svs"
@@ -424,13 +424,6 @@ def slide_info(display_all_properties=False):
     print("Level dimensions: " + str(slide.level_dimensions))
     print("Level downsamples: " + str(slide.level_downsamples))
     print("Dimensions: " + str(slide.dimensions))
-    print("Associated images: " + str(slide.associated_images))
-    print("Format: " + str(slide.detect_format(slide_filepath)))
-    if display_all_properties:
-      propertymap = slide.properties
-      keys = propertymap.keys()
-      for key in keys:
-        print("  Property: " + str(key) + ", value: " + str(propertymap.get(key)))
     objective_power = int(slide.properties[openslide.PROPERTY_NAME_OBJECTIVE_POWER])
     print("Objective power: " + str(objective_power))
     if objective_power == 20:
@@ -439,6 +432,14 @@ def slide_info(display_all_properties=False):
       obj_pow_40_list.append(slide_num)
     else:
       obj_pow_other_list.append(slide_num)
+    print("Associated images:")
+    for ai_key in slide.associated_images.keys():
+      print("  " + str(ai_key) + ": " + str(slide.associated_images.get(ai_key)))
+    print("Format: " + str(slide.detect_format(slide_filepath)))
+    if display_all_properties:
+      print("Properties:")
+      for prop_key in slide.properties.keys():
+        print("  Property: " + str(prop_key) + ", value: " + str(slide.properties.get(prop_key)))
 
   print("\n\nSlide Magnifications:")
   print("  20x Slides: " + str(obj_pow_20_list))
@@ -465,7 +466,8 @@ class Time:
     time_elapsed = self.end - self.start
     return time_elapsed
 
+
 # singleprocess_convert_training_slides_to_images()
 # multiprocess_convert_training_slides_to_images()
 # slide_stats()
-# slide_info(display_all_properties=False)
+slide_info(display_all_properties=True)
