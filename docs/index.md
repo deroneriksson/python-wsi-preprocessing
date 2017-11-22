@@ -130,22 +130,6 @@ with an average of 73,154 pixels. The image total pixel sizes varied from
 ![Training Image Sizes](images/svs-image-sizes.png "Training Image Sizes")
 
 
-**Training Images Statistics**<br/>
-
-| Attribute  | Size                  | Slide # |
-| ---------- | --------------------- | ------- |
-| Max width  |        198,220 pixels | 10      |
-| Max height |        256,256 pixels | 387     |
-| Max size   | 35,621,634,048 pixels | 387     |
-| Min width  |         19,920 pixels | 112     |
-| Min height |         13,347 pixels | 108     |
-| Min size   |    369,356,640 pixels | 112     |
-| Avg width  |        101,688 pixels |         |
-| Avg height |         73,154 pixels |         |
-| Avg size   |  7,670,709,629 pixels |         |
-
-
-
 Here we see a histogram distribution of the training image sizes in megapixels.
 
 **Distribution of Images Based on Number of Pixels**<br/>
@@ -196,8 +180,107 @@ the tile level. Zooming and scrolling operations make it relatively easy to visu
 To develop a set of filters that can be applied to an entire set of large whole-slide images, two of the first issues
 we are confronted with are the size of the data and the format of the data. As mentioned, for our training dataset,
 the average svs file size is over 1 GB and we have 500 total images. Additionally, the svs format is a fairly unusual
-format which typically can't be visually displayed by common applications and operating systems.
+format which typically can't be visually displayed by common applications and operating systems. Therefore, we will
+develop some code to overcome these important issues. Using OpenSlide and Python, we'll convert the training dataset to
+smaller images in a common format.
 
-Using OpenSlide and Python, we'll convert the training dataset to smaller images in a common format.
+In the `wsi/slide.py` file, we have many functions that can be used in relation to the original svs images. Of
+particular importance are the following functions:
 
+    open_slide()
+    slide_info(display_all_properties=True)
+    slide_stats()
+    training_slide_to_image()
+    singleprocess_convert_training_slides_to_images()
+    multiprocess_convert_training_slides_to_images()
+
+The `open_slide()` function uses OpenSlide to read in an svs file. The `slide_info()` function displays metadata
+associated with each svs file. The `slide_stats()` function looks at all images and summarizes pixel size information
+about the set of slides. It also generates a variety of charts for a visual representation of the slide statistics.
+The `training_slide_to_image()` function converts a single svs slide to a smaller image in a more common format such as
+jpg or png. The `singleprocess_convert_training_slides_to_images()` function converts all svs slides to smaller images,
+and the `multiprocess_convert_training_slides_to_images()` function uses multiple processes (1 process per core) to
+speed up the slide conversion process.
+
+One of the first actions we can take to become more familiar with the training dataset is to have a look at the metadata
+associated with each image, which we can do with the `slide_info()` function. Here we can see a sample of this
+metadata for Slide #1:
+
+```
+Opening Slide #1: /Volumes/BigData/TUPAC/training_slides/TUPAC-TR-001.svs
+Level count: 5
+Level dimensions: ((130304, 247552), (32576, 61888), (8144, 15472), (2036, 3868), (1018, 1934))
+Level downsamples: (1.0, 4.0, 16.0, 64.0, 128.0)
+Dimensions: (130304, 247552)
+Objective power: 40
+Associated images:
+  macro: <PIL.Image.Image image mode=RGBA size=497x1014 at 0x114B69F98>
+  thumbnail: <PIL.Image.Image image mode=RGBA size=404x768 at 0x114B69FD0>
+Format: aperio
+Properties:
+  Property: aperio.AppMag, value: 40
+  Property: aperio.MPP, value: 0.16437
+  Property: openslide.comment, value: Aperio Image Library v11.0.37
+130304x247552 (256x256) JPEG/RGB Q=40;Mirax Digital Slide|AppMag = 40|MPP = 0.16437
+  Property: openslide.level-count, value: 5
+  Property: openslide.level[0].downsample, value: 1
+  Property: openslide.level[0].height, value: 247552
+  Property: openslide.level[0].tile-height, value: 256
+  Property: openslide.level[0].tile-width, value: 256
+  Property: openslide.level[0].width, value: 130304
+  Property: openslide.level[1].downsample, value: 4
+  Property: openslide.level[1].height, value: 61888
+  Property: openslide.level[1].tile-height, value: 256
+  Property: openslide.level[1].tile-width, value: 256
+  Property: openslide.level[1].width, value: 32576
+  Property: openslide.level[2].downsample, value: 16
+  Property: openslide.level[2].height, value: 15472
+  Property: openslide.level[2].tile-height, value: 256
+  Property: openslide.level[2].tile-width, value: 256
+  Property: openslide.level[2].width, value: 8144
+  Property: openslide.level[3].downsample, value: 64
+  Property: openslide.level[3].height, value: 3868
+  Property: openslide.level[3].tile-height, value: 256
+  Property: openslide.level[3].tile-width, value: 256
+  Property: openslide.level[3].width, value: 2036
+  Property: openslide.level[4].downsample, value: 128
+  Property: openslide.level[4].height, value: 1934
+  Property: openslide.level[4].tile-height, value: 256
+  Property: openslide.level[4].tile-width, value: 256
+  Property: openslide.level[4].width, value: 1018
+  Property: openslide.mpp-x, value: 0.16436999999999999
+  Property: openslide.mpp-y, value: 0.16436999999999999
+  Property: openslide.objective-power, value: 40
+  Property: openslide.quickhash-1, value: 0e0631ade42ae3384aaa727ce2e36a8272fe67039c513e17dccfdd592f6040cb
+  Property: openslide.vendor, value: aperio
+  Property: tiff.ImageDescription, value: Aperio Image Library v11.0.37
+130304x247552 (256x256) JPEG/RGB Q=40;Mirax Digital Slide|AppMag = 40|MPP = 0.16437
+  Property: tiff.ResolutionUnit, value: inch
+```
+
+The most important metadata for our purposes is that the slide has a width of 130,304 pixels and a height of
+247,552 pixels. Note that these values are displayed as width followed by height. For most of our image processing,
+we will be using NumPy arrays, where rows (height) are followed by columns (width).
+
+If we visually look over the metadata associated with other images in the training dataset, we see that the slides
+are not consistent in their various properties such as the number of levels contained in the svs files. The metadata
+implies that the dataset comes from a variety of sources. The variability in the slides, especially regarding
+issues such as H&E staining and pen marks on the slides, needs to be considered during our filter development.
+
+If we call the `slide_stats()` function, in addition to the charts, we obtain a table of pixel statistics, shown
+below.
+
+**Training Images Statistics**<br/>
+
+| Attribute  | Size                  | Slide # |
+| ---------- | --------------------- | ------- |
+| Max width  |        198,220 pixels | 10      |
+| Max height |        256,256 pixels | 387     |
+| Max size   | 35,621,634,048 pixels | 387     |
+| Min width  |         19,920 pixels | 112     |
+| Min height |         13,347 pixels | 108     |
+| Min size   |    369,356,640 pixels | 112     |
+| Avg width  |        101,688 pixels |         |
+| Avg height |         73,154 pixels |         |
+| Avg size   |  7,670,709,629 pixels |         |
 
