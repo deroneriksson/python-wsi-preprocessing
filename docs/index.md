@@ -284,3 +284,23 @@ below.
 | Avg height |         73,154 pixels |         |
 | Avg size   |  7,670,709,629 pixels |         |
 
+
+The `wsi/slide.py` file contains constants that can be used to control various image conversion settings. For example,
+the `DEST_TRAIN_SIZE` constant controls the maximum width or height value. For our purposes, its default value will
+be 2048. The `DEST_TRAIN_EXT` constant controls the output format. We will use `png` since it is lossless.
+Note that `jpg` conversion can also be specified, but `jpg` is lossy. For later deep learning purposes with TensorFlow,
+we have determined that a lossless format is preferable.
+
+Using OS X with an external hard drive containing the training set, the following conversion numbers using
+`singleprocess_convert_training_slides_to_images()` and `multiprocess_convert_training_slides_to_images()`
+were obtained:
+
+    jpg single process: 4m47s
+    jpg multi process: 1n37s
+    png single process: 11m22s
+    png multi process: 3m08s
+
+
+After calling `multiprocess_convert_training_slides_to_images()` using the `png` format, we have 500 whole-slide
+images in lossless png format that we can now examine in much greater detail in relation to our filters.
+

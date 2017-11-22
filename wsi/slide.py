@@ -467,7 +467,7 @@ class Time:
     return time_elapsed
 
 
-# singleprocess_convert_training_slides_to_images()
+singleprocess_convert_training_slides_to_images()
 # multiprocess_convert_training_slides_to_images()
 # slide_stats()
-slide_info(display_all_properties=True)
+# slide_info(display_all_properties=True)
