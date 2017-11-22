@@ -20,14 +20,11 @@ limitations under the License.
 {% endcomment %}
 -->
 
-# Python WSI Preprocessing
+* Table of contents.
+{:toc}
 
 
-## Outline
-
-  1. [Project Introduction](#project-introduction)
-  2. [Setup](#setup)
-  3. [Whole Slide Imaging Background](#whole-slide-imaging-background)
+# Whole-Slide Image Preprocessing in Python
 
 
 ## Project Introduction
@@ -53,9 +50,9 @@ identification of tissue regions in whole-slide images is done using Otsu thresh
 binary dilation.
 
 Tissue identification in whole-slide images can be a very important precursor to deep learning, since accurate tissue
-identification decreases the quantity of data and increases the quality of the data that needs to be analyzed. This
+identification decreases the quantity of data and increases the quality of the data to be analyzed. This
 can lead to faster, more accurate model training.
-In this tutorial, we will take a look at whole-slide image processing and will describe and develop various filters
+In this tutorial, we will take a look at whole-slide image processing and will describe various filters
 that can be used to increase the accuracy of tissue identification.
 
 
@@ -133,6 +130,22 @@ with an average of 73,154 pixels. The image total pixel sizes varied from
 ![Training Image Sizes](images/svs-image-sizes.png "Training Image Sizes")
 
 
+**Training Images Statistics**<br/>
+
+| Attribute  | Size                  | Slide # |
+| ---------- | --------------------- | ------- |
+| Max width  |        198,220 pixels | 10      |
+| Max height |        256,256 pixels | 387     |
+| Max size   | 35,621,634,048 pixels | 387     |
+| Min width  |         19,920 pixels | 112     |
+| Min height |         13,347 pixels | 108     |
+| Min size   |    369,356,640 pixels | 112     |
+| Avg width  |        101,688 pixels |         |
+| Avg height |         73,154 pixels |         |
+| Avg size   |  7,670,709,629 pixels |         |
+
+
+
 Here we see a histogram distribution of the training image sizes in megapixels.
 
 **Distribution of Images Based on Number of Pixels**<br/>
@@ -176,4 +189,15 @@ the tile level. Zooming and scrolling operations make it relatively easy to visu
 
 **OpenSlide Whole Slide Image Zoomed**<br/>
 ![OpenSlide Whole Slide Image Zoomed](images/openslide-whole-slide-image-zoomed.png "OpenSlide Whole Slide Image Zoomed")
+
+
+## WSI Format Conversion
+
+To develop a set of filters that can be applied to an entire set of large whole-slide images, two of the first issues
+we are confronted with are the size of the data and the format of the data. As mentioned, for our training dataset,
+the average svs file size is over 1 GB and we have 500 total images. Additionally, the svs format is a fairly unusual
+format which typically can't be visually displayed by common applications and operating systems.
+
+Using OpenSlide and Python, we'll convert the training dataset to smaller images in a common format.
+
 

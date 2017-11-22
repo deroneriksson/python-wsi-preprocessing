@@ -1372,7 +1372,7 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 
 # apply_filters_to_image(4, display=False, save=True)
 # singleprocess_apply_filters_to_images(save=True, display=False)
-# multiprocess_apply_filters_to_images(save=True, display=False, html=True)
+multiprocess_apply_filters_to_images(save=True, display=False, html=True)
 
 # red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
 #                   336, 349, 357, 380, 450, 482]
@@ -1497,10 +1497,10 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 # rag_thresh = filter_rag_threshold(rgb_hyst)
 # np_to_pil(rag_thresh).show()
 
-np_img = apply_filters_to_image(15, display=False, save=False, return_image=True)
-add_text_and_display(np_img, "Filtered" + mask_percentage_text(mask_percent(np_img)))
-np_info(np_img)
-np_filt = filter_rgb_to_grayscale(np_img)
-np_filt = filter_entropy(np_filt, neighborhood=5, threshold=4, output_type="bool")
-np_img = mask_rgb(np_img, np_filt)
-add_text_and_display(np_img, "Entropy" + mask_percentage_text(mask_percent(np_img)))
+# np_img = apply_filters_to_image(15, display=False, save=False, return_image=True)
+# add_text_and_display(np_img, "Filtered" + mask_percentage_text(mask_percent(np_img)))
+# np_info(np_img)
+# np_filt = filter_rgb_to_grayscale(np_img)
+# np_filt = filter_entropy(np_filt, neighborhood=5, threshold=4, output_type="bool")
+# np_img = mask_rgb(np_img, np_filt)
+# add_text_and_display(np_img, "Entropy" + mask_percentage_text(mask_percent(np_img)))
