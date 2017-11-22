@@ -1038,7 +1038,7 @@ def apply_filters_to_image(slide_num, save=True, display=False, return_image=Fal
 
   if save and not os.path.exists(slide.FILTER_DIR):
     os.makedirs(slide.FILTER_DIR)
-  img_path = slide.get_training_thumb_path(slide_num)
+  img_path = slide.get_training_image_path(slide_num)
   img = slide.open_image(img_path)
 
   rgb = pil_to_np_rgb(img)
@@ -1140,10 +1140,10 @@ def image_cell(slide_num, filter_num, display_text, file_text):
     HTML for viewing a processed image.
   """
   return "    <td>\n" + \
-         "      <a href=\"" + slide.get_filter_thumb_path(slide_num, filter_num, file_text) + "\">\n" + \
+         "      <a href=\"" + slide.get_filter_image_path(slide_num, filter_num, file_text) + "\">\n" + \
          "        " + display_text + "<br/>\n" + \
-         "        " + slide.get_filter_thumb_filename(slide_num, filter_num, file_text) + "<br/>\n" + \
-         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + slide.get_filter_thumb_path(
+         "        " + slide.get_filter_image_filename(slide_num, filter_num, file_text) + "<br/>\n" + \
+         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + slide.get_filter_image_path(
     slide_num, filter_num, file_text) + "\" />\n" + \
          "      </a>\n" + \
          "    </td>\n"
@@ -1197,7 +1197,7 @@ def save_filtered_image(np_img, slide_num, filter_num, filter_text):
     filter_text: Descriptive text to add to the image filename.
   """
   t = Time()
-  filepath = slide.get_filter_thumb_path(slide_num, filter_num, filter_text)
+  filepath = slide.get_filter_image_path(slide_num, filter_num, filter_text)
   np_to_pil(np_img).save(filepath)
   print("%-20s | Time: %-14s  Name: %s" % ("Save Image", str(t.elapsed()), filepath))
 
@@ -1240,7 +1240,7 @@ def apply_filters_to_image_list(image_num_list, save, display):
     display: If True, display filtered images to screen.
 
   Returns:
-    The starting index and the ending index of the slides that were converted to thumbnails.
+    The starting index and the ending index of the slides that were converted to images.
   """
   html_page_info = dict()
   for slide_num in image_num_list:
@@ -1260,7 +1260,7 @@ def apply_filters_to_image_range(start_ind, end_ind, save, display):
     display: If True, display filtered images to screen.
 
   Returns:
-    The starting index and the ending index of the slides that were converted to thumbnails.
+    The starting index and the ending index of the slides that were converted to images.
   """
   html_page_info = dict()
   for slide_num in range(start_ind, end_ind + 1):
@@ -1389,7 +1389,7 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 # overmasked_slides = [21]
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=overmasked_slides)
 
-# img_path = slide.get_training_thumb_path(2)
+# img_path = slide.get_training_image_path(2)
 # img = slide.open_image(img_path)
 # rgb = pil_to_np_rgb(img)
 # add_text_and_display(rgb, "RGB")

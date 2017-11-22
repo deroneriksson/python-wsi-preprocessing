@@ -31,18 +31,18 @@ import PIL
 from PIL import Image
 import sys
 
-BASE_DIR = ".." + os.sep + "data"
-# BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
-SRC_TRAIN_IMG_DIR = BASE_DIR + os.sep + "training_slides"
-TRAIN_THUMB_SUFFIX = "thumb-"
-TRAIN_IMG_PREFIX = "TUPAC-TR-"
-TRAIN_IMG_EXT = ".svs"
-THUMB_EXT = ".png"
-THUMB_SIZE = 2048
-DEST_TRAIN_THUMB_DIR = BASE_DIR + os.sep + "training_thumbs_" + str(THUMB_SIZE)
+# BASE_DIR = ".." + os.sep + "data"
+BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
+TRAIN_PREFIX = "TUPAC-TR-"
+SRC_TRAIN_DIR = BASE_DIR + os.sep + "training_slides"
+SRC_TRAIN_EXT = "svs"
+DEST_TRAIN_SUFFIX = ""  # Example: "train-"
+DEST_TRAIN_EXT = "png"
+DEST_TRAIN_SIZE = 2048
+DEST_TRAIN_DIR = BASE_DIR + os.sep + "training_" + str(DEST_TRAIN_SIZE) + "_" + DEST_TRAIN_EXT
 
-FILTER_DIR = BASE_DIR + os.sep + "filter_level_1_" + str(THUMB_SIZE)
-FILTER_THUMB_SUFFIX = ""  # ""filter-"
+FILTER_DIR = BASE_DIR + os.sep + "filter_" + str(DEST_TRAIN_SIZE) + "_" + DEST_TRAIN_EXT
+FILTER_SUFFIX = ""  # Example: "filter-"
 
 STATS_DIR = BASE_DIR + os.sep + "svs_stats"
 
@@ -91,48 +91,70 @@ def get_training_slide_path(slide_number):
     slide_number: The slide number.
 
   Returns:
-    Path to the WSI training image file.
+    Path to the WSI training slide file.
   """
   padded_sl_num = str(slide_number).zfill(3)
-  slide_filepath = SRC_TRAIN_IMG_DIR + os.sep + TRAIN_IMG_PREFIX + padded_sl_num + TRAIN_IMG_EXT
+  slide_filepath = SRC_TRAIN_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "." + SRC_TRAIN_EXT
   return slide_filepath
 
 
-def get_training_thumb_path(slide_number):
+def get_training_image_path(slide_number):
   """
-  Convert slide number to a path to the corresponding destination thumbnail file.
+  Convert slide number to a path to the corresponding destination image file.
 
   Example:
-    5 -> ../data/training_thumbs_4096/TUPAC-TR-005-thumb-4096.jpg
+    5 -> ../data/training_4096_png/TUPAC-TR-005-4096.png
 
   Args:
     slide_number: The slide number.
 
   Returns:
-    Path to the destination thumbnail file.
+    Path to the destination image file.
   """
   padded_sl_num = str(slide_number).zfill(3)
-  thumb_path = DEST_TRAIN_THUMB_DIR + os.sep + TRAIN_IMG_PREFIX + padded_sl_num + "-" + TRAIN_THUMB_SUFFIX + str(
-    THUMB_SIZE) + THUMB_EXT
-  return thumb_path
+  img_path = DEST_TRAIN_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + DEST_TRAIN_SUFFIX + str(
+    DEST_TRAIN_SIZE) + "." + DEST_TRAIN_EXT
+  return img_path
 
 
-def get_filter_thumb_path(slide_number, filter_number, filter_name_info):
-  thumb_path = FILTER_DIR + os.sep + get_filter_thumb_filename(slide_number, filter_number, filter_name_info)
-  return thumb_path
+def get_filter_image_path(slide_number, filter_number, filter_name_info):
+  """
+  Convert slide number, filter number, and text to a path to a file.
+
+  Args:
+    slide_number: The slide number.
+    filter_number: The filter number.
+    filter_name_info: Descriptive text describing filter.
+
+  Returns:
+    Path to the filter image file.
+  """
+  img_path = FILTER_DIR + os.sep + get_filter_image_filename(slide_number, filter_number, filter_name_info)
+  return img_path
 
 
-def get_filter_thumb_filename(slide_number, filter_number, filter_name_info):
+def get_filter_image_filename(slide_number, filter_number, filter_name_info):
+  """
+  Convert slide number, filter number, and text to a file name.
+
+  Args:
+    slide_number: The slide number.
+    filter_number: The filter number.
+    filter_name_info: Descriptive text describing filter.
+
+  Returns:
+    The filter image file name.
+  """
   padded_sl_num = str(slide_number).zfill(3)
   padded_fi_num = str(filter_number).zfill(3)
-  thumb_filename = TRAIN_IMG_PREFIX + padded_sl_num + "-" + padded_fi_num + "-" + FILTER_THUMB_SUFFIX + str(
-    THUMB_SIZE) + "-" + filter_name_info + THUMB_EXT
-  return thumb_filename
+  img_filename = TRAIN_PREFIX + padded_sl_num + "-" + padded_fi_num + "-" + FILTER_SUFFIX + str(
+    DEST_TRAIN_SIZE) + "-" + filter_name_info + "." + DEST_TRAIN_EXT
+  return img_filename
 
 
-def training_slide_to_thumb(slide_number):
+def training_slide_to_image(slide_number):
   """
-  Convert a WSI training slide to a thumbnail.
+  Convert a WSI training slide to an image in a format such as jpg or png.
 
   Args:
     slide_number: The slide number.
@@ -142,13 +164,13 @@ def training_slide_to_thumb(slide_number):
   slide = open_slide(slide_filepath)
   whole_slide_image = slide.read_region((0, 0), slide.level_count - 1, slide.level_dimensions[-1])
   whole_slide_image = whole_slide_image.convert("RGB")
-  max_size = tuple(round(THUMB_SIZE * d / max(whole_slide_image.size)) for d in whole_slide_image.size)
-  thumb = whole_slide_image.resize(max_size, PIL.Image.BILINEAR)
-  thumb_path = get_training_thumb_path(slide_number)
-  print("Saving thumbnail to: " + thumb_path)
-  if not os.path.exists(DEST_TRAIN_THUMB_DIR):
-    os.makedirs(DEST_TRAIN_THUMB_DIR)
-  thumb.save(thumb_path)
+  max_size = tuple(round(DEST_TRAIN_SIZE * d / max(whole_slide_image.size)) for d in whole_slide_image.size)
+  img = whole_slide_image.resize(max_size, PIL.Image.BILINEAR)
+  img_path = get_training_image_path(slide_number)
+  print("Saving image to: " + img_path)
+  if not os.path.exists(DEST_TRAIN_DIR):
+    os.makedirs(DEST_TRAIN_DIR)
+  img.save(img_path)
 
 
 def get_num_training_slides():
@@ -158,41 +180,41 @@ def get_num_training_slides():
   Returns:
     The total number of WSI training slide images.
   """
-  num_training_slides = len(glob.glob1(SRC_TRAIN_IMG_DIR, "*" + TRAIN_IMG_EXT))
+  num_training_slides = len(glob.glob1(SRC_TRAIN_DIR, "*." + SRC_TRAIN_EXT))
   return num_training_slides
 
 
-def training_slide_range_to_thumbs(start_ind, end_ind):
+def training_slide_range_to_images(start_ind, end_ind):
   """
-  Convert a range of WSI training slides to thumbnails.
+  Convert a range of WSI training slides to smaller images (in a format such as jpg or png).
 
   Args:
     start_ind: Starting index (inclusive).
     end_ind: Ending index (inclusive).
 
   Returns:
-    The starting index and the ending index of the slides that were converted to thumbnails.
+    The starting index and the ending index of the slides that were converted.
   """
   for slide_num in range(start_ind, end_ind + 1):
-    training_slide_to_thumb(slide_num)
+    training_slide_to_image(slide_num)
   return (start_ind, end_ind)
 
 
-def singleprocess_convert_training_slides_to_thumbs():
+def singleprocess_convert_training_slides_to_images():
   """
-  Convert all WSI training slides to thumbnails using a single process.
+  Convert all WSI training slides to smaller images using a single process.
   """
   t = Time()
 
   num_train_images = get_num_training_slides()
-  training_slide_range_to_thumbs(1, num_train_images)
+  training_slide_range_to_images(1, num_train_images)
 
   t.elapsed_display()
 
 
-def multiprocess_convert_training_slides_to_thumbs():
+def multiprocess_convert_training_slides_to_images():
   """
-  Convert all WSI training slides to thumbnails using multiple processes (one process per core).
+  Convert all WSI training slides to smaller images using multiple processes (one process per core).
   Each process will process a range of slide numbers.
   """
   timer = Time()
@@ -225,7 +247,7 @@ def multiprocess_convert_training_slides_to_thumbs():
   # start tasks
   results = []
   for t in tasks:
-    results.append(pool.apply_async(training_slide_range_to_thumbs, t))
+    results.append(pool.apply_async(training_slide_range_to_images, t))
 
   for result in results:
     (start_ind, end_ind) = result.get()
@@ -427,6 +449,10 @@ def slide_info(display_all_properties=False):
 
 
 class Time:
+  """
+  Class for displaying elapsed time.
+  """
+
   def __init__(self):
     self.start = datetime.datetime.now()
 
@@ -439,8 +465,7 @@ class Time:
     time_elapsed = self.end - self.start
     return time_elapsed
 
-
-# singleprocess_convert_training_slides_to_thumbs()
-# multiprocess_convert_training_slides_to_thumbs()
+# singleprocess_convert_training_slides_to_images()
+# multiprocess_convert_training_slides_to_images()
 # slide_stats()
-slide_info(display_all_properties=False)
+# slide_info(display_all_properties=False)
