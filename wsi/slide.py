@@ -31,8 +31,8 @@ import PIL
 from PIL import Image
 import sys
 
-# BASE_DIR = ".." + os.sep + "data"
-BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
+BASE_DIR = ".." + os.sep + "data"
+# BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
 TRAIN_PREFIX = "TUPAC-TR-"
 SRC_TRAIN_DIR = BASE_DIR + os.sep + "training_slides"
 SRC_TRAIN_EXT = "svs"
@@ -200,7 +200,7 @@ def training_slide_range_to_images(start_ind, end_ind):
   return (start_ind, end_ind)
 
 
-def singleprocess_convert_training_slides_to_images():
+def singleprocess_training_slides_to_images():
   """
   Convert all WSI training slides to smaller images using a single process.
   """
@@ -212,7 +212,7 @@ def singleprocess_convert_training_slides_to_images():
   t.elapsed_display()
 
 
-def multiprocess_convert_training_slides_to_images():
+def multiprocess_training_slides_to_images():
   """
   Convert all WSI training slides to smaller images using multiple processes (one process per core).
   Each process will process a range of slide numbers.
@@ -467,7 +467,7 @@ class Time:
     return time_elapsed
 
 
-singleprocess_convert_training_slides_to_images()
-# multiprocess_convert_training_slides_to_images()
+# singleprocess_training_slides_to_images()
+# multiprocess_training_slides_to_images()
 # slide_stats()
 # slide_info(display_all_properties=True)

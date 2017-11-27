@@ -191,15 +191,15 @@ particular importance are the following functions:
     slide_info(display_all_properties=True)
     slide_stats()
     training_slide_to_image()
-    singleprocess_convert_training_slides_to_images()
-    multiprocess_convert_training_slides_to_images()
+    singleprocess_training_slides_to_images()
+    multiprocess_training_slides_to_images()
 
 The `open_slide()` function uses OpenSlide to read in an svs file. The `slide_info()` function displays metadata
 associated with each svs file. The `slide_stats()` function looks at all images and summarizes pixel size information
 about the set of slides. It also generates a variety of charts for a visual representation of the slide statistics.
 The `training_slide_to_image()` function converts a single svs slide to a smaller image in a more common format such as
-jpg or png. The `singleprocess_convert_training_slides_to_images()` function converts all svs slides to smaller images,
-and the `multiprocess_convert_training_slides_to_images()` function uses multiple processes (1 process per core) to
+jpg or png. The `singleprocess_training_slides_to_images()` function converts all svs slides to smaller images,
+and the `multiprocess_training_slides_to_images()` function uses multiple processes (1 process per core) to
 speed up the slide conversion process.
 
 One of the first actions we can take to become more familiar with the training dataset is to have a look at the metadata
@@ -292,7 +292,7 @@ Note that `jpg` conversion can also be specified, but `jpg` is lossy. For later 
 we have determined that a lossless format is preferable.
 
 Using OS X with an external hard drive containing the training set, the following conversion numbers using
-`singleprocess_convert_training_slides_to_images()` and `multiprocess_convert_training_slides_to_images()`
+`singleprocess_training_slides_to_images()` and `multiprocess_training_slides_to_images()`
 were obtained:
 
     jpg single process: 4m47s
@@ -301,6 +301,6 @@ were obtained:
     png multi process: 3m08s
 
 
-After calling `multiprocess_convert_training_slides_to_images()` using the `png` format, we have 500 whole-slide
+After calling `multiprocess_training_slides_to_images()` using the `png` format, we have 500 whole-slide
 images in lossless png format that we can now examine in much greater detail in relation to our filters.
 
