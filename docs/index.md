@@ -435,7 +435,7 @@ Gray                 | Time: 0:00:00.130243  Type: uint8   Shape: (1567, 2048)
 ```
 
 
-# Complement Filter
+### Complement Filter
 
 In our whole-slide image training set, the slide backgrounds are illuminated by white light, which means that a `uint8`
 pixel in the background of a grayscale image is usually close to or equal to 255. However, conceptually and
@@ -468,7 +468,7 @@ Complement           | Time: 0:00:00.002159  Type: uint8   Shape: (1567, 2048)
 ```
 
 
-## Hysteresis Threshold Filter
+### Hysteresis Threshold Filter
 
 With basic thresholding, a binary NumPy array is generated, where each value in the resulting NumPy array indicates
 whether the corresponding pixel in the original image is above (or equal to) a particular threshold value. So, a
@@ -518,7 +518,7 @@ Hysteresis Threshold | Time: 0:00:00.115570  Type: uint8   Shape: (1567, 2048)
 ```
 
 
-## Otsu Threshold
+### Otsu Threshold
 
 Thresholding using Otsu's method is another popular thresholding technique. This technique was used in the image
 processing described in [A Unified Framework for Tumor Proliferation Score Prediction in Breast
