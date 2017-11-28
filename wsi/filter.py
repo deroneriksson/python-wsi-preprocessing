@@ -19,11 +19,9 @@
 #
 # -------------------------------------------------------------
 
-import matplotlib.pyplot as plt
 import multiprocessing
 import numpy as np
 import os
-import PIL
 import scipy.ndimage.morphology as sc_morph
 import skimage.color as sk_color
 import skimage.exposure as sk_exposure
@@ -34,7 +32,7 @@ import skimage.morphology as sk_morphology
 import skimage.segmentation as sk_segmentation
 import wsi.slide as slide
 from wsi.slide import Time
-from PIL import ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont
 
 # If True, display NumPy array stats for filters (min, max, mean, is_binary).
 DISPLAY_FILTER_STATS = False
@@ -73,7 +71,7 @@ def np_to_pil(np_img):
     np_img = np_img.astype("uint8") * 255
   elif np_img.dtype == "float64":
     np_img = (np_img * 255).astype("uint8")
-  return PIL.Image.fromarray(np_img)
+  return Image.fromarray(np_img)
 
 
 def filter_rgb_to_grayscale(np_img, output_type="uint8"):
@@ -1372,7 +1370,7 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 
 # apply_filters_to_image(4, display=False, save=True)
 # singleprocess_apply_filters_to_images(save=True, display=False)
-multiprocess_apply_filters_to_images(save=True, display=False, html=True)
+# multiprocess_apply_filters_to_images(save=True, display=False, html=True)
 
 # red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
 #                   336, 349, 357, 380, 450, 482]
@@ -1389,10 +1387,10 @@ multiprocess_apply_filters_to_images(save=True, display=False, html=True)
 # overmasked_slides = [21]
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=overmasked_slides)
 
-# img_path = slide.get_training_image_path(2)
-# img = slide.open_image(img_path)
-# rgb = pil_to_np_rgb(img)
-# add_text_and_display(rgb, "RGB")
+img_path = slide.get_training_image_path(4)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "RGB")
 # gray = filter_rgb_to_grayscale(rgb)
 # add_text_and_display(gray, "Grayscale")
 # complement = filter_complement(gray)

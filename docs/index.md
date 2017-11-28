@@ -291,16 +291,61 @@ be 2048. The `DEST_TRAIN_EXT` constant controls the output format. We will use `
 Note that `jpg` conversion can also be specified, but `jpg` is lossy. For later deep learning purposes with TensorFlow,
 we have determined that a lossless format is preferable.
 
-Using OS X with an external hard drive containing the training set, the following conversion numbers using
+Using OS X with an external hard drive containing the training set, the following conversion times using
 `singleprocess_training_slides_to_images()` and `multiprocess_training_slides_to_images()`
-were obtained:
+on the 500 image training set were obtained:
 
-    jpg single process: 4m47s
-    jpg multi process: 1n37s
-    png single process: 11m22s
-    png multi process: 3m08s
+**Training Image Dataset Conversion Times**<br/>
+
+| Format | Processes      | Time   |
+| ------ | -------------- | ------ |
+| jpg    | single process | 4m47s  |
+| jpg    | multi process  | 1n37s  |
+| png    | single process | 11m22s |
+| png    | multi process  | 3m08s  |
 
 
 After calling `multiprocess_training_slides_to_images()` using the `png` format, we have 500 whole-slide
 images in lossless png format that we can now examine in much greater detail in relation to our filters.
+
+
+## Image Saving, Displaying, and Conversions
+
+In order to load, save, and display images, we use the Python [Pillow](https://pillow.readthedocs.io/en/4.3.x/)
+package. In particular, we make use of the Image module, which contains an Image class used to represent an image.
+The `wsi/slide.py` file contains an `open_image()` method to open an image stored in the file system.
+The `get_training_image_path()` function takes a slide number and returns the path to the corresponding training slide
+file. These functions can be used to open a converted image file as a PIL Image.
+
+```
+img_path = slide.get_training_image_path(4)
+img = slide.open_image(img_path)
+```
+
+
+To mathematically manipulate the images, we will use NumPy arrays. The `wsi/filter.py` file contains a
+`pil_to_np_rgb()` function that converts a PIL Image to a 3-dimensional NumPy array. The first dimension
+represents the number of rows, the second dimension represents the number of columns, and the third dimension
+represents the channel (red, green, and blue).
+
+```
+rgb = pil_to_np_rgb(img)
+```
+
+
+The `wsi/filter.py` file also contains an `np_to_pil()` function that converts a NumPy array to a PIL Image.
+
+For convenience, the `add_text_and_display()` function can be used to display a NumPy array image. Text can be added to
+the displayed image, which can be very useful when visually comparing the results of multiple filters.
+
+```
+img_path = slide.get_training_image_path(4)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "RGB")
+```
+
+
+**Display Image with Text**<br/>
+![Display Image with Text](images/display-image-with-text.png "Display Image with Text")
 
