@@ -435,4 +435,37 @@ Gray                 | Time: 0:00:00.130243  Type: uint8   Shape: (1567, 2048)
 ```
 
 
+# Complement Filter
+
+In our whole-slide image training set, the slide backgrounds are illuminated by white light, which means that a `uint8`
+pixel in the background of a grayscale image is usually close to or equal to 255. However, conceptually and
+mathematically it is often useful to have background values close to or equal to 0. For example, this is useful in
+thresholding, where we might ask if a pixel value is above a particular threshold value. This can also be useful in
+masking out a background of 0 values from an image.
+
+The `filter_complement()` function inverts the values and thus the colors in the NumPy array representation of an image.
+Below, we use the `filter_complement()` function to invert the previously obtained grayscale image.
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+grayscale = filter_rgb_to_grayscale(rgb)
+complement = filter_complement(grayscale)
+add_text_and_display(complement, "Complement")
+```
+
+**Complement Filter**<br/>
+![Complement Filter](images/complement.png "Complement Filter")
+
+
+In the console output, we see that computing the complement is a very fast operation.
+
+```
+RGB                  | Time: 0:00:00.225361  Type: uint8   Shape: (1567, 2048, 3)
+Gray                 | Time: 0:00:00.136738  Type: uint8   Shape: (1567, 2048)
+Complement           | Time: 0:00:00.002159  Type: uint8   Shape: (1567, 2048)
+```
+
+
 
