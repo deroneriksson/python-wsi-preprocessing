@@ -565,4 +565,47 @@ Otsu Threshold       | Time: 0:00:00.018829  Type: uint8   Shape: (1567, 2048)
 
 ### Contrast
 
-Increasing the contrast in an image can be used to bring out various details in an image.
+For an image, suppose we have a histogram of the intensities (y-axis, the number of pixels) plotted against the range
+of possible pixel values (x-axis, 0 to 255). Contrast is a measure of the difference in intensities. An image with
+low contrast is typically dull and details are not clearly seen visually. An image with high contrast is typically
+sharp and details can clearly be discerned. Modifying the contrast in an image can be used to bring out various details
+in the image.
+
+
+#### Contrast Stretching
+
+One form of increasing the contrast in an image is contrast stretching. Suppose that all intensities in an image occur
+between 100 and 150 on a scale from 0 to 255. If we rescale the intensities so that 100 now corresponds to 0 and
+150 corresponds to 255 and we linearly rescale the intensities between these points, we have increased the contrast
+in the image and differences in detail can more clearly be seen. This is contrast stretching.
+
+As an example, here we perform contrast stretching with a low pixel value of 100 and a high pixel value of 200 on
+the complement of the grayscale image.
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+grayscale = filter_rgb_to_grayscale(rgb)
+complement = filter_complement(grayscale)
+contrast_stretch = filter_contrast_stretch(complement, low=100, high=200)
+add_text_and_display(contrast_stretch, "Contrast Stretch")
+```
+
+This can be used to visually inspect details in the previous intensity range of 100 to 200.
+
+**Contrast Stretching Filter**<br/>
+![Contrast Stretching Filter](images/contrast-stretching.png "Contrast Stretching Filter")
+
+
+Here we see the console output from this set of filters.
+
+```
+RGB                  | Time: 0:00:00.207501  Type: uint8   Shape: (1567, 2048, 3)
+Gray                 | Time: 0:00:00.146119  Type: uint8   Shape: (1567, 2048)
+Complement           | Time: 0:00:00.001615  Type: uint8   Shape: (1567, 2048)
+Contrast Stretch     | Time: 0:00:00.075437  Type: uint8   Shape: (1567, 2048)
+```
+
+
+
