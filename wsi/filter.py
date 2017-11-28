@@ -1387,10 +1387,11 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 # overmasked_slides = [21]
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=overmasked_slides)
 
-img_path = slide.get_training_image_path(4)
+img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-add_text_and_display(rgb, "RGB")
+grayscale = filter_rgb_to_grayscale(rgb)
+add_text_and_display(grayscale, "Grayscale")
 # gray = filter_rgb_to_grayscale(rgb)
 # add_text_and_display(gray, "Grayscale")
 # complement = filter_complement(gray)

@@ -339,7 +339,7 @@ For convenience, the `add_text_and_display()` function can be used to display a 
 the displayed image, which can be very useful when visually comparing the results of multiple filters.
 
 ```
-img_path = slide.get_training_image_path(4)
+img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 add_text_and_display(rgb, "RGB")
@@ -387,6 +387,52 @@ functions may return `uint8` NumPy arrays. Before performing actions on a NumPy 
 the data type of the array and the nature of the data in that array. For performance reasons, normally
 `DISPLAY_FILTER_STATS` should be set to `False`.
 
-Filters will be represented by functions in the `wsi/filter.py` file and will have `filter_` prepended to the
-function names.
+
+## Filters
+
+Now, let's take a look at several ways that our images can be filtered. Filters are represented by functions
+in the `wsi/filter.py` file and have `filter_` prepended to the function names.
+
+
+### RGB to Grayscale Filter
+
+A very common task in image processing is to convert an RGB image to a grayscale image. In this process, the three
+color channels are replaced by a single grayscale channel. The grayscale pixel value is computed by combining the
+red, green, and blue values in set percentages. The `filter_rgb_to_grayscale()` function multiplies the red value by
+21.25%, the green value by 71.54%, and the blue value by 7.21%, and these values are added together to obtain the
+grayscale pixel value. 
+
+Although the PIL Image `convert("L")` function can also be used to convert an RGB image to a grayscale image, we
+will instead use the `filter_rgb_to_grayscale()` function, since having a reference to the RGB image as a NumPy array
+can often be very useful during image processing.
+
+Below, we'll open a slide as a PIL Image, convert this to an RGB NumPy array, and then convert this to a grayscale
+NumPy array.
+
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+grayscale = filter_rgb_to_grayscale(rgb)
+add_text_and_display(grayscale, "Grayscale")
+```
+
+Here we see the displayed grayscale image.
+
+**Grayscale Filter**<br/>
+![Grayscale Filter](images/grayscale.png "Grayscale Filter")
+
+
+In the console, we see that the grayscale image is a two-dimensional NumPy array, since the 3 color channels have
+been combined into a single grayscale channel. The data type is `uint8` and the pixel is represented by an integer
+value between 0 and 255.
+
+
+```
+RGB                  | Time: 0:00:00.220014  Type: uint8   Shape: (1567, 2048, 3)
+Gray                 | Time: 0:00:00.130243  Type: uint8   Shape: (1567, 2048)
+```
+
+
 
