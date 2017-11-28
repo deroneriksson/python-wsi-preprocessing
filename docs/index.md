@@ -502,6 +502,9 @@ In the generated image, notice that the result is a binary image. All pixel valu
 The red display text in the corner can be ignored since it is for informational purposes only and is not present when
 we save the images to the file system.
 
+Notice that the shadow area along the top edge of the slide makes it through the hysteresis threshold filter even
+though conceptually it is background and should not be treated as tissue.
+
 **Hysteresis Threshold Filter**<br/>
 ![Hysteresis Threshold Filter](images/hysteresis-threshold.png "Hysteresis Threshold Filter")
 
@@ -513,4 +516,47 @@ Gray                 | Time: 0:00:00.126530  Type: uint8   Shape: (1567, 2048)
 Complement           | Time: 0:00:00.001428  Type: uint8   Shape: (1567, 2048)
 Hysteresis Threshold | Time: 0:00:00.115570  Type: uint8   Shape: (1567, 2048)
 ```
+
+
+## Otsu Threshold
+
+Thresholding using Otsu's method is another popular thresholding technique. This technique was used in the image
+processing described in [A Unified Framework for Tumor Proliferation Score Prediction in Breast
+Histopathology](https://pdfs.semanticscholar.org/7d9b/ccac7a9a850cc84a980e5abeaeac2aef94e6.pdf). This technique is
+described in more detail at
+[https://en.wikipedia.org/wiki/Otsu%27s_method](https://en.wikipedia.org/wiki/Otsu%27s_method).
+
+Let's try Otsu's method on the complement image as we did when demonstrating hysteresis thresholding.
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+grayscale = filter_rgb_to_grayscale(rgb)
+complement = filter_complement(grayscale)
+otsu = filter_otsu_threshold(complement)
+add_text_and_display(otsu, "Otsu Threshold")
+```
+
+
+In the resulting image, we see that Otsu's method generates roughly similar results as hysteresis thresholding.
+However, Otsu's method is less aggressive in terms of what it lets through for the tissue in the upper left
+area of the slide. The background shadow area at the top of the slide is passed through the
+filter in a similar fashion as hysteresis thresholding. Most of the slides in the training set do not have such a
+pronounced shadow area, but it would be nice to have an image processing solution that treats the shadow area as
+background.
+
+**Otsu Threshold Filter**<br/>
+![Otsu Threshold Filter](images/otsu-threshold.png "Otsu Threshold Filter")
+
+
+In terms of performance, thresholding using Otsu's method is very fast, as we see in the console output.
+
+```
+RGB                  | Time: 0:00:00.206994  Type: uint8   Shape: (1567, 2048, 3)
+Gray                 | Time: 0:00:00.132579  Type: uint8   Shape: (1567, 2048)
+Complement           | Time: 0:00:00.001439  Type: uint8   Shape: (1567, 2048)
+Otsu Threshold       | Time: 0:00:00.018829  Type: uint8   Shape: (1567, 2048)
+```
+
 
