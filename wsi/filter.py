@@ -207,7 +207,6 @@ def filter_local_otsu_threshold(np_img, disk_size=3, output_type="uint8"):
   """
   t = Time()
   local_otsu = sk_filters.rank.otsu(np_img, sk_morphology.disk(disk_size))
-  local_otsu = (np_img <= local_otsu)
   if output_type == "bool":
     pass
   elif output_type == "float":
@@ -1392,8 +1391,8 @@ img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 grayscale = filter_rgb_to_grayscale(rgb)
 complement = filter_complement(grayscale)
-otsu = filter_otsu_threshold(complement)
-add_text_and_display(otsu, "Otsu Threshold")
+local_otsu = filter_local_otsu_threshold(complement, disk_size=5)
+add_text_and_display(local_otsu, "Local Otsu Threshold")
 
 # gray = filter_rgb_to_grayscale(rgb)
 # add_text_and_display(gray, "Grayscale")
