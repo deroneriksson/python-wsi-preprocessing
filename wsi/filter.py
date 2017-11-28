@@ -339,14 +339,14 @@ def filter_contrast_stretch(np_img, low=40, high=60):
 
   Args:
     np_img: Image as a NumPy array (gray or RGB).
-    low: Range percentage low value.
-    high: Range percentage high value.
+    low: Range low value (0 to 255).
+    high: Range high value (0 to 255).
 
   Returns:
     Image with contrast enhanced.
   """
   t = Time()
-  low_p, high_p = np.percentile(np_img, (low, high))
+  low_p, high_p = np.percentile(np_img, (low * 100 / 255, high * 100 / 255))
   contrast_stretch = sk_exposure.rescale_intensity(np_img, in_range=(low_p, high_p))
   np_info(contrast_stretch, "Contrast Stretch", t.elapsed())
   return contrast_stretch
@@ -1391,8 +1391,11 @@ img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 grayscale = filter_rgb_to_grayscale(rgb)
 complement = filter_complement(grayscale)
-local_otsu = filter_local_otsu_threshold(complement, disk_size=5)
-add_text_and_display(local_otsu, "Local Otsu Threshold")
+contrast_stretch = filter_contrast_stretch(complement, low=100, high=150)
+add_text_and_display(contrast_stretch, "Contrast Stretch")
+# complement = filter_complement(grayscale)
+# local_otsu = filter_local_otsu_threshold(complement, disk_size=5)
+# add_text_and_display(local_otsu, "Local Otsu Threshold")
 
 # gray = filter_rgb_to_grayscale(rgb)
 # add_text_and_display(gray, "Grayscale")

@@ -468,12 +468,15 @@ Complement           | Time: 0:00:00.002159  Type: uint8   Shape: (1567, 2048)
 ```
 
 
-### Hysteresis Threshold Filter
+### Thresholding
 
 With basic thresholding, a binary NumPy array is generated, where each value in the resulting NumPy array indicates
 whether the corresponding pixel in the original image is above (or equal to) a particular threshold value. So, a
 pixel with a value of 160 with a threshold of 150 would generate a True (or 255, or 1.0), and a pixel with a value
 of 140 with a threshold of 150 would generate a False (or 0, or 0.0).
+
+
+#### Hysteresis Threshold Filter
 
 Hysteresis thresholding is a two-level threshold. The top-level threshold is treated in a similar fashion as basic
 thresholding. The bottom-level threshold must be exceeded and must be connected to the top-level threshold. This
@@ -518,7 +521,7 @@ Hysteresis Threshold | Time: 0:00:00.115570  Type: uint8   Shape: (1567, 2048)
 ```
 
 
-### Otsu Threshold
+#### Otsu Threshold Filter
 
 Thresholding using Otsu's method is another popular thresholding technique. This technique was used in the image
 processing described in [A Unified Framework for Tumor Proliferation Score Prediction in Breast
@@ -560,3 +563,6 @@ Otsu Threshold       | Time: 0:00:00.018829  Type: uint8   Shape: (1567, 2048)
 ```
 
 
+### Contrast
+
+Increasing the contrast in an image can be used to bring out various details in an image.
