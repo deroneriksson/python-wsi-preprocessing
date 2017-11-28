@@ -468,4 +468,49 @@ Complement           | Time: 0:00:00.002159  Type: uint8   Shape: (1567, 2048)
 ```
 
 
+## Hysteresis Threshold Filter
+
+With basic thresholding, a binary NumPy array is generated, where each value in the resulting NumPy array indicates
+whether the corresponding pixel in the original image is above (or equal to) a particular threshold value. So, a
+pixel with a value of 160 with a threshold of 150 would generate a True (or 255, or 1.0), and a pixel with a value
+of 140 with a threshold of 150 would generate a False (or 0, or 0.0).
+
+Hysteresis thresholding is a two-level threshold. The top-level threshold is treated in a similar fashion as basic
+thresholding. The bottom-level threshold must be exceeded and must be connected to the top-level threshold. This
+processes typically results in much better thresholding than basic thresholding. The values of the top and bottom
+thresholds for images can be tested through experimentation.
+
+The `filter_hysteresis_threshold()` function uses default bottom and top threshold values of 50 and 100. The
+default array output type from this function is `uint8`. Since the output of this function is a binary image, the
+values in the output array will be either 255 or 0. The output type of this function can be specified using the
+`output_type` parameter. Note that when performing masking, it is typically more useful to have a NumPy array of
+boolean values.
+
+Here, we perform a hysteresis threshold on the complement of the grayscale image.
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+grayscale = filter_rgb_to_grayscale(rgb)
+complement = filter_complement(grayscale)
+hyst = filter_hysteresis_threshold(complement)
+add_text_and_display(hyst, "Hysteresis Threshold")
+```
+
+In the generated image, notice that the result is a binary image. All pixel values are either white (255) or black (0).
+The red display text in the corner can be ignored since it is for informational purposes only and is not present when
+we save the images to the file system.
+
+**Hysteresis Threshold Filter**<br/>
+![Hysteresis Threshold Filter](images/hysteresis-threshold.png "Hysteresis Threshold Filter")
+
+Here we see the console output from our filter operations.
+
+```
+RGB                  | Time: 0:00:00.213741  Type: uint8   Shape: (1567, 2048, 3)
+Gray                 | Time: 0:00:00.126530  Type: uint8   Shape: (1567, 2048)
+Complement           | Time: 0:00:00.001428  Type: uint8   Shape: (1567, 2048)
+Hysteresis Threshold | Time: 0:00:00.115570  Type: uint8   Shape: (1567, 2048)
+```
 
