@@ -345,7 +345,48 @@ rgb = pil_to_np_rgb(img)
 add_text_and_display(rgb, "RGB")
 ```
 
-
 **Display Image with Text**<br/>
 ![Display Image with Text](images/display-image-with-text.png "Display Image with Text")
+
+
+When performing operations on NumPy arrays, functions in the `wsi/filter.py` file will often utilize the
+`np_info()` function to display information about the NumPy array and the amount of time required to perform the
+operation. For example, the above call to `pil_to_np_rgb()` internally calls `np_info()`:
+
+```
+t = Time()
+rgb = np.asarray(pil_img)
+np_info(rgb, "RGB", t.elapsed())
+return rgb
+```
+
+This call to `np_info()` generates console output such as the following:
+
+```
+RGB                  | Time: 0:00:00.190174  Type: uint8   Shape: (1804, 2048, 3)
+```
+
+We see that the PIL-to-NumPy array conversion took 0.19s. The type of the NumPy array is `uint8`, which means
+that each pixel is represented by a red, green, and blue value from 0 to 255. The image has a height of 1804 pixels
+and a width of 2048 pixels.
+
+We can obtain additional information about NumPy arrays by setting the `DISPLAY_FILTER_STATS` constant to `True`.
+If we rerun the above code with `DISPLAY_FILTER_STATS = True`, we see the following:
+
+```
+RGB                  | Time: 0:00:00.186060 Min:   0.00  Max: 246.00  Mean: 198.86  Binary: F  Type: uint8   Shape: (1804, 2048, 3)
+```
+
+The minimum value is 0, the maximum value is 246, the mean value is 198.86, and binary is false, meaning that the
+image is not a binary image. A binary image is an image that consists of only two values (True or False, 1.0 or 0.0,
+255 or 0). Binary images are produced by actions such as thresholding.
+
+When interacting with NumPy image processing code, the information provided by `np_info()` can be extremely useful.
+For example, some functions return boolean NumPy arrays, other functions return float NumPy arrays, and other
+functions may return `uint8` NumPy arrays. Before performing actions on a NumPy array, it's usually necessary to know
+the data type of the array and the nature of the data in that array. For performance reasons, normally
+`DISPLAY_FILTER_STATS` should be set to `False`.
+
+Filters will be represented by functions in the `wsi/filter.py` file and will have `filter_` prepended to the
+function names.
 
