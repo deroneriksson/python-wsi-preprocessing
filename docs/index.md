@@ -714,4 +714,41 @@ Adapt Equalization   | Time: 0:00:00.278476  Type: uint8   Shape: (1567, 2048)
 ```
 
 
+### Color
+
+The WSI tissue samples in the training dataset have been H&E stained. Eosin stains basic structures such as
+most cytoplasm proteins with a pink tone. Hematoxylin stains acidic structures such as DNA and RNA with a purple
+tone. This means that cells tend to be stained pink, and particular areas of the cells such as the nuclei tend to be
+stained purple. However, note that appearance can vary greatly based on the types of cells that are stained and the
+amounts of stain applied.
+
+As an example of staining differences, below we see a slide that has pink and purple staining next to another slide
+where all tissue appears purple.
+
+| **Pink and Purple Slide** | **Purple Slide** |
+| -------------------- | --------------------------------- |
+| ![Pink and Purple Slide](images/pink-and-purple-slide.png "Pink and Purple Slide") | ![Purple Slide](images/purple-slide.png "Purple Slide") |
+
+
+Another factor regarding color is that many slides have been marked with red, green, and blue pens. Whereas in general
+we would like our filters to include pink and purple colors, since these typically indicate stained tissue, we would
+like our filters to exclude red, green, and blue colors, since these typically indicate pen marks on the slides which
+are not tissue.
+
+Below, we see an example of a slide that has been marked with red pen and some green pen.
+
+**Slide Marked with Red and Green Pen**<br/>
+![Slide Marked with Red and Green Pen](images/slide-pen.png "Slide Marked with Red and Green Pen")
+
+
+Developing color filters that can be used to filter tissue areas can be fairly challenging for a variety of reasons,
+including:
+
+1. Filters need to be general enough to work across all slides in the dataset.
+2. Filters should handle issues such as variations in shadows and lighting.
+3. Amount of H&E (purple and pink) staining can vary greatly from slide to slide.
+4. Pen marks colors (red, green, and blue) vary due to issues such as lighting and pen marks over tissue.
+5. There can be color overlap between stained tissue and pen marks, so we need to balance how aggressively stain
+colors are inclusively filtered and how pen colors are exclusively filtered.
+
 
