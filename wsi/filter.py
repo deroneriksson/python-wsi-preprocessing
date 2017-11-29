@@ -37,7 +37,7 @@ from wsi.slide import Time
 from PIL import Image, ImageDraw, ImageFont
 
 # If True, display NumPy array stats for filters (min, max, mean, is_binary).
-DISPLAY_FILTER_STATS = False
+DISPLAY_FILTER_STATS = True
 DISPLAY_MASK_PERCENTAGE = True
 
 
@@ -442,34 +442,46 @@ def filter_rgb_to_hed(np_img, output_type="uint8"):
   return hed
 
 
-def filter_hed_to_hematoxylin(np_img):
+def filter_hed_to_hematoxylin(np_img, output_type="uint8"):
   """
-  Obtain Hematoxylin channel from HED NumPy array.
+  Obtain Hematoxylin channel from HED NumPy array and rescale it (for example, to 0 to 255 for uint8) for increased
+  contrast.
 
   Args:
     np_img: HED image as a NumPy array.
+    output_type: Type of array to return (float or uint8).
 
   Returns:
     NumPy array for Hematoxylin channel.
   """
   t = Time()
   hema = np_img[:, :, 0]
+  if output_type == "float":
+    hema = sk_exposure.rescale_intensity(hema, out_range=(0.0, 1.0))
+  else:
+    hema = (sk_exposure.rescale_intensity(hema, out_range=(0, 255))).astype("uint8")
   np_info(hema, "HED to Hematoxylin", t.elapsed())
   return hema
 
 
-def filter_hed_to_eosin(np_img):
+def filter_hed_to_eosin(np_img, output_type="uint8"):
   """
-  Obtain Eosin channel from HED NumPy array.
+  Obtain Eosin channel from HED NumPy array and rescale it (for example, to 0 to 255 for uint8) for increased
+  contrast.
 
   Args:
     np_img: HED image as a NumPy array.
+    output_type: Type of array to return (float or uint8).
 
   Returns:
     NumPy array for Eosin channel.
   """
   t = Time()
   eosin = np_img[:, :, 1]
+  if output_type == "float":
+    eosin = sk_exposure.rescale_intensity(eosin, out_range=(0.0, 1.0))
+  else:
+    eosin = (sk_exposure.rescale_intensity(eosin, out_range=(0, 255))).astype("uint8")
   np_info(eosin, "HED to Eosin", t.elapsed())
   return eosin
 
@@ -1388,13 +1400,15 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 # overmasked_slides = [21]
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=overmasked_slides)
 
-img_path = slide.get_training_image_path(2)
+img_path = slide.get_training_image_path(4)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-grayscale = filter_rgb_to_grayscale(rgb)
-complement = filter_complement(grayscale)
-hyst = filter_threshold(complement, threshold=100)
-add_text_and_display(hyst, "Threshold")
+hed = filter_rgb_to_hed(rgb)
+# add_text_and_display(hed, "HED")
+hema = filter_hed_to_hematoxylin(hed)
+add_text_and_display(hema, "Hematoxylin")
+eosin = filter_hed_to_eosin(hed)
+add_text_and_display(eosin, "Eosin")
 
 # add_text_and_display(grayscale, "Grayscale")
 # complement = filter_complement(grayscale)
