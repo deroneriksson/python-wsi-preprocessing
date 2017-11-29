@@ -647,4 +647,41 @@ Hist Equalization    | Time: 0:00:00.152975  Type: uint8   Shape: (1567, 2048)
 ```
 
 
+#### Adaptive Equalization
+
+Rather than applying a single transformation to all pixels in an image, adaptive histogram equalization applies
+transformations to local regions in an image. As a result, adaptive equalization allows contrast to be enhanced to
+different extents in different regions based on the regions' histograms. For more information about adaptive
+equalization, please see
+[https://en.wikipedia.org/wiki/Adaptive_histogram_equalization](https://en.wikipedia.org/wiki/Adaptive_histogram_equalization).
+
+The `filter_adaptive_equalization()` function utilizes the scikit-image contrast limited adaptive histogram
+equalization (CLAHE) implementation. Below, we apply adaptive equalization to the grayscale image and display both
+the grayscale image and the image after adaptive equalization for comparison.
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+grayscale = filter_rgb_to_grayscale(rgb)
+add_text_and_display(grayscale, "Grayscale")
+adaptive_equ = filter_adaptive_equalization(grayscale)
+add_text_and_display(adaptive_equ, "Adaptive Equalization")
+```
+
+| **Grayscale Filter** | **Adaptive Equalization Filter** |
+| -------------------- | --------------------------------- |
+| ![Grayscale Filter](images/grayscale.png "Grayscale Filter") | ![Adaptive Equalization Filter](images/adaptive-equalization.png "Adaptive Equalization Filter") |
+
+
+In the console output, we can see that adaptive equalization is fairly compute-intensive compared with other filters
+that we have looked at so far.
+
+```
+RGB                  | Time: 0:00:00.209276  Type: uint8   Shape: (1567, 2048, 3)
+Gray                 | Time: 0:00:00.140665  Type: uint8   Shape: (1567, 2048)
+Adapt Equalization   | Time: 0:00:00.278476  Type: uint8   Shape: (1567, 2048)
+```
+
+
 
