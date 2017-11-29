@@ -30,6 +30,8 @@ import skimage.filters as sk_filters
 import skimage.future as sk_future
 import skimage.morphology as sk_morphology
 import skimage.segmentation as sk_segmentation
+from datetime import time
+
 import wsi.slide as slide
 from wsi.slide import Time
 from PIL import Image, ImageDraw, ImageFont
@@ -1390,9 +1392,9 @@ img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 grayscale = filter_rgb_to_grayscale(rgb)
-add_text_and_display(grayscale, "Grayscale")
-adaptive_equ = filter_adaptive_equalization(grayscale)
-add_text_and_display(adaptive_equ, "Adaptive Equalization")
+complement = filter_complement(grayscale)
+hyst = filter_threshold(complement, threshold=100)
+add_text_and_display(hyst, "Threshold")
 
 # add_text_and_display(grayscale, "Grayscale")
 # complement = filter_complement(grayscale)

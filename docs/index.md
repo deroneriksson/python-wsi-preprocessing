@@ -470,10 +470,40 @@ Complement           | Time: 0:00:00.002159  Type: uint8   Shape: (1567, 2048)
 
 ### Thresholding
 
+
+#### Basic Threshold
+
 With basic thresholding, a binary NumPy array is generated, where each value in the resulting NumPy array indicates
-whether the corresponding pixel in the original image is above (or equal to) a particular threshold value. So, a
+whether the corresponding pixel in the original image is above a particular threshold value. So, a
 pixel with a value of 160 with a threshold of 150 would generate a True (or 255, or 1.0), and a pixel with a value
 of 140 with a threshold of 150 would generate a False (or 0, or 0.0).
+
+Here, we apply a basic threshold with a threshold value of 100 to the grayscale complement of the original image.
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+grayscale = filter_rgb_to_grayscale(rgb)
+complement = filter_complement(grayscale)
+hyst = filter_threshold(complement, threshold=100)
+add_text_and_display(hyst, "Threshold")
+```
+
+The result is a binary image where pixel values that were above 100 are shown in white and pixel values that were 100 or
+lower are shown in black.
+
+**Basic Threshold Filter**<br/>
+![Basic Threshold Filter](images/basic-threshold.png "Basic Threshold Filter")
+
+In the console output, we see that basic thresholding is a very fast operation.
+
+```
+RGB                  | Time: 0:00:00.207232  Type: uint8   Shape: (1567, 2048, 3)
+Gray                 | Time: 0:00:00.132555  Type: uint8   Shape: (1567, 2048)
+Complement           | Time: 0:00:00.001420  Type: uint8   Shape: (1567, 2048)
+Threshold            | Time: 0:00:00.001329  Type: bool    Shape: (1567, 2048)
+```
 
 
 #### Hysteresis Threshold
