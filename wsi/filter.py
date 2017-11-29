@@ -37,7 +37,7 @@ from wsi.slide import Time
 from PIL import Image, ImageDraw, ImageFont
 
 # If True, display NumPy array stats for filters (min, max, mean, is_binary).
-DISPLAY_FILTER_STATS = True
+DISPLAY_FILTER_STATS = False
 DISPLAY_MASK_PERCENTAGE = True
 
 
@@ -1404,11 +1404,10 @@ img_path = slide.get_training_image_path(4)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 hed = filter_rgb_to_hed(rgb)
-# add_text_and_display(hed, "HED")
 hema = filter_hed_to_hematoxylin(hed)
-add_text_and_display(hema, "Hematoxylin")
+add_text_and_display(hema, "Hematoxylin Channel")
 eosin = filter_hed_to_eosin(hed)
-add_text_and_display(eosin, "Eosin")
+add_text_and_display(eosin, "Eosin Channel")
 
 # add_text_and_display(grayscale, "Grayscale")
 # complement = filter_complement(grayscale)

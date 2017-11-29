@@ -752,3 +752,46 @@ including:
 colors are inclusively filtered and how pen colors are exclusively filtered.
 
 
+#### Color Deconvolution with rgb2hed()
+
+The scikit-image `skimage.color` package features an `rgb2hed()` function that performs color deconvolution on the
+original RGB image to create HED (Hematoxylin, Eosin, Diaminobenzidine) channels. The `filter_rgb_to_hed()` function
+encapsulates `rgb2hed()`. The `filter_hed_to_hematoxylin()` and `filter_hed_to_eosin()` functions read the hematoxylin
+and eosin channels and rescale the resulting 2-dimensional NumPy arrays (for example, 0 to 255 for `uint8`)
+to increase contrast.
+
+Here, we'll convert the RGB image to an HED image. We'll then obtain the hematoxylin and eosin channels and display
+the resulting images.
+
+```
+img_path = slide.get_training_image_path(4)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+hed = filter_rgb_to_hed(rgb)
+hema = filter_hed_to_hematoxylin(hed)
+add_text_and_display(hema, "Hematoxylin Channel")
+eosin = filter_hed_to_eosin(hed)
+add_text_and_display(eosin, "Eosin Channel")
+```
+
+Notice that the hematoxylin channel does fairly well at detecting the purple areas of the original slide,
+which could potentially be used to narrow in on tissue with cell nuclei and thus on regions that can be inspected for
+mitoses. Both the hematoxylin and eosin channel filters include the background in the resulting image, which is
+rather unfortunate in terms of differentiating tissue from non-tissue. Also, notice in the eosin channel that the red
+pen is considered to be part of the eosin stain spectrum.
+
+
+| **Hematoxylin Channel** | **Eosin Channel** |
+| -------------------- | --------------------------------- |
+| ![Hematoxylin Channel](images/hematoxylin-channel.png "Hematoxylin Channel") | ![Eosin Channel](images/eosin-channel.png "Eosin Channel") |
+
+
+Console output:
+
+```
+RGB                  | Time: 0:00:00.185915  Type: uint8   Shape: (1804, 2048, 3)
+RGB to HED           | Time: 0:00:00.515751  Type: uint8   Shape: (1804, 2048, 3)
+HED to Hematoxylin   | Time: 0:00:00.063843  Type: uint8   Shape: (1804, 2048)
+HED to Eosin         | Time: 0:00:00.042430  Type: uint8   Shape: (1804, 2048)
+```
+
