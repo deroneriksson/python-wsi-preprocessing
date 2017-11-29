@@ -394,7 +394,7 @@ Now, let's take a look at several ways that our images can be filtered. Filters 
 in the `wsi/filter.py` file and have `filter_` prepended to the function names.
 
 
-### RGB to Grayscale Filter
+### RGB to Grayscale
 
 A very common task in image processing is to convert an RGB image to a grayscale image. In this process, the three
 color channels are replaced by a single grayscale channel. The grayscale pixel value is computed by combining the
@@ -435,7 +435,7 @@ Gray                 | Time: 0:00:00.130243  Type: uint8   Shape: (1567, 2048)
 ```
 
 
-### Complement Filter
+### Complement
 
 In our whole-slide image training set, the slide backgrounds are illuminated by white light, which means that a `uint8`
 pixel in the background of a grayscale image is usually close to or equal to 255. However, conceptually and
@@ -476,7 +476,7 @@ pixel with a value of 160 with a threshold of 150 would generate a True (or 255,
 of 140 with a threshold of 150 would generate a False (or 0, or 0.0).
 
 
-#### Hysteresis Threshold Filter
+#### Hysteresis Threshold
 
 Hysteresis thresholding is a two-level threshold. The top-level threshold is treated in a similar fashion as basic
 thresholding. The bottom-level threshold must be exceeded and must be connected to the top-level threshold. This
@@ -521,7 +521,7 @@ Hysteresis Threshold | Time: 0:00:00.115570  Type: uint8   Shape: (1567, 2048)
 ```
 
 
-#### Otsu Threshold Filter
+#### Otsu Threshold
 
 Thresholding using Otsu's method is another popular thresholding technique. This technique was used in the image
 processing described in [A Unified Framework for Tumor Proliferation Score Prediction in Breast
