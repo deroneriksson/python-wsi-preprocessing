@@ -565,10 +565,10 @@ Otsu Threshold       | Time: 0:00:00.018829  Type: uint8   Shape: (1567, 2048)
 
 ### Contrast
 
-For an image, suppose we have a histogram of the intensities (y-axis, the number of pixels) plotted against the range
+For an image, suppose we have a histogram of the number of pixels (y-axis) plotted against the range
 of possible pixel values (x-axis, 0 to 255). Contrast is a measure of the difference in intensities. An image with
 low contrast is typically dull and details are not clearly seen visually. An image with high contrast is typically
-sharp and details can clearly be discerned. Modifying the contrast in an image can be used to bring out various details
+sharp and details can clearly be discerned. Increasing the contrast in an image can be used to bring out various details
 in the image.
 
 
@@ -592,7 +592,9 @@ contrast_stretch = filter_contrast_stretch(complement, low=100, high=200)
 add_text_and_display(contrast_stretch, "Contrast Stretch")
 ```
 
-This can be used to visually inspect details in the previous intensity range of 100 to 200.
+This can be used to visually inspect details in the previous intensity range of 100 to 200, since the image filter has
+spread out this range across the full spectrum.
+
 
 **Contrast Stretching Filter**<br/>
 ![Contrast Stretching Filter](images/contrast-stretching.png "Contrast Stretching Filter")
@@ -605,6 +607,43 @@ RGB                  | Time: 0:00:00.207501  Type: uint8   Shape: (1567, 2048, 3
 Gray                 | Time: 0:00:00.146119  Type: uint8   Shape: (1567, 2048)
 Complement           | Time: 0:00:00.001615  Type: uint8   Shape: (1567, 2048)
 Contrast Stretch     | Time: 0:00:00.075437  Type: uint8   Shape: (1567, 2048)
+```
+
+
+#### Histogram Equalization
+
+Histogram equalization is another technique that can be used to increase contrast in an image. However, unlike
+contrast stretching, which has a linear distribution of the resulting intensities, the histogram equalization
+transformation is based on probabilities and is non-linear. For more information about histogram equalization, please
+see [https://en.wikipedia.org/wiki/Histogram_equalization](https://en.wikipedia.org/wiki/Histogram_equalization).
+
+As an example, here we display the grayscale image. We increase contrast in the grayscale image using histogram
+equalization and display the resulting image.
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+grayscale = filter_rgb_to_grayscale(rgb)
+add_text_and_display(grayscale, "Grayscale")
+hist_equ = filter_histogram_equalization(grayscale)
+add_text_and_display(hist_equ, "Histogram Equalization")
+```
+
+Comparing the grayscale image and the image after histogram equalization, we see that contrast in the image has been
+increased.
+
+| **Grayscale Filter** | **Histogram Equalization Filter** |
+| -------------------- | --------------------------------- |
+| ![Grayscale Filter](images/grayscale.png "Grayscale Filter") | ![Histogram Equalization Filter](images/histogram-equalization.png "Histogram Equalization Filter") |
+
+
+Console output following histogram equalization is shown here.
+
+```
+RGB                  | Time: 0:00:00.201479  Type: uint8   Shape: (1567, 2048, 3)
+Gray                 | Time: 0:00:00.129065  Type: uint8   Shape: (1567, 2048)
+Hist Equalization    | Time: 0:00:00.152975  Type: uint8   Shape: (1567, 2048)
 ```
 
 
