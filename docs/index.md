@@ -997,6 +997,7 @@ RGB image to help visualize the filter results.
 img_path = slide.get_training_image_path(241)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "Original")
 not_blue = filter_blue(rgb, red_upper_thresh=130, green_upper_thresh=155, blue_lower_thresh=180, display_np_info=True)
 add_text_and_display(not_blue, "Blue Filter (130, 155, 180)")
 add_text_and_display(mask_rgb(rgb, not_blue), "Not Blue")
@@ -1023,3 +1024,79 @@ Filter Blue          | Time: 0:00:00.011197  Type: bool    Shape: (1301, 2048)
 Mask RGB             | Time: 0:00:00.010248  Type: uint8   Shape: (1301, 2048, 3)
 Mask RGB             | Time: 0:00:00.009995  Type: uint8   Shape: (1301, 2048, 3)
 ```
+
+
+#### Blue Pen Filter
+
+In `filter_blue_pen()`, we can AND together various blue shade ranges using `filter_blue()` with
+sets of red, green, and blue threshold values to create a blue pen filter that filters out various shades of blue.
+
+```
+result = filter_blue(rgb, red_upper_thresh=60, green_upper_thresh=120, blue_lower_thresh=190) & \
+         filter_blue(rgb, red_upper_thresh=120, green_upper_thresh=170, blue_lower_thresh=200) & \
+         filter_blue(rgb, red_upper_thresh=175, green_upper_thresh=210, blue_lower_thresh=230) & \
+         filter_blue(rgb, red_upper_thresh=145, green_upper_thresh=180, blue_lower_thresh=210) & \
+         filter_blue(rgb, red_upper_thresh=37, green_upper_thresh=95, blue_lower_thresh=160) & \
+         filter_blue(rgb, red_upper_thresh=30, green_upper_thresh=65, blue_lower_thresh=130) & \
+         filter_blue(rgb, red_upper_thresh=130, green_upper_thresh=155, blue_lower_thresh=180) & \
+         filter_blue(rgb, red_upper_thresh=40, green_upper_thresh=35, blue_lower_thresh=85) & \
+         filter_blue(rgb, red_upper_thresh=30, green_upper_thresh=20, blue_lower_thresh=65) & \
+         filter_blue(rgb, red_upper_thresh=90, green_upper_thresh=90, blue_lower_thresh=140) & \
+         filter_blue(rgb, red_upper_thresh=60, green_upper_thresh=60, blue_lower_thresh=120) & \
+         filter_blue(rgb, red_upper_thresh=110, green_upper_thresh=110, blue_lower_thresh=175)
+```
+
+Once again, we'll apply the filter and its inverse to the original slide to help us visualize the results.
+
+```
+img_path = slide.get_training_image_path(241)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "Original")
+not_blue_pen = filter_blue_pen(rgb)
+add_text_and_display(not_blue_pen, "Blue Pen Filter")
+add_text_and_display(mask_rgb(rgb, not_blue_pen), "Not Blue Pen")
+add_text_and_display(mask_rgb(rgb, ~not_blue_pen), "Blue Pen")
+```
+
+For this slide, we see that `filter_blue_pen()` filters out more blue than the previous `filter_blue()` example.
+
+| **Original Slide** | **Blue Pen Filter** |
+| -------------------- | --------------------------------- |
+| ![Original Slide](images/blue-original.png "Original Slide") | ![Blue Pen Filter](images/blue-pen-filter.png "Blue Pen Filter") |
+
+
+| **Not Blue Pen** | **Blue Pen** |
+| -------------------- | --------------------------------- |
+| ![Not Blue Pen](images/not-blue-pen.png "Not Blue Pen") | ![Blue Pen](images/blue-pen.png "Blue Pen") |
+
+
+We see from the console output that the blue pen filter is quite fast.
+
+```
+RGB                  | Time: 0:00:00.146905  Type: uint8   Shape: (1301, 2048, 3)
+Filter Blue Pen      | Time: 0:00:00.134946  Type: bool    Shape: (1301, 2048)
+Mask RGB             | Time: 0:00:00.010695  Type: uint8   Shape: (1301, 2048, 3)
+Mask RGB             | Time: 0:00:00.005944  Type: uint8   Shape: (1301, 2048, 3)
+```
+
+As an aside, we can easily quantify the differences in filtering between the `filter_blue()` and `filter_blue_pen()`
+results.
+
+```
+not_blue = filter_blue(rgb, red_upper_thresh=130, green_upper_thresh=155, blue_lower_thresh=180, display_np_info=True)
+not_blue_pen = filter_blue_pen(rgb)
+print("filter_blue:" + mask_percentage_text(mask_percent(not_blue)))
+print("filter_blue_pen:" + mask_percentage_text(mask_percent(not_blue_pen)))
+```
+
+The `filter_blue()` example filtered out 0.45% of the slide pixels and the `filter_blue_pen()` example filtered out
+0.68% of the slide pixels.
+
+```
+filter_blue:
+(0.45% masked)
+filter_blue_pen:
+(0.68% masked)
+```
+
