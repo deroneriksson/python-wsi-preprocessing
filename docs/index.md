@@ -795,3 +795,39 @@ HED to Hematoxylin   | Time: 0:00:00.063843  Type: uint8   Shape: (1804, 2048)
 HED to Eosin         | Time: 0:00:00.042430  Type: uint8   Shape: (1804, 2048)
 ```
 
+
+### Green Channel Filter
+
+If we look at a color wheel, we see that purple and pink are next to each other. On the other side of color wheel, we
+have yellow and green. Since green is one of our 3 NumPy array RGB color channels, filtering out pixels that have a high
+green channel value can be one way to potentially filter out parts of the slide that are not pink or purple. This
+includes the white background, since white also has a high green channel value along with high red and blue channel
+values.
+
+We'll use the default green threshold value of 200 for the `filter_green_channel()` function, meaning that any pixels
+with green channel values of 200 or greater will be rejected.
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+not_green = filter_green_channel(rgb)
+add_text_and_display(not_green, "Green Channel Filter")
+```
+
+The green channel filter does a decent job of differentiating the tissue from the white background. However, notice
+that the shadow area at the top of the slide is not excluded by the filter.
+
+| **Original Slide** | **Green Channel Filter** |
+| -------------------- | --------------------------------- |
+| ![Original Slide](images/display-image-with-text.png "Original Slide") | ![Green Channel Filter](images/green-channel-filter.png "Green Channel Filter") |
+
+A filter such as the green channel filter most likely would be used in conjunction with other filters for masking
+purposes. As a result, the default output type for the green channel filter is `bool`, as we see in the console
+output. If another output type is desired, this can be set with the function's `output_type` parameter.
+
+```
+RGB                  | Time: 0:00:00.210066  Type: uint8   Shape: (1567, 2048, 3)
+Filter Green Channel | Time: 0:00:00.027842  Type: bool    Shape: (1567, 2048)
+```
+

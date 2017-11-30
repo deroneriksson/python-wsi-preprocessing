@@ -1400,14 +1400,12 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 # overmasked_slides = [21]
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=overmasked_slides)
 
-img_path = slide.get_training_image_path(4)
+img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-hed = filter_rgb_to_hed(rgb)
-hema = filter_hed_to_hematoxylin(hed)
-add_text_and_display(hema, "Hematoxylin Channel")
-eosin = filter_hed_to_eosin(hed)
-add_text_and_display(eosin, "Eosin Channel")
+not_green = filter_green_channel(rgb)
+add_text_and_display(not_green, "Green Channel Filter")
+
 
 # add_text_and_display(grayscale, "Grayscale")
 # complement = filter_complement(grayscale)
