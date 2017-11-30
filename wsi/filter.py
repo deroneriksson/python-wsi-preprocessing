@@ -1403,14 +1403,10 @@ img_path = slide.get_training_image_path(51)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 add_text_and_display(rgb, "Original")
-not_green = filter_green(rgb, red_upper_thresh=150, green_lower_thresh=160, blue_lower_thresh=140, display_np_info=True)
-add_text_and_display(not_green, "Green Filter (150, 160, 140)")
-add_text_and_display(mask_rgb(rgb, not_green), "Not Green")
-add_text_and_display(mask_rgb(rgb, ~not_green), "Green")
-
-# result = filter_bluegreen(rgb, red_upper_thresh=150, green_lower_thresh=160, blue_lower_thresh=140) & \
-#          filter_bluegreen(rgb, red_upper_thresh=70, green_lower_thresh=110, blue_lower_thresh=110) & \
-#          filter_bluegreen(rgb, red_upper_thresh=45, green_lower_thresh=115, blue_lower_thresh=100) & \
+not_green_pen = filter_green_pen(rgb)
+add_text_and_display(not_green_pen, "Green Pen Filter")
+add_text_and_display(mask_rgb(rgb, not_green_pen), "Not Green Pen")
+add_text_and_display(mask_rgb(rgb, ~not_green_pen), "Green Pen")
 
 # not_red_pen = filter_red_pen(rgb)
 # add_text_and_display(not_red_pen, "Red Pen Filter")

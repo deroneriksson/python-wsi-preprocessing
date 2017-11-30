@@ -1142,3 +1142,57 @@ Mask RGB             | Time: 0:00:00.009844  Type: uint8   Shape: (1222, 2048, 3
 Mask RGB             | Time: 0:00:00.006240  Type: uint8   Shape: (1222, 2048, 3)
 ```
 
+#### Green Pen Filter
+
+To handle the green pen shades, the `filter_green_pen()` function combines different shade results using sets of
+red, green, and blue threshold values passed to the `filter_green()` function.
+
+```
+result = filter_green(rgb, red_upper_thresh=150, green_lower_thresh=160, blue_lower_thresh=140) & \
+         filter_green(rgb, red_upper_thresh=70, green_lower_thresh=110, blue_lower_thresh=110) & \
+         filter_green(rgb, red_upper_thresh=45, green_lower_thresh=115, blue_lower_thresh=100) & \
+         filter_green(rgb, red_upper_thresh=30, green_lower_thresh=75, blue_lower_thresh=60) & \
+         filter_green(rgb, red_upper_thresh=195, green_lower_thresh=220, blue_lower_thresh=210) & \
+         filter_green(rgb, red_upper_thresh=225, green_lower_thresh=230, blue_lower_thresh=225) & \
+         filter_green(rgb, red_upper_thresh=170, green_lower_thresh=210, blue_lower_thresh=200) & \
+         filter_green(rgb, red_upper_thresh=20, green_lower_thresh=30, blue_lower_thresh=20) & \
+         filter_green(rgb, red_upper_thresh=50, green_lower_thresh=60, blue_lower_thresh=40) & \
+         filter_green(rgb, red_upper_thresh=30, green_lower_thresh=50, blue_lower_thresh=35) & \
+         filter_green(rgb, red_upper_thresh=65, green_lower_thresh=70, blue_lower_thresh=60) & \
+         filter_green(rgb, red_upper_thresh=100, green_lower_thresh=110, blue_lower_thresh=105) & \
+         filter_green(rgb, red_upper_thresh=165, green_lower_thresh=180, blue_lower_thresh=180) & \
+         filter_green(rgb, red_upper_thresh=140, green_lower_thresh=140, blue_lower_thresh=150) & \
+         filter_green(rgb, red_upper_thresh=185, green_lower_thresh=195, blue_lower_thresh=195)
+```
+
+If we apply the green pen filter, we see that it includes most of the green shades above the tissue in slide 51.
+
+```
+img_path = slide.get_training_image_path(51)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "Original")
+not_green_pen = filter_green_pen(rgb)
+add_text_and_display(not_green_pen, "Green Pen Filter")
+add_text_and_display(mask_rgb(rgb, not_green_pen), "Not Green Pen")
+add_text_and_display(mask_rgb(rgb, ~not_green_pen), "Green Pen")
+```
+
+| **Original Slide** | **Green Pen Filter** |
+| -------------------- | --------------------------------- |
+| ![Original Slide](images/green-original.png "Original Slide") | ![Green Pen Filter](images/green-pen-filter.png "Green Pen Filter") |
+
+
+| **Not Green Pen** | **Green Pen** |
+| -------------------- | --------------------------------- |
+| ![Not Green Pen](images/not-green-pen.png "Not Green Pen") | ![Green Pen](images/green-pen.png "Green Pen") |
+
+
+Like the other pen filters, the green pen filter's performance is quite good.
+
+```
+RGB                  | Time: 0:00:00.165038  Type: uint8   Shape: (1222, 2048, 3)
+Filter Green Pen     | Time: 0:00:00.118797  Type: bool    Shape: (1222, 2048)
+Mask RGB             | Time: 0:00:00.011132  Type: uint8   Shape: (1222, 2048, 3)
+Mask RGB             | Time: 0:00:00.005561  Type: uint8   Shape: (1222, 2048, 3)
+```
