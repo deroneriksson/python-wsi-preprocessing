@@ -1393,6 +1393,7 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 # green_pen_slides = [74]
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
 # blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
+# multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
 # overmasked_slides = [1, 21, 29, 37, 43, 88, 116, 126, 127, 142, 145, 173, 196, 220, 225, 234, 238, 284, 292, 294, 304,
 #                      316, 401, 403, 424, 448, 452, 472, 494]
@@ -1400,14 +1401,23 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 # overmasked_slides = [21]
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=overmasked_slides)
 
-img_path = slide.get_training_image_path(4)
+# img_path = slide.get_training_image_path(4)
+# img = slide.open_image(img_path)
+# rgb = pil_to_np_rgb(img)
+# not_red_pen = filter_red_pen(rgb)
+# add_text_and_display(not_red_pen, "Red Pen Filter")
+# add_text_and_display(mask_rgb(rgb, not_red_pen), "Not Red Pen")
+# add_text_and_display(mask_rgb(rgb, ~not_red_pen), "Red Pen")
+# filter_blue(rgb, red_upper_thresh=60, green_upper_thresh=120, blue_lower_thresh=190)
+
+img_path = slide.get_training_image_path(241)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-not_red_pen = filter_red_pen(rgb)
-add_text_and_display(not_red_pen, "Red Pen Filter")
-add_text_and_display(mask_rgb(rgb, not_red_pen), "Not Red Pen")
-add_text_and_display(mask_rgb(rgb, ~not_red_pen), "Red Pen")
-
+add_text_and_display(rgb, "Original")
+not_blue = filter_blue(rgb, red_upper_thresh=130, green_upper_thresh=155, blue_lower_thresh=180, display_np_info=True)
+add_text_and_display(not_blue, "Blue Filter (130, 155, 180)")
+add_text_and_display(mask_rgb(rgb, not_blue), "Not Blue")
+add_text_and_display(mask_rgb(rgb, ~not_blue), "Blue")
 
 # add_text_and_display(grayscale, "Grayscale")
 # complement = filter_complement(grayscale)

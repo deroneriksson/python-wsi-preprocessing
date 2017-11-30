@@ -978,3 +978,48 @@ Mask RGB             | Time: 0:00:00.014232  Type: uint8   Shape: (1804, 2048, 3
 Mask RGB             | Time: 0:00:00.019559  Type: uint8   Shape: (1804, 2048, 3)
 ```
 
+#### Blue Filter
+
+If we visually examine the 500 slides in the training dataset, we see that several of the slides have been marked
+with blue pen. Rather than blue lines, many of the blue marks consist of blue dots surrounding particular areas of
+interest on the slides, although this is not always the case. Some of the slides also have blue pen lines. Once again,
+the blue pen marks consist of several gradations of blue.
+
+We'll start by creating a filter to filter out blue. The `filter_blue()` function operates in a similar way as the
+`filter_red()` function. It takes a red channel upper threshold value, a green channel upper threshold value, and
+a blue channel lower threshold value. The generated mask is based on a pixel being below the red channel threshold
+value, below the green channel threshold value, and above the blue channel threshold value.
+
+Once again, we'll also apply the results of the blue filter and the inverse of the blue filter as masks to the original
+RGB image to help visualize the filter results.
+
+```
+img_path = slide.get_training_image_path(241)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+not_blue = filter_blue(rgb, red_upper_thresh=130, green_upper_thresh=155, blue_lower_thresh=180, display_np_info=True)
+add_text_and_display(not_blue, "Blue Filter (130, 155, 180)")
+add_text_and_display(mask_rgb(rgb, not_blue), "Not Blue")
+add_text_and_display(mask_rgb(rgb, ~not_blue), "Blue")
+```
+
+We see that a lot of the blue pen has been filtered out.
+
+| **Original Slide** | **Blue Filter** |
+| -------------------- | --------------------------------- |
+| ![Original Slide](images/blue-original.png "Original Slide") | ![Blue Filter](images/blue-filter.png "Blue Filter") |
+
+
+| **Not Blue** | **Blue** |
+| -------------------- | --------------------------------- |
+| ![Not Blue](images/not-blue.png "Not Blue") | ![Blue](images/blue.png "Blue") |
+
+
+Console output:
+
+```
+RGB                  | Time: 0:00:00.142685  Type: uint8   Shape: (1301, 2048, 3)
+Filter Blue          | Time: 0:00:00.011197  Type: bool    Shape: (1301, 2048)
+Mask RGB             | Time: 0:00:00.010248  Type: uint8   Shape: (1301, 2048, 3)
+Mask RGB             | Time: 0:00:00.009995  Type: uint8   Shape: (1301, 2048, 3)
+```
