@@ -1100,3 +1100,45 @@ filter_blue_pen:
 (0.68% masked)
 ```
 
+#### Green Filter
+
+To develop a filter for the green ink from the pen, we'll create a `filter_green()` function to handle the green
+color shades. Using a color picker tool, if we examine the green pen marks on the slides, the green and blue channel
+values for pixels appear to track together. As a result of this, this function will have a red channel upper
+threshold value, a green channel lower threshold value, and a blue channel lower threshold value.
+
+
+```
+img_path = slide.get_training_image_path(51)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "Original")
+not_green = filter_green(rgb, red_upper_thresh=150, green_lower_thresh=160, blue_lower_thresh=140, display_np_info=True)
+add_text_and_display(not_green, "Green Filter (150, 160, 140)")
+add_text_and_display(mask_rgb(rgb, not_green), "Not Green")
+add_text_and_display(mask_rgb(rgb, ~not_green), "Green")
+```
+
+Using a red upper threshold of 150, a green lower threshold of 160, and a blue lower threshold of 140, we see that the
+much of the green ink above the background is filtered out, but most of the green ink above the tissue is not filtered
+out.
+
+| **Original Slide** | **Green Filter** |
+| -------------------- | --------------------------------- |
+| ![Original Slide](images/green-original.png "Original Slide") | ![Green Filter](images/green-filter.png "Green Filter") |
+
+
+| **Not Green** | **Green** |
+| -------------------- | --------------------------------- |
+| ![Not Green](images/not-green.png "Not Green") | ![Green](images/green.png "Green") |
+
+
+Console output:
+
+```
+RGB                  | Time: 0:00:00.150075  Type: uint8   Shape: (1222, 2048, 3)
+Filter Green         | Time: 0:00:00.010120  Type: bool    Shape: (1222, 2048)
+Mask RGB             | Time: 0:00:00.009844  Type: uint8   Shape: (1222, 2048, 3)
+Mask RGB             | Time: 0:00:00.006240  Type: uint8   Shape: (1222, 2048, 3)
+```
+

@@ -807,11 +807,13 @@ def filter_red_pen(rgb, output_type="bool"):
   return result
 
 
-def filter_bluegreen(rgb, red_upper_thresh, green_lower_thresh, blue_lower_thresh, output_type="bool",
-                     display_np_info=False):
+def filter_green(rgb, red_upper_thresh, green_lower_thresh, blue_lower_thresh, output_type="bool",
+                 display_np_info=False):
   """
-  Create a mask to filter out blueish/greenish colors, where the mask is based on a pixel being below a
+  Create a mask to filter out greenish colors, where the mask is based on a pixel being below a
   red channel threshold value, above a green channel threshold value, and above a blue channel threshold value.
+  Note that for the green ink, the green and blue channels tend to track together, so we use a blue channel
+  lower threshold value rather than a blue channel upper threshold value.
 
   Args:
     rgb: RGB image as a NumPy array.
@@ -837,13 +839,13 @@ def filter_bluegreen(rgb, red_upper_thresh, green_lower_thresh, blue_lower_thres
   else:
     result = result.astype("uint8") * 255
   if display_np_info:
-    np_info(result, "Filter BlueGreen", t.elapsed())
+    np_info(result, "Filter Green", t.elapsed())
   return result
 
 
 def filter_green_pen(rgb, output_type="bool"):
   """
-  Create a mask to filter out green (actually blue-green) pen marks from a slide.
+  Create a mask to filter out green pen marks from a slide.
 
   Args:
     rgb: RGB image as a NumPy array.
@@ -853,21 +855,21 @@ def filter_green_pen(rgb, output_type="bool"):
     NumPy array representing the mask.
   """
   t = Time()
-  result = filter_bluegreen(rgb, red_upper_thresh=150, green_lower_thresh=160, blue_lower_thresh=140) & \
-           filter_bluegreen(rgb, red_upper_thresh=70, green_lower_thresh=110, blue_lower_thresh=110) & \
-           filter_bluegreen(rgb, red_upper_thresh=45, green_lower_thresh=115, blue_lower_thresh=100) & \
-           filter_bluegreen(rgb, red_upper_thresh=30, green_lower_thresh=75, blue_lower_thresh=60) & \
-           filter_bluegreen(rgb, red_upper_thresh=195, green_lower_thresh=220, blue_lower_thresh=210) & \
-           filter_bluegreen(rgb, red_upper_thresh=225, green_lower_thresh=230, blue_lower_thresh=225) & \
-           filter_bluegreen(rgb, red_upper_thresh=170, green_lower_thresh=210, blue_lower_thresh=200) & \
-           filter_bluegreen(rgb, red_upper_thresh=20, green_lower_thresh=30, blue_lower_thresh=20) & \
-           filter_bluegreen(rgb, red_upper_thresh=50, green_lower_thresh=60, blue_lower_thresh=40) & \
-           filter_bluegreen(rgb, red_upper_thresh=30, green_lower_thresh=50, blue_lower_thresh=35) & \
-           filter_bluegreen(rgb, red_upper_thresh=65, green_lower_thresh=70, blue_lower_thresh=60) & \
-           filter_bluegreen(rgb, red_upper_thresh=100, green_lower_thresh=110, blue_lower_thresh=105) & \
-           filter_bluegreen(rgb, red_upper_thresh=165, green_lower_thresh=180, blue_lower_thresh=180) & \
-           filter_bluegreen(rgb, red_upper_thresh=140, green_lower_thresh=140, blue_lower_thresh=150) & \
-           filter_bluegreen(rgb, red_upper_thresh=185, green_lower_thresh=195, blue_lower_thresh=195)
+  result = filter_green(rgb, red_upper_thresh=150, green_lower_thresh=160, blue_lower_thresh=140) & \
+           filter_green(rgb, red_upper_thresh=70, green_lower_thresh=110, blue_lower_thresh=110) & \
+           filter_green(rgb, red_upper_thresh=45, green_lower_thresh=115, blue_lower_thresh=100) & \
+           filter_green(rgb, red_upper_thresh=30, green_lower_thresh=75, blue_lower_thresh=60) & \
+           filter_green(rgb, red_upper_thresh=195, green_lower_thresh=220, blue_lower_thresh=210) & \
+           filter_green(rgb, red_upper_thresh=225, green_lower_thresh=230, blue_lower_thresh=225) & \
+           filter_green(rgb, red_upper_thresh=170, green_lower_thresh=210, blue_lower_thresh=200) & \
+           filter_green(rgb, red_upper_thresh=20, green_lower_thresh=30, blue_lower_thresh=20) & \
+           filter_green(rgb, red_upper_thresh=50, green_lower_thresh=60, blue_lower_thresh=40) & \
+           filter_green(rgb, red_upper_thresh=30, green_lower_thresh=50, blue_lower_thresh=35) & \
+           filter_green(rgb, red_upper_thresh=65, green_lower_thresh=70, blue_lower_thresh=60) & \
+           filter_green(rgb, red_upper_thresh=100, green_lower_thresh=110, blue_lower_thresh=105) & \
+           filter_green(rgb, red_upper_thresh=165, green_lower_thresh=180, blue_lower_thresh=180) & \
+           filter_green(rgb, red_upper_thresh=140, green_lower_thresh=140, blue_lower_thresh=150) & \
+           filter_green(rgb, red_upper_thresh=185, green_lower_thresh=195, blue_lower_thresh=195)
   if output_type == "bool":
     pass
   elif output_type == "float":
@@ -1387,42 +1389,48 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 
 # red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
 #                   336, 349, 357, 380, 450, 482]
-# red_pen_slides = [1, 2, 3]
 # multiprocess_apply_filters_to_images(save=False, display=False, image_num_list=red_pen_slides)
 # green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
-# green_pen_slides = [74]
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
 # blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
 # overmasked_slides = [1, 21, 29, 37, 43, 88, 116, 126, 127, 142, 145, 173, 196, 220, 225, 234, 238, 284, 292, 294, 304,
 #                      316, 401, 403, 424, 448, 452, 472, 494]
-# overmasked_slides = [1, 2, 3, 4, 5, 21, 37, 294, 401, 424, 472]
-# overmasked_slides = [21]
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=overmasked_slides)
 
-# img_path = slide.get_training_image_path(4)
-# img = slide.open_image(img_path)
-# rgb = pil_to_np_rgb(img)
+img_path = slide.get_training_image_path(51)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "Original")
+not_green = filter_green(rgb, red_upper_thresh=150, green_lower_thresh=160, blue_lower_thresh=140, display_np_info=True)
+add_text_and_display(not_green, "Green Filter (150, 160, 140)")
+add_text_and_display(mask_rgb(rgb, not_green), "Not Green")
+add_text_and_display(mask_rgb(rgb, ~not_green), "Green")
+
+# result = filter_bluegreen(rgb, red_upper_thresh=150, green_lower_thresh=160, blue_lower_thresh=140) & \
+#          filter_bluegreen(rgb, red_upper_thresh=70, green_lower_thresh=110, blue_lower_thresh=110) & \
+#          filter_bluegreen(rgb, red_upper_thresh=45, green_lower_thresh=115, blue_lower_thresh=100) & \
+
 # not_red_pen = filter_red_pen(rgb)
 # add_text_and_display(not_red_pen, "Red Pen Filter")
 # add_text_and_display(mask_rgb(rgb, not_red_pen), "Not Red Pen")
 # add_text_and_display(mask_rgb(rgb, ~not_red_pen), "Red Pen")
 # filter_blue(rgb, red_upper_thresh=60, green_upper_thresh=120, blue_lower_thresh=190)
 
-img_path = slide.get_training_image_path(241)
-img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
+# img_path = slide.get_training_image_path(241)
+# img = slide.open_image(img_path)
+# rgb = pil_to_np_rgb(img)
 # add_text_and_display(rgb, "Original")
-not_blue_pen = filter_blue_pen(rgb)
+# not_blue_pen = filter_blue_pen(rgb)
 # add_text_and_display(not_blue_pen, "Blue Pen Filter")
 # add_text_and_display(mask_rgb(rgb, not_blue_pen), "Not Blue Pen")
 # add_text_and_display(mask_rgb(rgb, ~not_blue_pen), "Blue Pen")
 
-not_blue = filter_blue(rgb, red_upper_thresh=130, green_upper_thresh=155, blue_lower_thresh=180, display_np_info=True)
-not_blue_pen = filter_blue_pen(rgb)
-print("filter_blue:" + mask_percentage_text(mask_percent(not_blue)))
-print("filter_blue_pen:" + mask_percentage_text(mask_percent(not_blue_pen)))
+# not_blue = filter_blue(rgb, red_upper_thresh=130, green_upper_thresh=155, blue_lower_thresh=180, display_np_info=True)
+# not_blue_pen = filter_blue_pen(rgb)
+# print("filter_blue:" + mask_percentage_text(mask_percent(not_blue)))
+# print("filter_blue_pen:" + mask_percentage_text(mask_percent(not_blue_pen)))
 
 # add_text_and_display(grayscale, "Grayscale")
 # complement = filter_complement(grayscale)
