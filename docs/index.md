@@ -831,3 +831,38 @@ RGB                  | Time: 0:00:00.210066  Type: uint8   Shape: (1567, 2048, 3
 Filter Green Channel | Time: 0:00:00.027842  Type: bool    Shape: (1567, 2048)
 ```
 
+
+### Grays Filter
+
+Next, let's utilize a filter that can filter out the annoying shadow area at the top of slide #2. Notice that the
+shadow area consists of a gradient of dark-to-light grays. A gray pixel has red, green, and blue channel values that
+are close together. The `filter_grays()` function will filter out pixels that have red, blue, and green values that
+are within a certain tolerance of each other. The default tolerance for `filter_grays()` is 15. The grays filter will
+also filter out white and black pixels, since they have similar red, green, and blue values.
+
+Here, we run the grays filter on the original RGB image.
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+not_grays = filter_grays(rgb)
+add_text_and_display(not_grays, "Grays Filter")
+```
+
+Notice that in addition to filtering out the white background, the grays filter has indeed filtered out the shadow
+area at the top of the slide.
+
+| **Original Slide** | **Grays Filter** |
+| -------------------- | --------------------------------- |
+| ![Original Slide](images/display-image-with-text.png "Original Slide") | ![Grays Filter](images/grays-filter.png "Grays Filter") |
+
+Like the green channel filter, the default type of the returned array is `bool` since the grays filter will typically
+be used in combination with other filters. Since the grays filter is fast, it offers a potentially
+low-cost way to filter out shadows from the slides during preprocessing.
+
+```
+RGB                  | Time: 0:00:00.219749  Type: uint8   Shape: (1567, 2048, 3)
+Filter Grays         | Time: 0:00:00.091341  Type: bool    Shape: (1567, 2048)
+```
+

@@ -1403,8 +1403,8 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-not_green = filter_green_channel(rgb)
-add_text_and_display(not_green, "Green Channel Filter")
+not_grays = filter_grays(rgb)
+add_text_and_display(not_grays, "Grays Filter")
 
 
 # add_text_and_display(grayscale, "Grayscale")
