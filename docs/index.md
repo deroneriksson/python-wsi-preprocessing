@@ -796,7 +796,7 @@ HED to Eosin         | Time: 0:00:00.042430  Type: uint8   Shape: (1804, 2048)
 ```
 
 
-### Green Channel Filter
+#### Green Channel Filter
 
 If we look at a color wheel, we see that purple and pink are next to each other. On the other side of color wheel, we
 have yellow and green. Since green is one of our 3 NumPy array RGB color channels, filtering out pixels that have a high
@@ -832,7 +832,7 @@ Filter Green Channel | Time: 0:00:00.027842  Type: bool    Shape: (1567, 2048)
 ```
 
 
-### Grays Filter
+#### Grays Filter
 
 Next, let's utilize a filter that can filter out the annoying shadow area at the top of slide #2. Notice that the
 shadow area consists of a gradient of dark-to-light grays. A gray pixel has red, green, and blue channel values that
@@ -864,5 +864,57 @@ low-cost way to filter out shadows from the slides during preprocessing.
 ```
 RGB                  | Time: 0:00:00.219749  Type: uint8   Shape: (1567, 2048, 3)
 Filter Grays         | Time: 0:00:00.091341  Type: bool    Shape: (1567, 2048)
+```
+
+
+#### Red and Red Pen Filters
+
+Next, let's turn our attention to filtering out shades of red, which can be used to filter out the red pen color.
+The red pen consists of a wide variety of closely related red shades. Certain shades are
+reddish, others are maroonish, and others are pinkish, for example. These color gradations are a result of a variety of
+factors, such as the amount of ink, lighting, shadowing, and tissue under the pen marks.
+
+The `filter_red()` function filters out reddish colors through a red channel lower threshold value, a green channel
+upper threshold value, and a blue channel upper threshold value. The generated mask is based on a pixel being above
+the red channel threshold value and below the green and blue channel threshold values. One way to determine these
+values is to display the slide image in a web browser and use a tool such as the Chrome ColorPick Eyedropper to
+click on a red pen pixel to determine the approximate red, green, and blue values.
+
+In this example with slide #4, we'll use a red threshold value of 150, a green threshold value of 80, and a blue
+threshold value of 90. In addition, to help us visualize the filter results, we will apply the red filter to the
+original RGB image as a mask, and we will also apply the inverse of the red filter to the original image as a mask.
+
+```
+img_path = slide.get_training_image_path(4)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+not_red = filter_red(rgb, red_lower_thresh=150, green_upper_thresh=80, blue_upper_thresh=90, display_np_info=True)
+add_text_and_display(not_red, "Red Filter (150, 80, 90)")
+add_text_and_display(mask_rgb(rgb, not_red), "Not Red")
+add_text_and_display(mask_rgb(rgb, ~not_red), "Red")
+```
+
+In the generated image, we can see that much of the red pen marks have been filtered out.
+
+| **Original Slide** | **Red Filter** |
+| -------------------- | --------------------------------- |
+| ![Original Slide](images/slide-pen.png "Original Slide") | ![Red Filter](images/red-filter.png "Red Filter") |
+
+
+Applying the red filter and the inverse of the red filter as masks to the original image, we see that our threshold
+values did quite well at filtering out a large amount of the red pen.
+
+| **Not Red** | **Red** |
+| -------------------- | --------------------------------- |
+| ![Not Red](images/not-red.png "Not Red") | ![Red](images/red.png "Red") |
+
+
+Console output:
+
+```
+RGB                  | Time: 0:00:00.182861  Type: uint8   Shape: (1804, 2048, 3)
+Filter Red           | Time: 0:00:00.013861  Type: bool    Shape: (1804, 2048)
+Mask RGB             | Time: 0:00:00.015051  Type: uint8   Shape: (1804, 2048, 3)
+Mask RGB             | Time: 0:00:00.018000  Type: uint8   Shape: (1804, 2048, 3)
 ```
 

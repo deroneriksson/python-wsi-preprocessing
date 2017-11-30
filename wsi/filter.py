@@ -1400,11 +1400,13 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 # overmasked_slides = [21]
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=overmasked_slides)
 
-img_path = slide.get_training_image_path(2)
+img_path = slide.get_training_image_path(4)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-not_grays = filter_grays(rgb)
-add_text_and_display(not_grays, "Grays Filter")
+not_red = filter_red(rgb, red_lower_thresh=150, green_upper_thresh=80, blue_upper_thresh=90, display_np_info=True)
+add_text_and_display(not_red, "Red Filter (150, 80, 90)")
+add_text_and_display(mask_rgb(rgb, not_red), "Not Red")
+add_text_and_display(mask_rgb(rgb, ~not_red), "Red")
 
 
 # add_text_and_display(grayscale, "Grayscale")
