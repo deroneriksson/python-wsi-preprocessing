@@ -867,7 +867,7 @@ Filter Grays         | Time: 0:00:00.091341  Type: bool    Shape: (1567, 2048)
 ```
 
 
-#### Red and Red Pen Filters
+#### Red Filter
 
 Next, let's turn our attention to filtering out shades of red, which can be used to filter out the red pen color.
 The red pen consists of a wide variety of closely related red shades. Certain shades are
@@ -894,7 +894,7 @@ add_text_and_display(mask_rgb(rgb, not_red), "Not Red")
 add_text_and_display(mask_rgb(rgb, ~not_red), "Red")
 ```
 
-In the generated image, we can see that much of the red pen marks have been filtered out.
+In the generated image, we can see that much of the red pen has been filtered out.
 
 | **Original Slide** | **Red Filter** |
 | -------------------- | --------------------------------- |
@@ -909,12 +909,72 @@ values did quite well at filtering out a large amount of the red pen.
 | ![Not Red](images/not-red.png "Not Red") | ![Red](images/red.png "Red") |
 
 
-Console output:
+Console output from the above image generation:
 
 ```
 RGB                  | Time: 0:00:00.182861  Type: uint8   Shape: (1804, 2048, 3)
 Filter Red           | Time: 0:00:00.013861  Type: bool    Shape: (1804, 2048)
 Mask RGB             | Time: 0:00:00.015051  Type: uint8   Shape: (1804, 2048, 3)
 Mask RGB             | Time: 0:00:00.018000  Type: uint8   Shape: (1804, 2048, 3)
+```
+
+
+#### Red Pen Filter
+
+Next, let's turn our attention to a more inclusive red pen filter that handles more shades of red. Since the
+`filter_red()` function returns a boolean array result, we can easily combine multiple sets of `filter_red()` threshold
+values (`red_lower_thresh`, `green_upper_thresh`, `blue_upper_thresh`) using boolean operators such as &. We can
+determine these values using a color picker tool such as the Chrome ColorPick Eyedropper, as mentioned previously.
+In addition to determining various shades of red pen on a single slide, shades of red pen from other slides should be
+identified and included. Note that we need to be careful with pinkish shades of red due to the similarity of these
+shades to eosin staining.
+
+Using the color picker technique, the `filter_red_pen()` function utilizes the following sets of red threshold values.
+
+```
+result = filter_red(rgb, red_lower_thresh=150, green_upper_thresh=80, blue_upper_thresh=90) & \
+         filter_red(rgb, red_lower_thresh=110, green_upper_thresh=20, blue_upper_thresh=30) & \
+         filter_red(rgb, red_lower_thresh=185, green_upper_thresh=65, blue_upper_thresh=105) & \
+         filter_red(rgb, red_lower_thresh=195, green_upper_thresh=85, blue_upper_thresh=125) & \
+         filter_red(rgb, red_lower_thresh=220, green_upper_thresh=115, blue_upper_thresh=145) & \
+         filter_red(rgb, red_lower_thresh=125, green_upper_thresh=40, blue_upper_thresh=70) & \
+         filter_red(rgb, red_lower_thresh=200, green_upper_thresh=120, blue_upper_thresh=150) & \
+         filter_red(rgb, red_lower_thresh=100, green_upper_thresh=50, blue_upper_thresh=65) & \
+         filter_red(rgb, red_lower_thresh=85, green_upper_thresh=25, blue_upper_thresh=45)
+```
+
+Let's apply the red pen filter to slide #4.
+
+```
+img_path = slide.get_training_image_path(4)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+not_red_pen = filter_red_pen(rgb)
+add_text_and_display(not_red_pen, "Red Pen Filter")
+add_text_and_display(mask_rgb(rgb, not_red_pen), "Not Red Pen")
+add_text_and_display(mask_rgb(rgb, ~not_red_pen), "Red Pen")
+```
+
+| **Original Slide** | **Red Pen Filter** |
+| -------------------- | --------------------------------- |
+| ![Original Slide](images/slide-pen.png "Original Slide") | ![Red Pen Filter](images/red-pen-filter.png "Red Pen Filter") |
+
+Compared with using a single set of red threshold values, we can see that the red pen filter is significantly
+more inclusive in terms of the shades of red that are accepted. As a result, more red pen is filtered. However, notice
+that some of the pinkish-red from eosin-stained tissue is also included as a result of this more aggressive filtering.
+
+
+| **Not Red Pen** | **Red Pen** |
+| -------------------- | --------------------------------- |
+| ![Not Red Pen](images/not-red-pen.png "Not Red Pen") | ![Red Pen](images/red-pen.png "Red Pen") |
+
+
+Even though the red pen filter ANDs nine sets of red filter results together, we see that the performance is excellent.
+
+```
+RGB                  | Time: 0:00:00.192713  Type: uint8   Shape: (1804, 2048, 3)
+Filter Red Pen       | Time: 0:00:00.113712  Type: bool    Shape: (1804, 2048)
+Mask RGB             | Time: 0:00:00.014232  Type: uint8   Shape: (1804, 2048, 3)
+Mask RGB             | Time: 0:00:00.019559  Type: uint8   Shape: (1804, 2048, 3)
 ```
 
