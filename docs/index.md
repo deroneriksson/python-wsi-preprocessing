@@ -752,7 +752,7 @@ including:
 colors are inclusively filtered and how pen colors are exclusively filtered.
 
 
-#### Color Deconvolution with rgb2hed()
+#### RGB to HED
 
 The scikit-image `skimage.color` package features an `rgb2hed()` function that performs color deconvolution on the
 original RGB image to create HED (Hematoxylin, Eosin, Diaminobenzidine) channels. The `filter_rgb_to_hed()` function
