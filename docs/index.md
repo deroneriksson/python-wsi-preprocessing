@@ -1196,3 +1196,60 @@ Filter Green Pen     | Time: 0:00:00.118797  Type: bool    Shape: (1222, 2048)
 Mask RGB             | Time: 0:00:00.011132  Type: uint8   Shape: (1222, 2048, 3)
 Mask RGB             | Time: 0:00:00.005561  Type: uint8   Shape: (1222, 2048, 3)
 ```
+
+
+#### K-Means Segmentation
+
+The scikit-image library contains functionality that allows for image segmentation using k-means clustering based
+on location and color. This allows regions of similarly colored pixels to be grouped together. These regions are
+colored based on the average color of the pixels in the individual regions. This could potentially be used to filter
+regions based on their colors, where we could filter on pink shades for eosin-stained tissue and purple shades for
+hematoxylin-stained tissue.
+
+The `filter_kmeans_segmentation()` function has a default value of 800 segments. We'll increase this to 3000 using
+the `n_segments` parameter. In the example below, we'll perform k-means segmentation on the original image. In
+addition, we'll create a threshold using Otsu's method and apply the resulting mask to the original image. We'll then
+perform k-means segmentation on that image.
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "Original")
+kmeans_seg = filter_kmeans_segmentation(rgb, n_segments=3000)
+add_text_and_display(kmeans_seg, "K-Means Segmentation", color=(0, 0, 0))
+otsu_mask = mask_rgb(rgb, filter_otsu_threshold(filter_complement(filter_rgb_to_grayscale(rgb)), output_type="bool"))
+add_text_and_display(otsu_mask, "Image after Otsu Mask", color=(255, 255, 255))
+kmeans_seg_otsu = filter_kmeans_segmentation(otsu_mask, n_segments=3000)
+add_text_and_display(kmeans_seg_otsu, "K-Means Segmentation after Otsu Mask", color=(255, 255, 255))
+```
+
+
+| **Original Slide** | **K-Means Segmentation** |
+| -------------------- | --------------------------------- |
+| ![Original Slide](images/kmeans-original.png "Original Slide") | ![K-Means Segmentation](images/kmeans-segmentation.png "K-Means Segmentation") |
+
+
+| **Image after Otsu Mask** | **K-Means Segmentation after Otsu Mask** |
+| -------------------- | --------------------------------- |
+| ![Image after Otsu Mask](images/otsu-mask.png "Image after Otsu Mask") | ![K-Means Segmentation after Otsu Mask](images/kmeans-segmentation-after-otsu.png "K-Means Segmentation after Otsu Mask") |
+
+
+Note that there are a couple practical difficulties in terms of implementing automated tissue detection using k-means
+segmentation. To begin with, due to the variation in tissue stain colors across the image dataset, it can be difficult
+to filter on "pinkish" and "purplish" colors across all the slides. In addition, the k-means segmentation technique
+is very computationally expensive, as we can see in the console output. The compute time increases with the number
+of segments. For 3000 segments, we have a filter time of 26 seconds, whereas all operations that we have seen up to
+this point are subsecond. If we use the default value of 800 segments, compute time for the k-means segmentation filter
+is 9 seconds.
+
+```
+RGB                  | Time: 0:00:00.206051  Type: uint8   Shape: (1567, 2048, 3)
+K-Means Segmentation | Time: 0:00:26.106364  Type: uint8   Shape: (1567, 2048, 3)
+Gray                 | Time: 0:00:00.109594  Type: uint8   Shape: (1567, 2048)
+Complement           | Time: 0:00:00.000841  Type: uint8   Shape: (1567, 2048)
+Otsu Threshold       | Time: 0:00:00.016523  Type: bool    Shape: (1567, 2048)
+Mask RGB             | Time: 0:00:00.009480  Type: uint8   Shape: (1567, 2048, 3)
+K-Means Segmentation | Time: 0:00:26.232028  Type: uint8   Shape: (1567, 2048, 3)
+```
+

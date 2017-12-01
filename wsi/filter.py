@@ -640,7 +640,7 @@ def filter_kmeans_segmentation(np_img, compactness=10, n_segments=800):
   t = Time()
   labels = sk_segmentation.slic(np_img, compactness=compactness, n_segments=n_segments)
   result = sk_color.label2rgb(labels, np_img, kind='avg')
-  np_info(result, "Kmeans Segmentation", t.elapsed())
+  np_info(result, "K-Means Segmentation", t.elapsed())
   return result
 
 
@@ -1399,14 +1399,21 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 #                      316, 401, 403, 424, 448, 452, 472, 494]
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=overmasked_slides)
 
-img_path = slide.get_training_image_path(51)
+img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 add_text_and_display(rgb, "Original")
-not_green_pen = filter_green_pen(rgb)
-add_text_and_display(not_green_pen, "Green Pen Filter")
-add_text_and_display(mask_rgb(rgb, not_green_pen), "Not Green Pen")
-add_text_and_display(mask_rgb(rgb, ~not_green_pen), "Green Pen")
+kmeans_seg = filter_kmeans_segmentation(rgb, n_segments=3000)
+add_text_and_display(kmeans_seg, "K-Means Segmentation", color=(0, 0, 0))
+otsu_mask = mask_rgb(rgb, filter_otsu_threshold(filter_complement(filter_rgb_to_grayscale(rgb)), output_type="bool"))
+add_text_and_display(otsu_mask, "Image after Otsu Mask", color=(255, 255, 255))
+kmeans_seg_otsu = filter_kmeans_segmentation(otsu_mask, n_segments=3000)
+add_text_and_display(kmeans_seg_otsu, "K-Means Segmentation after Otsu Mask", color=(255, 255, 255))
+
+# not_green_pen = filter_green_pen(rgb)
+# add_text_and_display(not_green_pen, "Green Pen Filter")
+# add_text_and_display(mask_rgb(rgb, not_green_pen), "Not Green Pen")
+# add_text_and_display(mask_rgb(rgb, ~not_green_pen), "Green Pen")
 
 # not_red_pen = filter_red_pen(rgb)
 # add_text_and_display(not_red_pen, "Red Pen Filter")
