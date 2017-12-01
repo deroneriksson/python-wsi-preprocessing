@@ -625,7 +625,7 @@ def filter_binary_closing(np_img, disk_size=3, iterations=1, output_type="uint8"
 # step, could filter out segments that aren't pink or purple enough.
 def filter_kmeans_segmentation(np_img, compactness=10, n_segments=800):
   """
-  Use Kmeans segmentation (color/space proximity) to segment RGB image where each segment is
+  Use K-means segmentation (color/space proximity) to segment RGB image where each segment is
   colored based on the average color for that segment.
 
   Args:
@@ -644,9 +644,9 @@ def filter_kmeans_segmentation(np_img, compactness=10, n_segments=800):
   return result
 
 
-def filter_rag_threshold(np_img, compactness=10, n_segments=800):
+def filter_rag_threshold(np_img, compactness=10, n_segments=800, threshold=9):
   """
-  Use Kmeans segmentation to segment RGB image, build region adjacency graph based on the segments, combine
+  Use K-means segmentation to segment RGB image, build region adjacency graph based on the segments, combine
   similar regions based on threshold value, and then output these resulting region segments.
 
   Args:
@@ -661,7 +661,7 @@ def filter_rag_threshold(np_img, compactness=10, n_segments=800):
   t = Time()
   labels = sk_segmentation.slic(np_img, compactness=compactness, n_segments=n_segments)
   g = sk_future.graph.rag_mean_color(np_img, labels)
-  labels2 = sk_future.graph.cut_threshold(labels, g, 9)
+  labels2 = sk_future.graph.cut_threshold(labels, g, threshold)
   result = sk_color.label2rgb(labels2, np_img, kind='avg')
   np_info(result, "RAG Threshold", t.elapsed())
   return result
@@ -1403,12 +1403,19 @@ img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 add_text_and_display(rgb, "Original")
-kmeans_seg = filter_kmeans_segmentation(rgb, n_segments=3000)
-add_text_and_display(kmeans_seg, "K-Means Segmentation", color=(0, 0, 0))
-otsu_mask = mask_rgb(rgb, filter_otsu_threshold(filter_complement(filter_rgb_to_grayscale(rgb)), output_type="bool"))
-add_text_and_display(otsu_mask, "Image after Otsu Mask", color=(255, 255, 255))
-kmeans_seg_otsu = filter_kmeans_segmentation(otsu_mask, n_segments=3000)
-add_text_and_display(kmeans_seg_otsu, "K-Means Segmentation after Otsu Mask", color=(255, 255, 255))
+rag_thresh = filter_rag_threshold(rgb)
+add_text_and_display(rag_thresh, "RAG Threshold (9)")
+rag_thresh = filter_rag_threshold(rgb, threshold=1)
+add_text_and_display(rag_thresh, "RAG Threshold (1)")
+rag_thresh = filter_rag_threshold(rgb, threshold=20)
+add_text_and_display(rag_thresh, "RAG Threshold (20)")
+
+# kmeans_seg = filter_kmeans_segmentation(rgb, n_segments=3000)
+# add_text_and_display(kmeans_seg, "K-Means Segmentation", color=(0, 0, 0))
+# otsu_mask = mask_rgb(rgb, filter_otsu_threshold(filter_complement(filter_rgb_to_grayscale(rgb)), output_type="bool"))
+# add_text_and_display(otsu_mask, "Image after Otsu Mask", color=(255, 255, 255))
+# kmeans_seg_otsu = filter_kmeans_segmentation(otsu_mask, n_segments=3000)
+# add_text_and_display(kmeans_seg_otsu, "K-Means Segmentation after Otsu Mask", color=(255, 255, 255))
 
 # not_green_pen = filter_green_pen(rgb)
 # add_text_and_display(not_green_pen, "Green Pen Filter")
