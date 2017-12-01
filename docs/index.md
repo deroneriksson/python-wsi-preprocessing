@@ -1253,3 +1253,45 @@ Mask RGB             | Time: 0:00:00.009480  Type: uint8   Shape: (1567, 2048, 3
 K-Means Segmentation | Time: 0:00:26.232028  Type: uint8   Shape: (1567, 2048, 3)
 ```
 
+---
+
+The sci-kit image library also makes it possible to combine similarly colored regions. One way to do this with the
+k-means segmentation results is to build a region adjacency graph (RAG) and combine regions based on a threshold value.
+The `filter_rag_threshold()` function performs k-means segmentation, builds the RAG, and allows us to pass in the RAG
+threshold value.
+
+Here, we perform k-means segmentation, build a RAG, and apply different RAG thresholds to combine similar regions.
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "Original")
+rag_thresh = filter_rag_threshold(rgb)
+add_text_and_display(rag_thresh, "RAG Threshold (9)")
+rag_thresh = filter_rag_threshold(rgb, threshold=1)
+add_text_and_display(rag_thresh, "RAG Threshold (1)")
+rag_thresh = filter_rag_threshold(rgb, threshold=20)
+add_text_and_display(rag_thresh, "RAG Threshold (20)")
+```
+
+| **Original Slide** | **RAG Threshold = 9** |
+| -------------------- | --------------------------------- |
+| ![Original Slide](images/rag-thresh-original.png "Original Slide") | ![RAG Threshold = 9](images/rag-thresh-9.png "RAG Threshold = 9") |
+
+
+| **RAG Threshold = 1** | **RAG Threshold = 20** |
+| -------------------- | --------------------------------- |
+| ![RAG Threshold = 1](images/rag-thresh-1.png "RAG Threshold = 1") | ![RAG Threshold = 20](images/rag-thresh-20.png "RAG Threshold = 20") |
+
+
+Even using the default 800 number of segments for the k-means segmentation, we see that this technique is very
+computationally expensive.
+
+```
+RGB                  | Time: 0:00:00.202184  Type: uint8   Shape: (1567, 2048, 3)
+RAG Threshold        | Time: 0:00:30.311410  Type: uint8   Shape: (1567, 2048, 3)
+RAG Threshold        | Time: 0:00:32.604226  Type: uint8   Shape: (1567, 2048, 3)
+RAG Threshold        | Time: 0:00:28.637301  Type: uint8   Shape: (1567, 2048, 3)
+```
+
