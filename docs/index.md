@@ -1295,3 +1295,15 @@ RAG Threshold        | Time: 0:00:32.604226  Type: uint8   Shape: (1567, 2048, 3
 RAG Threshold        | Time: 0:00:28.637301  Type: uint8   Shape: (1567, 2048, 3)
 ```
 
+
+### Morphology
+
+Information about the field of morphology applied to images can be found at
+[https://en.wikipedia.org/wiki/Mathematical_morphology](https://en.wikipedia.org/wiki/Mathematical_morphology).
+The primary morphology operators are erosion, dilation, opening, and closing. With erosion, pixels along the edges
+of an object are removed. For dilation, pixels along the edges of an object are added. Opening is erosion followed
+by dilation. Closing is dilation followed by erosion. With morphology operators, a structuring element (such as
+a square, circle, cross, etc) is passed along the edges of the objects to perform the operations. Morphology operators
+can be performed on binary and grayscale images. In our examples, we will apply morphology operators to binary images
+(2-dimensional arrays of 2 values, such as True/False, 1.0/0.0, and 255/0).
+
