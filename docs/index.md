@@ -1307,3 +1307,41 @@ a square, circle, cross, etc) is passed along the edges of the objects to perfor
 can be performed on binary and grayscale images. In our examples, we will apply morphology operators to binary images
 (2-dimensional arrays of 2 values, such as True/False, 1.0/0.0, and 255/0).
 
+
+#### Erosion
+
+We create a binary image mask by calling the `filter_grays()` function on the original RGB image. The
+`filter_binary_erosion()` function uses a disk as the structuring element that will be used to erode the edges of the
+"No Grays" binary image. We demonstrate erosion with disk structuring elements of radius 5 and radius 20.
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "Original")
+no_grays = filter_grays(rgb, output_type="bool")
+add_text_and_display(no_grays, "No Grays")
+bin_erosion_5 = filter_binary_erosion(no_grays, disk_size=5)
+add_text_and_display(bin_erosion_5, "Binary Erosion (5)")
+bin_erosion_20 = filter_binary_erosion(no_grays, disk_size=20)
+add_text_and_display(bin_erosion_20, "Binary Erosion (20)")
+```
+
+| **Original Slide** | **No Grays** |
+| -------------------- | --------------------------------- |
+| ![Original Slide](images/binary-erosion-original.png "Original Slide") | ![No Grays](images/binary-erosion-no-grays.png "No Grays") |
+
+
+| **Binary Erosion (disk_size = 5)** | **Binary Erosion (disk_size = 20)** |
+| -------------------- | --------------------------------- |
+| ![Binary Erosion (disk_size = 5)](images/binary-erosion-5.png "Binary Erosion (disk_size = 5)") | ![Binary Erosion (disk_size = 20)](images/binary-erosion-20.png "Binary Erosion (disk_size = 20)") |
+
+
+Notice that increasing the structuring element radius increases the compute time.
+
+```
+RGB                  | Time: 0:00:00.208153  Type: uint8   Shape: (1567, 2048, 3)
+Filter Grays         | Time: 0:00:00.096831  Type: bool    Shape: (1567, 2048)
+Binary Erosion       | Time: 0:00:00.156416  Type: uint8   Shape: (1567, 2048)
+Binary Erosion       | Time: 0:00:00.900778  Type: uint8   Shape: (1567, 2048)
+```
