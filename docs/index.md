@@ -1382,3 +1382,38 @@ Binary Dilation      | Time: 0:00:00.084602  Type: uint8   Shape: (1567, 2048)
 Binary Dilation      | Time: 0:00:00.689930  Type: uint8   Shape: (1567, 2048)
 ```
 
+
+#### Opening
+
+As mentioned, opening is erosion followed by dilation. Opening can be used to remove small foreground objects.
+
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "Original")
+no_grays = filter_grays(rgb, output_type="bool")
+add_text_and_display(no_grays, "No Grays")
+bin_opening_5 = filter_binary_opening(no_grays, disk_size=5)
+add_text_and_display(bin_opening_5, "Binary Opening (5)")
+bin_opening_20 = filter_binary_opening(no_grays, disk_size=20)
+add_text_and_display(bin_opening_20, "Binary Opening (20)")
+```
+
+| **Binary Opening (disk_size = 5)** | **Binary Opening (disk_size = 20)** |
+| -------------------- | --------------------------------- |
+| ![Binary Opening (disk_size = 5)](images/binary-opening-5.png "Binary Opening (disk_size = 5)") | ![Binary Opening (disk_size = 20)](images/binary-opening-20.png "Binary Opening (disk_size = 20)") |
+
+
+Opening is a fairly expensive operation, since it is an erosion followed by a dilation. The compute time increases
+with the size of the structuring element. The 5-pixel disk radius for the structuring element results in a 0.3s
+operation, whereas the 20-pixel disk radius results in a 3 second operation.
+
+```
+RGB                  | Time: 0:00:00.207179  Type: uint8   Shape: (1567, 2048, 3)
+Filter Grays         | Time: 0:00:00.099212  Type: bool    Shape: (1567, 2048)
+Binary Opening       | Time: 0:00:00.299361  Type: uint8   Shape: (1567, 2048)
+Binary Opening       | Time: 0:00:03.019376  Type: uint8   Shape: (1567, 2048)
+```
+
