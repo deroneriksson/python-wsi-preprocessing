@@ -1417,3 +1417,37 @@ Binary Opening       | Time: 0:00:00.299361  Type: uint8   Shape: (1567, 2048)
 Binary Opening       | Time: 0:00:03.019376  Type: uint8   Shape: (1567, 2048)
 ```
 
+
+#### Closing
+
+Closing is a dilation followed by an erosion. Closing can be used to remove small background holes.
+
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "Original")
+no_grays = filter_grays(rgb, output_type="bool")
+add_text_and_display(no_grays, "No Grays")
+bin_closing_5 = filter_binary_closing(no_grays, disk_size=5)
+add_text_and_display(bin_closing_5, "Binary Closing (5)")
+bin_closing_20 = filter_binary_closing(no_grays, disk_size=20)
+add_text_and_display(bin_closing_20, "Binary Closing (20)")
+```
+
+| **Binary Closing (disk_size = 5)** | **Binary Closing (disk_size = 20)** |
+| -------------------- | --------------------------------- |
+| ![Binary Closing (disk_size = 5)](images/binary-closing-5.png "Binary Closing (disk_size = 5)") | ![Binary Closing (disk_size = 20)](images/binary-closing-20.png "Binary Closing (disk_size = 20)") |
+
+
+Like opening, closing is a fairly expensive operation since it performs both a dilation and an erosion. Compute time
+increases with structuring element size.
+
+```
+RGB                  | Time: 0:00:00.204637  Type: uint8   Shape: (1567, 2048, 3)
+Filter Grays         | Time: 0:00:00.099459  Type: bool    Shape: (1567, 2048)
+Binary Closing       | Time: 0:00:00.309861  Type: uint8   Shape: (1567, 2048)
+Binary Closing       | Time: 0:00:03.165193  Type: uint8   Shape: (1567, 2048)
+```
+
