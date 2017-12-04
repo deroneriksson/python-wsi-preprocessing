@@ -1345,3 +1345,40 @@ Filter Grays         | Time: 0:00:00.096831  Type: bool    Shape: (1567, 2048)
 Binary Erosion       | Time: 0:00:00.156416  Type: uint8   Shape: (1567, 2048)
 Binary Erosion       | Time: 0:00:00.900778  Type: uint8   Shape: (1567, 2048)
 ```
+
+
+#### Dilation
+
+The `filter_binary_dilation()` function utilizes a disk structuring element in a similar manner as the corresponding
+erosion function. We'll utilize the same "No Grays" binary image from the previous example and dilate the image
+utilizing a disk radius of 5 pixels followed by a disk radius of 20 pixels.
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "Original")
+no_grays = filter_grays(rgb, output_type="bool")
+add_text_and_display(no_grays, "No Grays")
+bin_dilation_5 = filter_binary_dilation(no_grays, disk_size=5)
+add_text_and_display(bin_dilation_5, "Binary Dilation (5)")
+bin_dilation_20 = filter_binary_dilation(no_grays, disk_size=20)
+add_text_and_display(bin_dilation_20, "Binary Dilation (20)")
+```
+
+We see that dilation expands the edges of the binary image as opposed to the erosion, which shrinks the edges.
+
+| **Binary Dilation (disk_size = 5)** | **Binary Dilation (disk_size = 20)** |
+| -------------------- | --------------------------------- |
+| ![Binary Dilation (disk_size = 5)](images/binary-dilation-5.png "Binary Dilation (disk_size = 5)") | ![Binary Dilation (disk_size = 20)](images/binary-dilation-20.png "Binary Dilation (disk_size = 20)") |
+
+
+Console output:
+
+```
+RGB                  | Time: 0:00:00.203026  Type: uint8   Shape: (1567, 2048, 3)
+Filter Grays         | Time: 0:00:00.096591  Type: bool    Shape: (1567, 2048)
+Binary Dilation      | Time: 0:00:00.084602  Type: uint8   Shape: (1567, 2048)
+Binary Dilation      | Time: 0:00:00.689930  Type: uint8   Shape: (1567, 2048)
+```
+
