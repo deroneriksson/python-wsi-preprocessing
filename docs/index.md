@@ -1451,3 +1451,50 @@ Binary Closing       | Time: 0:00:00.309861  Type: uint8   Shape: (1567, 2048)
 Binary Closing       | Time: 0:00:03.165193  Type: uint8   Shape: (1567, 2048)
 ```
 
+
+#### Remove Small Objects
+
+The scikit-image `remove_small_objects()` function removes objects less than a particular minimum size. The
+`filter_remove_small_objects()` function wraps this. This can be useful for removing small islands of noise from images.
+We'll demonstrate it here with two sizes, 100 pixels and 10,000 pixels, and we'll perform this on the "No Grays" binary
+image.
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "Original")
+no_grays = filter_grays(rgb, output_type="bool")
+add_text_and_display(no_grays, "No Grays")
+remove_small_100 = filter_remove_small_objects(no_grays, min_size=100)
+add_text_and_display(remove_small_100, "Remove Small Objects (100)")
+remove_small_10000 = filter_remove_small_objects(no_grays, min_size=10000)
+add_text_and_display(remove_small_10000, "Remove Small Objects (10000)")
+```
+
+Notice in the "No Grays" mask that we see lots of scattered, small objects.
+
+| **Original Slide** | **No Grays** |
+| -------------------- | --------------------------------- |
+| ![Original Slide](images/binary-erosion-original.png "Original Slide") | ![No Grays](images/binary-erosion-no-grays.png "No Grays") |
+
+
+After removing small objects with a connected size less than 100 pixels, we see that the smallest objects have been
+removed from the binary image. With a minimum size of 10,000 pixels, we see that many larger objects have also been
+removed from the binary image.
+
+| **Remove Small Objects (100)** | **Remove Small Objects (10000)** |
+| -------------------- | --------------------------------- |
+| ![Remove Small Objects (100)](images/remove-small-objects-100.png "Remove Small Objects (100)") | ![Remove Small Objects (10000)](images/remove-small-objects-10000.png "Remove Small Objects (10000)") |
+
+
+The performance of the filters to remove small objects is quite fast.
+
+```
+RGB                  | Time: 0:00:00.208705  Type: uint8   Shape: (1567, 2048, 3)
+Filter Grays         | Time: 0:00:00.100657  Type: bool    Shape: (1567, 2048)
+Remove Small Objs    | Time: 0:00:00.055258  Type: uint8   Shape: (1567, 2048)
+Remove Small Objs    | Time: 0:00:00.056445  Type: uint8   Shape: (1567, 2048)
+```
+
+
