@@ -1432,10 +1432,19 @@ rgb = pil_to_np_rgb(img)
 add_text_and_display(rgb, "Original")
 no_grays = filter_grays(rgb, output_type="bool")
 add_text_and_display(no_grays, "No Grays")
-remove_small_100 = filter_remove_small_holes(no_grays, min_size=100)
-add_text_and_display(remove_small_100, "Remove Small Holes (100)")
-remove_small_10000 = filter_remove_small_holes(no_grays, min_size=10000)
-add_text_and_display(remove_small_10000, "Remove Small Holes (10000)")
+fill_holes = filter_binary_fill_holes(no_grays)
+add_text_and_display(fill_holes, "Fill Holes")
+
+remove_holes_100 = filter_remove_small_holes(no_grays, min_size=100, output_type="bool")
+add_text_and_display(fill_holes ^ remove_holes_100, "Differences between Fill Holes and Remove Small Holes (100)")
+
+remove_holes_10000 = filter_remove_small_holes(no_grays, min_size=10000, output_type="bool")
+add_text_and_display(fill_holes ^ remove_holes_10000, "Differences between Fill Holes and Remove Small Holes (10000)")
+
+# remove_small_100 = filter_remove_small_holes(no_grays, min_size=100)
+# add_text_and_display(remove_small_100, "Remove Small Holes (100)")
+# remove_small_10000 = filter_remove_small_holes(no_grays, min_size=10000)
+# add_text_and_display(remove_small_10000, "Remove Small Holes (10000)")
 
 # rem_sm_obj = filter_remove_small_objects(no_grays, min_size=10000)
 # add_text_and_display(rem_sm_obj, "1")

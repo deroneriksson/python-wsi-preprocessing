@@ -1533,3 +1533,54 @@ Remove Small Holes   | Time: 0:00:00.055991  Type: uint8   Shape: (1567, 2048)
 Remove Small Holes   | Time: 0:00:00.058003  Type: uint8   Shape: (1567, 2048)
 ```
 
+
+#### Fill Holes
+
+The scikit-image `binary_fill_holes()` function is similar to the `remove_small_holes()` function. Using its default
+settings, it generates results similar but typically not identical to `remove_small_holes()` with a high minimum
+size value.
+
+Here, we'll display the result of `filter_binary_fill_holes()` on the image after gray shades have been removed. After
+this, we'll perform exclusive-or operations to look at the differences between "Fill Holes" and "Remove Small Holes"
+with size values of 100 and 10,000.
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "Original")
+no_grays = filter_grays(rgb, output_type="bool")
+add_text_and_display(no_grays, "No Grays")
+fill_holes = filter_binary_fill_holes(no_grays)
+add_text_and_display(fill_holes, "Fill Holes")
+
+remove_holes_100 = filter_remove_small_holes(no_grays, min_size=100, output_type="bool")
+add_text_and_display(fill_holes ^ remove_holes_100, "Differences between Fill Holes and Remove Small Holes (100)")
+
+remove_holes_10000 = filter_remove_small_holes(no_grays, min_size=10000, output_type="bool")
+add_text_and_display(fill_holes ^ remove_holes_10000, "Differences between Fill Holes and Remove Small Holes (10000)")
+
+```
+
+| **Original Slide** | **Fill Holes** |
+| -------------------- | --------------------------------- |
+| ![Original Slide](images/binary-erosion-original.png "Original Slide") | ![Fill Holes](images/fill-holes.png "Fill Holes") |
+
+
+In this example, increasing the minimum small hole size results in less differences between "Fill Holes" and
+"Remove Small Holes".
+
+| **Differences between Fill Holes and Remove Small Holes (100)** | **Differences between Fill Holes and Remove Small Holes (10000)** |
+| -------------------- | --------------------------------- |
+| ![Differences between Fill Holes and Remove Small Holes (100)](images/fill-holes-remove-small-holes-100.png "Differences between Fill Holes and Remove Small Holes (100)") | ![Differences between Fill Holes and Remove Small Holes (10000)](images/fill-holes-remove-small-holes-10000.png "Differences between Fill Holes and Remove Small Holes (10000)") |
+
+
+Console output:
+
+```
+RGB                  | Time: 0:00:00.208171  Type: uint8   Shape: (1567, 2048, 3)
+Filter Grays         | Time: 0:00:00.108048  Type: bool    Shape: (1567, 2048)
+Binary Fill Holes    | Time: 0:00:00.088519  Type: bool    Shape: (1567, 2048)
+Remove Small Holes   | Time: 0:00:00.054506  Type: bool    Shape: (1567, 2048)
+Remove Small Holes   | Time: 0:00:00.056771  Type: bool    Shape: (1567, 2048)
+```
