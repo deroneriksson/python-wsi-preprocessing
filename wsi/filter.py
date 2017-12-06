@@ -1430,16 +1430,37 @@ img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 add_text_and_display(rgb, "Original")
-no_grays = filter_grays(rgb, output_type="bool")
-add_text_and_display(no_grays, "No Grays")
-fill_holes = filter_binary_fill_holes(no_grays)
-add_text_and_display(fill_holes, "Fill Holes")
+gray = filter_rgb_to_grayscale(rgb)
+add_text_and_display(gray, "Grayscale")
+entropy = filter_entropy(gray, output_type="bool")
+add_text_and_display(entropy, "Entropy")
+add_text_and_display(mask_rgb(rgb, entropy), "Original with Entropy Mask")
+add_text_and_display(mask_rgb(rgb, ~entropy), "Original with Inverse of Entropy Mask")
 
-remove_holes_100 = filter_remove_small_holes(no_grays, min_size=100, output_type="bool")
-add_text_and_display(fill_holes ^ remove_holes_100, "Differences between Fill Holes and Remove Small Holes (100)")
+# r = rgb[:, :, 0]
+# g = rgb[:, :, 1]
+# b = rgb[:, :, 2]
+#
+# r = filter_entropy(rgb[:, :, 0], output_type="bool")
+# add_text_and_display(r, "R Entropy")
+# g = filter_entropy(rgb[:, :, 1], output_type="bool")
+# add_text_and_display(g, "G Entropy")
+# b = filter_entropy(rgb[:, :, 2], output_type="bool")
+# add_text_and_display(b, "B Entropy")
+# rgb_entropy = r & g & b
+# add_text_and_display(rgb_entropy, "RGB Entropy")
+# add_text_and_display(mask_rgb(rgb, entropy), "Original with RGB Entropy Mask")
 
-remove_holes_10000 = filter_remove_small_holes(no_grays, min_size=10000, output_type="bool")
-add_text_and_display(fill_holes ^ remove_holes_10000, "Differences between Fill Holes and Remove Small Holes (10000)")
+# no_grays = filter_grays(rgb, output_type="bool")
+# add_text_and_display(no_grays, "No Grays")
+# fill_holes = filter_binary_fill_holes(no_grays)
+# add_text_and_display(fill_holes, "Fill Holes")
+
+# remove_holes_100 = filter_remove_small_holes(no_grays, min_size=100, output_type="bool")
+# add_text_and_display(fill_holes ^ remove_holes_100, "Differences between Fill Holes and Remove Small Holes (100)")
+#
+# remove_holes_10000 = filter_remove_small_holes(no_grays, min_size=10000, output_type="bool")
+# add_text_and_display(fill_holes ^ remove_holes_10000, "Differences between Fill Holes and Remove Small Holes (10000)")
 
 # remove_small_100 = filter_remove_small_holes(no_grays, min_size=100)
 # add_text_and_display(remove_small_100, "Remove Small Holes (100)")

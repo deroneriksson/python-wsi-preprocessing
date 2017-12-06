@@ -1584,3 +1584,61 @@ Binary Fill Holes    | Time: 0:00:00.088519  Type: bool    Shape: (1567, 2048)
 Remove Small Holes   | Time: 0:00:00.054506  Type: bool    Shape: (1567, 2048)
 Remove Small Holes   | Time: 0:00:00.056771  Type: bool    Shape: (1567, 2048)
 ```
+
+
+### Entropy
+
+The scikit-image `entropy()` function allows us to filter images based on complexity. Since areas such as slide
+backgrounds are less complex than area of interest such as cell nuclei, filtering on entropy offers interesting
+possibilities for tissue identification.
+
+Here, we use the `filter_entropy()` function to filter the grayscale image based on entropy. We display
+the resulting binary image. After that, we mask the original image with the entropy mask and the inverse of entropy
+mask.
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "Original")
+gray = filter_rgb_to_grayscale(rgb)
+add_text_and_display(gray, "Grayscale")
+entropy = filter_entropy(gray, output_type="bool")
+add_text_and_display(entropy, "Entropy")
+add_text_and_display(mask_rgb(rgb, entropy), "Original with Entropy Mask")
+add_text_and_display(mask_rgb(rgb, ~entropy), "Original with Inverse of Entropy Mask")
+```
+
+| **Original Slide** | **Grayscale** |
+| -------------------- | --------------------------------- |
+| ![Original Slide](images/entropy-original.png "Original Slide") | ![Grayscale](images/entropy-grayscale.png "Grayscale") |
+
+
+| **Entropy Filter** |
+| ------------------ |
+| ![Entropy Filter](images/entropy.png "Entropy Filter") |
+
+
+The results of the original image with the inverse of the entropy mask are particularly interesting. Notice that much
+of the white background including the shadow region at the top of the slide has been filtered out. Additionally, notice
+that for the stained regions, a significant amount of the pink eosin-stained area has been filtered out while a
+smaller proportion of the purple-stained hemotoxylin area has been filtered out. This makes sense since hemotoxylin
+stains regions such as cell nuclei, which are structures with significant complexity. Therefore, complexity seems
+like a good candidate for identifying regions of interest where mitoses are occurring.
+
+
+| **Original with Entropy Mask** | **Original with Inverse of Entropy Mask** |
+| -------------------- | --------------------------------- |
+| ![Original with Entropy Mask](images/entropy-original-entropy-mask.png "Original with Entropy Mask") | ![Original with Inverse of Entropy Mask](images/entropy-original-inverse-entropy-mask.png "Original with Inverse of Entropy Mask") |
+
+
+A drawback of using entropy is that its computation is significant. The entropy filter takes over 4 seconds to run
+in this example.
+
+```
+RGB                  | Time: 0:00:00.204830  Type: uint8   Shape: (1567, 2048, 3)
+Gray                 | Time: 0:00:00.136988  Type: uint8   Shape: (1567, 2048)
+Entropy              | Time: 0:00:04.148810  Type: bool    Shape: (1567, 2048)
+Mask RGB             | Time: 0:00:00.012648  Type: uint8   Shape: (1567, 2048, 3)
+Mask RGB             | Time: 0:00:00.007009  Type: uint8   Shape: (1567, 2048, 3)
+```
