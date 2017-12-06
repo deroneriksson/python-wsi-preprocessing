@@ -334,6 +334,33 @@ def filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=True, over
   return np_img
 
 
+def filter_remove_small_holes(np_img, min_size=3000, output_type="uint8"):
+  """
+  Filter image to remove small holes less than a particular size.
+
+  Args:
+    np_img: Image as a NumPy array of type bool.
+    min_size: Remove small holes below this size.
+    output_type: Type of array to return (bool, float, or uint8).
+
+  Returns:
+    NumPy array (bool, float, or uint8).
+  """
+  t = Time()
+
+  rem_sm = sk_morphology.remove_small_holes(np_img, min_size=min_size)
+
+  if output_type == "bool":
+    pass
+  elif output_type == "float":
+    rem_sm = rem_sm.astype(float)
+  else:
+    rem_sm = rem_sm.astype("uint8") * 255
+
+  np_info(rem_sm, "Remove Small Holes", t.elapsed())
+  return rem_sm
+
+
 def filter_contrast_stretch(np_img, low=40, high=60):
   """
   Filter image (gray or RGB) using contrast stretching to increase contrast in image based on the intensities in
@@ -1405,10 +1432,20 @@ rgb = pil_to_np_rgb(img)
 add_text_and_display(rgb, "Original")
 no_grays = filter_grays(rgb, output_type="bool")
 add_text_and_display(no_grays, "No Grays")
-remove_small_100 = filter_remove_small_objects(no_grays, min_size=100)
-add_text_and_display(remove_small_100, "Remove Small Objects (100)")
-remove_small_10000 = filter_remove_small_objects(no_grays, min_size=10000)
-add_text_and_display(remove_small_10000, "Remove Small Objects (10000)")
+remove_small_100 = filter_remove_small_holes(no_grays, min_size=100)
+add_text_and_display(remove_small_100, "Remove Small Holes (100)")
+remove_small_10000 = filter_remove_small_holes(no_grays, min_size=10000)
+add_text_and_display(remove_small_10000, "Remove Small Holes (10000)")
+
+rem_sm_obj = filter_remove_small_objects(no_grays, min_size=10000)
+# add_text_and_display(rem_sm_obj, "1")
+# rem_sm_hole = filter_remove_small_holes(rem_sm_obj, min_size=10000)
+# add_text_and_display(rem_sm_hole, "2")
+# erosion = filter_binary_erosion(rem_sm_hole, disk_size=1, iterations=2, output_type="bool")
+# # result = sc_morph.binary_erosion(rem_sm_hole.astype(bool), np.ones(1).astype(bool), iterations=1)
+# add_text_and_display(erosion, "3")
+# result = mask_rgb(rgb, erosion)
+# add_text_and_display(result, "4")
 
 # rag_thresh = filter_rag_threshold(rgb)
 # add_text_and_display(rag_thresh, "RAG Threshold (9)")

@@ -1455,9 +1455,9 @@ Binary Closing       | Time: 0:00:03.165193  Type: uint8   Shape: (1567, 2048)
 #### Remove Small Objects
 
 The scikit-image `remove_small_objects()` function removes objects less than a particular minimum size. The
-`filter_remove_small_objects()` function wraps this. This can be useful for removing small islands of noise from images.
-We'll demonstrate it here with two sizes, 100 pixels and 10,000 pixels, and we'll perform this on the "No Grays" binary
-image.
+`filter_remove_small_objects()` function wraps this and adds additional functionality. This can be useful for
+removing small islands of noise from images. We'll demonstrate it here with two sizes, 100 pixels and 10,000 pixels,
+and we'll perform this on the "No Grays" binary image.
 
 ```
 img_path = slide.get_training_image_path(2)
