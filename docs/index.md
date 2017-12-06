@@ -1498,3 +1498,38 @@ Remove Small Objs    | Time: 0:00:00.056445  Type: uint8   Shape: (1567, 2048)
 ```
 
 
+#### Remove Small Holes
+
+The scikit-image `remove_small_holes()` function is similar to the `remove_small_objects()` function except it removes
+holes rather than objects from binary images. Here we demonstrate this using the `filter_remove_small_holes()`
+wrapper with sizes of 100 pixels and 10,000 pixels.
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "Original")
+no_grays = filter_grays(rgb, output_type="bool")
+add_text_and_display(no_grays, "No Grays")
+remove_small_100 = filter_remove_small_holes(no_grays, min_size=100)
+add_text_and_display(remove_small_100, "Remove Small Holes (100)")
+remove_small_10000 = filter_remove_small_holes(no_grays, min_size=10000)
+add_text_and_display(remove_small_10000, "Remove Small Holes (10000)")
+```
+
+Notice that using a minimum size of 10,000 removes more holes than a size of 100, as we would expect.
+
+| **Remove Small Holes (100)** | **Remove Small Holes (10000)** |
+| -------------------- | --------------------------------- |
+| ![Remove Small Holes (100)](images/remove-small-holes-100.png "Remove Small Holes (100)") | ![Remove Small Holes (10000)](images/remove-small-holes-10000.png "Remove Small Holes (10000)") |
+
+
+Console output:
+
+```
+RGB                  | Time: 0:00:00.210587  Type: uint8   Shape: (1567, 2048, 3)
+Filter Grays         | Time: 0:00:00.105123  Type: bool    Shape: (1567, 2048)
+Remove Small Holes   | Time: 0:00:00.055991  Type: uint8   Shape: (1567, 2048)
+Remove Small Holes   | Time: 0:00:00.058003  Type: uint8   Shape: (1567, 2048)
+```
+

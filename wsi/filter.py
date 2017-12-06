@@ -1437,7 +1437,7 @@ add_text_and_display(remove_small_100, "Remove Small Holes (100)")
 remove_small_10000 = filter_remove_small_holes(no_grays, min_size=10000)
 add_text_and_display(remove_small_10000, "Remove Small Holes (10000)")
 
-rem_sm_obj = filter_remove_small_objects(no_grays, min_size=10000)
+# rem_sm_obj = filter_remove_small_objects(no_grays, min_size=10000)
 # add_text_and_display(rem_sm_obj, "1")
 # rem_sm_hole = filter_remove_small_holes(rem_sm_obj, min_size=10000)
 # add_text_and_display(rem_sm_hole, "2")
