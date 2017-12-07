@@ -1642,3 +1642,98 @@ Entropy              | Time: 0:00:04.148810  Type: bool    Shape: (1567, 2048)
 Mask RGB             | Time: 0:00:00.012648  Type: uint8   Shape: (1567, 2048, 3)
 Mask RGB             | Time: 0:00:00.007009  Type: uint8   Shape: (1567, 2048, 3)
 ```
+
+
+## Combining Filters
+
+Since our image filter data utilizes NumPy arrays, it is straightforward to combine our filters. For example, when
+we have filters that return boolean images for masking, we can use standard boolean algebra on our arrays to do
+operations such as AND, OR, XOR, and NOT.
+
+As an example, here we run our green pen and blue pen filters on the original RGB image to filter out the green and
+blue pen marks on the slides. We combine the resulting masks with a boolean AND (&) operation. We display the resulting
+mask and this mask applied to the original image, masking out the green and blue pen marks from the image.
+
+```
+img_path = slide.get_training_image_path(74)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "Original")
+no_green_pen = filter_green_pen(rgb)
+add_text_and_display(no_green_pen, "No Green Pen")
+no_blue_pen = filter_blue_pen(rgb)
+add_text_and_display(no_blue_pen, "No Blue Pen")
+no_gp_bp = no_green_pen & no_blue_pen
+add_text_and_display(no_gp_bp, "No Green Pen, No Blue Pen")
+add_text_and_display(mask_rgb(rgb, no_gp_bp), "Original with No Green Pen, No Blue Pen")
+```
+
+| **Original Slide** |
+| -------------------- |
+| ![Original Slide](images/combine-pen-filters-original.png "Original Slide") |
+
+| **No Green Pen** | **No Blue Pen** |
+| -------------------- | --------------------------------- |
+| ![No Green Pen](images/combine-pen-filters-no-green-pen.png "No Green Pen") | ![No Blue Pen](images/combine-pen-filters-no-blue-pen.png "No Blue Pen") |
+
+| **No Green Pen, No Blue Pen** | **Original with No Green Pen, No Blue Pen** |
+| -------------------- | --------------------------------- |
+| ![No Green Pen, No Blue Pen](images/combine-pen-filters-no-green-pen-no-blue-pen.png "No Green Pen, No Blue Pen") | ![Original with No Green Pen, No Blue Pen](images/combine-pen-filters-original-with-no-green-pen-no-blue-pen.png "Original with No Green Pen, No Blue Pen") |
+
+
+Console Output:
+
+```
+RGB                  | Time: 0:00:00.174402  Type: uint8   Shape: (1513, 2048, 3)
+Filter Green Pen     | Time: 0:00:00.199907  Type: bool    Shape: (1513, 2048)
+Filter Blue Pen      | Time: 0:00:00.100322  Type: bool    Shape: (1513, 2048)
+Mask RGB             | Time: 0:00:00.011881  Type: uint8   Shape: (1513, 2048, 3)
+```
+
+
+---
+
+Let's try another combination of filters that should give us a fairly good tissue extraction, where the slide
+background and pen marks are removed. We can do this for this slide by ANDing together the "No Grays" filter, the
+"No Green Channel" filter, the "No Green Pen" filter, and the "No Blue Pen" filter. In addition, we can use our
+"Remove Small Objects" filter to remove small islands from the mask. We display the resulting mask. We apply
+this mask and the inverse of the mask to the original image to visually see which parts of the slide are passed through
+and which parts are masked out.
+
+```
+img_path = slide.get_training_image_path(74)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+add_text_and_display(rgb, "Original")
+mask = filter_grays(rgb) & filter_green_channel(rgb) & filter_green_pen(rgb) & filter_blue_pen(rgb)
+mask = filter_remove_small_objects(mask, min_size=100, output_type="bool")
+add_text_and_display(mask, "No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects")
+add_text_and_display(mask_rgb(rgb, mask),
+                     "Original with No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects")
+add_text_and_display(mask_rgb(rgb, ~mask), "Original with Inverse Mask")
+```
+
+| **Original Slide** | **No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects** |
+| -------------------- | --------------------------------- |
+| ![Original Slide](images/combine-pens-background-original.png "Original Slide") | ![No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects](images/combine-pens-background-mask.png "No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects") |
+
+
+We see that this combination does a good job at allowing us to filter the most relevant tissue sections of this slide.
+
+| **Original with No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects** | **Original with Inverse Mask** |
+| -------------------- | --------------------------------- |
+| ![Original with No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects](images/combine-pens-background-original-with-mask.png "Original with No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects") | ![Original with Inverse Mask](images/combine-pens-background-original-with-inverse-mask.png "Original with Inverse Mask") |
+
+
+Console Output:
+
+```
+RGB                  | Time: 0:00:00.167955  Type: uint8   Shape: (1513, 2048, 3)
+Filter Grays         | Time: 0:00:00.109165  Type: bool    Shape: (1513, 2048)
+Filter Green Channel | Time: 0:00:00.044170  Type: bool    Shape: (1513, 2048)
+Filter Green Pen     | Time: 0:00:00.194573  Type: bool    Shape: (1513, 2048)
+Filter Blue Pen      | Time: 0:00:00.118921  Type: bool    Shape: (1513, 2048)
+Remove Small Objs    | Time: 0:00:00.042549  Type: bool    Shape: (1513, 2048)
+Mask RGB             | Time: 0:00:00.011598  Type: uint8   Shape: (1513, 2048, 3)
+Mask RGB             | Time: 0:00:00.007193  Type: uint8   Shape: (1513, 2048, 3)
+```

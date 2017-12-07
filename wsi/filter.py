@@ -1426,16 +1426,46 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 #                      316, 401, 403, 424, 448, 452, 472, 494]
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=overmasked_slides)
 
-img_path = slide.get_training_image_path(2)
+img_path = slide.get_training_image_path(74)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 add_text_and_display(rgb, "Original")
-gray = filter_rgb_to_grayscale(rgb)
-add_text_and_display(gray, "Grayscale")
-entropy = filter_entropy(gray, output_type="bool")
-add_text_and_display(entropy, "Entropy")
-add_text_and_display(mask_rgb(rgb, entropy), "Original with Entropy Mask")
-add_text_and_display(mask_rgb(rgb, ~entropy), "Original with Inverse of Entropy Mask")
+mask = filter_grays(rgb) & filter_green_channel(rgb) & filter_green_pen(rgb) & filter_blue_pen(rgb)
+mask = filter_remove_small_objects(mask, min_size=100, output_type="bool")
+add_text_and_display(mask, "No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects")
+add_text_and_display(mask_rgb(rgb, mask),
+                     "Original with No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects")
+add_text_and_display(mask_rgb(rgb, ~mask), "Original with Inverse Mask")
+
+# no_green_pen = filter_green_pen(rgb)
+# no_blue_pen = filter_blue_pen(rgb)
+# no_gp_bp = no_green_pen & no_blue_pen
+# add_text_and_display(no_gp_bp, "No Green Pen, No Blue Pen")
+# add_text_and_display(mask_rgb(rgb, no_gp_bp), "Original with No Green Pen, No Blue Pen")
+
+# no_grays = filter_grays(rgb)
+# add_text_and_display(no_grays, "No Grays")
+# no_green_channel = filter_green_channel(rgb)
+# add_text_and_display(no_green_channel, "No Green Channel")
+# mask = no_grays & no_green_channel & no_green_pen & no_blue_pen
+# add_text_and_display(mask, "No Grays, No Green Channel, No Green Pen, No Blue Pen")
+# add_text_and_display(mask_rgb(rgb, mask), "Original with No Grays, No Green Channel, No Green Pen, No Blue Pen")
+
+# gray = filter_rgb_to_grayscale(rgb)
+# add_text_and_display(gray, "Grayscale")
+# canny = filter_canny(gray)
+# add_text_and_display(canny, "Canny")
+# bin = filter_binary_dilation(canny, disk_size=1, output_type="bool")
+# add_text_and_display(bin, "Dilation")
+# sm_o = filter_remove_small_objects(bin, min_size=20000, output_type="bool")
+# add_text_and_display(sm_o, "Remove Small Objects")
+# sm_h = filter_remove_small_holes(sm_o, min_size=1000, output_type="bool")
+# add_text_and_display(sm_h, "Remove Small Holes")
+# add_text_and_display(mask_rgb(rgb, sm_h), "Masked Image")
+# entropy = filter_entropy(gray, output_type="bool")
+# add_text_and_display(entropy, "Entropy")
+# add_text_and_display(mask_rgb(rgb, entropy), "Original with Entropy Mask")
+# add_text_and_display(mask_rgb(rgb, ~entropy), "Original with Inverse of Entropy Mask")
 
 # r = rgb[:, :, 0]
 # g = rgb[:, :, 1]
