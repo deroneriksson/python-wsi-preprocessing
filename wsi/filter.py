@@ -1037,7 +1037,8 @@ def uint8_to_bool(np_img):
   return result
 
 
-def add_text_and_display(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf", size=48, color=(255, 0, 0)):
+def add_text_and_display(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf", size=48, color=(255, 0, 0),
+                         background=(255, 255, 255), border=(0, 0, 0), bg=False):
   """
   Convert a NumPy array to a PIL image, add text to the image, and display the image.
 
@@ -1047,6 +1048,9 @@ def add_text_and_display(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf"
     font_path: The path to the font to use.
     size: The font size
     color: The font color
+    background: The background color
+    border: The border color
+    bg: If True, add rectangle background behind text
   """
   result = np_to_pil(np_img)
   # if gray, convert to RGB for display
@@ -1054,6 +1058,9 @@ def add_text_and_display(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf"
     result = result.convert('RGB')
   draw = ImageDraw.Draw(result)
   font = ImageFont.truetype(font_path, size)
+  if bg == True:
+    (x, y) = draw.textsize(text, font)
+    draw.rectangle([(0, 0), (x + 1, y + 1)], fill=background, outline=border)
   draw.text((0, 0), text, color, font=font)
   result.show()
 
@@ -1426,16 +1433,31 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 #                      316, 401, 403, 424, 448, 452, 472, 494]
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=overmasked_slides)
 
-img_path = slide.get_training_image_path(74)
+img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 add_text_and_display(rgb, "Original")
-mask = filter_grays(rgb) & filter_green_channel(rgb) & filter_green_pen(rgb) & filter_blue_pen(rgb)
-mask = filter_remove_small_objects(mask, min_size=100, output_type="bool")
-add_text_and_display(mask, "No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects")
-add_text_and_display(mask_rgb(rgb, mask),
-                     "Original with No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects")
-add_text_and_display(mask_rgb(rgb, ~mask), "Original with Inverse Mask")
+gray = filter_rgb_to_grayscale(rgb)
+canny = filter_canny(gray, output_type="bool")
+add_text_and_display(canny, "Canny")
+# otsu = filter_otsu_threshold(filter_complement(gray), output_type="bool")
+# add_text_and_display(otsu, "Otsu")
+# add_text_and_display(mask_rgb(rgb, canny & otsu), "Canny & Otsu")
+# add_text_and_display(mask_rgb(rgb, canny | otsu), "Canny | Otsu")
+# add_text_and_display(mask_rgb(rgb, canny ^ otsu), "Canny ^ Otsu")
+rgb = rgb[300:900, 300:900]
+canny = canny[300:900, 300:900]
+add_text_and_display(rgb, "Original", size=36, bg=True)
+add_text_and_display(mask_rgb(rgb, canny), "Original with Canny Mask", size=36, bg=True)
+add_text_and_display(mask_rgb(rgb, ~canny), "Original with ~Canny Mask", size=36, bg=True)
+
+
+# mask = filter_grays(rgb) & filter_green_channel(rgb) & filter_green_pen(rgb) & filter_blue_pen(rgb)
+# mask = filter_remove_small_objects(mask, min_size=100, output_type="bool")
+# add_text_and_display(mask, "No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects")
+# add_text_and_display(mask_rgb(rgb, mask),
+#                      "Original with No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects")
+# add_text_and_display(mask_rgb(rgb, ~mask), "Original with Inverse Mask")
 
 # no_green_pen = filter_green_pen(rgb)
 # no_blue_pen = filter_blue_pen(rgb)
