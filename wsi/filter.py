@@ -1038,7 +1038,7 @@ def uint8_to_bool(np_img):
 
 
 def display(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf", size=48, color=(255, 0, 0),
-                         background=(255, 255, 255), border=(0, 0, 0), bg=False):
+            background=(255, 255, 255), border=(0, 0, 0), bg=False):
   """
   Convert a NumPy array to a PIL image, add text to the image, and display the image.
 
@@ -1439,13 +1439,19 @@ rgb = pil_to_np_rgb(img)
 display(rgb, "Original")
 gray = filter_rgb_to_grayscale(rgb)
 canny = filter_canny(gray, output_type="bool")
-display(canny, "Canny")
-
+display(canny, "Canny", bg=True)
 rgb_crop = rgb[300:900, 300:900]
 canny_crop = canny[300:900, 300:900]
 display(rgb_crop, "Original", size=24, bg=True)
 display(mask_rgb(rgb_crop, ~canny_crop), "Original with ~Canny Mask", size=24, bg=True)
 
+# import skimage.filters
+#
+# sobel = sk_filters.sobel(gray)
+# sobel = (sobel * 255).astype("uint8")
+# sobel = filter_histogram_equalization(sobel)
+# np_info(sobel, "SOBEL")
+# display(sobel, "Sobel")
 
 # mask = filter_grays(rgb) & filter_green_channel(rgb) & filter_green_pen(rgb) & filter_blue_pen(rgb)
 # mask = filter_remove_small_objects(mask, min_size=100, output_type="bool")

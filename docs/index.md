@@ -1644,6 +1644,56 @@ Mask RGB             | Time: 0:00:00.007009  Type: uint8   Shape: (1567, 2048, 3
 ```
 
 
+### Canny Edge Detection
+
+Edges in images are areas where there is typically a significant, abrupt change in image brightness.
+The Canny edge detection algorithm is implemented in sci-kit image. More information about
+edge detection can be found at [https://en.wikipedia.org/wiki/Edge_detection](https://en.wikipedia.org/wiki/Edge_detection).
+More information about Canny edge detection can be found at
+[https://en.wikipedia.org/wiki/Canny_edge_detector](https://en.wikipedia.org/wiki/Canny_edge_detector).
+
+The sci-kit image `canny()` function returns a binary edge map for the detected edges in an input image. In the
+example below, we'll call the canny edge filter on the grayscale image and display the resulting Canny edges.
+After this, we'll crop a 600x600 area of the original slide and display this. We'll then apply the inverse of the
+canny mask to the cropped original slide and display this for comparison.
+
+```
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = pil_to_np_rgb(img)
+display(rgb, "Original")
+gray = filter_rgb_to_grayscale(rgb)
+canny = filter_canny(gray, output_type="bool")
+display(canny, "Canny", bg=True)
+rgb_crop = rgb[300:900, 300:900]
+canny_crop = canny[300:900, 300:900]
+display(rgb_crop, "Original", size=24, bg=True)
+display(mask_rgb(rgb_crop, ~canny_crop), "Original with ~Canny Mask", size=24, bg=True)
+```
+
+| **Original** | **Canny Edges** |
+| -------------------- | --------------------------------- |
+| ![Original](images/canny-original.png "Original") | ![Canny Edges](images/canny.png "Canny Edges") |
+
+
+By applying the inverse of the canny edge mask to the original image, the detected edges are colored black. This
+visually accentuates the different structures in the slide.
+
+| **Cropped Original** | **Cropped Original with Inverse Canny Edges Mask** |
+| -------------------- | --------------------------------- |
+| ![Cropped Original](images/canny-original-cropped.png "Cropped Original") | ![Cropped Original with Inverse Canny Edges Mask](images/canny-original-with-inverse-mask.png "Cropped Original with Inverse Canny Edges Mask") |
+
+
+In the console output, we see that Canny edge detection is fairly expensive, since its computation took over 1 second.
+
+```
+RGB                  | Time: 0:00:00.204199  Type: uint8   Shape: (1567, 2048, 3)
+Gray                 | Time: 0:00:00.134988  Type: uint8   Shape: (1567, 2048)
+Canny Edges          | Time: 0:00:01.237061  Type: bool    Shape: (1567, 2048)
+Mask RGB             | Time: 0:00:00.000929  Type: uint8   Shape: (600, 600, 3)
+```
+
+
 ## Combining Filters
 
 Since our image filter data utilizes NumPy arrays, it is straightforward to combine our filters. For example, when
