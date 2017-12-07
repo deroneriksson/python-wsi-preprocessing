@@ -1432,9 +1432,9 @@ rgb = pil_to_np_rgb(img)
 add_text_and_display(rgb, "Original")
 mask = filter_grays(rgb) & filter_green_channel(rgb) & filter_green_pen(rgb) & filter_blue_pen(rgb)
 mask = filter_remove_small_objects(mask, min_size=100, output_type="bool")
-add_text_and_display(mask, "No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects")
+add_text_and_display(mask, "No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects")
 add_text_and_display(mask_rgb(rgb, mask),
-                     "Original with No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects")
+                     "Original with No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects")
 add_text_and_display(mask_rgb(rgb, ~mask), "Original with Inverse Mask")
 
 # no_green_pen = filter_green_pen(rgb)

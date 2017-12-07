@@ -1695,7 +1695,7 @@ Mask RGB             | Time: 0:00:00.011881  Type: uint8   Shape: (1513, 2048, 3
 
 Let's try another combination of filters that should give us a fairly good tissue extraction, where the slide
 background and pen marks are removed. We can do this for this slide by ANDing together the "No Grays" filter, the
-"No Green Channel" filter, the "No Green Pen" filter, and the "No Blue Pen" filter. In addition, we can use our
+"Green Channel" filter, the "No Green Pen" filter, and the "No Blue Pen" filter. In addition, we can use our
 "Remove Small Objects" filter to remove small islands from the mask. We display the resulting mask. We apply
 this mask and the inverse of the mask to the original image to visually see which parts of the slide are passed through
 and which parts are masked out.
@@ -1707,9 +1707,9 @@ rgb = pil_to_np_rgb(img)
 add_text_and_display(rgb, "Original")
 mask = filter_grays(rgb) & filter_green_channel(rgb) & filter_green_pen(rgb) & filter_blue_pen(rgb)
 mask = filter_remove_small_objects(mask, min_size=100, output_type="bool")
-add_text_and_display(mask, "No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects")
+add_text_and_display(mask, "No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects")
 add_text_and_display(mask_rgb(rgb, mask),
-                     "Original with No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects")
+                     "Original with No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects")
 add_text_and_display(mask_rgb(rgb, ~mask), "Original with Inverse Mask")
 ```
 
