@@ -1038,7 +1038,7 @@ def uint8_to_bool(np_img):
 
 
 def display_img(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf", size=48, color=(255, 0, 0),
-            background=(255, 255, 255), border=(0, 0, 0), bg=False):
+                background=(255, 255, 255), border=(0, 0, 0), bg=False):
   """
   Convert a NumPy array to a PIL image, add text to the image, and display the image.
 
@@ -1065,7 +1065,7 @@ def display_img(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf", size=48
   result.show()
 
 
-def apply_filters_to_image(slide_num, save=True, display=False, return_image=False):
+def apply_filters_to_image(slide_num, save=True, display=False):
   """
   Apply a set of filters to an image and optionally save and/or display filtered images.
 
@@ -1075,8 +1075,8 @@ def apply_filters_to_image(slide_num, save=True, display=False, return_image=Fal
     display: If True, display filtered images to screen.
 
   Returns:
-    Dictionary of image information (used for HTML page generation), or if return_image is True, return the resulting
-    filtered image as a NumPy array.
+    Tuple consisting of 1) the resulting filtered image as a NumPy array, and 2) dictionary of image information
+    (used for HTML page generation).
   """
   t = Time()
   print("Processing slide #%d" % slide_num)
@@ -1124,11 +1124,8 @@ def apply_filters_to_image(slide_num, save=True, display=False, return_image=Fal
 
   print("Slide #%03d processing time: %s\n" % (slide_num, str(t.elapsed())))
 
-  if return_image:
-    img_result = rgb_remove_small
-    return img_result
-  else:
-    return info
+  img = rgb_remove_small
+  return img, info
 
 
 def save_display(save, display, info, np_img, slide_num, filter_num, display_text, file_text):
@@ -1293,8 +1290,8 @@ def apply_filters_to_image_list(image_num_list, save, display):
   """
   html_page_info = dict()
   for slide_num in image_num_list:
-    result = apply_filters_to_image(slide_num, save=save, display=display)
-    html_page_info.update(result)
+    _, info = apply_filters_to_image(slide_num, save=save, display=display)
+    html_page_info.update(info)
   return (image_num_list, html_page_info)
 
 
@@ -1313,8 +1310,8 @@ def apply_filters_to_image_range(start_ind, end_ind, save, display):
   """
   html_page_info = dict()
   for slide_num in range(start_ind, end_ind + 1):
-    result = apply_filters_to_image(slide_num, save=save, display=display)
-    html_page_info.update(result)
+    _, info = apply_filters_to_image(slide_num, save=save, display=display)
+    html_page_info.update(info)
   return (start_ind, end_ind, html_page_info)
 
 
@@ -1332,15 +1329,15 @@ def singleprocess_apply_filters_to_images(save=True, display=False, html=True, i
   print("Applying filters to images\n")
 
   if image_num_list is not None:
-    html_page_info = apply_filters_to_image_list(image_num_list, save, display)
+    _, info = apply_filters_to_image_list(image_num_list, save, display)
   else:
     num_training_slides = slide.get_num_training_slides()
-    (s, e, html_page_info) = apply_filters_to_image_range(1, num_training_slides, save, display)
+    (s, e, info) = apply_filters_to_image_range(1, num_training_slides, save, display)
 
   print("Time to apply filters to all images: %s\n" % str(t.elapsed()))
 
   if html:
-    generate_filter_html_page(html_page_info)
+    generate_filter_html_page(info)
 
 
 def multiprocess_apply_filters_to_images(save=False, display=False, html=True, image_num_list=None):
@@ -1419,9 +1416,12 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
   print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
 
 
-apply_filters_to_image(4, display=True, save=False)
+# img, _ = apply_filters_to_image(4, display=True, save=False)
+# display_img(img, "RESULT", bg=True)
+# canny = filter_canny(filter_rgb_to_grayscale(img))
+# display_img(canny, "CANNY", bg=True)
 # singleprocess_apply_filters_to_images(save=True, display=False)
-# multiprocess_apply_filters_to_images(save=True, display=False, html=True)
+# multiprocess_apply_filters_to_images(save=True, display=False)
 
 # red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
 #                   336, 349, 357, 380, 450, 482]
