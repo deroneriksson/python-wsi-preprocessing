@@ -1698,7 +1698,7 @@ Mask RGB             | Time: 0:00:00.000929  Type: uint8   Shape: (600, 600, 3)
 
 Since our image filter data utilizes NumPy arrays, it is straightforward to combine our filters. For example, when
 we have filters that return boolean images for masking, we can use standard boolean algebra on our arrays to do
-operations such as AND, OR, XOR, and NOT.
+operations such as AND, OR, XOR, and NOT. We can also run filters on the results of other filters.
 
 As an example, here we run our green pen and blue pen filters on the original RGB image to filter out the green and
 blue pen marks on the slides. We combine the resulting masks with a boolean AND (&) operation. We display the resulting
@@ -1763,16 +1763,16 @@ display_img(mask_rgb(rgb, mask),
 display_img(mask_rgb(rgb, ~mask), "Original with Inverse Mask")
 ```
 
-| **Original Slide** | **No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects** |
+| **Original Slide** | **No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects** |
 | -------------------- | --------------------------------- |
-| ![Original Slide](images/combine-pens-background-original.png "Original Slide") | ![No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects](images/combine-pens-background-mask.png "No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects") |
+| ![Original Slide](images/combine-pens-background-original.png "Original Slide") | ![No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects](images/combine-pens-background-mask.png "No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects") |
 
 
 We see that this combination does a good job at allowing us to filter the most relevant tissue sections of this slide.
 
-| **Original with No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects** | **Original with Inverse Mask** |
+| **Original with No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects** | **Original with Inverse Mask** |
 | -------------------- | --------------------------------- |
-| ![Original with No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects](images/combine-pens-background-original-with-mask.png "Original with No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects") | ![Original with Inverse Mask](images/combine-pens-background-original-with-inverse-mask.png "Original with Inverse Mask") |
+| ![Original with No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects](images/combine-pens-background-original-with-mask.png "Original with No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects") | ![Original with Inverse Mask](images/combine-pens-background-original-with-inverse-mask.png "Original with Inverse Mask") |
 
 
 Console Output:
