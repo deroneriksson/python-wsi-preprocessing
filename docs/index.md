@@ -1815,3 +1815,69 @@ mask_remove_small = filter_remove_small_objects(mask_gray_green_pens, min_size=5
 After each of the above masks is created, it is applied to the original image and the resulting image is saved
 to the file system, displayed to the screen, or both.
 
+Let's try this function out. In this example, we'll run `apply_filters_to_image()` on slide 337 and display the results
+to the screen.
+
+```
+apply_filters_to_image(337, display=True, save=False)
+```
+
+Here, we see the original slide #337 and the green channel filter applied to it. Notice that the green channel filter
+with a default threshold of 200 removes most of the white background but only a relatively small fraction of the green
+pen. The green channel filter masks 72.36% of the original slide.
+
+| **Slide 337, F001** | **Slide 337, F002** |
+| -------------------- | --------------------------------- |
+| ![Slide 337, F001](images/337-001.png "Slide 337, F001") | ![Slide 337, F002](images/337-002.png "Slide 337, F002") |
+
+
+Here, we see the results of the grays filter and the red pen filter. For this slide, the grays filter masks 67.66% of
+the slide, which is actually less than the green channel filter. The red pen filter masks only 0.03% of the slide,
+which makes sense since there are no red pen marks on the slide.
+
+| **Slide 337, F003** | **Slide 337, F004** |
+| -------------------- | --------------------------------- |
+| ![Slide 337, F003](images/337-003.png "Slide 337, F003") | ![Slide 337, F004](images/337-004.png "Slide 337, F004") |
+
+
+The green pen filter masks 3.71% of the slide. Visually, we see that it does a decent job of masking out the green
+pen marks on the slide. The blue pen filter masks 0% of the slide, which is perfect since there are no blue pen marks on
+the slide.
+
+| **Slide 337, F005** | **Slide 337, F006** |
+| -------------------- | --------------------------------- |
+| ![Slide 337, F005](images/337-005.png "Slide 337, F005") | ![Slide 337, F006](images/337-006.png "Slide 337, F006") |
+
+
+Combining the above filters with a boolean AND results in 74.37% masking. Cleaning up these results by remove small
+objects results in a masking of 75.82%. This potentially gives a good tissue sample that we can use for deep learning.
+
+| **Slide 337, F007** | **Slide 337, F008** |
+| -------------------- | --------------------------------- |
+| ![Slide 337, F007](images/337-007.png "Slide 337, F007") | ![Slide 337, F008](images/337-008.png "Slide 337, F008") |
+
+
+In the console, we see the slide #337 processing time takes ~5.5s in this example. The filtering is only a relatively
+small fraction of this time.
+
+```
+Processing slide #337
+RGB                  | Time: 0:00:00.214366  Type: uint8   Shape: (1636, 2048, 3)
+Filter Green Channel | Time: 0:00:00.030129  Type: bool    Shape: (1636, 2048)
+Mask RGB             | Time: 0:00:00.013435  Type: uint8   Shape: (1636, 2048, 3)
+Filter Grays         | Time: 0:00:00.100411  Type: bool    Shape: (1636, 2048)
+Mask RGB             | Time: 0:00:00.012338  Type: uint8   Shape: (1636, 2048, 3)
+Filter Red Pen       | Time: 0:00:00.082352  Type: bool    Shape: (1636, 2048)
+Mask RGB             | Time: 0:00:00.012389  Type: uint8   Shape: (1636, 2048, 3)
+Filter Green Pen     | Time: 0:00:00.158260  Type: bool    Shape: (1636, 2048)
+Mask RGB             | Time: 0:00:00.012019  Type: uint8   Shape: (1636, 2048, 3)
+Filter Blue Pen      | Time: 0:00:00.106823  Type: bool    Shape: (1636, 2048)
+Mask RGB             | Time: 0:00:00.011877  Type: uint8   Shape: (1636, 2048, 3)
+Mask RGB             | Time: 0:00:00.015465  Type: uint8   Shape: (1636, 2048, 3)
+Remove Small Objs    | Time: 0:00:00.066158  Type: bool    Shape: (1636, 2048)
+Mask RGB             | Time: 0:00:00.013019  Type: uint8   Shape: (1636, 2048, 3)
+Slide #337 processing time: 0:00:05.485500
+```
+
+
+
