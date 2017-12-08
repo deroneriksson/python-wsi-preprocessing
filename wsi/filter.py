@@ -1091,7 +1091,7 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   rgb = pil_to_np_rgb(img)
   save_display(save, display, info, rgb, slide_num, 1, "Original", "rgb")
 
-  mask_not_green = filter_green_channel(rgb, green_thresh=200)
+  mask_not_green = filter_green_channel(rgb)
   rgb_not_green = mask_rgb(rgb, mask_not_green)
   save_display(save, display, info, rgb_not_green, slide_num, 2, "Not Green", "rgb-not-green")
 
@@ -1416,12 +1416,14 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
   print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
 
 
+apply_filters_to_image(337, display=True, save=False)
+
 # img, _ = apply_filters_to_image(4, display=True, save=False)
 # display_img(img, "RESULT", bg=True)
 # canny = filter_canny(filter_rgb_to_grayscale(img))
 # display_img(canny, "CANNY", bg=True)
 # singleprocess_apply_filters_to_images(save=True, display=False)
-# multiprocess_apply_filters_to_images(save=True, display=False)
+# multiprocess_apply_filters_to_images(save=False, display=False, html=True)
 
 # red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
 #                   336, 349, 357, 380, 450, 482]

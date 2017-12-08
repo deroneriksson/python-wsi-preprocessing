@@ -1743,12 +1743,12 @@ Mask RGB             | Time: 0:00:00.011881  Type: uint8   Shape: (1513, 2048, 3
 
 ---
 
-Let's try another combination of filters that should give us a fairly good tissue extraction, where the slide
-background and pen marks are removed. We can do this for this slide by ANDing together the "No Grays" filter, the
-"Green Channel" filter, the "No Green Pen" filter, and the "No Blue Pen" filter. In addition, we can use our
-"Remove Small Objects" filter to remove small islands from the mask. We display the resulting mask. We apply
-this mask and the inverse of the mask to the original image to visually see which parts of the slide are passed through
-and which parts are masked out.
+Let's try another combination of filters that should give us a fairly good tissue extraction for this slide,
+where the slide background and blue and green pen marks are removed. We can do this for this slide by ANDing
+together the "No Grays" filter, the "Green Channel" filter, the "No Green Pen" filter, and the "No Blue Pen" filter.
+In addition, we can use our "Remove Small Objects" filter to remove small islands from the mask. We display the
+resulting mask. We apply this mask and the inverse of the mask to the original image to visually see which parts of the
+slide are passed through and which parts are masked out.
 
 ```
 img_path = slide.get_training_image_path(74)
@@ -1790,4 +1790,28 @@ Mask RGB             | Time: 0:00:00.007193  Type: uint8   Shape: (1513, 2048, 3
 
 
 ---
+
+In the `wsi/filter.py` file, the `apply_filters_to_image(slide_num, save=True, display=False)` function will be the
+primary way we'll apply a set of filters to an image with the goal of identifying the tissue in the slide. This
+function allows us to see the results of each filter and the combined results of different filters. If the
+`save` parameter is `True`, the various filter results will be saved to the file system. If the `display`
+parameter is `True`, the filter results will be displayed on the screen. The function returns a tuple consisting of
+the resulting NumPy array image and a dictionary of information that is used elsewhere for generating an HTML page
+to view the various filter results for multiple images, as we will see later.
+
+The `apply_filters_to_image()` function will create green channel, grays, red pen, green pen, and blue pen masks
+and combine these into a single mask using boolean ANDs. After this, small objects will be removed from the mask.
+
+```
+mask_not_green = filter_green_channel(rgb)
+mask_not_gray = filter_grays(rgb)
+mask_no_red_pen = filter_red_pen(rgb)
+mask_no_green_pen = filter_green_pen(rgb)
+mask_no_blue_pen = filter_blue_pen(rgb)
+mask_gray_green_pens = mask_not_gray & mask_not_green & mask_no_red_pen & mask_no_green_pen & mask_no_blue_pen
+mask_remove_small = filter_remove_small_objects(mask_gray_green_pens, min_size=500, output_type="bool")
+```
+
+After each of the above masks is created, it is applied to the original image and the resulting image is saved
+to the file system, displayed to the screen, or both.
 
