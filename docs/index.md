@@ -335,14 +335,14 @@ rgb = pil_to_np_rgb(img)
 
 The `wsi/filter.py` file also contains an `np_to_pil()` function that converts a NumPy array to a PIL Image.
 
-For convenience, the `display()` function can be used to display a NumPy array image. Text can be added to
+For convenience, the `display_img()` function can be used to display a NumPy array image. Text can be added to
 the displayed image, which can be very useful when visually comparing the results of multiple filters.
 
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-display(rgb, "RGB")
+display_img(rgb, "RGB")
 ```
 
 **Display Image with Text**<br/>
@@ -415,7 +415,7 @@ img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 grayscale = filter_rgb_to_grayscale(rgb)
-display(grayscale, "Grayscale")
+display_img(grayscale, "Grayscale")
 ```
 
 Here we see the displayed grayscale image.
@@ -452,7 +452,7 @@ img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 grayscale = filter_rgb_to_grayscale(rgb)
 complement = filter_complement(grayscale)
-display(complement, "Complement")
+display_img(complement, "Complement")
 ```
 
 **Complement Filter**<br/>
@@ -487,7 +487,7 @@ rgb = pil_to_np_rgb(img)
 grayscale = filter_rgb_to_grayscale(rgb)
 complement = filter_complement(grayscale)
 hyst = filter_threshold(complement, threshold=100)
-display(hyst, "Threshold")
+display_img(hyst, "Threshold")
 ```
 
 The result is a binary image where pixel values that were above 100 are shown in white and pixel values that were 100 or
@@ -528,7 +528,7 @@ rgb = pil_to_np_rgb(img)
 grayscale = filter_rgb_to_grayscale(rgb)
 complement = filter_complement(grayscale)
 hyst = filter_hysteresis_threshold(complement)
-display(hyst, "Hysteresis Threshold")
+display_img(hyst, "Hysteresis Threshold")
 ```
 
 In the generated image, notice that the result is a binary image. All pixel values are either white (255) or black (0).
@@ -568,7 +568,7 @@ rgb = pil_to_np_rgb(img)
 grayscale = filter_rgb_to_grayscale(rgb)
 complement = filter_complement(grayscale)
 otsu = filter_otsu_threshold(complement)
-display(otsu, "Otsu Threshold")
+display_img(otsu, "Otsu Threshold")
 ```
 
 
@@ -619,7 +619,7 @@ rgb = pil_to_np_rgb(img)
 grayscale = filter_rgb_to_grayscale(rgb)
 complement = filter_complement(grayscale)
 contrast_stretch = filter_contrast_stretch(complement, low=100, high=200)
-display(contrast_stretch, "Contrast Stretch")
+display_img(contrast_stretch, "Contrast Stretch")
 ```
 
 This can be used to visually inspect details in the previous intensity range of 100 to 200, since the image filter has
@@ -655,9 +655,9 @@ img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 grayscale = filter_rgb_to_grayscale(rgb)
-display(grayscale, "Grayscale")
+display_img(grayscale, "Grayscale")
 hist_equ = filter_histogram_equalization(grayscale)
-display(hist_equ, "Histogram Equalization")
+display_img(hist_equ, "Histogram Equalization")
 ```
 
 Comparing the grayscale image and the image after histogram equalization, we see that contrast in the image has been
@@ -694,9 +694,9 @@ img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 grayscale = filter_rgb_to_grayscale(rgb)
-display(grayscale, "Grayscale")
+display_img(grayscale, "Grayscale")
 adaptive_equ = filter_adaptive_equalization(grayscale)
-display(adaptive_equ, "Adaptive Equalization")
+display_img(adaptive_equ, "Adaptive Equalization")
 ```
 
 | **Grayscale Filter** | **Adaptive Equalization Filter** |
@@ -769,9 +769,9 @@ img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 hed = filter_rgb_to_hed(rgb)
 hema = filter_hed_to_hematoxylin(hed)
-display(hema, "Hematoxylin Channel")
+display_img(hema, "Hematoxylin Channel")
 eosin = filter_hed_to_eosin(hed)
-display(eosin, "Eosin Channel")
+display_img(eosin, "Eosin Channel")
 ```
 
 Notice that the hematoxylin channel does fairly well at detecting the purple areas of the original slide,
@@ -812,7 +812,7 @@ img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 not_green = filter_green_channel(rgb)
-display(not_green, "Green Channel Filter")
+display_img(not_green, "Green Channel Filter")
 ```
 
 The green channel filter does a decent job of differentiating the tissue from the white background. However, notice
@@ -847,7 +847,7 @@ img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 not_grays = filter_grays(rgb)
-display(not_grays, "Grays Filter")
+display_img(not_grays, "Grays Filter")
 ```
 
 Notice that in addition to filtering out the white background, the grays filter has indeed filtered out the shadow
@@ -889,9 +889,9 @@ img_path = slide.get_training_image_path(4)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 not_red = filter_red(rgb, red_lower_thresh=150, green_upper_thresh=80, blue_upper_thresh=90, display_np_info=True)
-display(not_red, "Red Filter (150, 80, 90)")
-display(mask_rgb(rgb, not_red), "Not Red")
-display(mask_rgb(rgb, ~not_red), "Red")
+display_img(not_red, "Red Filter (150, 80, 90)")
+display_img(mask_rgb(rgb, not_red), "Not Red")
+display_img(mask_rgb(rgb, ~not_red), "Red")
 ```
 
 In the generated image, we can see that much of the red pen has been filtered out.
@@ -950,9 +950,9 @@ img_path = slide.get_training_image_path(4)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
 not_red_pen = filter_red_pen(rgb)
-display(not_red_pen, "Red Pen Filter")
-display(mask_rgb(rgb, not_red_pen), "Not Red Pen")
-display(mask_rgb(rgb, ~not_red_pen), "Red Pen")
+display_img(not_red_pen, "Red Pen Filter")
+display_img(mask_rgb(rgb, not_red_pen), "Not Red Pen")
+display_img(mask_rgb(rgb, ~not_red_pen), "Red Pen")
 ```
 
 | **Original Slide** | **Red Pen Filter** |
@@ -997,11 +997,11 @@ RGB image to help visualize the filter results.
 img_path = slide.get_training_image_path(241)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-display(rgb, "Original")
+display_img(rgb, "Original")
 not_blue = filter_blue(rgb, red_upper_thresh=130, green_upper_thresh=155, blue_lower_thresh=180, display_np_info=True)
-display(not_blue, "Blue Filter (130, 155, 180)")
-display(mask_rgb(rgb, not_blue), "Not Blue")
-display(mask_rgb(rgb, ~not_blue), "Blue")
+display_img(not_blue, "Blue Filter (130, 155, 180)")
+display_img(mask_rgb(rgb, not_blue), "Not Blue")
+display_img(mask_rgb(rgb, ~not_blue), "Blue")
 ```
 
 We see that a lot of the blue pen has been filtered out.
@@ -1052,11 +1052,11 @@ Once again, we'll apply the filter and its inverse to the original slide to help
 img_path = slide.get_training_image_path(241)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-display(rgb, "Original")
+display_img(rgb, "Original")
 not_blue_pen = filter_blue_pen(rgb)
-display(not_blue_pen, "Blue Pen Filter")
-display(mask_rgb(rgb, not_blue_pen), "Not Blue Pen")
-display(mask_rgb(rgb, ~not_blue_pen), "Blue Pen")
+display_img(not_blue_pen, "Blue Pen Filter")
+display_img(mask_rgb(rgb, not_blue_pen), "Not Blue Pen")
+display_img(mask_rgb(rgb, ~not_blue_pen), "Blue Pen")
 ```
 
 For this slide, we see that `filter_blue_pen()` filters out more blue than the previous `filter_blue()` example.
@@ -1112,11 +1112,11 @@ threshold value, a green channel lower threshold value, and a blue channel lower
 img_path = slide.get_training_image_path(51)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-display(rgb, "Original")
+display_img(rgb, "Original")
 not_green = filter_green(rgb, red_upper_thresh=150, green_lower_thresh=160, blue_lower_thresh=140, display_np_info=True)
-display(not_green, "Green Filter (150, 160, 140)")
-display(mask_rgb(rgb, not_green), "Not Green")
-display(mask_rgb(rgb, ~not_green), "Green")
+display_img(not_green, "Green Filter (150, 160, 140)")
+display_img(mask_rgb(rgb, not_green), "Not Green")
+display_img(mask_rgb(rgb, ~not_green), "Green")
 ```
 
 Using a red upper threshold of 150, a green lower threshold of 160, and a blue lower threshold of 140, we see that the
@@ -1171,11 +1171,11 @@ If we apply the green pen filter, we see that it includes most of the green shad
 img_path = slide.get_training_image_path(51)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-display(rgb, "Original")
+display_img(rgb, "Original")
 not_green_pen = filter_green_pen(rgb)
-display(not_green_pen, "Green Pen Filter")
-display(mask_rgb(rgb, not_green_pen), "Not Green Pen")
-display(mask_rgb(rgb, ~not_green_pen), "Green Pen")
+display_img(not_green_pen, "Green Pen Filter")
+display_img(mask_rgb(rgb, not_green_pen), "Not Green Pen")
+display_img(mask_rgb(rgb, ~not_green_pen), "Green Pen")
 ```
 
 | **Original Slide** | **Green Pen Filter** |
@@ -1215,13 +1215,13 @@ perform k-means segmentation on that image.
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-display(rgb, "Original")
+display_img(rgb, "Original")
 kmeans_seg = filter_kmeans_segmentation(rgb, n_segments=3000)
-display(kmeans_seg, "K-Means Segmentation", color=(0, 0, 0))
+display_img(kmeans_seg, "K-Means Segmentation", color=(0, 0, 0))
 otsu_mask = mask_rgb(rgb, filter_otsu_threshold(filter_complement(filter_rgb_to_grayscale(rgb)), output_type="bool"))
-display(otsu_mask, "Image after Otsu Mask", color=(255, 255, 255))
+display_img(otsu_mask, "Image after Otsu Mask", color=(255, 255, 255))
 kmeans_seg_otsu = filter_kmeans_segmentation(otsu_mask, n_segments=3000)
-display(kmeans_seg_otsu, "K-Means Segmentation after Otsu Mask", color=(255, 255, 255))
+display_img(kmeans_seg_otsu, "K-Means Segmentation after Otsu Mask", color=(255, 255, 255))
 ```
 
 
@@ -1266,13 +1266,13 @@ Here, we perform k-means segmentation, build a RAG, and apply different RAG thre
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-display(rgb, "Original")
+display_img(rgb, "Original")
 rag_thresh = filter_rag_threshold(rgb)
-display(rag_thresh, "RAG Threshold (9)")
+display_img(rag_thresh, "RAG Threshold (9)")
 rag_thresh = filter_rag_threshold(rgb, threshold=1)
-display(rag_thresh, "RAG Threshold (1)")
+display_img(rag_thresh, "RAG Threshold (1)")
 rag_thresh = filter_rag_threshold(rgb, threshold=20)
-display(rag_thresh, "RAG Threshold (20)")
+display_img(rag_thresh, "RAG Threshold (20)")
 ```
 
 | **Original Slide** | **RAG Threshold = 9** |
@@ -1318,13 +1318,13 @@ We create a binary image mask by calling the `filter_grays()` function on the or
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-display(rgb, "Original")
+display_img(rgb, "Original")
 no_grays = filter_grays(rgb, output_type="bool")
-display(no_grays, "No Grays")
+display_img(no_grays, "No Grays")
 bin_erosion_5 = filter_binary_erosion(no_grays, disk_size=5)
-display(bin_erosion_5, "Binary Erosion (5)")
+display_img(bin_erosion_5, "Binary Erosion (5)")
 bin_erosion_20 = filter_binary_erosion(no_grays, disk_size=20)
-display(bin_erosion_20, "Binary Erosion (20)")
+display_img(bin_erosion_20, "Binary Erosion (20)")
 ```
 
 | **Original Slide** | **No Grays** |
@@ -1357,13 +1357,13 @@ utilizing a disk radius of 5 pixels followed by a disk radius of 20 pixels.
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-display(rgb, "Original")
+display_img(rgb, "Original")
 no_grays = filter_grays(rgb, output_type="bool")
-display(no_grays, "No Grays")
+display_img(no_grays, "No Grays")
 bin_dilation_5 = filter_binary_dilation(no_grays, disk_size=5)
-display(bin_dilation_5, "Binary Dilation (5)")
+display_img(bin_dilation_5, "Binary Dilation (5)")
 bin_dilation_20 = filter_binary_dilation(no_grays, disk_size=20)
-display(bin_dilation_20, "Binary Dilation (20)")
+display_img(bin_dilation_20, "Binary Dilation (20)")
 ```
 
 We see that dilation expands the edges of the binary image as opposed to the erosion, which shrinks the edges.
@@ -1392,13 +1392,13 @@ As mentioned, opening is erosion followed by dilation. Opening can be used to re
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-display(rgb, "Original")
+display_img(rgb, "Original")
 no_grays = filter_grays(rgb, output_type="bool")
-display(no_grays, "No Grays")
+display_img(no_grays, "No Grays")
 bin_opening_5 = filter_binary_opening(no_grays, disk_size=5)
-display(bin_opening_5, "Binary Opening (5)")
+display_img(bin_opening_5, "Binary Opening (5)")
 bin_opening_20 = filter_binary_opening(no_grays, disk_size=20)
-display(bin_opening_20, "Binary Opening (20)")
+display_img(bin_opening_20, "Binary Opening (20)")
 ```
 
 | **Binary Opening (disk_size = 5)** | **Binary Opening (disk_size = 20)** |
@@ -1427,13 +1427,13 @@ Closing is a dilation followed by an erosion. Closing can be used to remove smal
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-display(rgb, "Original")
+display_img(rgb, "Original")
 no_grays = filter_grays(rgb, output_type="bool")
-display(no_grays, "No Grays")
+display_img(no_grays, "No Grays")
 bin_closing_5 = filter_binary_closing(no_grays, disk_size=5)
-display(bin_closing_5, "Binary Closing (5)")
+display_img(bin_closing_5, "Binary Closing (5)")
 bin_closing_20 = filter_binary_closing(no_grays, disk_size=20)
-display(bin_closing_20, "Binary Closing (20)")
+display_img(bin_closing_20, "Binary Closing (20)")
 ```
 
 | **Binary Closing (disk_size = 5)** | **Binary Closing (disk_size = 20)** |
@@ -1463,13 +1463,13 @@ and we'll perform this on the "No Grays" binary image.
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-display(rgb, "Original")
+display_img(rgb, "Original")
 no_grays = filter_grays(rgb, output_type="bool")
-display(no_grays, "No Grays")
+display_img(no_grays, "No Grays")
 remove_small_100 = filter_remove_small_objects(no_grays, min_size=100)
-display(remove_small_100, "Remove Small Objects (100)")
+display_img(remove_small_100, "Remove Small Objects (100)")
 remove_small_10000 = filter_remove_small_objects(no_grays, min_size=10000)
-display(remove_small_10000, "Remove Small Objects (10000)")
+display_img(remove_small_10000, "Remove Small Objects (10000)")
 ```
 
 Notice in the "No Grays" mask that we see lots of scattered, small objects.
@@ -1508,13 +1508,13 @@ wrapper with sizes of 100 pixels and 10,000 pixels.
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-display(rgb, "Original")
+display_img(rgb, "Original")
 no_grays = filter_grays(rgb, output_type="bool")
-display(no_grays, "No Grays")
+display_img(no_grays, "No Grays")
 remove_small_100 = filter_remove_small_holes(no_grays, min_size=100)
-display(remove_small_100, "Remove Small Holes (100)")
+display_img(remove_small_100, "Remove Small Holes (100)")
 remove_small_10000 = filter_remove_small_holes(no_grays, min_size=10000)
-display(remove_small_10000, "Remove Small Holes (10000)")
+display_img(remove_small_10000, "Remove Small Holes (10000)")
 ```
 
 Notice that using a minimum size of 10,000 removes more holes than a size of 100, as we would expect.
@@ -1548,17 +1548,17 @@ with size values of 100 and 10,000.
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-display(rgb, "Original")
+display_img(rgb, "Original")
 no_grays = filter_grays(rgb, output_type="bool")
-display(no_grays, "No Grays")
+display_img(no_grays, "No Grays")
 fill_holes = filter_binary_fill_holes(no_grays)
-display(fill_holes, "Fill Holes")
+display_img(fill_holes, "Fill Holes")
 
 remove_holes_100 = filter_remove_small_holes(no_grays, min_size=100, output_type="bool")
-display(fill_holes ^ remove_holes_100, "Differences between Fill Holes and Remove Small Holes (100)")
+display_img(fill_holes ^ remove_holes_100, "Differences between Fill Holes and Remove Small Holes (100)")
 
 remove_holes_10000 = filter_remove_small_holes(no_grays, min_size=10000, output_type="bool")
-display(fill_holes ^ remove_holes_10000, "Differences between Fill Holes and Remove Small Holes (10000)")
+display_img(fill_holes ^ remove_holes_10000, "Differences between Fill Holes and Remove Small Holes (10000)")
 
 ```
 
@@ -1600,13 +1600,13 @@ mask.
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-display(rgb, "Original")
+display_img(rgb, "Original")
 gray = filter_rgb_to_grayscale(rgb)
-display(gray, "Grayscale")
+display_img(gray, "Grayscale")
 entropy = filter_entropy(gray, output_type="bool")
-display(entropy, "Entropy")
-display(mask_rgb(rgb, entropy), "Original with Entropy Mask")
-display(mask_rgb(rgb, ~entropy), "Original with Inverse of Entropy Mask")
+display_img(entropy, "Entropy")
+display_img(mask_rgb(rgb, entropy), "Original with Entropy Mask")
+display_img(mask_rgb(rgb, ~entropy), "Original with Inverse of Entropy Mask")
 ```
 
 | **Original Slide** | **Grayscale** |
@@ -1661,14 +1661,14 @@ canny mask to the cropped original slide and display this for comparison.
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-display(rgb, "Original")
+display_img(rgb, "Original")
 gray = filter_rgb_to_grayscale(rgb)
 canny = filter_canny(gray, output_type="bool")
-display(canny, "Canny", bg=True)
+display_img(canny, "Canny", bg=True)
 rgb_crop = rgb[300:900, 300:900]
 canny_crop = canny[300:900, 300:900]
-display(rgb_crop, "Original", size=24, bg=True)
-display(mask_rgb(rgb_crop, ~canny_crop), "Original with ~Canny Mask", size=24, bg=True)
+display_img(rgb_crop, "Original", size=24, bg=True)
+display_img(mask_rgb(rgb_crop, ~canny_crop), "Original with ~Canny Mask", size=24, bg=True)
 ```
 
 | **Original** | **Canny Edges** |
@@ -1708,14 +1708,14 @@ mask and this mask applied to the original image, masking out the green and blue
 img_path = slide.get_training_image_path(74)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-display(rgb, "Original")
+display_img(rgb, "Original")
 no_green_pen = filter_green_pen(rgb)
-display(no_green_pen, "No Green Pen")
+display_img(no_green_pen, "No Green Pen")
 no_blue_pen = filter_blue_pen(rgb)
-display(no_blue_pen, "No Blue Pen")
+display_img(no_blue_pen, "No Blue Pen")
 no_gp_bp = no_green_pen & no_blue_pen
-display(no_gp_bp, "No Green Pen, No Blue Pen")
-display(mask_rgb(rgb, no_gp_bp), "Original with No Green Pen, No Blue Pen")
+display_img(no_gp_bp, "No Green Pen, No Blue Pen")
+display_img(mask_rgb(rgb, no_gp_bp), "Original with No Green Pen, No Blue Pen")
 ```
 
 | **Original Slide** |
@@ -1754,13 +1754,13 @@ and which parts are masked out.
 img_path = slide.get_training_image_path(74)
 img = slide.open_image(img_path)
 rgb = pil_to_np_rgb(img)
-display(rgb, "Original")
+display_img(rgb, "Original")
 mask = filter_grays(rgb) & filter_green_channel(rgb) & filter_green_pen(rgb) & filter_blue_pen(rgb)
 mask = filter_remove_small_objects(mask, min_size=100, output_type="bool")
-display(mask, "No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects")
-display(mask_rgb(rgb, mask),
+display_img(mask, "No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects")
+display_img(mask_rgb(rgb, mask),
                      "Original with No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects")
-display(mask_rgb(rgb, ~mask), "Original with Inverse Mask")
+display_img(mask_rgb(rgb, ~mask), "Original with Inverse Mask")
 ```
 
 | **Original Slide** | **No Grays, No Green Channel, No Green Pen, No Blue Pen, No Small Objects** |
