@@ -1416,7 +1416,32 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
   print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
 
 
-apply_filters_to_image(337, display=True, save=False)
+rgb, _ = apply_filters_to_image(337, display=False, save=False)
+display_img(rgb, "RGB")
+not_greenish = filter_green(rgb, red_upper_thresh=125, green_lower_thresh=30, blue_lower_thresh=30,
+                            display_np_info=True)
+not_grayish = filter_grays(rgb, tolerance=30)
+rgb_new = mask_rgb(rgb, not_greenish & not_grayish)
+display_img(mask_rgb(rgb, not_greenish & not_grayish), "Not Greenish, Not Grayish")
+
+c1 = rgb[800:1200, 100:500]
+c2 = rgb[750:1150, 1350:1750]
+c12 = np.concatenate((c1, c2), axis=1)
+c3 = rgb_new[800:1200, 100:500]
+c4 = rgb_new[750:1150, 1350:1750]
+c34 = np.concatenate((c3, c4), axis=1)
+c1234 = np.concatenate((c12, c34), axis=0)
+display_img(c1234, "Crop 1234")
+
+# otsu = filter_otsu_threshold(filter_rgb_to_grayscale(rgb), output_type="bool")
+# display_img(otsu, "Otsu Threshold")
+# display_img(mask_rgb(rgb, otsu), "RGB with Otsu Threshold Mask")
+# hyst = filter_hysteresis_threshold(filter_rgb_to_grayscale(rgb), output_type="bool")
+# display_img(hyst, "Hysteresis Threshold")
+# display_img(mask_rgb(rgb, hyst), "RGB with Hysteresis Threshold Mask")
+# display_img(otsu ^ hyst, "XOR")
+
+
 
 # img, _ = apply_filters_to_image(4, display=True, save=False)
 # display_img(img, "RESULT", bg=True)

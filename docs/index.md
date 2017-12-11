@@ -1797,7 +1797,7 @@ function allows us to see the results of each filter and the combined results of
 `save` parameter is `True`, the various filter results will be saved to the file system. If the `display`
 parameter is `True`, the filter results will be displayed on the screen. The function returns a tuple consisting of
 the resulting NumPy array image and a dictionary of information that is used elsewhere for generating an HTML page
-to view the various filter results for multiple images, as we will see later.
+to view the various filter results for multiple slides, as we will see later.
 
 The `apply_filters_to_image()` function will create green channel, grays, red pen, green pen, and blue pen masks
 and combine these into a single mask using boolean ANDs. After this, small objects will be removed from the mask.
