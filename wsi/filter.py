@@ -1037,7 +1037,7 @@ def uint8_to_bool(np_img):
   return result
 
 
-def display_img(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf", size=48, color=(255, 0, 0),
+def display_img(np_img, text=None, font_path="/Library/Fonts/Arial Bold.ttf", size=48, color=(255, 0, 0),
                 background=(255, 255, 255), border=(0, 0, 0), bg=False):
   """
   Convert a NumPy array to a PIL image, add text to the image, and display the image.
@@ -1057,11 +1057,12 @@ def display_img(np_img, text, font_path="/Library/Fonts/Arial Bold.ttf", size=48
   if result.mode == 'L':
     result = result.convert('RGB')
   draw = ImageDraw.Draw(result)
-  font = ImageFont.truetype(font_path, size)
-  if bg == True:
-    (x, y) = draw.textsize(text, font)
-    draw.rectangle([(0, 0), (x + 1, y + 1)], fill=background, outline=border)
-  draw.text((0, 0), text, color, font=font)
+  if text is not None:
+    font = ImageFont.truetype(font_path, size)
+    if bg == True:
+      (x, y) = draw.textsize(text, font)
+      draw.rectangle([(0, 0), (x + 1, y + 1)], fill=background, outline=border)
+    draw.text((0, 0), text, color, font=font)
   result.show()
 
 
@@ -1424,14 +1425,10 @@ not_grayish = filter_grays(rgb, tolerance=30)
 rgb_new = mask_rgb(rgb, not_greenish & not_grayish)
 display_img(mask_rgb(rgb, not_greenish & not_grayish), "Not Greenish, Not Grayish")
 
-c1 = rgb[800:1200, 100:500]
-c2 = rgb[750:1150, 1350:1750]
-c12 = np.concatenate((c1, c2), axis=1)
-c3 = rgb_new[800:1200, 100:500]
-c4 = rgb_new[750:1150, 1350:1750]
-c34 = np.concatenate((c3, c4), axis=1)
-c1234 = np.concatenate((c12, c34), axis=0)
-display_img(c1234, "Crop 1234")
+row1 = np.concatenate((rgb[800:1200, 100:500], rgb[750:1150, 1350:1750]), axis=1)
+row2 = np.concatenate((rgb_new[800:1200, 100:500], rgb_new[750:1150, 1350:1750]), axis=1)
+result = np.concatenate((row1, row2), axis=0)
+display_img(result)
 
 # otsu = filter_otsu_threshold(filter_rgb_to_grayscale(rgb), output_type="bool")
 # display_img(otsu, "Otsu Threshold")
