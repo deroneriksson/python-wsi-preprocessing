@@ -1879,5 +1879,32 @@ Mask RGB             | Time: 0:00:00.013019  Type: uint8   Shape: (1636, 2048, 3
 Slide #337 processing time: 0:00:05.485500
 ```
 
+Since `apply_filters_to_image()` returns the resulting image as a NumPy array, we can perform further processing on
+the image. If we look at the `apply_filters_to_image()` results for slide #337, we can see that some grayish greenish
+pen marks remain on the slide. We can filter some of these out using our `filter_green()` function with different
+threshold values and our `filter_grays()` function with an increased tolerance value.
+
+We'll compare the results by cropping two regions of the slide before and after this additional processing and
+displaying all four of these regions together.
+
+```
+rgb, _ = apply_filters_to_image(337, display=False, save=False)
+
+not_greenish = filter_green(rgb, red_upper_thresh=125, green_lower_thresh=30, blue_lower_thresh=30,
+                            display_np_info=True)
+not_grayish = filter_grays(rgb, tolerance=30)
+rgb_new = mask_rgb(rgb, not_greenish & not_grayish)
+
+row1 = np.concatenate((rgb[800:1200, 100:500], rgb[750:1150, 1350:1750]), axis=1)
+row2 = np.concatenate((rgb_new[800:1200, 100:500], rgb_new[750:1150, 1350:1750]), axis=1)
+result = np.concatenate((row1, row2), axis=0)
+display_img(result)
+```
+
+After the additional processing, we see that the pen marks in the displayed regions have been significantly reduced.
+
+| **Remove More Green and More Gray** |
+| -------------------- |
+| ![Remove More Green and More Gray](images/remove-more-green-more-gray.png "Remove More Green and More Gray") |
 
 

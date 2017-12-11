@@ -1418,12 +1418,13 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
 
 
 rgb, _ = apply_filters_to_image(337, display=False, save=False)
-display_img(rgb, "RGB")
+# display_img(rgb, "RGB")
+
 not_greenish = filter_green(rgb, red_upper_thresh=125, green_lower_thresh=30, blue_lower_thresh=30,
                             display_np_info=True)
 not_grayish = filter_grays(rgb, tolerance=30)
 rgb_new = mask_rgb(rgb, not_greenish & not_grayish)
-display_img(mask_rgb(rgb, not_greenish & not_grayish), "Not Greenish, Not Grayish")
+# display_img(mask_rgb(rgb, not_greenish & not_grayish), "Not Greenish, Not Grayish")
 
 row1 = np.concatenate((rgb[800:1200, 100:500], rgb[750:1150, 1350:1750]), axis=1)
 row2 = np.concatenate((rgb_new[800:1200, 100:500], rgb_new[750:1150, 1350:1750]), axis=1)
