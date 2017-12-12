@@ -106,8 +106,9 @@ A whole-slide image is a digital representation of a microscopic slide, typicall
 such as 20x or 40x. As a result of this high magnification, whole slide images are typically very large in size.
 The maximum file size for a single whole-slide image in our training dataset was 3.4 GB, with an average over 1 GB.
 
-**WSI Example Slide**<br/>
-![WSI Example Slide](images/wsi-example.png "WSI Example Slide")
+| **WSI Example Slide** |
+| -------------------- |
+| ![WSI Example Slide](images/wsi-example.png "WSI Example Slide") |
 
 
 A whole-slide image is created by a microscope that scans a slide and combines smaller images into a large image.
@@ -115,8 +116,9 @@ Techniques include combining scanned square tiles into a whole-slide image and c
 into a resulting whole-slide image. Occasionally, the smaller constituent images can be
 visually discerned, as in the shaded area at the top of the slide seen below.
 
-**Combining Smaller Images into a Whole-Slide Image**<br/>
-![Combining Smaller Images into a Whole-Slide Image](images/slide-scan.png "Combining Smaller Images into a Whole-Slide Image")
+| **Combining Smaller Images into a Whole-Slide Image** |
+| -------------------- |
+| ![Combining Smaller Images into a Whole-Slide Image](images/slide-scan.png "Combining Smaller Images into a Whole-Slide Image") |
 
 
 A fairly unusual feature of whole-slide images is the very large image size.
@@ -126,14 +128,16 @@ with an average of 73,154 pixels. The image total pixel sizes varied from
 369,356,640 to 35,621,634,048 pixels, with an average of
 7,670,709,628 pixels. The 500 training images take up a total of 525 GB of storage space.
 
-**Training Image Sizes**<br/>
-![Training Image Sizes](images/svs-image-sizes.png "Training Image Sizes")
+| **Training Image Sizes** |
+| -------------------- |
+| ![Training Image Sizes](images/svs-image-sizes.png "Training Image Sizes") |
 
 
 Here we see a histogram distribution of the training image sizes in megapixels.
 
-**Distribution of Images Based on Number of Pixels**<br/>
-![Distribution of Image Sizes](images/distribution-of-svs-image-sizes.png "Distribution of Image Sizes")
+| **Distribution of Images Based on Number of Pixels** |
+| -------------------- |
+| ![Distribution of Image Sizes](images/distribution-of-svs-image-sizes.png "Distribution of Image Sizes") |
 
 
 The [OpenSlide](http://openslide.org/) project can be used to read a variety of whole-slide
@@ -158,21 +162,24 @@ slides.
 If this viewing application is installed on a server that also hosts the whole-slide image repository, this
 offers a convenient mechanism for users to view the slides without requiring local storage space.
 
-**OpenSlide Available Slides**<br/>
-![OpenSlide Available Slides](images/openslide-available-slides.png "OpenSlide Available Slides")
+| **OpenSlide Available Slides** |
+| -------------------- |
+| ![OpenSlide Available Slides](images/openslide-available-slides.png "OpenSlide Available Slides") |
 
 
 Here we can see the initial view of one of the whole-slide images viewed in a web browser.
 
-**OpenSlide Whole Slide Image**<br/>
-![OpenSlide Whole Slide Image](images/openslide-whole-slide-image.png "OpenSlide Whole Slide Image")
+| **OpenSlide Whole Slide Image** |
+| -------------------- |
+| ![OpenSlide Whole Slide Image](images/openslide-whole-slide-image.png "OpenSlide Whole Slide Image") |
 
 
 Using this web interface, the whole-slide image can be zoomed to the highest magnification, revealing fine details at
 the tile level. Zooming and scrolling operations make it relatively easy to visually peruse the whole slide image.
 
-**OpenSlide Whole Slide Image Zoomed**<br/>
-![OpenSlide Whole Slide Image Zoomed](images/openslide-whole-slide-image-zoomed.png "OpenSlide Whole Slide Image Zoomed")
+| **OpenSlide Whole Slide Image Zoomed** |
+| -------------------- |
+| ![OpenSlide Whole Slide Image Zoomed](images/openslide-whole-slide-image-zoomed.png "OpenSlide Whole Slide Image Zoomed") |
 
 
 ## WSI Format Conversion
@@ -306,7 +313,7 @@ on the 500 image training set were obtained:
 
 
 After calling `multiprocess_training_slides_to_images()` using the `png` format, we have 500 whole-slide
-images in lossless png format that we can now examine in much greater detail in relation to our filters.
+images in lossless `png` format that we can now examine in much greater detail in relation to our filters.
 
 
 ## Image Saving, Displaying, and Conversions
@@ -345,8 +352,9 @@ rgb = pil_to_np_rgb(img)
 display_img(rgb, "RGB")
 ```
 
-**Display Image with Text**<br/>
-![Display Image with Text](images/display-image-with-text.png "Display Image with Text")
+| **Display Image with Text** |
+| -------------------- |
+| ![Display Image with Text](images/display-image-with-text.png "Display Image with Text") |
 
 
 When performing operations on NumPy arrays, functions in the `wsi/filter.py` file will often utilize the
@@ -420,8 +428,9 @@ display_img(grayscale, "Grayscale")
 
 Here we see the displayed grayscale image.
 
-**Grayscale Filter**<br/>
-![Grayscale Filter](images/grayscale.png "Grayscale Filter")
+| **Grayscale Filter** |
+| -------------------- |
+| ![Grayscale Filter](images/grayscale.png "Grayscale Filter") |
 
 
 In the console, we see that the grayscale image is a two-dimensional NumPy array, since the 3 color channels have
@@ -455,8 +464,9 @@ complement = filter_complement(grayscale)
 display_img(complement, "Complement")
 ```
 
-**Complement Filter**<br/>
-![Complement Filter](images/complement.png "Complement Filter")
+| **Complement Filter** |
+| -------------------- |
+| ![Complement Filter](images/complement.png "Complement Filter") |
 
 
 In the console output, we see that computing the complement is a very fast operation.
@@ -493,8 +503,10 @@ display_img(hyst, "Threshold")
 The result is a binary image where pixel values that were above 100 are shown in white and pixel values that were 100 or
 lower are shown in black.
 
-**Basic Threshold Filter**<br/>
-![Basic Threshold Filter](images/basic-threshold.png "Basic Threshold Filter")
+| **Basic Threshold Filter** |
+| -------------------- |
+| ![Basic Threshold Filter](images/basic-threshold.png "Basic Threshold Filter") |
+
 
 In the console output, we see that basic thresholding is a very fast operation.
 
@@ -538,8 +550,10 @@ we save the images to the file system.
 Notice that the shadow area along the top edge of the slide makes it through the hysteresis threshold filter even
 though conceptually it is background and should not be treated as tissue.
 
-**Hysteresis Threshold Filter**<br/>
-![Hysteresis Threshold Filter](images/hysteresis-threshold.png "Hysteresis Threshold Filter")
+| **Hysteresis Threshold Filter** |
+| -------------------- |
+| ![Hysteresis Threshold Filter](images/hysteresis-threshold.png "Hysteresis Threshold Filter") |
+
 
 Here we see the console output from our filter operations.
 
@@ -579,8 +593,9 @@ filter in a similar fashion as hysteresis thresholding. Most of the slides in th
 pronounced shadow area, but it would be nice to have an image processing solution that treats the shadow area as
 background.
 
-**Otsu Threshold Filter**<br/>
-![Otsu Threshold Filter](images/otsu-threshold.png "Otsu Threshold Filter")
+| **Otsu Threshold Filter** |
+| -------------------- |
+| ![Otsu Threshold Filter](images/otsu-threshold.png "Otsu Threshold Filter") |
 
 
 In terms of performance, thresholding using Otsu's method is very fast, as we see in the console output.
@@ -626,8 +641,9 @@ This can be used to visually inspect details in the previous intensity range of 
 spread out this range across the full spectrum.
 
 
-**Contrast Stretching Filter**<br/>
-![Contrast Stretching Filter](images/contrast-stretching.png "Contrast Stretching Filter")
+| **Contrast Stretching Filter** |
+| -------------------- |
+| ![Contrast Stretching Filter](images/contrast-stretching.png "Contrast Stretching Filter") |
 
 
 Here we see the console output from this set of filters.
@@ -737,8 +753,9 @@ are not tissue.
 
 Below, we see an example of a slide that has been marked with red pen and some green pen.
 
-**Slide Marked with Red and Green Pen**<br/>
-![Slide Marked with Red and Green Pen](images/slide-pen.png "Slide Marked with Red and Green Pen")
+| **Slide Marked with Red and Green Pen** |
+| -------------------- |
+| ![Slide Marked with Red and Green Pen](images/slide-pen.png "Slide Marked with Red and Green Pen") |
 
 
 Developing color filters that can be used to filter tissue areas can be fairly challenging for a variety of reasons,
