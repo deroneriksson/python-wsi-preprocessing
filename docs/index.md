@@ -1989,3 +1989,6 @@ If we would like to increase the effectiveness of red pen filters, we could make
 multiprocess_apply_filters_to_images(image_num_list=red_pen_slides)
 ```
 
+In this way, we can make tweaks to specific filters or combinations of specific filters and see how these changes apply
+to the subset of relevant training images without requiring reprocessing of the entire training dataset.
+
