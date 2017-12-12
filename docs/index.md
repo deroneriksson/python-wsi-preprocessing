@@ -1908,3 +1908,82 @@ After the additional processing, we see that the pen marks in the displayed regi
 | ![Remove More Green and More Gray](images/remove-more-green-more-gray.png "Remove More Green and More Gray") |
 
 
+## Applying Filters to Multiple Images
+
+When designing our set of tissue-selecting filters, one very important requirement is the ability to visually inspect
+the filter results across multiple slides. Ideally we should easily be able to alternate between displaying the
+results for a single image, a select subset of our training image dataset, and our entire dataset. Additionally,
+multiprocessing can result in a significant performance boost, so we should be able to multiprocess our image
+processing if desired.
+
+A simple, powerful way to visually inspect our filter results is to generate an HTML page for a set of images.
+
+The following functions in `wsi/filter.py` can be used to apply filters to multiple images:
+
+```
+apply_filters_to_image_list(image_num_list, save, display)
+apply_filters_to_image_range(start_ind, end_ind, save, display)
+singleprocess_apply_filters_to_images(save=True, display=False, html=True, image_num_list=None)
+multiprocess_apply_filters_to_images(save=True, display=False, html=True, image_num_list=None)
+
+```
+
+The `apply_filters_to_image_list()` function takes a list of image numbers for processing. It does not generate an
+HTML page but it does generate information that can be used by other functions to generate an HTML page.
+The `save` parameter if `True` will save the generated images to the file system. If the `display` parameter
+is `True`, the generated images will be displayed to the screen. If several images are being processed,
+`display` should be set to False.
+
+The `apply_filters_to_image_range()` function is similar to `apply_filters_to_image_list()` except than rather than
+taking a list of image numbers, it takes a starting index number and ending index number for the slides in the
+training set. Like `apply_filters_to_image_list()`, the `apply_filters_to_image_range()` function has `save` and
+`display` parameters.
+
+The `singleprocess_apply_filters_to_images()` and `multiprocess_apply_filters_to_images()` functions are the
+primary functions that should be called to apply filters to multiple images. Both of these functions feature `save`
+and `display` parameters. The additional `html` parameter if `True` generates an HTML page for displaying the filter
+results on the image set. The `singleprocess_apply_filters_to_images()` and `multiprocess_apply_filters_to_images()`
+functions also feature an `image_num_list` parameter which specifies a list of image numbers that should be
+processed. If `image_num_list` is not supplied, all training images will be processed.
+
+As an example, let's use a single process to apply our filters to images 1, 2, and 3. We can accomplish this with
+the following:
+
+```
+singleprocess_apply_filters_to_images(image_num_list=[1, 2, 3])
+```
+
+In addition to saving the filtered images to the file system, this creates a `filters.html` file that displays all the
+filtered slide images. This file performs lazy image loading since so many images can potentially be loaded.
+If we open the `filters.html` file in a browser, we can see 8 images displayed for each slide. Each separate slide
+is displayed as a separate row. Here, we see slides #1 and #2 displayed in a browser.
+
+| **Filters 001 through 004** | **Fitlers 005 through 008** |
+| -------------------- | --------------------------------- |
+| ![Filters 001 through 004](images/filters-001-004.png "Filters 001 through 004") | ![Fitlers 005 through 008](images/filters-005-008.png "Fitlers 005 through 008") |
+
+
+To apply all filters to all images in the training set, we can utilize the `multiprocess_apply_filters_to_images()`
+function. Since there are 8 images per slide and 500 slides, this results in a total of 4000 images.
+
+```
+multiprocess_apply_filters_to_images()
+```
+
+If we display the `filters.html` file in a browser, we see that all filter results for all images are displayed.
+Using this page, one useful action we can take is to manually group similar slides into categories. For example,
+we could group slides into slides that have red, green, and blue pen marks on them. 
+
+```
+red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289, 336, 349, 357, 380, 450, 482]
+green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
+blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
+```
+
+If we would like to increase the effectiveness of red pen filters, we could make tweaks to our
+`apply_filters_to_image()` function and run these changes on the set of red pen slides:
+
+```
+multiprocess_apply_filters_to_images(image_num_list=red_pen_slides)
+```
+

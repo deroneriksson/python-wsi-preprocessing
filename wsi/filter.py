@@ -1341,7 +1341,7 @@ def singleprocess_apply_filters_to_images(save=True, display=False, html=True, i
     generate_filter_html_page(info)
 
 
-def multiprocess_apply_filters_to_images(save=False, display=False, html=True, image_num_list=None):
+def multiprocess_apply_filters_to_images(save=True, display=False, html=True, image_num_list=None):
   """
   Apply a set of filters to all training images using multiple processes (one process per core).
 
@@ -1417,19 +1417,17 @@ def multiprocess_apply_filters_to_images(save=False, display=False, html=True, i
   print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
 
 
-rgb, _ = apply_filters_to_image(337, display=False, save=False)
+# rgb, _ = apply_filters_to_image(337, display=False, save=False)
 # display_img(rgb, "RGB")
-
-not_greenish = filter_green(rgb, red_upper_thresh=125, green_lower_thresh=30, blue_lower_thresh=30,
-                            display_np_info=True)
-not_grayish = filter_grays(rgb, tolerance=30)
-rgb_new = mask_rgb(rgb, not_greenish & not_grayish)
+# not_greenish = filter_green(rgb, red_upper_thresh=125, green_lower_thresh=30, blue_lower_thresh=30,
+#                             display_np_info=True)
+# not_grayish = filter_grays(rgb, tolerance=30)
+# rgb_new = mask_rgb(rgb, not_greenish & not_grayish)
 # display_img(mask_rgb(rgb, not_greenish & not_grayish), "Not Greenish, Not Grayish")
-
-row1 = np.concatenate((rgb[800:1200, 100:500], rgb[750:1150, 1350:1750]), axis=1)
-row2 = np.concatenate((rgb_new[800:1200, 100:500], rgb_new[750:1150, 1350:1750]), axis=1)
-result = np.concatenate((row1, row2), axis=0)
-display_img(result)
+# row1 = np.concatenate((rgb[800:1200, 100:500], rgb[750:1150, 1350:1750]), axis=1)
+# row2 = np.concatenate((rgb_new[800:1200, 100:500], rgb_new[750:1150, 1350:1750]), axis=1)
+# result = np.concatenate((row1, row2), axis=0)
+# display_img(result)
 
 # otsu = filter_otsu_threshold(filter_rgb_to_grayscale(rgb), output_type="bool")
 # display_img(otsu, "Otsu Threshold")
@@ -1439,7 +1437,9 @@ display_img(result)
 # display_img(mask_rgb(rgb, hyst), "RGB with Hysteresis Threshold Mask")
 # display_img(otsu ^ hyst, "XOR")
 
+# singleprocess_apply_filters_to_images(image_num_list=[1, 2, 3])
 
+multiprocess_apply_filters_to_images()
 
 # img, _ = apply_filters_to_image(4, display=True, save=False)
 # display_img(img, "RESULT", bg=True)
