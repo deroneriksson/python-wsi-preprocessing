@@ -1963,16 +1963,22 @@ is displayed as a separate row. Here, we see slides #1 and #2 displayed in a bro
 | ![Filters 001 through 004](images/filters-001-004.png "Filters 001 through 004") | ![Fitlers 005 through 008](images/filters-005-008.png "Fitlers 005 through 008") |
 
 
-To apply all filters to all images in the training set, we can utilize the `multiprocess_apply_filters_to_images()`
-function. Since there are 8 images per slide and 500 slides, this results in a total of 4000 images. Generating
-PNG images, this takes about 16 minutes on my Mac laptop. This can be sped up significantly if JPEG images are used as
-the format.
+To apply all filters to all images in the training set using multiprocessing, we can utilize the
+`multiprocess_apply_filters_to_images()` function. Since there are 8 images per slide and 500 slides,
+this results in a total of 4000 images. Generating PNG images, this takes about 16 minutes on my Mac laptop.
+This can be sped up significantly if JPEG images are used as the format.
 
 ```
 multiprocess_apply_filters_to_images()
 ```
 
 If we display the `filters.html` file in a browser, we see that all filter results for all images are displayed.
+
+| **All Slides and Filter Results** |
+| -------------------- |
+| ![All Slides and Filter Results](images/slides-and-filters-browser.png "All Slides and Filter Results") |
+
+
 Using this page, one useful action we can take is to manually group similar slides into categories. For example,
 we could group slides into slides that have red, green, and blue pen marks on them. 
 
