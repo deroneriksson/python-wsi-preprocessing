@@ -2015,3 +2015,56 @@ multiprocess_apply_filters_to_images(image_num_list=red_pen_slides)
 In this way, we can make tweaks to specific filters or combinations of specific filters and see how these changes apply
 to the subset of relevant training images without requiring reprocessing of the entire training dataset.
 
+
+## Overmask Avoidance
+
+When developing filters and filter settings to perform tissue identification on the entire training
+set, we have to deal with a great amount of variation in the slide samples. To begin with, some slides have a large
+amount of tissue on them, while other slides only have a minimal amount of tissue. There is a great deal of
+variation in tissue staining. We also need to deal with additional issues such as pen marks and shadows on some of
+the slides.
+
+| **Slide with Large Tissue Sample** | **Slide with Small Tissue Sample** |
+| -- | -- |
+| Example goes here. | Example goes here. |
+
+
+| **Slide with Pink Staining** | **Slide with Purple Staining** |
+| -- | -- |
+| Example goes here. | Example goes here. |
+
+
+Because of this, being aggressive in our filtering may generate excellent results for many of the slides but may
+result in overmasking of other slides, where the amount of non-tissue masking is too high. For example, if 99% of
+a slide is masked, most likely it has been overmasked.
+
+| **Slide with Overmasking** |
+| -- |
+| Example goes here. |
+
+
+Avoiding overmasking across the entire training dataset can be difficult. For example, suppose we have a slide that
+has only a proportionaly small amount of tissue on it to start, say 10%. If this particular tissue sample has been
+poorly stained so that it is perhaps a light purplish grayish color, applying our grays filter might result in a
+significant portion of the tissue being masked out. This could also potentially result in small islands of non-masked
+tissue, and since we utilize a filter to remove small objects, this could result in the further masking out of
+additional tissue regions. In such a situation, masking of 95% to 100% of the slide is possible.
+
+Therefore, rather than having fixed settings, we can automatically have our filters tweak parameter values to avoid
+overmasking if desired. As examples, the `filter_green_channel()` and `filter_remove_small_objects()` functions have
+this ability. If this masking exceeds a certain overmasking threshold, a parameter value can be changed to lower
+the amount of overmasking until the masking is below the overmasking threshold.
+
+```
+filter_green_channel(np_img, green_thresh=200, avoid_overmask=True, overmask_thresh=90, output_type="bool")
+filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=True, overmask_thresh=95, output_type="uint8")
+```
+
+For the `filter_green_channel()` function, if a `green_thresh` value of 200 results in masking over 90%, the
+function will try with a higher `green_thresh` value (227) and the masking level will be checked. This will continue
+until the masking doesn't exceed the overmask threshold of 90%.
+
+For the `filter_remove_small_objects()` function, if a `min_size` value of 3000 results in a masking level over 95%,
+the function will try with a lower `min_size` value (1500) and the masking level will be checked. These `min_size`
+reductions will continue until the masking level isn't over 95%.
+
