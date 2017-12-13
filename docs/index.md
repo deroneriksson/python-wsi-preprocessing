@@ -2015,6 +2015,10 @@ multiprocess_apply_filters_to_images(image_num_list=red_pen_slides)
 In this way, we can make tweaks to specific filters or combinations of specific filters and see how these changes apply
 to the subset of relevant training images without requiring reprocessing of the entire training dataset.
 
+| **Red Pen Slides with Filter Results** |
+| -------------------- |
+| ![Red Pen Slides with Filter Results](images/red-pen-slides-filters.png "Red Pen Slides with Filter Results") |
+
 
 ## Overmask Avoidance
 
