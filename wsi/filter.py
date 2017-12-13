@@ -1448,17 +1448,17 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 # singleprocess_apply_filters_to_images(save=True, display=False)
 # multiprocess_apply_filters_to_images(save=False, display=False, html=True)
 
-red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
-                  336, 349, 357, 380, 450, 482]
-multiprocess_apply_filters_to_images(image_num_list=red_pen_slides)
+# red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
+#                   336, 349, 357, 380, 450, 482]
+# multiprocess_apply_filters_to_images(image_num_list=red_pen_slides)
 # green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
 # blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
-# overmasked_slides = [1, 21, 29, 37, 43, 88, 116, 126, 127, 142, 145, 173, 196, 220, 225, 234, 238, 284, 292, 294, 304,
-#                      316, 401, 403, 424, 448, 452, 472, 494]
-# multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=overmasked_slides)
+overmasked_slides = [1, 21, 29, 37, 43, 88, 116, 126, 127, 142, 145, 173, 196, 220, 225, 234, 238, 284, 292, 294, 304,
+                     316, 401, 403, 424, 448, 452, 472, 494]
+multiprocess_apply_filters_to_images(image_num_list=overmasked_slides)
 
 # img_path = slide.get_training_image_path(2)
 # img = slide.open_image(img_path)

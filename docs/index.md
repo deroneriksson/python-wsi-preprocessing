@@ -2028,9 +2028,19 @@ amount of tissue on them, while other slides only have a minimal amount of tissu
 variation in tissue staining. We also need to deal with additional issues such as pen marks and shadows on some of
 the slides.
 
-| **Slide with Large Tissue Sample** | **Slide with Small Tissue Sample** |
+Slide #498 is an example of a slide with a large tissue sample. After filtering, the slide is 46% masked.
+
+| **Slide with Large Tissue Sample** | **Slide with Large Tissue Sample after Filtering** |
 | -- | -- |
-| Example goes here. | Example goes here. |
+| ![Slide with Large Tissue Sample](images/498-rgb.png "Slide with Large Tissue Sample") | ![Slide with Large Tissue Sample after Filtering](images/498-rgb-after-filters.png "Slide with Large Tissue Sample after Filtering") |
+
+
+Slide #127 is an example of a small tissue sample. After filtering, the slide is 93% masked. With such a small tissue
+sample to begin with, we need to be careful that our filters don't overmask this slide.
+
+| **Slide with Small Tissue Sample** | **Slide with Small Tissue Sample after Filtering** |
+| -- | -- |
+| ![Slide with Small Tissue Sample](images/127-rgb.png "Slide with Small Tissue Sample") | ![Slide with Small Tissue Sample after Filtering](images/127-rgb-after-filters.png "Slide with Small Tissue Sample after Filtering") |
 
 
 | **Slide with Pink Staining** | **Slide with Purple Staining** |
@@ -2071,4 +2081,10 @@ until the masking doesn't exceed the overmask threshold of 90%.
 For the `filter_remove_small_objects()` function, if a `min_size` value of 3000 results in a masking level over 95%,
 the function will try with a lower `min_size` value (1500) and the masking level will be checked. These `min_size`
 reductions will continue until the masking level isn't over 95%.
+
+```
+overmasked_slides = [1, 21, 29, 37, 43, 88, 116, 126, 127, 142, 145, 173, 196, 220, 225, 234, 238, 284, 292, 294, 304,
+                     316, 401, 403, 424, 448, 452, 472, 494]
+multiprocess_apply_filters_to_images(image_num_list=overmasked_slides)
+```
 
