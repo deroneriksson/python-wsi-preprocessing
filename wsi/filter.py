@@ -1101,9 +1101,16 @@ def apply_filters_to_image(slide_num, save=True, display=False):
                "Not Gray, Not Green, No Pens,\nRemove Small Objects",
                "rgb-not-green-not-gray-no-pens-remove-small")
 
+  img = rgb_remove_small
+
+  if save:
+    t1 = Time()
+    result_path = slide.get_filter_image_result(slide_num)
+    np_to_pil(img).save(result_path)
+    print("%-20s | Time: %-14s  Name: %s" % ("Save Image", str(t1.elapsed()), result_path))
+
   print("Slide #%03d processing time: %s\n" % (slide_num, str(t.elapsed())))
 
-  img = rgb_remove_small
   return img, info
 
 
@@ -1394,7 +1401,6 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 
   print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
 
-
 # rgb, _ = apply_filters_to_image(337, display=False, save=False)
 # display_img(rgb, "RGB")
 # not_greenish = filter_green(rgb, red_upper_thresh=125, green_lower_thresh=30, blue_lower_thresh=30,
@@ -1418,9 +1424,9 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 # singleprocess_apply_filters_to_images(save=True, display=False)
 # multiprocess_apply_filters_to_images(save=False, display=False, html=True)
 
-# red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
-#                   336, 349, 357, 380, 450, 482]
-# multiprocess_apply_filters_to_images(image_num_list=red_pen_slides)
+red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
+                  336, 349, 357, 380, 450, 482]
+multiprocess_apply_filters_to_images(image_num_list=red_pen_slides)
 # green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
 # blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]

@@ -152,6 +152,22 @@ def get_filter_image_filename(slide_number, filter_number, filter_name_info):
   return img_filename
 
 
+def get_filter_image_result(slide_number):
+  """
+  Convert slide number to the path to the file that is the final result of filtering.
+
+  Args:
+    slide_number: The slide number.
+
+  Returns:
+    Path to the filter image file.
+  """
+  padded_sl_num = str(slide_number).zfill(3)
+  img_path = FILTER_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + FILTER_SUFFIX + str(DEST_TRAIN_SIZE) + \
+             "-filtered" + "." + DEST_TRAIN_EXT
+  return img_path
+
+
 def training_slide_to_image(slide_number):
   """
   Convert a WSI training slide to an image in a format such as jpg or png.
@@ -465,7 +481,6 @@ class Time:
     self.end = datetime.datetime.now()
     time_elapsed = self.end - self.start
     return time_elapsed
-
 
 # singleprocess_training_slides_to_images()
 # multiprocess_training_slides_to_images()
