@@ -2166,10 +2166,10 @@ Mask RGB             | Time: 0:00:00.014755  Type: uint8   Shape: (1944, 2048, 3
 Save Image           | Time: 0:00:01.020773  Name: /Volumes/BigData/TUPAC/filter_2048_png/TUPAC-TR-021-006-2048-rgb-no-blue-pen.png
 Mask RGB             | Time: 0:00:00.015858  Type: uint8   Shape: (1944, 2048, 3)
 Save Image           | Time: 0:00:00.541936  Name: /Volumes/BigData/TUPAC/filter_2048_png/TUPAC-TR-021-007-2048-rgb-no-gray-no-green-no-pens.png
-Mask percentage 97.81% >= threshold 95.00% for Remove Small Objs size 500, so try 250
-Mask percentage 97.04% >= threshold 95.00% for Remove Small Objs size 250, so try 125
-Mask percentage 96.06% >= threshold 95.00% for Remove Small Objs size 125, so try 62
-Mask percentage 95.02% >= threshold 95.00% for Remove Small Objs size 62, so try 31
+Mask percentage 97.81% >= overmask threshold 95.00% for Remove Small Objs size 500, so try 250
+Mask percentage 97.04% >= overmask threshold 95.00% for Remove Small Objs size 250, so try 125
+Mask percentage 96.06% >= overmask threshold 95.00% for Remove Small Objs size 125, so try 62
+Mask percentage 95.02% >= overmask threshold 95.00% for Remove Small Objs size 62, so try 31
 Remove Small Objs    | Time: 0:00:00.076443  Type: bool    Shape: (1944, 2048)
 Remove Small Objs    | Time: 0:00:00.160442  Type: bool    Shape: (1944, 2048)
 Remove Small Objs    | Time: 0:00:00.231779  Type: bool    Shape: (1944, 2048)

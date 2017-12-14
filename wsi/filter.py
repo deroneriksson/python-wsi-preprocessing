@@ -307,7 +307,7 @@ def filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=True, over
   mask_percentage = mask_percent(rem_sm)
   if (mask_percentage >= overmask_thresh) and (min_size >= 1) and (avoid_overmask is True):
     new_min_size = min_size / 2
-    print("Mask percentage %3.2f%% >= threshold %3.2f%% for Remove Small Objs size %d, so try %d" % (
+    print("Mask percentage %3.2f%% >= overmask threshold %3.2f%% for Remove Small Objs size %d, so try %d" % (
       mask_percentage, overmask_thresh, min_size, new_min_size))
     rem_sm = filter_remove_small_objects(np_img, new_min_size, avoid_overmask, overmask_thresh, output_type)
   np_img = rem_sm
