@@ -1469,3 +1469,10 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 # np_filt = filter_entropy(np_filt, neighborhood=5, threshold=4, output_type="bool")
 # np_img = mask_rgb(np_img, np_filt)
 # display_img(np_img, "Entropy" + mask_percentage_text(mask_percent(np_img)))
+
+# red_pen_mask_percentage = mask_percent(mask_no_red_pen)
+# if red_pen_mask_percentage >= 1.0:
+#   gray_no_red_pen = filter_rgb_to_grayscale(rgb_no_red_pen)
+#   mask_entropy = filter_entropy(gray_no_red_pen, neighborhood=5, threshold=4, output_type="bool")
+#   rgb_entropy = mask_rgb(rgb, mask_entropy)
+#   save_display(save, display, info, rgb_entropy, slide_num, 5, "Entropy", "rgb-entropy")
