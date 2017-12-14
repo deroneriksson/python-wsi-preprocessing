@@ -284,7 +284,7 @@ def mask_percent(np_img):
   return mask_percentage
 
 
-def filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=True, overmask_thresh=95, output_type="uint8"):
+def filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=False, overmask_thresh=95, output_type="uint8"):
   """
   Filter image to remove small objects (connected components) less than a particular minimum size. If avoid_overmask
   is True, this function can recursively call itself with progressively smaller minimum size objects to remove to
@@ -312,7 +312,7 @@ def filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=True, over
     rem_sm = np_img.astype(bool)  # make sure mask is boolean
     rem_sm = sk_morphology.remove_small_objects(rem_sm, min_size=min_size)
     mask_percentage = mask_percent(rem_sm)
-    if (mask_percentage >= overmask_thresh):
+    if (mask_percentage >= overmask_thresh) and (min_size >= 1):
       new_min_size = min_size / 2
       print("Mask percentage %3.2f%% >= threshold %3.2f%% for Remove Small Objs size %d, so try %d" % (
         mask_percentage, overmask_thresh, min_size, new_min_size))
@@ -736,23 +736,16 @@ def filter_green_channel(np_img, green_thresh=200, avoid_overmask=True, overmask
   """
   t = Time()
 
-  skip = False
-  if (avoid_overmask == True):
-    skip_mask_percent_check = mask_percent(np_img)
-    if skip_mask_percent_check >= overmask_thresh:
-      skip = True
-
-  if not skip:
-    g = np_img[:, :, 1]
-    gr_ch_mask = (g < green_thresh) & (g > 0)
-    mask_percentage = mask_percent(gr_ch_mask)
-    if (mask_percentage >= overmask_thresh):
-      new_green_thresh = (255 - green_thresh) / 2 + green_thresh
-      print(
-        "Mask percentage %3.2f%% >= overmask threshold %3.2f%% for Remove Green Channel green_thresh=%d, so try %d" % (
-          mask_percentage, overmask_thresh, green_thresh, new_green_thresh))
-      gr_ch_mask = filter_green_channel(np_img, new_green_thresh, avoid_overmask, overmask_thresh, output_type)
-    np_img = gr_ch_mask
+  g = np_img[:, :, 1]
+  gr_ch_mask = (g < green_thresh) & (g > 0)
+  mask_percentage = mask_percent(gr_ch_mask)
+  if (mask_percentage >= overmask_thresh) and (avoid_overmask is True):
+    new_green_thresh = (255 - green_thresh) / 2 + green_thresh
+    print(
+      "Mask percentage %3.2f%% >= overmask threshold %3.2f%% for Remove Green Channel green_thresh=%d, so try %d" % (
+        mask_percentage, overmask_thresh, green_thresh, new_green_thresh))
+    gr_ch_mask = filter_green_channel(np_img, new_green_thresh, avoid_overmask, overmask_thresh, output_type)
+  np_img = gr_ch_mask
 
   if output_type == "bool":
     pass
@@ -761,11 +754,7 @@ def filter_green_channel(np_img, green_thresh=200, avoid_overmask=True, overmask
   else:
     np_img = np_img.astype("uint8") * 255
 
-  if skip:
-    print("Mask percentage %3.2f%% >= threshold %3.2f%%, so Filter Green Channel skipped." % (
-      skip_mask_percent_check, overmask_thresh))
-  else:
-    np_info(np_img, "Filter Green Channel", t.elapsed())
+  np_info(np_img, "Filter Green Channel", t.elapsed())
   return np_img
 
 
@@ -1456,9 +1445,10 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 # blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
 # multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
 # singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
-overmasked_slides = [1, 21, 29, 37, 43, 88, 116, 126, 127, 142, 145, 173, 196, 220, 225, 234, 238, 284, 292, 294, 304,
-                     316, 401, 403, 424, 448, 452, 472, 494]
-multiprocess_apply_filters_to_images(image_num_list=overmasked_slides)
+# overmasked_slides = [1, 21, 29, 37, 43, 88, 116, 126, 127, 142, 145, 173, 196, 220, 225, 234, 238, 284, 292, 294, 304,
+#                      316, 401, 403, 424, 448, 452, 472, 494]
+# multiprocess_apply_filters_to_images(image_num_list=overmasked_slides)
+singleprocess_apply_filters_to_images(image_num_list=[21])
 
 # img_path = slide.get_training_image_path(2)
 # img = slide.open_image(img_path)
