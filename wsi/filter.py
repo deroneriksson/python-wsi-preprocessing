@@ -1437,7 +1437,7 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 # overmasked_slides = [1, 21, 29, 37, 43, 88, 116, 126, 127, 142, 145, 173, 196, 220, 225, 234, 238, 284, 292, 294, 304,
 #                      316, 401, 403, 424, 448, 452, 472, 494]
 # multiprocess_apply_filters_to_images(image_num_list=overmasked_slides)
-singleprocess_apply_filters_to_images(image_num_list=[21])
+singleprocess_apply_filters_to_images(image_num_list=[424])
 
 # img_path = slide.get_training_image_path(2)
 # img = slide.open_image(img_path)

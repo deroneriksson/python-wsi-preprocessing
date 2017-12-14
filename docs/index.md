@@ -2043,31 +2043,30 @@ sample to begin with, we need to be careful that our filters don't overmask this
 | ![Slide with Small Tissue Sample](images/127-rgb.png "Slide with Small Tissue Sample") | ![Slide with Small Tissue Sample after Filtering](images/127-rgb-after-filters.png "Slide with Small Tissue Sample after Filtering") |
 
 
-| **Slide with Pink Staining** | **Slide with Purple Staining** |
-| -- | -- |
-| Example goes here. | Example goes here. |
-
-
-Because of this, being aggressive in our filtering may generate excellent results for many of the slides but may
+Being aggressive in our filtering may generate excellent results for many of the slides but may
 result in overmasking of other slides, where the amount of non-tissue masking is too high. For example, if 99% of
-a slide is masked, most likely it has been overmasked.
-
-| **Slide with Overmasking** |
-| -- |
-| Example goes here. |
-
+a slide is masked, it has been overmasked.
 
 Avoiding overmasking across the entire training dataset can be difficult. For example, suppose we have a slide that
 has only a proportionaly small amount of tissue on it to start, say 10%. If this particular tissue sample has been
-poorly stained so that it is perhaps a light purplish grayish color, applying our grays filter might result in a
-significant portion of the tissue being masked out. This could also potentially result in small islands of non-masked
-tissue, and since we utilize a filter to remove small objects, this could result in the further masking out of
-additional tissue regions. In such a situation, masking of 95% to 100% of the slide is possible.
+poorly stained so that it is perhaps a light purplish grayish color, applying our grays or green channel filters might
+result in a significant portion of the tissue being masked out. This could also potentially result in small
+islands of non-masked tissue, and since we utilize a filter to remove small objects, this could result in the
+further masking out of additional tissue regions. In such a situation, masking of 95% to 100% of the slide is possible.
+
+Slide #424 has a small tissue sample and its staining is a very faint lavender color. Slide #424 is
+at risk for overmasking with our given combination of filters.
+
+| **Slide with Small Tissue Sample and Faint Staining** |
+| -- |
+| ![Slide with Small Tissue Sample and Faint Staining](images/424-rgb.png "Slide with Small Tissue Sample and Faint Staining") |
+
+
 
 Therefore, rather than having fixed settings, we can automatically have our filters tweak parameter values to avoid
 overmasking if desired. As examples, the `filter_green_channel()` and `filter_remove_small_objects()` functions have
 this ability. If this masking exceeds a certain overmasking threshold, a parameter value can be changed to lower
-the amount of overmasking until the masking is below the overmasking threshold.
+the amount of masking until the masking is below the overmasking threshold.
 
 ```
 filter_green_channel(np_img, green_thresh=200, avoid_overmask=True, overmask_thresh=90, output_type="bool")
@@ -2081,6 +2080,11 @@ until the masking doesn't exceed the overmask threshold of 90%.
 For the `filter_remove_small_objects()` function, if a `min_size` value of 3000 results in a masking level over 95%,
 the function will try with a lower `min_size` value (1500) and the masking level will be checked. These `min_size`
 reductions will continue until the masking level isn't over 95%.
+
+Examining our full set of images using `multiprocess_apply_filters_to_images()`, we can identify slides that are
+at risk for overmasking. We can create a list of these slide numbers and use `multiprocess_apply_filters_to_images()`
+with this list of slide numbers to generate our HTML filters page that allows us to visually inspect the filters
+applied to this set of slides.
 
 ```
 overmasked_slides = [1, 21, 29, 37, 43, 88, 116, 126, 127, 142, 145, 173, 196, 220, 225, 234, 238, 284, 292, 294, 304,
