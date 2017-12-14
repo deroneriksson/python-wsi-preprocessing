@@ -284,7 +284,7 @@ def mask_percent(np_img):
   return mask_percentage
 
 
-def filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=False, overmask_thresh=95, output_type="uint8"):
+def filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=True, overmask_thresh=95, output_type="uint8"):
   """
   Filter image to remove small objects (connected components) less than a particular minimum size. If avoid_overmask
   is True, this function can recursively call itself with progressively smaller minimum size objects to remove to
@@ -302,22 +302,15 @@ def filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=False, ove
   """
   t = Time()
 
-  skip = False
-  if (avoid_overmask == True):
-    skip_mask_percent_check = mask_percent(np_img)
-    if skip_mask_percent_check >= overmask_thresh:
-      skip = True
-
-  if not skip:
-    rem_sm = np_img.astype(bool)  # make sure mask is boolean
-    rem_sm = sk_morphology.remove_small_objects(rem_sm, min_size=min_size)
-    mask_percentage = mask_percent(rem_sm)
-    if (mask_percentage >= overmask_thresh) and (min_size >= 1):
-      new_min_size = min_size / 2
-      print("Mask percentage %3.2f%% >= threshold %3.2f%% for Remove Small Objs size %d, so try %d" % (
-        mask_percentage, overmask_thresh, min_size, new_min_size))
-      rem_sm = filter_remove_small_objects(np_img, new_min_size, avoid_overmask, overmask_thresh, output_type)
-    np_img = rem_sm
+  rem_sm = np_img.astype(bool)  # make sure mask is boolean
+  rem_sm = sk_morphology.remove_small_objects(rem_sm, min_size=min_size)
+  mask_percentage = mask_percent(rem_sm)
+  if (mask_percentage >= overmask_thresh) and (min_size >= 1) and (avoid_overmask is True):
+    new_min_size = min_size / 2
+    print("Mask percentage %3.2f%% >= threshold %3.2f%% for Remove Small Objs size %d, so try %d" % (
+      mask_percentage, overmask_thresh, min_size, new_min_size))
+    rem_sm = filter_remove_small_objects(np_img, new_min_size, avoid_overmask, overmask_thresh, output_type)
+  np_img = rem_sm
 
   if output_type == "bool":
     pass
@@ -326,11 +319,7 @@ def filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=False, ove
   else:
     np_img = np_img.astype("uint8") * 255
 
-  if skip:
-    print("Mask percentage %3.2f%% >= threshold %3.2f%%, so Remove Small Objs skipped." % (
-      skip_mask_percent_check, overmask_thresh))
-  else:
-    np_info(np_img, "Remove Small Objs", t.elapsed())
+  np_info(np_img, "Remove Small Objs", t.elapsed())
   return np_img
 
 
