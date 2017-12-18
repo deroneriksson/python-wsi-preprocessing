@@ -24,25 +24,13 @@ import wsi.filter as filter
 import wsi.slide as slide
 import math
 
-TILE_SIZE = 256
+ROW_TILE_SIZE = 256
+COL_TILE_SIZE = 256
 
 img_path = slide.get_filter_image_result(4)
 img = slide.open_image(img_path)
-# # img.show()
 np_img = filter.pil_to_np_rgb(img)
 
-
-# # print(str(np_img))
-# tiles = np.array_split(np_img, [TILE_SIZE, TILE_SIZE])
-# print(str(tiles))
-
-# a = np.arange(1,101).reshape(10,10)
-# print(str(a))
-# tiles = np.array_split(a, 2)
-# tiles = np.vsplit(a, 10/5)
-# print(str(tiles))
-# tiles2 = np.hsplit(tiles, 10/5)
-# print(str(tiles2))
 
 def get_tile_indices(np_img, row_tile_size, col_tile_size):
   indices = list()
@@ -62,6 +50,22 @@ def get_tile_indices(np_img, row_tile_size, col_tile_size):
   return indices
 
 
-tile_indices = get_tile_indices(np_img, TILE_SIZE, TILE_SIZE)
+tile_indices = get_tile_indices(np_img, ROW_TILE_SIZE, COL_TILE_SIZE)
 print("length:" + str(len(tile_indices)))
 print(str(tile_indices))
+for t in tile_indices:
+  r_s, r_e, c_s, c_e = t
+  print("[%d:%d, %d:%d]" % (r_s, r_e, c_s, c_e))
+  np_tile = np_img[r_s:r_e, c_s:c_e]
+  mask_percentage = filter.mask_percent(np_tile)
+  tissue_percentage = filter.tissue_percent(np_tile)
+  print("TILE " + str(np_tile.shape) + ": " + str(mask_percentage) + "%, " + str(tissue_percentage) + "%")
+
+# a = np.array([[1,2],[3,4]])
+# b = np.array([[5,6],[7,8]])
+# print(str(a))
+# print(str(b))
+# c = np.dstack((a,b))
+# print(str(c.shape))
+# d = c[:,:,0] + c[:,:,1]
+# print(str(d))
