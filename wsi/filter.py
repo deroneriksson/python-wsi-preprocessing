@@ -284,6 +284,19 @@ def mask_percent(np_img):
   return mask_percentage
 
 
+def tissue_percent(np_img):
+  """
+  Determine the percentage of a NumPy array that is tissue (not masked).
+
+  Args:
+    np_img: Image as a NumPy array.
+
+  Returns:
+    The percentage of the NumPy array that is tissue.
+  """
+  return 100 - mask_percent(np_img)
+
+
 def filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=True, overmask_thresh=95, output_type="uint8"):
   """
   Filter image to remove small objects (connected components) less than a particular minimum size. If avoid_overmask
