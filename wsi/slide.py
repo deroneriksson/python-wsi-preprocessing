@@ -43,6 +43,7 @@ DEST_TRAIN_DIR = BASE_DIR + os.sep + "training_" + str(DEST_TRAIN_SIZE) + "_" + 
 
 FILTER_DIR = BASE_DIR + os.sep + "filter_" + str(DEST_TRAIN_SIZE) + "_" + DEST_TRAIN_EXT
 FILTER_SUFFIX = ""  # Example: "filter-"
+FILTER_RESULT_TEXT = "filtered"
 
 STATS_DIR = BASE_DIR + os.sep + "svs_stats"
 
@@ -164,7 +165,7 @@ def get_filter_image_result(slide_number):
   """
   padded_sl_num = str(slide_number).zfill(3)
   img_path = FILTER_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + FILTER_SUFFIX + str(DEST_TRAIN_SIZE) + \
-             "-filtered" + "." + DEST_TRAIN_EXT
+             "-" + FILTER_RESULT_TEXT + "." + DEST_TRAIN_EXT
   return img_path
 
 
