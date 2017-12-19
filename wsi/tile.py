@@ -27,7 +27,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROW_TILE_SIZE = 128
 COL_TILE_SIZE = 128
-TISSUE_THRESHOLD_PERCENT = 80
+TISSUE_THRESHOLD_PERCENT = 50
 
 
 def get_num_tiles(np_img, row_tile_size, col_tile_size):
@@ -91,7 +91,12 @@ def display_tile_summary(np_img, tile_indices, row_tile_size, col_tile_size):
     np_tile = np_img[r_s:r_e, c_s:c_e]
     tissue_percentage = filter.tissue_percent(np_tile)
     print("TILE [%d:%d, %d:%d]: Tissue %f%%" % (r_s, r_e, c_s, c_e, tissue_percentage))
-    draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=(255, 0, 0))
+    if (tissue_percentage >= TISSUE_THRESHOLD_PERCENT):
+      draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=(0, 255, 0))
+      draw.rectangle([(c_s+1, r_s+1), (c_e - 2, r_e - 2)], outline=(0, 255, 0))
+    else:
+      draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=(255, 0, 0))
+      draw.rectangle([(c_s+1, r_s+1), (c_e - 2, r_e - 2)], outline=(255, 0, 0))
     # filter.display_img(np_tile, text=label, size=14, bg=True)
     label = "#%d\n%4.2f%%" % (count, tissue_percentage)
     font = ImageFont.truetype("/Library/Fonts/Arial Bold.ttf", size=22)
@@ -99,7 +104,7 @@ def display_tile_summary(np_img, tile_indices, row_tile_size, col_tile_size):
   summary.show()
 
 
-img_path = slide.get_filter_image_result(4)
+img_path = slide.get_filter_image_result(10)
 img = slide.open_image(img_path)
 np_img = filter.pil_to_np_rgb(img)
 
