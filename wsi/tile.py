@@ -76,24 +76,32 @@ def get_tile_indices(np_img, row_tile_size, col_tile_size):
   return indices
 
 
+def display_tile_summary(np_img, tile_indices, row_tile_size, col_tile_size):
+  num_row_tiles, num_col_tiles = get_num_tiles(np_img, row_tile_size, col_tile_size)
+  summary_img = np.zeros([ROW_TILE_SIZE * num_row_tiles, COL_TILE_SIZE * num_col_tiles, np_img.shape[2]],
+                         dtype=np.uint8)
+  summary_img.fill(120)
+  summary_img[0:np_img.shape[0], 0:np_img.shape[1]] = np_img
+  summary = filter.np_to_pil(summary_img)
+  draw = ImageDraw.Draw(summary)
+  count = 0
+  for t in tile_indices:
+    count += 1
+    r_s, r_e, c_s, c_e = t
+    np_tile = np_img[r_s:r_e, c_s:c_e]
+    tissue_percentage = filter.tissue_percent(np_tile)
+    print("TILE [%d:%d, %d:%d]: Tissue %f%%" % (r_s, r_e, c_s, c_e, tissue_percentage))
+    draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=(255, 0, 0))
+    # filter.display_img(np_tile, text=label, size=14, bg=True)
+    label = "#%d\n%4.2f%%" % (count, tissue_percentage)
+    font = ImageFont.truetype("/Library/Fonts/Arial Bold.ttf", size=22)
+    draw.text((c_s + 2, r_s + 2), label, (255, 255, 255), font=font)
+  summary.show()
+
+
 img_path = slide.get_filter_image_result(4)
 img = slide.open_image(img_path)
 np_img = filter.pil_to_np_rgb(img)
 
 tile_indices = get_tile_indices(np_img, ROW_TILE_SIZE, COL_TILE_SIZE)
-summary_img = filter.np_to_pil(np_img)
-draw = ImageDraw.Draw(summary_img)
-count = 0
-for t in tile_indices:
-  count += 1
-  r_s, r_e, c_s, c_e = t
-  np_tile = np_img[r_s:r_e, c_s:c_e]
-  tissue_percentage = filter.tissue_percent(np_tile)
-  print("TILE [%d:%d, %d:%d]: Tissue %f%%" % (r_s, r_e, c_s, c_e, tissue_percentage))
-  # label = "[%d:%d, %d:%d]:\n %4.2f%%" % (r_s, r_e, c_s, c_e, tissue_percentage)
-  # filter.display_img(np_tile, text=label, size=14, bg=True)
-  label = "#%d\n%4.2f%%" % (count, tissue_percentage)
-  font = ImageFont.truetype("/Library/Fonts/Arial Bold.ttf", size=22)
-  draw.text((c_s + 2, r_s + 2), label, (255, 255, 255), font=font)
-  draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=(255, 0, 0))
-summary_img.show()
+display_tile_summary(np_img, tile_indices, ROW_TILE_SIZE, COL_TILE_SIZE)
