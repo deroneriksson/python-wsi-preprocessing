@@ -25,8 +25,8 @@ import wsi.slide as slide
 import math
 from PIL import Image, ImageDraw, ImageFont
 
-ROW_TILE_SIZE = 256
-COL_TILE_SIZE = 256
+ROW_TILE_SIZE = 128
+COL_TILE_SIZE = 128
 TISSUE_THRESHOLD_PERCENT = 80
 
 
@@ -90,9 +90,10 @@ for t in tile_indices:
   np_tile = np_img[r_s:r_e, c_s:c_e]
   tissue_percentage = filter.tissue_percent(np_tile)
   print("TILE [%d:%d, %d:%d]: Tissue %f%%" % (r_s, r_e, c_s, c_e, tissue_percentage))
-  label = "[%d:%d, %d:%d]:\n %4.2f%%" % (r_s, r_e, c_s, c_e, tissue_percentage)
+  # label = "[%d:%d, %d:%d]:\n %4.2f%%" % (r_s, r_e, c_s, c_e, tissue_percentage)
   # filter.display_img(np_tile, text=label, size=14, bg=True)
-  font = ImageFont.truetype("/Library/Fonts/Arial Bold.ttf", size=24)
-  draw.text((c_s + 2, r_s + 2), label, (255, 0, 0), font=font)
+  label = "#%d\n%4.2f%%" % (count, tissue_percentage)
+  font = ImageFont.truetype("/Library/Fonts/Arial Bold.ttf", size=22)
+  draw.text((c_s + 2, r_s + 2), label, (255, 255, 255), font=font)
   draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=(255, 0, 0))
 summary_img.show()
