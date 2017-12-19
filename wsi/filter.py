@@ -280,8 +280,7 @@ def mask_percent(np_img):
   Returns:
     The percentage of the NumPy array that is masked.
   """
-  _, _, channels = np_img.shape
-  if channels == 3:
+  if (len(np_img.shape) == 3) and (np_img.shape[2] == 3):
     np_sum = np_img[:, :, 0] + np_img[:, :, 1] + np_img[:, :, 2]
     mask_percentage = 100 - np.count_nonzero(np_sum) / np_sum.size * 100
   else:
