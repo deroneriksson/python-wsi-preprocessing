@@ -177,7 +177,30 @@ def image_range_to_tile_summaries(start_ind, end_ind, save=True, display=False):
     summary(slide_num, save, display)
 
 
+def singleprocess_images_to_tile_summaries(save=True, display=False, image_num_list=None):
+  """
+  Generate tile summaries to training images and optionally save/and or display the tile summaries.
+
+  Args:
+    save: If True, save images.
+    display: If True, display images to screen.
+    image_num_list: Optionally specify a list of image slide numbers.
+  """
+  t = Time()
+  print("Generating tile summaries\n")
+
+  if image_num_list is not None:
+    image_list_to_tile_summaries(image_num_list, save, display)
+  else:
+    num_training_slides = slide.get_num_training_slides()
+    image_range_to_tile_summaries(1, num_training_slides, save, display)
+
+  print("Time to generate tile summaries for all images: %s\n" % str(t.elapsed()))
+
+
 # summary(25, save=True)
 # summary(26, save=True)
 # image_list_to_tile_summaries([1, 2, 3, 4, 5], display=True)
-image_range_to_tile_summaries(1, 50)
+# image_range_to_tile_summaries(1, 50)
+# singleprocess_images_to_tile_summaries(image_num_list=[54, 55, 56], display=True)
+singleprocess_images_to_tile_summaries()
