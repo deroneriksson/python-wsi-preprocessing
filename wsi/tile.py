@@ -23,6 +23,7 @@ import numpy as np
 import wsi.filter as filter
 import wsi.slide as slide
 import math
+from wsi.slide import Time
 from PIL import Image, ImageDraw, ImageFont
 
 ROW_TILE_SIZE = 128
@@ -76,10 +77,10 @@ def get_tile_indices(np_img, row_tile_size, col_tile_size):
   return indices
 
 
-def display_tile_summary(np_img, tile_indices, row_tile_size, col_tile_size, thresh_color=(0, 255, 0),
-                         below_thresh_color=(255, 255, 0), no_tissue_color=(255, 0, 0), text_color=(255, 255, 255),
-                         text_size=22,
-                         font_path="/Library/Fonts/Arial Bold.ttf"):
+def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, display=True, save=False,
+                 thresh_color=(0, 255, 0),
+                 below_thresh_color=(255, 255, 0), no_tissue_color=(255, 0, 0), text_color=(255, 255, 255),
+                 text_size=22, font_path="/Library/Fonts/Arial Bold.ttf"):
   num_row_tiles, num_col_tiles = get_num_tiles(np_img, row_tile_size, col_tile_size)
   summary_img = np.zeros([ROW_TILE_SIZE * num_row_tiles, COL_TILE_SIZE * num_col_tiles, np_img.shape[2]],
                          dtype=np.uint8)
@@ -108,12 +109,30 @@ def display_tile_summary(np_img, tile_indices, row_tile_size, col_tile_size, thr
     label = "#%d\n%4.2f%%" % (count, tissue_percentage)
     font = ImageFont.truetype(font_path, size=text_size)
     draw.text((c_s + 2, r_s + 2), label, text_color, font=font)
-  summary.show()
+  if display:
+    summary.show()
+  if save:
+    save_tile_summary_image(summary, slide_num)
 
 
-img_path = slide.get_filter_image_result(16)
+def save_tile_summary_image(pil_img, slide_num):
+  """
+  Save a tile summary image to the file system.
+
+  Args:
+    pil_img: Image as a PIL Image.
+    slide_num:  The slide number.
+  """
+  t = Time()
+  filepath = slide.get_tile_summary_image_path(slide_num)
+  pil_img.save(filepath)
+  print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Summary Image", str(t.elapsed()), filepath))
+
+
+slide_num = 21
+img_path = slide.get_filter_image_result(slide_num)
 img = slide.open_image(img_path)
 np_img = filter.pil_to_np_rgb(img)
 
 tile_indices = get_tile_indices(np_img, ROW_TILE_SIZE, COL_TILE_SIZE)
-display_tile_summary(np_img, tile_indices, ROW_TILE_SIZE, COL_TILE_SIZE)
+tile_summary(slide_num, np_img, tile_indices, ROW_TILE_SIZE, COL_TILE_SIZE, display=True, save=True)

@@ -45,6 +45,9 @@ FILTER_DIR = BASE_DIR + os.sep + "filter_" + str(DEST_TRAIN_SIZE) + "_" + DEST_T
 FILTER_SUFFIX = ""  # Example: "filter-"
 FILTER_RESULT_TEXT = "filtered"
 
+TILE_SUMMARY_DIR = BASE_DIR + os.sep + "tile_summary_" + DEST_TRAIN_EXT
+TILE_SUMMARY_SUFFIX = "tile_summary"
+
 STATS_DIR = BASE_DIR + os.sep + "svs_stats"
 
 
@@ -150,6 +153,37 @@ def get_filter_image_filename(slide_number, filter_number, filter_name_info):
   padded_fi_num = str(filter_number).zfill(3)
   img_filename = TRAIN_PREFIX + padded_sl_num + "-" + padded_fi_num + "-" + FILTER_SUFFIX + str(
     DEST_TRAIN_SIZE) + "-" + filter_name_info + "." + DEST_TRAIN_EXT
+  return img_filename
+
+
+def get_tile_summary_image_path(slide_number):
+  """
+  Convert slide number to a path to a tile summary image file.
+
+  Args:
+    slide_number: The slide number.
+
+  Returns:
+    Path to the tile summary image file.
+  """
+  if not os.path.exists(TILE_SUMMARY_DIR):
+    os.makedirs(TILE_SUMMARY_DIR)
+  img_path = TILE_SUMMARY_DIR + os.sep + get_tile_summary_image_filename(slide_number)
+  return img_path
+
+
+def get_tile_summary_image_filename(slide_number):
+  """
+  Convert slide number to a tile summary image file name.
+
+  Args:
+    slide_number: The slide number.
+
+  Returns:
+    The tile summary image file name.
+  """
+  padded_sl_num = str(slide_number).zfill(3)
+  img_filename = TRAIN_PREFIX + padded_sl_num + "-" + TILE_SUMMARY_SUFFIX + "." + DEST_TRAIN_EXT
   return img_filename
 
 
