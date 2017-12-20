@@ -19,10 +19,12 @@
 #
 # -------------------------------------------------------------
 
+import math
+import multiprocessing
 import numpy as np
+import os
 import wsi.filter as filter
 import wsi.slide as slide
-import math
 from wsi.slide import Time
 from PIL import Image, ImageDraw, ImageFont
 
@@ -179,7 +181,7 @@ def image_range_to_tile_summaries(start_ind, end_ind, save=True, display=False):
 
 def singleprocess_images_to_tile_summaries(save=True, display=False, image_num_list=None):
   """
-  Generate tile summaries to training images and optionally save/and or display the tile summaries.
+  Generate tile summaries for training images and optionally save/and or display the tile summaries.
 
   Args:
     save: If True, save images.
@@ -198,9 +200,71 @@ def singleprocess_images_to_tile_summaries(save=True, display=False, image_num_l
   print("Time to generate tile summaries for all images: %s\n" % str(t.elapsed()))
 
 
+def multiprocess_images_to_tile_summaries(save=True, display=False, image_num_list=None):
+  """
+  Generate tile summaries for all training images using multiple processes (one process per core).
+
+  Args:
+    save: If True, save images.
+    display: If True, display images to screen (multiprocessed display not recommended).
+    image_num_list: Optionally specify a list of image slide numbers.
+  """
+  timer = Time()
+  print("Generating tile summaries (multiprocess)\n")
+
+  if save and not os.path.exists(slide.TILE_SUMMARY_DIR):
+    os.makedirs(slide.TILE_SUMMARY_DIR)
+
+  # how many processes to use
+  num_processes = multiprocessing.cpu_count()
+  pool = multiprocessing.Pool(num_processes)
+
+  if image_num_list is not None:
+    num_train_images = len(image_num_list)
+  else:
+    num_train_images = slide.get_num_training_slides()
+  if num_processes > num_train_images:
+    num_processes = num_train_images
+  images_per_process = num_train_images / num_processes
+
+  print("Number of processes: " + str(num_processes))
+  print("Number of training images: " + str(num_train_images))
+
+  tasks = []
+  for num_process in range(1, num_processes + 1):
+    start_index = (num_process - 1) * images_per_process + 1
+    end_index = num_process * images_per_process
+    start_index = int(start_index)
+    end_index = int(end_index)
+    if image_num_list is not None:
+      sublist = image_num_list[start_index - 1:end_index]
+      tasks.append((sublist, save, display))
+      print("Task #" + str(num_process) + ": Process slides " + str(sublist))
+    else:
+      tasks.append((start_index, end_index, save, display))
+      if start_index == end_index:
+        print("Task #" + str(num_process) + ": Process slide " + str(start_index))
+      else:
+        print("Task #" + str(num_process) + ": Process slides " + str(start_index) + " to " + str(end_index))
+
+  # start tasks
+  results = []
+  for t in tasks:
+    if image_num_list is not None:
+      results.append(pool.apply_async(image_list_to_tile_summaries, t))
+    else:
+      results.append(pool.apply_async(image_range_to_tile_summaries, t))
+
+  for result in results:
+    result.get()
+
+  print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
+
+
 # summary(25, save=True)
 # summary(26, save=True)
 # image_list_to_tile_summaries([1, 2, 3, 4, 5], display=True)
 # image_range_to_tile_summaries(1, 50)
 # singleprocess_images_to_tile_summaries(image_num_list=[54, 55, 56], display=True)
-singleprocess_images_to_tile_summaries()
+# singleprocess_images_to_tile_summaries()
+multiprocess_images_to_tile_summaries()
