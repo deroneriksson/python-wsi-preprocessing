@@ -29,6 +29,7 @@ from PIL import Image, ImageDraw, ImageFont
 ROW_TILE_SIZE = 128
 COL_TILE_SIZE = 128
 TISSUE_THRESHOLD_PERCENT = 50
+TISSUE_LOW_THRESHOLD_PERCENT = 5
 
 
 def get_num_tiles(np_img, row_tile_size, col_tile_size):
@@ -78,9 +79,9 @@ def get_tile_indices(np_img, row_tile_size, col_tile_size):
 
 
 def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, display=True, save=False,
-                 thresh_color=(0, 255, 0),
-                 below_thresh_color=(255, 255, 0), no_tissue_color=(255, 0, 0), text_color=(255, 255, 255),
-                 text_size=22, font_path="/Library/Fonts/Arial Bold.ttf"):
+                 thresh_color=(0, 255, 0), below_thresh_color=(255, 255, 0), below_lower_thresh_color=(255, 165, 0),
+                 no_tissue_color=(255, 0, 0), text_color=(255, 255, 255), text_size=22,
+                 font_path="/Library/Fonts/Arial Bold.ttf"):
   num_row_tiles, num_col_tiles = get_num_tiles(np_img, row_tile_size, col_tile_size)
   summary_img = np.zeros([ROW_TILE_SIZE * num_row_tiles, COL_TILE_SIZE * num_col_tiles, np_img.shape[2]],
                          dtype=np.uint8)
@@ -99,9 +100,12 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
     if (tissue_percentage >= TISSUE_THRESHOLD_PERCENT):
       draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=thresh_color)
       draw.rectangle([(c_s + 1, r_s + 1), (c_e - 2, r_e - 2)], outline=thresh_color)
-    elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
+    elif (tissue_percentage >= TISSUE_LOW_THRESHOLD_PERCENT) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
       draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=below_thresh_color)
       draw.rectangle([(c_s + 1, r_s + 1), (c_e - 2, r_e - 2)], outline=below_thresh_color)
+    elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESHOLD_PERCENT):
+      draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=below_lower_thresh_color)
+      draw.rectangle([(c_s + 1, r_s + 1), (c_e - 2, r_e - 2)], outline=below_lower_thresh_color)
     else:
       draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=no_tissue_color)
       draw.rectangle([(c_s + 1, r_s + 1), (c_e - 2, r_e - 2)], outline=no_tissue_color)
@@ -175,5 +179,5 @@ def image_range_to_tile_summaries(start_ind, end_ind, save=True, display=False):
 
 # summary(25, save=True)
 # summary(26, save=True)
-# image_list_to_tile_summaries([1, 2, 3, 4, 5])
+# image_list_to_tile_summaries([1, 2, 3, 4, 5], display=True)
 image_range_to_tile_summaries(1, 50)
