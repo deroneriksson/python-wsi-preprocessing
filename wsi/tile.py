@@ -159,6 +159,21 @@ def image_list_to_tile_summaries(image_num_list, save=True, display=False):
     summary(slide_num, save, display)
 
 
+def image_range_to_tile_summaries(start_ind, end_ind, save=True, display=False):
+  """
+  Generate tile summaries for a range of images.
+
+  Args:
+    start_ind: Starting index (inclusive).
+    end_ind: Ending index (inclusive).
+    save: If True, save tile summary images.
+    display: If True, display tile summary images to screen.
+  """
+  for slide_num in range(start_ind, end_ind + 1):
+    summary(slide_num, save, display)
+
+
 # summary(25, save=True)
 # summary(26, save=True)
-image_list_to_tile_summaries([1,2,3,4,5])
+# image_list_to_tile_summaries([1, 2, 3, 4, 5])
+image_range_to_tile_summaries(1, 50)
