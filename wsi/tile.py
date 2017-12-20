@@ -76,10 +76,13 @@ def get_tile_indices(np_img, row_tile_size, col_tile_size):
   return indices
 
 
-def display_tile_summary(np_img, tile_indices, row_tile_size, col_tile_size):
+def display_tile_summary(np_img, tile_indices, row_tile_size, col_tile_size, thresh_color=(0, 255, 0),
+                         below_thresh_color=(255, 0, 0), text_color=(255, 255, 255), text_size=22,
+                         font_path="/Library/Fonts/Arial Bold.ttf"):
   num_row_tiles, num_col_tiles = get_num_tiles(np_img, row_tile_size, col_tile_size)
   summary_img = np.zeros([ROW_TILE_SIZE * num_row_tiles, COL_TILE_SIZE * num_col_tiles, np_img.shape[2]],
                          dtype=np.uint8)
+  # add gray edges so that summary text does not get cut off
   summary_img.fill(120)
   summary_img[0:np_img.shape[0], 0:np_img.shape[1]] = np_img
   summary = filter.np_to_pil(summary_img)
@@ -92,19 +95,19 @@ def display_tile_summary(np_img, tile_indices, row_tile_size, col_tile_size):
     tissue_percentage = filter.tissue_percent(np_tile)
     print("TILE [%d:%d, %d:%d]: Tissue %f%%" % (r_s, r_e, c_s, c_e, tissue_percentage))
     if (tissue_percentage >= TISSUE_THRESHOLD_PERCENT):
-      draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=(0, 255, 0))
-      draw.rectangle([(c_s+1, r_s+1), (c_e - 2, r_e - 2)], outline=(0, 255, 0))
+      draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=thresh_color)
+      draw.rectangle([(c_s + 1, r_s + 1), (c_e - 2, r_e - 2)], outline=thresh_color)
     else:
-      draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=(255, 0, 0))
-      draw.rectangle([(c_s+1, r_s+1), (c_e - 2, r_e - 2)], outline=(255, 0, 0))
+      draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=below_thresh_color)
+      draw.rectangle([(c_s + 1, r_s + 1), (c_e - 2, r_e - 2)], outline=below_thresh_color)
     # filter.display_img(np_tile, text=label, size=14, bg=True)
     label = "#%d\n%4.2f%%" % (count, tissue_percentage)
-    font = ImageFont.truetype("/Library/Fonts/Arial Bold.ttf", size=22)
-    draw.text((c_s + 2, r_s + 2), label, (255, 255, 255), font=font)
+    font = ImageFont.truetype(font_path, size=text_size)
+    draw.text((c_s + 2, r_s + 2), label, text_color, font=font)
   summary.show()
 
 
-img_path = slide.get_filter_image_result(10)
+img_path = slide.get_filter_image_result(16)
 img = slide.open_image(img_path)
 np_img = filter.pil_to_np_rgb(img)
 
