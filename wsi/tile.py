@@ -121,7 +121,7 @@ def save_tile_summary_image(pil_img, slide_num):
 
   Args:
     pil_img: Image as a PIL Image.
-    slide_num:  The slide number.
+    slide_num: The slide number.
   """
   t = Time()
   filepath = slide.get_tile_summary_image_path(slide_num)
@@ -129,10 +129,22 @@ def save_tile_summary_image(pil_img, slide_num):
   print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Summary Image", str(t.elapsed()), filepath))
 
 
-slide_num = 21
-img_path = slide.get_filter_image_result(slide_num)
-img = slide.open_image(img_path)
-np_img = filter.pil_to_np_rgb(img)
+def summary(slide_num, display=True, save=False):
+  """
+  Display and/or save a summary image of tiles.
 
-tile_indices = get_tile_indices(np_img, ROW_TILE_SIZE, COL_TILE_SIZE)
-tile_summary(slide_num, np_img, tile_indices, ROW_TILE_SIZE, COL_TILE_SIZE, display=True, save=True)
+  Args:
+    slide_num: The slide number.
+    display: If True, display tile summary to screen.
+    save: If True, save tile summary image.
+  """
+  img_path = slide.get_filter_image_result(slide_num)
+  img = slide.open_image(img_path)
+  np_img = filter.pil_to_np_rgb(img)
+
+  tile_indices = get_tile_indices(np_img, ROW_TILE_SIZE, COL_TILE_SIZE)
+  tile_summary(slide_num, np_img, tile_indices, ROW_TILE_SIZE, COL_TILE_SIZE, display=display, save=save)
+
+
+summary(25, save=True)
+summary(26, save=True)
