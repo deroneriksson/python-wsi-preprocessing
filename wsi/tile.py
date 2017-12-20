@@ -129,7 +129,7 @@ def save_tile_summary_image(pil_img, slide_num):
   print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Summary Image", str(t.elapsed()), filepath))
 
 
-def summary(slide_num, display=True, save=False):
+def summary(slide_num, save=False, display=True):
   """
   Display and/or save a summary image of tiles.
 
@@ -146,5 +146,19 @@ def summary(slide_num, display=True, save=False):
   tile_summary(slide_num, np_img, tile_indices, ROW_TILE_SIZE, COL_TILE_SIZE, display=display, save=save)
 
 
-summary(25, save=True)
-summary(26, save=True)
+def image_list_to_tile_summaries(image_num_list, save=True, display=False):
+  """
+  Generate tile summaries for a list of images.
+
+  Args:
+    image_num_list: List of image numbers.
+    save: If True, save tile summary images.
+    display: If True, display tile summary images to screen.
+  """
+  for slide_num in image_num_list:
+    summary(slide_num, save, display)
+
+
+# summary(25, save=True)
+# summary(26, save=True)
+image_list_to_tile_summaries([1,2,3,4,5])
