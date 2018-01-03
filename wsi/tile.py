@@ -163,6 +163,7 @@ def image_list_to_tile_summaries(image_num_list, save=True, display=False):
   """
   for slide_num in image_num_list:
     summary(slide_num, save, display)
+  return image_num_list
 
 
 def image_range_to_tile_summaries(start_ind, end_ind, save=True, display=False):
@@ -175,17 +176,21 @@ def image_range_to_tile_summaries(start_ind, end_ind, save=True, display=False):
     save: If True, save tile summary images.
     display: If True, display tile summary images to screen.
   """
+  image_num_list = list()
   for slide_num in range(start_ind, end_ind + 1):
     summary(slide_num, save, display)
+    image_num_list.append(slide_num)
+  return image_num_list
 
 
-def singleprocess_images_to_tile_summaries(save=True, display=False, image_num_list=None):
+def singleprocess_images_to_tile_summaries(save=True, display=False, html=True, image_num_list=None):
   """
   Generate tile summaries for training images and optionally save/and or display the tile summaries.
 
   Args:
     save: If True, save images.
     display: If True, display images to screen.
+    html: If True, generate HTML page to display tiled images
     image_num_list: Optionally specify a list of image slide numbers.
   """
   t = Time()
@@ -195,18 +200,22 @@ def singleprocess_images_to_tile_summaries(save=True, display=False, image_num_l
     image_list_to_tile_summaries(image_num_list, save, display)
   else:
     num_training_slides = slide.get_num_training_slides()
-    image_range_to_tile_summaries(1, num_training_slides, save, display)
+    image_num_list = image_range_to_tile_summaries(1, num_training_slides, save, display)
 
-  print("Time to generate tile summaries for all images: %s\n" % str(t.elapsed()))
+  print("Time to generate tile summaries: %s\n" % str(t.elapsed()))
+
+  if html:
+    generate_tiled_html_page(image_num_list)
 
 
-def multiprocess_images_to_tile_summaries(save=True, display=False, image_num_list=None):
+def multiprocess_images_to_tile_summaries(save=True, display=False, html=True, image_num_list=None):
   """
   Generate tile summaries for all training images using multiple processes (one process per core).
 
   Args:
     save: If True, save images.
     display: If True, display images to screen (multiprocessed display not recommended).
+    html: If True, generate HTML page to display tiled images.
     image_num_list: Optionally specify a list of image slide numbers.
   """
   timer = Time()
@@ -255,16 +264,115 @@ def multiprocess_images_to_tile_summaries(save=True, display=False, image_num_li
     else:
       results.append(pool.apply_async(image_range_to_tile_summaries, t))
 
+  slide_nums = list()
   for result in results:
-    result.get()
+    image_nums = result.get()
+    slide_nums.extend(image_nums)
+    print("Done tiling slides: %s" % image_nums)
 
-  print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
+  if html:
+    generate_tiled_html_page(slide_nums)
+
+  print("Time to generate tile previews (multiprocess): %s\n" % str(timer.elapsed()))
+
+
+def html_header():
+  """
+  Generate an HTML header for viewing tiled images.
+
+  Returns:
+    HTML header for viewing tiled images.
+  """
+  html = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" " + \
+         "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" + \
+         "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n" + \
+         "  <head>\n" + \
+         "    <title>Tiled Images</title>\n" + \
+         "    <style type=\"text/css\">\n" + \
+         "     img { max-width: 400px; max-height: 400px; border: 2px solid black; }\n" + \
+         "     td { border: 2px solid black; }\n" + \
+         "    </style>\n" + \
+         "  </head>\n" + \
+         "  <body>\n" + \
+         "  <script src=\"../js/lazyload.js\"></script>\n" + \
+         "  <table>\n"
+  return html
+
+
+def html_footer():
+  """
+  Generate an HTML footer for viewing tiled images.
+
+  Returns:
+    HTML footer for viewing tiled images.
+  """
+  html = "</table>\n" + \
+         "<script>lazyload();</script>\n" + \
+         "</body>\n" + \
+         "</html>\n"
+  return html
+
+
+def image_row(slide_num):
+  """
+  Generate HTML for viewing a tiled image.
+
+  Args:
+    slide_num: The slide number.
+
+  Returns:
+    HTML for viewing a tiled image.
+  """
+  return "  <tr>" + \
+         "    <td>\n" + \
+         "      <a href=\"" + slide.get_training_image_path(slide_num) + "\">\n" + \
+         "        " + "S%03d " % slide_num + "Original" + "<br/>\n" + \
+         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + slide.get_training_image_path(
+    slide_num) + "\" />\n" + \
+         "      </a>\n" + \
+         "    </td>\n" + \
+         "    <td>\n" + \
+         "      <a href=\"" + slide.get_filter_image_result(slide_num) + "\">\n" + \
+         "        " + "S%03d " % slide_num + "Filtered" + "<br/>\n" + \
+         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + slide.get_filter_image_result(
+    slide_num) + "\" />\n" + \
+         "      </a>\n" + \
+         "    </td>\n" + \
+         "    <td>\n" + \
+         "      <a href=\"" + slide.get_tile_summary_image_path(slide_num) + "\">\n" + \
+         "        " + "S%03d " % slide_num + "Tiled" + "<br/>\n" + \
+         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + slide.get_tile_summary_image_path(
+    slide_num) + "\" />\n" + \
+         "      </a>\n" + \
+         "    </td>\n" + \
+         "  <tr>"
+
+
+def generate_tiled_html_page(slide_nums):
+  """
+  Generate an HTML page to view the tiled images.
+
+  Args:
+    slide_nums: List of slide numbers.
+  """
+  html = ""
+  html += html_header()
+
+  row = 0
+  for slide_num in sorted(slide_nums):
+    html += image_row(slide_num)
+
+  html += html_footer()
+  text_file = open("tiles.html", "w")
+  text_file.write(html)
+  text_file.close()
 
 
 # summary(25, save=True)
 # summary(26, save=True)
 # image_list_to_tile_summaries([1, 2, 3, 4, 5], display=True)
 # image_range_to_tile_summaries(1, 50)
-# singleprocess_images_to_tile_summaries(image_num_list=[54, 55, 56], display=True)
+# singleprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5, 6], display=True)
 # singleprocess_images_to_tile_summaries()
+# multiprocess_images_to_tile_summaries(image_num_list=[5,10,15,20,25,30])
 multiprocess_images_to_tile_summaries()
