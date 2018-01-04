@@ -1212,7 +1212,7 @@ def html_header():
          "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" + \
          "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n" + \
          "  <head>\n" + \
-         "    <title>Image Processing</title>\n" + \
+         "    <title>Filtered Images</title>\n" + \
          "    <style type=\"text/css\">\n" + \
          "     img { max-width: 400px; max-height: 400px; border: 2px solid black; }\n" + \
          "     td { border: 2px solid black; }\n" + \
