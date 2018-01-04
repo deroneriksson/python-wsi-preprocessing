@@ -30,6 +30,7 @@ from openslide import OpenSlideError
 import os
 import PIL
 from PIL import Image
+import re
 import sys
 
 # BASE_DIR = ".." + os.sep + "data"
@@ -229,6 +230,15 @@ def get_filter_image_result(slide_number):
     img_path = FILTER_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + FILTER_SUFFIX + str(DEST_TRAIN_SIZE) + \
                "-" + FILTER_RESULT_TEXT + "." + DEST_TRAIN_EXT
   return img_path
+
+
+def parse_dimensions_from_filename(filename):
+  m = re.match(".*-(.*)x(.*)-(.*)x(.*)\..*", filename)
+  large_w = m.group(1)
+  large_h = m.group(2)
+  small_w = m.group(3)
+  small_h = m.group(4)
+  return large_w, large_h, small_w, small_h
 
 
 def small_to_large_mapping(small_pixel, large_dimensions):
