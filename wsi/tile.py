@@ -28,19 +28,24 @@ import wsi.slide as slide
 from wsi.slide import Time
 from PIL import Image, ImageDraw, ImageFont
 
-ROW_TILE_SIZE = 128
-COL_TILE_SIZE = 128
 TISSUE_THRESHOLD_PERCENT = 50
 TISSUE_LOW_THRESHOLD_PERCENT = 5
 
+ROW_TILE_SIZE = 1024
+COL_TILE_SIZE = 1024
 
-def get_num_tiles(np_img, row_tile_size, col_tile_size):
+ROW_TILE_SIZE_BASED_ON_SUMMARY_IMAGE_SIZE = 128
+COL_TILE_SIZE_BASED_ON_SUMMARY_IMAGE_SIZE = 128
+
+
+def get_num_tiles(rows, cols, row_tile_size, col_tile_size):
   """
   Obtain the number of vertical and horizontal tiles that an image can be divided into given a row tile size and
   a column tile size.
 
   Args:
-    np_img: Image as a NumPy array.
+    rows: Number of rows.
+    cols: Number of columns.
     row_tile_size: Number of pixels in a tile row.
     col_tile_size: Number of pixels in a tile column.
 
@@ -48,18 +53,18 @@ def get_num_tiles(np_img, row_tile_size, col_tile_size):
     Tuple consisting of the number of vertical tiles and the number of horizontal tiles that the image can be divided
     into given the row tile size and the column tile size.
   """
-  rows, cols, _ = np_img.shape
   num_row_tiles = math.ceil(rows / row_tile_size)
   num_col_tiles = math.ceil(cols / col_tile_size)
   return num_row_tiles, num_col_tiles
 
 
-def get_tile_indices(np_img, row_tile_size, col_tile_size):
+def get_tile_indices(rows, cols, row_tile_size, col_tile_size):
   """
   Obtain a list of tile coordinates (starting row, ending row, starting column, ending column).
 
   Args:
-    np_img: Image as a NumPy array.
+    rows: Number of rows.
+    cols: Number of columns.
     row_tile_size: Number of pixels in a tile row.
     col_tile_size: Number of pixels in a tile column.
 
@@ -68,8 +73,7 @@ def get_tile_indices(np_img, row_tile_size, col_tile_size):
     starting column, ending column.
   """
   indices = list()
-  rows, cols, _ = np_img.shape
-  num_row_tiles, num_col_tiles = get_num_tiles(np_img, row_tile_size, col_tile_size)
+  num_row_tiles, num_col_tiles = get_num_tiles(rows, cols, row_tile_size, col_tile_size)
   for r in range(0, num_row_tiles):
     start_r = r * row_tile_size
     end_r = ((r + 1) * row_tile_size) if (r < num_row_tiles - 1) else rows
@@ -84,8 +88,9 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
                  thresh_color=(0, 255, 0), below_thresh_color=(255, 255, 0), below_lower_thresh_color=(255, 165, 0),
                  no_tissue_color=(255, 0, 0), text_color=(255, 255, 255), text_size=22,
                  font_path="/Library/Fonts/Arial Bold.ttf"):
-  num_row_tiles, num_col_tiles = get_num_tiles(np_img, row_tile_size, col_tile_size)
-  summary_img = np.zeros([ROW_TILE_SIZE * num_row_tiles, COL_TILE_SIZE * num_col_tiles, np_img.shape[2]],
+  rows, cols, _ = np_img.shape
+  num_row_tiles, num_col_tiles = get_num_tiles(rows, cols, row_tile_size, col_tile_size)
+  summary_img = np.zeros([row_tile_size * num_row_tiles, col_tile_size * num_col_tiles, np_img.shape[2]],
                          dtype=np.uint8)
   # add gray edges so that summary text does not get cut off
   summary_img.fill(120)
@@ -112,9 +117,10 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
       draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=no_tissue_color)
       draw.rectangle([(c_s + 1, r_s + 1), (c_e - 2, r_e - 2)], outline=no_tissue_color)
     # filter.display_img(np_tile, text=label, size=14, bg=True)
-    label = "#%d\n%4.2f%%" % (count, tissue_percentage)
-    font = ImageFont.truetype(font_path, size=text_size)
-    draw.text((c_s + 2, r_s + 2), label, text_color, font=font)
+    if slide.RESIZE_ALL_BY_SCALE_FACTOR == False:
+      label = "#%d\n%4.2f%%" % (count, tissue_percentage)
+      font = ImageFont.truetype(font_path, size=text_size)
+      draw.text((c_s + 2, r_s + 2), label, text_color, font=font)
   if display:
     summary.show()
   if save:
@@ -148,8 +154,17 @@ def summary(slide_num, save=False, display=True):
   img = slide.open_image(img_path)
   np_img = filter.pil_to_np_rgb(img)
 
-  tile_indices = get_tile_indices(np_img, ROW_TILE_SIZE, COL_TILE_SIZE)
-  tile_summary(slide_num, np_img, tile_indices, ROW_TILE_SIZE, COL_TILE_SIZE, display=display, save=save)
+  rows, cols, _ = np_img.shape
+
+  if slide.RESIZE_ALL_BY_SCALE_FACTOR == True:
+    row_tile_size = round(ROW_TILE_SIZE / slide.SCALE_FACTOR)  # use round?
+    col_tile_size = round(COL_TILE_SIZE / slide.SCALE_FACTOR)  # use round?
+  else:
+    row_tile_size = ROW_TILE_SIZE_BASED_ON_SUMMARY_IMAGE_SIZE
+    col_tile_size = COL_TILE_SIZE_BASED_ON_SUMMARY_IMAGE_SIZE
+
+  tile_indices = get_tile_indices(rows, cols, row_tile_size, col_tile_size)
+  tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, display=display, save=save)
 
 
 def image_list_to_tile_summaries(image_num_list, save=True, display=False):
@@ -368,11 +383,12 @@ def generate_tiled_html_page(slide_nums):
   text_file.close()
 
 
-# summary(25, save=True)
+# summary(1, save=True)
 # summary(26, save=True)
-# image_list_to_tile_summaries([1, 2, 3, 4, 5], display=True)
+image_list_to_tile_summaries([1, 2, 3, 4], display=True)
 # image_range_to_tile_summaries(1, 50)
 # singleprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5, 6], display=True)
 # singleprocess_images_to_tile_summaries()
 # multiprocess_images_to_tile_summaries(image_num_list=[5,10,15,20,25,30])
-multiprocess_images_to_tile_summaries()
+# multiprocess_images_to_tile_summaries()
+# summary(3)

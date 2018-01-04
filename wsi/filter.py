@@ -1433,10 +1433,10 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 # result = np.concatenate((row1, row2), axis=0)
 # display_img(result)
 
-singleprocess_apply_filters_to_images(image_num_list=[1])
+# singleprocess_apply_filters_to_images(image_num_list=[1,2,3,4])
 
 # multiprocess_apply_filters_to_images()
-
+# multiprocess_apply_filters_to_images(image_num_list=[1,2,3,4,5,6,7,8,9,10,11,12])
 # img, _ = apply_filters_to_image(4, display=True, save=False)
 # display_img(img, "RESULT", bg=True)
 # canny = filter_canny(filter_rgb_to_grayscale(img))
