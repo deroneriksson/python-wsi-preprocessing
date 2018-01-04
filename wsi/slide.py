@@ -48,6 +48,7 @@ DEST_TRAIN_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "training_" + DEST_TRAIN_EXT
 FILTER_DIR = BASE_DIR + os.sep + "filter_" + str(DEST_TRAIN_SIZE) + "_" + DEST_TRAIN_EXT
 FILTER_SUFFIX = ""  # Example: "filter-"
 FILTER_RESULT_TEXT = "filtered"
+FILTER_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "filter_" + DEST_TRAIN_EXT
 
 TILE_SUMMARY_DIR = BASE_DIR + os.sep + "tile_summary_" + DEST_TRAIN_EXT
 TILE_SUMMARY_SUFFIX = "tile_summary"
@@ -125,10 +126,14 @@ def get_training_image_path(slide_number):
   return img_path
 
 
-def get_training_image_path_scale_factor(slide_number, large_w, large_h, small_w, small_h):
+def get_training_image_path_scale_factor(slide_number, large_w=None, large_h=None, small_w=None, small_h=None):
   padded_sl_num = str(slide_number).zfill(3)
-  img_path = DEST_TRAIN_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + DEST_TRAIN_SUFFIX + str(
-    large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(small_h) + "." + DEST_TRAIN_EXT
+  if large_w is None and large_h is None and small_w is None and small_h is None:
+    wilcard_path = DEST_TRAIN_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "*." + DEST_TRAIN_EXT
+    img_path = glob.glob(wilcard_path)[0]
+  else:
+    img_path = DEST_TRAIN_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + DEST_TRAIN_SUFFIX + str(
+      large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(small_h) + "." + DEST_TRAIN_EXT
   return img_path
 
 
@@ -144,7 +149,13 @@ def get_filter_image_path(slide_number, filter_number, filter_name_info):
   Returns:
     Path to the filter image file.
   """
-  img_path = FILTER_DIR + os.sep + get_filter_image_filename(slide_number, filter_number, filter_name_info)
+  if RESIZE_ALL_BY_SCALE_FACTOR == True:
+    dir = FILTER_DIR_SCALE_FACTOR
+  else:
+    dir = FILTER_DIR
+  if not os.path.exists(dir):
+    os.makedirs(dir)
+  img_path = dir + os.sep + get_filter_image_filename(slide_number, filter_number, filter_name_info)
   return img_path
 
 
@@ -162,8 +173,11 @@ def get_filter_image_filename(slide_number, filter_number, filter_name_info):
   """
   padded_sl_num = str(slide_number).zfill(3)
   padded_fi_num = str(filter_number).zfill(3)
-  img_filename = TRAIN_PREFIX + padded_sl_num + "-" + padded_fi_num + "-" + FILTER_SUFFIX + str(
-    DEST_TRAIN_SIZE) + "-" + filter_name_info + "." + DEST_TRAIN_EXT
+  if RESIZE_ALL_BY_SCALE_FACTOR == True:
+    img_filename = TRAIN_PREFIX + padded_sl_num + "-" + padded_fi_num + "-" + FILTER_SUFFIX + filter_name_info + "." + DEST_TRAIN_EXT
+  else:
+    img_filename = TRAIN_PREFIX + padded_sl_num + "-" + padded_fi_num + "-" + FILTER_SUFFIX + str(
+      DEST_TRAIN_SIZE) + "-" + filter_name_info + "." + DEST_TRAIN_EXT
   return img_filename
 
 
@@ -209,8 +223,11 @@ def get_filter_image_result(slide_number):
     Path to the filter image file.
   """
   padded_sl_num = str(slide_number).zfill(3)
-  img_path = FILTER_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + FILTER_SUFFIX + str(DEST_TRAIN_SIZE) + \
-             "-" + FILTER_RESULT_TEXT + "." + DEST_TRAIN_EXT
+  if RESIZE_ALL_BY_SCALE_FACTOR == True:
+    img_path = FILTER_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + FILTER_SUFFIX + FILTER_RESULT_TEXT + "." + DEST_TRAIN_EXT
+  else:
+    img_path = FILTER_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + FILTER_SUFFIX + str(DEST_TRAIN_SIZE) + \
+               "-" + FILTER_RESULT_TEXT + "." + DEST_TRAIN_EXT
   return img_path
 
 
@@ -556,7 +573,6 @@ class Time:
     self.end = datetime.datetime.now()
     time_elapsed = self.end - self.start
     return time_elapsed
-
 
 # singleprocess_training_slides_to_images()
 # multiprocess_training_slides_to_images()

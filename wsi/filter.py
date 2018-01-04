@@ -1081,7 +1081,10 @@ def apply_filters_to_image(slide_num, save=True, display=False):
 
   if save and not os.path.exists(slide.FILTER_DIR):
     os.makedirs(slide.FILTER_DIR)
-  img_path = slide.get_training_image_path(slide_num)
+  if slide.RESIZE_ALL_BY_SCALE_FACTOR == True:
+    img_path = slide.get_training_image_path_scale_factor(slide_num)
+  else:
+    img_path = slide.get_training_image_path(slide_num)
   img = slide.open_image(img_path)
 
   rgb = pil_to_np_rgb(img)
@@ -1430,7 +1433,7 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 # result = np.concatenate((row1, row2), axis=0)
 # display_img(result)
 
-# singleprocess_apply_filters_to_images(image_num_list=[1, 2, 3])
+singleprocess_apply_filters_to_images(image_num_list=[1])
 
 # multiprocess_apply_filters_to_images()
 
