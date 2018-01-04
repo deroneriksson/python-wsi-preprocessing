@@ -21,6 +21,7 @@
 
 import datetime
 import glob
+import math
 import matplotlib.pyplot as plt
 import multiprocessing
 import numpy as np
@@ -40,6 +41,8 @@ DEST_TRAIN_SUFFIX = ""  # Example: "train-"
 DEST_TRAIN_EXT = "png"
 DEST_TRAIN_SIZE = 2048
 DEST_TRAIN_DIR = BASE_DIR + os.sep + "training_" + str(DEST_TRAIN_SIZE) + "_" + DEST_TRAIN_EXT
+SCALE_FACTOR = 32
+RESIZE_ALL_BY_SCALE_FACTOR = True
 
 FILTER_DIR = BASE_DIR + os.sep + "filter_" + str(DEST_TRAIN_SIZE) + "_" + DEST_TRAIN_EXT
 FILTER_SUFFIX = ""  # Example: "filter-"
@@ -213,10 +216,25 @@ def training_slide_to_image(slide_number):
   slide_filepath = get_training_slide_path(slide_number)
   print("Opening Slide #%d: %s" % (slide_number, slide_filepath))
   slide = open_slide(slide_filepath)
-  whole_slide_image = slide.read_region((0, 0), slide.level_count - 1, slide.level_dimensions[-1])
-  whole_slide_image = whole_slide_image.convert("RGB")
-  max_size = tuple(round(DEST_TRAIN_SIZE * d / max(whole_slide_image.size)) for d in whole_slide_image.size)
-  img = whole_slide_image.resize(max_size, PIL.Image.BILINEAR)
+  # print("SLIDE DIMENSIONS: " + str(slide.dimensions))
+  # print("LEVEL COUNT: " + str(slide.level_count))
+  # print("LEVEL DIMENSIONS: " + str(slide.level_dimensions))
+  # print("LEVEL DOWNSAMPLES: " + str(slide.level_downsamples))
+  if RESIZE_ALL_BY_SCALE_FACTOR == True:
+    new_w = math.floor(slide.dimensions[0] / SCALE_FACTOR)
+    new_h = math.floor(slide.dimensions[1] / SCALE_FACTOR)
+    level = slide.get_best_level_for_downsample(SCALE_FACTOR)
+    whole_slide_image = slide.read_region((0, 0), level, slide.level_dimensions[level])
+    whole_slide_image = whole_slide_image.convert("RGB")
+    img = whole_slide_image.resize((new_w, new_h), PIL.Image.BILINEAR)
+    # print("BEST LEVEL: " + str(level))
+    # print("WSI LEVEL SIZE: " + str(whole_slide_image.size))
+    # print("IMG SIZE: " + str(img.size))
+  else:
+    whole_slide_image = slide.read_region((0, 0), slide.level_count - 1, slide.level_dimensions[-1])
+    whole_slide_image = whole_slide_image.convert("RGB")
+    max_size = tuple(round(DEST_TRAIN_SIZE * d / max(whole_slide_image.size)) for d in whole_slide_image.size)
+    img = whole_slide_image.resize(max_size, PIL.Image.BILINEAR)
   img_path = get_training_image_path(slide_number)
   print("Saving image to: " + img_path)
   if not os.path.exists(DEST_TRAIN_DIR):
@@ -517,7 +535,12 @@ class Time:
     time_elapsed = self.end - self.start
     return time_elapsed
 
+
 # singleprocess_training_slides_to_images()
 # multiprocess_training_slides_to_images()
 # slide_stats()
 # slide_info(display_all_properties=True)
+training_slide_to_image(1)
+training_slide_to_image(2)
+training_slide_to_image(3)
+training_slide_to_image(4)
