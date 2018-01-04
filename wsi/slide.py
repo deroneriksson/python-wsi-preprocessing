@@ -206,6 +206,14 @@ def get_filter_image_result(slide_number):
   return img_path
 
 
+def small_to_large_mapping(small_pixel, large_dimensions):
+  small_x, small_y = small_pixel
+  large_w, large_h = large_dimensions
+  large_x = math.round((large_w / SCALE_FACTOR) / math.floor(large_w / SCALE_FACTOR) * (SCALE_FACTOR * small_x))
+  large_y = math.round((large_h / SCALE_FACTOR) / math.floor(large_h / SCALE_FACTOR) * (SCALE_FACTOR * small_y))
+  return large_x, large_y
+
+
 def training_slide_to_image(slide_number):
   """
   Convert a WSI training slide to an image in a format such as jpg or png.
