@@ -43,6 +43,7 @@ DEST_TRAIN_SIZE = 2048
 DEST_TRAIN_DIR = BASE_DIR + os.sep + "training_" + str(DEST_TRAIN_SIZE) + "_" + DEST_TRAIN_EXT
 SCALE_FACTOR = 32
 RESIZE_ALL_BY_SCALE_FACTOR = True
+DEST_TRAIN_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "training_" + DEST_TRAIN_EXT
 
 FILTER_DIR = BASE_DIR + os.sep + "filter_" + str(DEST_TRAIN_SIZE) + "_" + DEST_TRAIN_EXT
 FILTER_SUFFIX = ""  # Example: "filter-"
@@ -121,6 +122,13 @@ def get_training_image_path(slide_number):
   padded_sl_num = str(slide_number).zfill(3)
   img_path = DEST_TRAIN_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + DEST_TRAIN_SUFFIX + str(
     DEST_TRAIN_SIZE) + "." + DEST_TRAIN_EXT
+  return img_path
+
+
+def get_training_image_path_scale_factor(slide_number, large_w, large_h, small_w, small_h):
+  padded_sl_num = str(slide_number).zfill(3)
+  img_path = DEST_TRAIN_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + DEST_TRAIN_SUFFIX + str(
+    large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(small_h) + "." + DEST_TRAIN_EXT
   return img_path
 
 
@@ -229,8 +237,9 @@ def training_slide_to_image(slide_number):
   # print("LEVEL DIMENSIONS: " + str(slide.level_dimensions))
   # print("LEVEL DOWNSAMPLES: " + str(slide.level_downsamples))
   if RESIZE_ALL_BY_SCALE_FACTOR == True:
-    new_w = math.floor(slide.dimensions[0] / SCALE_FACTOR)
-    new_h = math.floor(slide.dimensions[1] / SCALE_FACTOR)
+    large_w, large_h = slide.dimensions
+    new_w = math.floor(large_w / SCALE_FACTOR)
+    new_h = math.floor(large_h / SCALE_FACTOR)
     level = slide.get_best_level_for_downsample(SCALE_FACTOR)
     whole_slide_image = slide.read_region((0, 0), level, slide.level_dimensions[level])
     whole_slide_image = whole_slide_image.convert("RGB")
@@ -238,16 +247,21 @@ def training_slide_to_image(slide_number):
     # print("BEST LEVEL: " + str(level))
     # print("WSI LEVEL SIZE: " + str(whole_slide_image.size))
     # print("IMG SIZE: " + str(img.size))
+    img_path = get_training_image_path_scale_factor(slide_number, large_w, large_h, new_w, new_h)
+    print("Saving image to: " + img_path)
+    if not os.path.exists(DEST_TRAIN_DIR_SCALE_FACTOR):
+      os.makedirs(DEST_TRAIN_DIR_SCALE_FACTOR)
+    img.save(img_path)
   else:
     whole_slide_image = slide.read_region((0, 0), slide.level_count - 1, slide.level_dimensions[-1])
     whole_slide_image = whole_slide_image.convert("RGB")
     max_size = tuple(round(DEST_TRAIN_SIZE * d / max(whole_slide_image.size)) for d in whole_slide_image.size)
     img = whole_slide_image.resize(max_size, PIL.Image.BILINEAR)
-  img_path = get_training_image_path(slide_number)
-  print("Saving image to: " + img_path)
-  if not os.path.exists(DEST_TRAIN_DIR):
-    os.makedirs(DEST_TRAIN_DIR)
-  img.save(img_path)
+    img_path = get_training_image_path(slide_number)
+    print("Saving image to: " + img_path)
+    if not os.path.exists(DEST_TRAIN_DIR):
+      os.makedirs(DEST_TRAIN_DIR)
+    img.save(img_path)
 
 
 def get_num_training_slides():
