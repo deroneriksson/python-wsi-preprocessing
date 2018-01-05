@@ -134,7 +134,8 @@ def get_training_image_path_scale_factor(slide_number, large_w=None, large_h=Non
     wilcard_path = DEST_TRAIN_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "*." + DEST_TRAIN_EXT
     img_path = glob.glob(wilcard_path)[0]
   else:
-    img_path = DEST_TRAIN_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + DEST_TRAIN_SUFFIX + str(
+    img_path = DEST_TRAIN_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
+      SCALE_FACTOR) + "x-" + DEST_TRAIN_SUFFIX + str(
       large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(small_h) + "." + DEST_TRAIN_EXT
   return img_path
 
@@ -245,9 +246,9 @@ def get_filter_image_result(slide_number):
 
     training_img_path = get_training_image_path_scale_factor(slide_number)
     large_w, large_h, small_w, small_h = parse_dimensions_from_training_image_filename(training_img_path)
-    img_path = FILTER_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + FILTER_SUFFIX + \
-               str(large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(small_h) + "-" + \
-               FILTER_RESULT_TEXT + "." + DEST_TRAIN_EXT
+    img_path = FILTER_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
+      SCALE_FACTOR) + "x-" + FILTER_SUFFIX + str(large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(
+      small_h) + "-" + FILTER_RESULT_TEXT + "." + DEST_TRAIN_EXT
   else:
     img_path = FILTER_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + FILTER_SUFFIX + str(DEST_TRAIN_SIZE) + \
                "-" + FILTER_RESULT_TEXT + "." + DEST_TRAIN_EXT
