@@ -39,6 +39,8 @@ COL_TILE_SIZE_BASED_ON_SUMMARY_IMAGE_SIZE = 128
 
 DISPLAY_TILE_LABELS = False
 
+TILE_BORDER_SIZE = 2
+
 
 def get_num_tiles(rows, cols, row_tile_size, col_tile_size):
   """
@@ -107,17 +109,13 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
     tissue_percentage = filter.tissue_percent(np_tile)
     print("TILE [%d:%d, %d:%d]: Tissue %f%%" % (r_s, r_e, c_s, c_e, tissue_percentage))
     if (tissue_percentage >= TISSUE_THRESHOLD_PERCENT):
-      draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=thresh_color)
-      draw.rectangle([(c_s + 1, r_s + 1), (c_e - 2, r_e - 2)], outline=thresh_color)
+      tile_border(draw, r_s, r_e, c_s, c_e, thresh_color)
     elif (tissue_percentage >= TISSUE_LOW_THRESHOLD_PERCENT) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
-      draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=below_thresh_color)
-      draw.rectangle([(c_s + 1, r_s + 1), (c_e - 2, r_e - 2)], outline=below_thresh_color)
+      tile_border(draw, r_s, r_e, c_s, c_e, below_thresh_color)
     elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESHOLD_PERCENT):
-      draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=below_lower_thresh_color)
-      draw.rectangle([(c_s + 1, r_s + 1), (c_e - 2, r_e - 2)], outline=below_lower_thresh_color)
+      tile_border(draw, r_s, r_e, c_s, c_e, below_lower_thresh_color)
     else:
-      draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=no_tissue_color)
-      draw.rectangle([(c_s + 1, r_s + 1), (c_e - 2, r_e - 2)], outline=no_tissue_color)
+      tile_border(draw, r_s, r_e, c_s, c_e, no_tissue_color)
     # filter.display_img(np_tile, text=label, size=14, bg=True)
     if DISPLAY_TILE_LABELS == True:
       label = "#%d\n%4.2f%%" % (count, tissue_percentage)
@@ -127,6 +125,11 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
     summary.show()
   if save:
     save_tile_summary_image(summary, slide_num)
+
+
+def tile_border(draw, r_s, r_e, c_s, c_e, color):
+  for x in range(0, TILE_BORDER_SIZE):
+    draw.rectangle([(c_s + x, r_s + x), (c_e - 1 - x, r_e - 1 - x)], outline=color)
 
 
 def save_tile_summary_image(pil_img, slide_num):
@@ -394,4 +397,4 @@ multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8], d
 # singleprocess_images_to_tile_summaries()
 # multiprocess_images_to_tile_summaries(image_num_list=[5,10,15,20,25,30])
 # multiprocess_images_to_tile_summaries()
-# summary(3)
+# summary(3, display=True)
