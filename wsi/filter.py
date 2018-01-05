@@ -34,6 +34,7 @@ from datetime import time
 
 import wsi.slide as slide
 from wsi.slide import Time
+import PIL
 from PIL import Image, ImageDraw, ImageFont
 
 # If True, display NumPy array stats for filters (min, max, mean, is_binary).
@@ -1195,8 +1196,8 @@ def image_cell(slide_num, filter_num, display_text, file_text):
          "      <a href=\"" + slide.get_filter_image_path(slide_num, filter_num, file_text) + "\">\n" + \
          "        " + display_text + "<br/>\n" + \
          "        " + slide.get_filter_image_filename(slide_num, filter_num, file_text) + "<br/>\n" + \
-         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + slide.get_filter_image_path(
-    slide_num, filter_num, file_text) + "\" />\n" + \
+         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + \
+         slide.get_filter_thumbnail_path(slide_num, filter_num, file_text) + "\" />\n" + \
          "      </a>\n" + \
          "    </td>\n"
 
@@ -1250,8 +1251,14 @@ def save_filtered_image(np_img, slide_num, filter_num, filter_text):
   """
   t = Time()
   filepath = slide.get_filter_image_path(slide_num, filter_num, filter_text)
-  np_to_pil(np_img).save(filepath)
+  pil_img = np_to_pil(np_img)
+  pil_img.save(filepath)
   print("%-20s | Time: %-14s  Name: %s" % ("Save Image", str(t.elapsed()), filepath))
+
+  t1 = Time()
+  thumbnail_filepath = slide.get_filter_thumbnail_path(slide_num, filter_num, filter_text)
+  slide.save_thumbnail(pil_img, slide.THUMBNAIL_SIZE, thumbnail_filepath)
+  print("%-20s | Time: %-14s  Name: %s" % ("Save Thumbnail", str(t1.elapsed()), thumbnail_filepath))
 
 
 def generate_filter_html_page(html_page_info):
@@ -1421,6 +1428,7 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 
   print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
 
+
 # apply_filters_to_image(1)
 # rgb, _ = apply_filters_to_image(337, display=False, save=False)
 # display_img(rgb, "RGB")
@@ -1437,7 +1445,7 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 # singleprocess_apply_filters_to_images(image_num_list=[1,2,3,4])
 
 # multiprocess_apply_filters_to_images()
-# multiprocess_apply_filters_to_images(image_num_list=[1,2,3,4,5,6,7,8,9,10,11,12])
+multiprocess_apply_filters_to_images(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
 # img, _ = apply_filters_to_image(4, display=True, save=False)
 # display_img(img, "RESULT", bg=True)
 # canny = filter_canny(filter_rgb_to_grayscale(img))

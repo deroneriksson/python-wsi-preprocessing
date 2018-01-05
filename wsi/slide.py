@@ -51,6 +51,9 @@ FILTER_SUFFIX = ""  # Example: "filter-"
 FILTER_RESULT_TEXT = "filtered"
 FILTER_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "filter_" + DEST_TRAIN_EXT
 
+FILTER_THUMBNAIL_DIR = BASE_DIR + os.sep + "filter_thumbnail_" + str(DEST_TRAIN_SIZE) + "_" + DEST_TRAIN_EXT
+FILTER_THUMBNAIL_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "filter_thumbnail_" + DEST_TRAIN_EXT
+
 TILE_SUMMARY_DIR = BASE_DIR + os.sep + "tile_summary_" + DEST_TRAIN_EXT
 TILE_SUMMARY_ON_ORIGINAL_DIR = BASE_DIR + os.sep + "tile_summary_on_original_" + DEST_TRAIN_EXT
 TILE_SUMMARY_SUFFIX = "tile_summary"
@@ -161,6 +164,28 @@ def get_filter_image_path(slide_number, filter_number, filter_name_info):
     dir = FILTER_DIR_SCALE_FACTOR
   else:
     dir = FILTER_DIR
+  if not os.path.exists(dir):
+    os.makedirs(dir)
+  img_path = dir + os.sep + get_filter_image_filename(slide_number, filter_number, filter_name_info)
+  return img_path
+
+
+def get_filter_thumbnail_path(slide_number, filter_number, filter_name_info):
+  """
+  Convert slide number, filter number, and text to a path to a thumbnail file.
+
+  Args:
+    slide_number: The slide number.
+    filter_number: The filter number.
+    filter_name_info: Descriptive text describing filter.
+
+  Returns:
+    Path to the filter thumbnail file.
+  """
+  if RESIZE_ALL_BY_SCALE_FACTOR == True:
+    dir = FILTER_THUMBNAIL_DIR_SCALE_FACTOR
+  else:
+    dir = FILTER_THUMBNAIL_DIR
   if not os.path.exists(dir):
     os.makedirs(dir)
   img_path = dir + os.sep + get_filter_image_filename(slide_number, filter_number, filter_name_info)
