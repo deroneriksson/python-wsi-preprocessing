@@ -52,6 +52,7 @@ FILTER_RESULT_TEXT = "filtered"
 FILTER_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "filter_" + DEST_TRAIN_EXT
 
 TILE_SUMMARY_DIR = BASE_DIR + os.sep + "tile_summary_" + DEST_TRAIN_EXT
+TILE_SUMMARY_ON_ORIGINAL_DIR = BASE_DIR + os.sep + "tile_summary_on_original_" + DEST_TRAIN_EXT
 TILE_SUMMARY_SUFFIX = "tile_summary"
 
 STATS_DIR = BASE_DIR + os.sep + "svs_stats"
@@ -195,6 +196,22 @@ def get_tile_summary_image_path(slide_number):
   if not os.path.exists(TILE_SUMMARY_DIR):
     os.makedirs(TILE_SUMMARY_DIR)
   img_path = TILE_SUMMARY_DIR + os.sep + get_tile_summary_image_filename(slide_number)
+  return img_path
+
+
+def get_tile_summary_on_original_image_path(slide_number):
+  """
+  Convert slide number to a path to a tile summary on original image file.
+
+  Args:
+    slide_number: The slide number.
+
+  Returns:
+    Path to the tile summary on original image file.
+  """
+  if not os.path.exists(TILE_SUMMARY_ON_ORIGINAL_DIR):
+    os.makedirs(TILE_SUMMARY_ON_ORIGINAL_DIR)
+  img_path = TILE_SUMMARY_ON_ORIGINAL_DIR + os.sep + get_tile_summary_image_filename(slide_number)
   return img_path
 
 

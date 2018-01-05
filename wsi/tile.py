@@ -101,6 +101,14 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
   summary_img[0:np_img.shape[0], 0:np_img.shape[1]] = np_img
   summary = filter.np_to_pil(summary_img)
   draw = ImageDraw.Draw(summary)
+
+  if slide.RESIZE_ALL_BY_SCALE_FACTOR == True:
+    original_img_path = slide.get_training_image_path_scale_factor(slide_num)
+  else:
+    original_img_path = slide.get_training_image_path(slide_num)
+  orig_img = slide.open_image(original_img_path)
+  draw_orig = ImageDraw.Draw(orig_img)
+
   count = 0
   for t in tile_indices:
     count += 1
@@ -110,12 +118,16 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
     print("TILE [%d:%d, %d:%d]: Tissue %f%%" % (r_s, r_e, c_s, c_e, tissue_percentage))
     if (tissue_percentage >= TISSUE_THRESHOLD_PERCENT):
       tile_border(draw, r_s, r_e, c_s, c_e, thresh_color)
+      tile_border(draw_orig, r_s, r_e, c_s, c_e, thresh_color)
     elif (tissue_percentage >= TISSUE_LOW_THRESHOLD_PERCENT) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
       tile_border(draw, r_s, r_e, c_s, c_e, below_thresh_color)
+      tile_border(draw_orig, r_s, r_e, c_s, c_e, below_thresh_color)
     elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESHOLD_PERCENT):
       tile_border(draw, r_s, r_e, c_s, c_e, below_lower_thresh_color)
+      tile_border(draw_orig, r_s, r_e, c_s, c_e, below_lower_thresh_color)
     else:
       tile_border(draw, r_s, r_e, c_s, c_e, no_tissue_color)
+      tile_border(draw_orig, r_s, r_e, c_s, c_e, no_tissue_color)
     # filter.display_img(np_tile, text=label, size=14, bg=True)
     if DISPLAY_TILE_LABELS == True:
       label = "#%d\n%4.2f%%" % (count, tissue_percentage)
@@ -123,8 +135,10 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
       draw.text((c_s + 2, r_s + 2), label, text_color, font=font)
   if display:
     summary.show()
+    orig_img.show()
   if save:
     save_tile_summary_image(summary, slide_num)
+    save_tile_summary_on_original_image(orig_img, slide_num)
 
 
 def tile_border(draw, r_s, r_e, c_s, c_e, color):
@@ -144,6 +158,20 @@ def save_tile_summary_image(pil_img, slide_num):
   filepath = slide.get_tile_summary_image_path(slide_num)
   pil_img.save(filepath)
   print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Summary Image", str(t.elapsed()), filepath))
+
+
+def save_tile_summary_on_original_image(pil_img, slide_num):
+  """
+  Save a tile summary on original image to the file system.
+
+  Args:
+    pil_img: Image as a PIL Image.
+    slide_num: The slide number.
+  """
+  t = Time()
+  filepath = slide.get_tile_summary_on_original_image_path(slide_num)
+  pil_img.save(filepath)
+  print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Summary on Original Image", str(t.elapsed()), filepath))
 
 
 def summary(slide_num, save=False, display=True):
@@ -365,6 +393,13 @@ def image_row(slide_num):
     slide_num) + "\" />\n" + \
          "      </a>\n" + \
          "    </td>\n" + \
+         "    <td>\n" + \
+         "      <a href=\"" + slide.get_tile_summary_on_original_image_path(slide_num) + "\">\n" + \
+         "        " + "S%03d " % slide_num + "Original Tiled" + "<br/>\n" + \
+         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + slide.get_tile_summary_on_original_image_path(
+    slide_num) + "\" />\n" + \
+         "      </a>\n" + \
+         "    </td>\n" + \
          "  <tr>"
 
 
@@ -397,4 +432,4 @@ multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8], d
 # singleprocess_images_to_tile_summaries()
 # multiprocess_images_to_tile_summaries(image_num_list=[5,10,15,20,25,30])
 # multiprocess_images_to_tile_summaries()
-# summary(3, display=True)
+# summary(1, display=True, save=True)
