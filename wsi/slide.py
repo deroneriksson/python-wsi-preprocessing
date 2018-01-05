@@ -317,6 +317,30 @@ def get_filter_image_result(slide_number):
   return img_path
 
 
+def get_filter_thumbnail_result(slide_number):
+  """
+  Convert slide number to the path to the file that is the final thumbnail result of filtering.
+
+  Args:
+    slide_number: The slide number.
+
+  Returns:
+    Path to the filter thumbnail file.
+  """
+  padded_sl_num = str(slide_number).zfill(3)
+  if RESIZE_ALL_BY_SCALE_FACTOR == True:
+
+    training_img_path = get_training_image_path_scale_factor(slide_number)
+    large_w, large_h, small_w, small_h = parse_dimensions_from_training_image_filename(training_img_path)
+    img_path = FILTER_THUMBNAIL_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
+      SCALE_FACTOR) + "x-" + FILTER_SUFFIX + str(large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(
+      small_h) + "-" + FILTER_RESULT_TEXT + "." + DEST_TRAIN_EXT
+  else:
+    img_path = FILTER_THUMBNAIL_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + FILTER_SUFFIX + str(DEST_TRAIN_SIZE) + \
+               "-" + FILTER_RESULT_TEXT + "." + DEST_TRAIN_EXT
+  return img_path
+
+
 def parse_dimensions_from_training_image_filename(filename):
   """
   Parse the training image filename to extract the original width and height and the converted width and height.

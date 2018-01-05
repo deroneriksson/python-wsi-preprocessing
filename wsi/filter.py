@@ -1127,8 +1127,14 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   if save:
     t1 = Time()
     result_path = slide.get_filter_image_result(slide_num)
-    np_to_pil(img).save(result_path)
+    pil_img = np_to_pil(img)
+    pil_img.save(result_path)
     print("%-20s | Time: %-14s  Name: %s" % ("Save Image", str(t1.elapsed()), result_path))
+
+    t1 = Time()
+    thumbnail_path = slide.get_filter_thumbnail_result(slide_num)
+    slide.save_thumbnail(pil_img, slide.THUMBNAIL_SIZE, thumbnail_path)
+    print("%-20s | Time: %-14s  Name: %s" % ("Save Thumbnail", str(t1.elapsed()), thumbnail_path))
 
   print("Slide #%03d processing time: %s\n" % (slide_num, str(t.elapsed())))
 
@@ -1445,7 +1451,7 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 # singleprocess_apply_filters_to_images(image_num_list=[1,2,3,4])
 
 # multiprocess_apply_filters_to_images()
-multiprocess_apply_filters_to_images(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+# multiprocess_apply_filters_to_images(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
 # img, _ = apply_filters_to_image(4, display=True, save=False)
 # display_img(img, "RESULT", bg=True)
 # canny = filter_canny(filter_rgb_to_grayscale(img))
