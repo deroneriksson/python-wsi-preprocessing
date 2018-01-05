@@ -148,7 +148,7 @@ def tile_border(draw, r_s, r_e, c_s, c_e, color):
 
 def save_tile_summary_image(pil_img, slide_num):
   """
-  Save a tile summary image to the file system.
+  Save a tile summary image and thumbnail to the file system.
 
   Args:
     pil_img: Image as a PIL Image.
@@ -159,10 +159,15 @@ def save_tile_summary_image(pil_img, slide_num):
   pil_img.save(filepath)
   print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Summary Image", str(t.elapsed()), filepath))
 
+  t = Time()
+  thumbnail_filepath = slide.get_tile_summary_thumbnail_path(slide_num)
+  slide.save_thumbnail(pil_img, slide.THUMBNAIL_SIZE, thumbnail_filepath)
+  print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Summary Thumbnail", str(t.elapsed()), thumbnail_filepath))
+
 
 def save_tile_summary_on_original_image(pil_img, slide_num):
   """
-  Save a tile summary on original image to the file system.
+  Save a tile summary on original image and thumbnail to the file system.
 
   Args:
     pil_img: Image as a PIL Image.
@@ -172,6 +177,12 @@ def save_tile_summary_on_original_image(pil_img, slide_num):
   filepath = slide.get_tile_summary_on_original_image_path(slide_num)
   pil_img.save(filepath)
   print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Summary on Original Image", str(t.elapsed()), filepath))
+
+  t = Time()
+  thumbnail_filepath = slide.get_tile_summary_on_original_thumbnail_path(slide_num)
+  slide.save_thumbnail(pil_img, slide.THUMBNAIL_SIZE, thumbnail_filepath)
+  print(
+    "%-20s | Time: %-14s  Name: %s" % ("Save Tile Summary on Original Thumbnail", str(t.elapsed()), thumbnail_filepath))
 
 
 def summary(slide_num, save=False, display=True):
@@ -389,15 +400,15 @@ def image_row(slide_num):
          "    <td>\n" + \
          "      <a href=\"" + slide.get_tile_summary_image_path(slide_num) + "\">\n" + \
          "        " + "S%03d " % slide_num + "Tiled" + "<br/>\n" + \
-         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + slide.get_tile_summary_image_path(
-    slide_num) + "\" />\n" + \
+         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + \
+         slide.get_tile_summary_thumbnail_path(slide_num) + "\" />\n" + \
          "      </a>\n" + \
          "    </td>\n" + \
          "    <td>\n" + \
          "      <a href=\"" + slide.get_tile_summary_on_original_image_path(slide_num) + "\">\n" + \
          "        " + "S%03d " % slide_num + "Original Tiled" + "<br/>\n" + \
-         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + slide.get_tile_summary_on_original_image_path(
-    slide_num) + "\" />\n" + \
+         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + \
+         slide.get_tile_summary_on_original_thumbnail_path(slide_num) + "\" />\n" + \
          "      </a>\n" + \
          "    </td>\n" + \
          "  <tr>"

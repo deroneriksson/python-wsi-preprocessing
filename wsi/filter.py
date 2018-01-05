@@ -1421,6 +1421,7 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 
   print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
 
+# apply_filters_to_image(1)
 # rgb, _ = apply_filters_to_image(337, display=False, save=False)
 # display_img(rgb, "RGB")
 # not_greenish = filter_green(rgb, red_upper_thresh=125, green_lower_thresh=30, blue_lower_thresh=30,

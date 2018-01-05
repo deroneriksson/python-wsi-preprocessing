@@ -55,7 +55,12 @@ TILE_SUMMARY_DIR = BASE_DIR + os.sep + "tile_summary_" + DEST_TRAIN_EXT
 TILE_SUMMARY_ON_ORIGINAL_DIR = BASE_DIR + os.sep + "tile_summary_on_original_" + DEST_TRAIN_EXT
 TILE_SUMMARY_SUFFIX = "tile_summary"
 
+TILE_SUMMARY_THUMBNAIL_DIR = BASE_DIR + os.sep + "tile_summary_thumbnail_" + DEST_TRAIN_EXT
+TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR = BASE_DIR + os.sep + "tile_summary_on_original_thumbnail_" + DEST_TRAIN_EXT
+
 STATS_DIR = BASE_DIR + os.sep + "svs_stats"
+
+THUMBNAIL_SIZE = 400
 
 
 def open_slide(filename):
@@ -200,6 +205,22 @@ def get_tile_summary_image_path(slide_number):
   return img_path
 
 
+def get_tile_summary_thumbnail_path(slide_number):
+  """
+  Convert slide number to a path to a tile summary thumbnail file.
+
+  Args:
+    slide_number: The slide number.
+
+  Returns:
+    Path to the tile summary thumbnail file.
+  """
+  if not os.path.exists(TILE_SUMMARY_THUMBNAIL_DIR):
+    os.makedirs(TILE_SUMMARY_THUMBNAIL_DIR)
+  img_path = TILE_SUMMARY_THUMBNAIL_DIR + os.sep + get_tile_summary_image_filename(slide_number)
+  return img_path
+
+
 def get_tile_summary_on_original_image_path(slide_number):
   """
   Convert slide number to a path to a tile summary on original image file.
@@ -213,6 +234,22 @@ def get_tile_summary_on_original_image_path(slide_number):
   if not os.path.exists(TILE_SUMMARY_ON_ORIGINAL_DIR):
     os.makedirs(TILE_SUMMARY_ON_ORIGINAL_DIR)
   img_path = TILE_SUMMARY_ON_ORIGINAL_DIR + os.sep + get_tile_summary_image_filename(slide_number)
+  return img_path
+
+
+def get_tile_summary_on_original_thumbnail_path(slide_number):
+  """
+  Convert slide number to a path to a tile summary on original thumbnail file.
+
+  Args:
+    slide_number: The slide number.
+
+  Returns:
+    Path to the tile summary on original thumbnail file.
+  """
+  if not os.path.exists(TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR):
+    os.makedirs(TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR)
+  img_path = TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR + os.sep + get_tile_summary_image_filename(slide_number)
   return img_path
 
 
@@ -331,6 +368,16 @@ def training_slide_to_image(slide_number):
     if not os.path.exists(DEST_TRAIN_DIR):
       os.makedirs(DEST_TRAIN_DIR)
     img.save(img_path)
+
+
+def save_thumbnail(pil_img, size, path):
+  max_size = tuple(round(size * d / max(pil_img.size)) for d in pil_img.size)
+  img = pil_img.resize(max_size, PIL.Image.BILINEAR)
+  print("Saving thumbnail to: " + path)
+  dir = os.path.dirname(path)
+  if not os.path.exists(dir):
+    os.makedirs(dir)
+  img.save(path)
 
 
 def get_num_training_slides():
