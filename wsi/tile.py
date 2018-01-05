@@ -37,6 +37,8 @@ COL_TILE_SIZE = 1024
 ROW_TILE_SIZE_BASED_ON_SUMMARY_IMAGE_SIZE = 128
 COL_TILE_SIZE_BASED_ON_SUMMARY_IMAGE_SIZE = 128
 
+DISPLAY_TILE_LABELS = False
+
 
 def get_num_tiles(rows, cols, row_tile_size, col_tile_size):
   """
@@ -117,7 +119,7 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
       draw.rectangle([(c_s, r_s), (c_e - 1, r_e - 1)], outline=no_tissue_color)
       draw.rectangle([(c_s + 1, r_s + 1), (c_e - 2, r_e - 2)], outline=no_tissue_color)
     # filter.display_img(np_tile, text=label, size=14, bg=True)
-    if slide.RESIZE_ALL_BY_SCALE_FACTOR == False:
+    if DISPLAY_TILE_LABELS == True:
       label = "#%d\n%4.2f%%" % (count, tissue_percentage)
       font = ImageFont.truetype(font_path, size=text_size)
       draw.text((c_s + 2, r_s + 2), label, text_color, font=font)
@@ -385,9 +387,10 @@ def generate_tiled_html_page(slide_nums):
 
 # summary(1, save=True)
 # summary(26, save=True)
-image_list_to_tile_summaries([1, 2, 3, 4], display=True)
+# image_list_to_tile_summaries([1, 2, 3, 4], display=True)
 # image_range_to_tile_summaries(1, 50)
-# singleprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5, 6], display=True)
+# singleprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
+multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8], display=False)
 # singleprocess_images_to_tile_summaries()
 # multiprocess_images_to_tile_summaries(image_num_list=[5,10,15,20,25,30])
 # multiprocess_images_to_tile_summaries()
