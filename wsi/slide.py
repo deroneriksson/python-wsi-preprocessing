@@ -66,7 +66,7 @@ TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR = BASE_DIR + os.sep + "tile_summary_on_or
 
 STATS_DIR = BASE_DIR + os.sep + "svs_stats"
 
-THUMBNAIL_SIZE = 400
+THUMBNAIL_SIZE = 300
 
 
 def open_slide(filename):
