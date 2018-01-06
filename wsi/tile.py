@@ -382,12 +382,18 @@ def image_row(slide_num):
   Returns:
     HTML for viewing a tiled image.
   """
+  if slide.RESIZE_ALL_BY_SCALE_FACTOR == True:
+    training_image_path = slide.get_training_image_path_scale_factor(slide_num)
+    training_thumb_path = slide.get_training_thumbnail_path_scale_factor(slide_num)
+  else:
+    training_image_path = slide.get_training_image_path(slide_num)
+    training_thumb_path = slide.get_training_thumbnail_path(slide_num)
   return "  <tr>\n" + \
          "    <td>\n" + \
-         "      <a href=\"" + slide.get_training_image_path(slide_num) + "\">\n" + \
+         "      <a href=\"" + training_image_path + "\">\n" + \
          "        " + "S%03d " % slide_num + "Original" + "<br/>\n" + \
          "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + \
-         slide.get_training_image_path(slide_num) + "\" />\n" + \
+         training_thumb_path + "\" />\n" + \
          "      </a>\n" + \
          "    </td>\n" + \
          "    <td>\n" + \
@@ -411,7 +417,7 @@ def image_row(slide_num):
          slide.get_tile_summary_on_original_thumbnail_path(slide_num) + "\" />\n" + \
          "      </a>\n" + \
          "    </td>\n" + \
-         "  <tr>"
+         "  </tr>\n"
 
 
 def generate_tiled_html_page(slide_nums):
