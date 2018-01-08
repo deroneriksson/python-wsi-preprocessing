@@ -330,7 +330,7 @@ def multiprocess_images_to_tile_summaries(save=True, display=False, html=True, i
     print("Done tiling slides: %s" % image_nums)
 
   if html:
-    generate_tiled_html_page(slide_nums)
+    generate_tiled_html_result(slide_nums)
 
   print("Time to generate tile previews (multiprocess): %s\n" % str(timer.elapsed()))
 
@@ -383,24 +383,61 @@ def image_row(slide_num):
          "  </tr>\n"
 
 
-def generate_tiled_html_page(slide_nums):
+def generate_tiled_html_result(slide_nums):
   """
-  Generate an HTML page to view the tiled images.
+  Generate HTML to view the tiled images.
 
   Args:
     slide_nums: List of slide numbers.
   """
-  html = ""
-  html += filter.html_header("Tiled Images")
+  if slide.TILE_SUMMARY_PAGINATE == False:
+    html = ""
+    html += filter.html_header("Tiled Images")
 
-  row = 0
-  for slide_num in sorted(slide_nums):
-    html += image_row(slide_num)
+    html += "  <table>\n"
+    for slide_num in sorted(slide_nums):
+      html += image_row(slide_num)
+    html += "  </table>\n"
 
-  html += filter.html_footer()
-  text_file = open("tiles.html", "w")
-  text_file.write(html)
-  text_file.close()
+    html += filter.html_footer()
+    text_file = open("tiles.html", "w")
+    text_file.write(html)
+    text_file.close()
+  else:
+    total_len = len(slide_nums)
+    page_size = slide.TILE_SUMMARY_PAGINATION_SIZE
+    num_pages = math.ceil(total_len / page_size)
+    for page_num in range(1, num_pages + 1):
+      start_index = (page_num - 1) * page_size
+      end_index = (page_num * page_size) if (page_num < num_pages) else total_len
+      page_slide_nums = slide_nums[start_index:end_index]
+
+      html = ""
+      html += filter.html_header("Tiled Images, Page %d" % page_num)
+
+      html += "<div style=\"font-size: 20px\">"
+      if (page_num > 1):
+        if (page_num == 2):
+          html += "<a href=\"tiles.html\">&lt;</a> "
+        else:
+          html += "<a href=\"tiles-%d.html\">&lt;</a> " % (page_num - 1)
+      html += "Page %d" % page_num
+      if (page_num < num_pages):
+        html += " <a href=\"tiles-%d.html\">&gt;</a> " % (page_num + 1)
+      html += "</div>"
+
+      html += "  <table>\n"
+      for slide_num in sorted(page_slide_nums):
+        html += image_row(slide_num)
+      html += "  </table>\n"
+
+      html += filter.html_footer()
+      if page_num == 1:
+        text_file = open("tiles.html", "w")
+      else:
+        text_file = open("tiles-%d.html" % page_num, "w")
+      text_file.write(html)
+      text_file.close()
 
 
 # summary(1, save=True)
@@ -411,5 +448,8 @@ def generate_tiled_html_page(slide_nums):
 # multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
 # singleprocess_images_to_tile_summaries()
 # multiprocess_images_to_tile_summaries(image_num_list=[5,10,15,20,25,30])
-multiprocess_images_to_tile_summaries(save=False, display=False, html=True)
+# multiprocess_images_to_tile_summaries(save=False, display=False, html=True)
+multiprocess_images_to_tile_summaries()
 # summary(1, display=True, save=True)
+# generate_tiled_html_result(slide_nums=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
+# generate_tiled_html_result(slide_nums=[1,2,3,4,5])

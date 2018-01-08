@@ -1227,8 +1227,7 @@ def html_header(page_title):
          "    </style>\n" + \
          "  </head>\n" + \
          "  <body>\n" + \
-         "  <script src=\"../js/lazyload.js\"></script>\n" + \
-         "  <table>\n"
+         "  <script src=\"../js/lazyload.js\"></script>\n"
   return html
 
 
@@ -1239,8 +1238,7 @@ def html_footer():
   Returns:
     HTML footer for viewing images.
   """
-  html = "</table>\n" + \
-         "<script>lazyload();</script>\n" + \
+  html = "<script>lazyload();</script>\n" + \
          "</body>\n" + \
          "</html>\n"
   return html
@@ -1277,6 +1275,7 @@ def generate_filter_html_page(html_page_info):
   """
   html = ""
   html += html_header("Filtered Images")
+  html += "  <table>\n"
 
   row = 0
   for key in sorted(html_page_info):
@@ -1290,6 +1289,7 @@ def generate_filter_html_page(html_page_info):
     if next_key not in html_page_info:
       html += "  </tr>\n"
 
+  html += "  </table>\n"
   html += html_footer()
   text_file = open("filters.html", "w")
   text_file.write(html)

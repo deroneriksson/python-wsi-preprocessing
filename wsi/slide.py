@@ -55,16 +55,18 @@ FILTER_DIR = BASE_DIR + os.sep + "filter_" + str(DEST_TRAIN_SIZE) + "_" + DEST_T
 FILTER_SUFFIX = ""  # Example: "filter-"
 FILTER_RESULT_TEXT = "filtered"
 FILTER_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "filter_" + DEST_TRAIN_EXT
-
 FILTER_THUMBNAIL_DIR = BASE_DIR + os.sep + "filter_thumbnail_" + str(DEST_TRAIN_SIZE) + "_" + THUMBNAIL_EXT
 FILTER_THUMBNAIL_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "filter_thumbnail_" + THUMBNAIL_EXT
+FILTER_PAGINATION_SIZE = 50
+FILTER_PAGINATE = True
 
 TILE_SUMMARY_DIR = BASE_DIR + os.sep + "tile_summary_" + DEST_TRAIN_EXT
 TILE_SUMMARY_ON_ORIGINAL_DIR = BASE_DIR + os.sep + "tile_summary_on_original_" + DEST_TRAIN_EXT
 TILE_SUMMARY_SUFFIX = "tile_summary"
-
 TILE_SUMMARY_THUMBNAIL_DIR = BASE_DIR + os.sep + "tile_summary_thumbnail_" + THUMBNAIL_EXT
 TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR = BASE_DIR + os.sep + "tile_summary_on_original_thumbnail_" + THUMBNAIL_EXT
+TILE_SUMMARY_PAGINATION_SIZE = 50
+TILE_SUMMARY_PAGINATE = True
 
 STATS_DIR = BASE_DIR + os.sep + "svs_stats"
 
