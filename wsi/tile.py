@@ -411,5 +411,5 @@ def generate_tiled_html_page(slide_nums):
 # multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
 # singleprocess_images_to_tile_summaries()
 # multiprocess_images_to_tile_summaries(image_num_list=[5,10,15,20,25,30])
-multiprocess_images_to_tile_summaries()
+multiprocess_images_to_tile_summaries(save=False, display=False, html=True)
 # summary(1, display=True, save=True)

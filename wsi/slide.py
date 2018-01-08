@@ -45,28 +45,28 @@ DEST_TRAIN_DIR = BASE_DIR + os.sep + "training_" + str(DEST_TRAIN_SIZE) + "_" + 
 SCALE_FACTOR = 32
 RESIZE_ALL_BY_SCALE_FACTOR = True
 DEST_TRAIN_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "training_" + DEST_TRAIN_EXT
+THUMBNAIL_SIZE = 300
+THUMBNAIL_EXT = "jpg"
 
-DEST_TRAIN_THUMBNAIL_DIR = BASE_DIR + os.sep + "training_thumbnail_" + str(DEST_TRAIN_SIZE) + "_" + DEST_TRAIN_EXT
-DEST_TRAIN_THUMBNAIL_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "training_thumbnail_" + DEST_TRAIN_EXT
+DEST_TRAIN_THUMBNAIL_DIR = BASE_DIR + os.sep + "training_thumbnail_" + str(DEST_TRAIN_SIZE) + "_" + THUMBNAIL_EXT
+DEST_TRAIN_THUMBNAIL_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "training_thumbnail_" + THUMBNAIL_EXT
 
 FILTER_DIR = BASE_DIR + os.sep + "filter_" + str(DEST_TRAIN_SIZE) + "_" + DEST_TRAIN_EXT
 FILTER_SUFFIX = ""  # Example: "filter-"
 FILTER_RESULT_TEXT = "filtered"
 FILTER_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "filter_" + DEST_TRAIN_EXT
 
-FILTER_THUMBNAIL_DIR = BASE_DIR + os.sep + "filter_thumbnail_" + str(DEST_TRAIN_SIZE) + "_" + DEST_TRAIN_EXT
-FILTER_THUMBNAIL_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "filter_thumbnail_" + DEST_TRAIN_EXT
+FILTER_THUMBNAIL_DIR = BASE_DIR + os.sep + "filter_thumbnail_" + str(DEST_TRAIN_SIZE) + "_" + THUMBNAIL_EXT
+FILTER_THUMBNAIL_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "filter_thumbnail_" + THUMBNAIL_EXT
 
 TILE_SUMMARY_DIR = BASE_DIR + os.sep + "tile_summary_" + DEST_TRAIN_EXT
 TILE_SUMMARY_ON_ORIGINAL_DIR = BASE_DIR + os.sep + "tile_summary_on_original_" + DEST_TRAIN_EXT
 TILE_SUMMARY_SUFFIX = "tile_summary"
 
-TILE_SUMMARY_THUMBNAIL_DIR = BASE_DIR + os.sep + "tile_summary_thumbnail_" + DEST_TRAIN_EXT
-TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR = BASE_DIR + os.sep + "tile_summary_on_original_thumbnail_" + DEST_TRAIN_EXT
+TILE_SUMMARY_THUMBNAIL_DIR = BASE_DIR + os.sep + "tile_summary_thumbnail_" + THUMBNAIL_EXT
+TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR = BASE_DIR + os.sep + "tile_summary_on_original_thumbnail_" + THUMBNAIL_EXT
 
 STATS_DIR = BASE_DIR + os.sep + "svs_stats"
-
-THUMBNAIL_SIZE = 300
 
 
 def open_slide(filename):
@@ -144,7 +144,7 @@ def get_training_thumbnail_path(slide_number):
   Convert slide number to a path to the corresponding destination thumbnail file.
 
   Example:
-    5 -> ../data/training_thumbnail_4096_png/TUPAC-TR-005-4096.png
+    5 -> ../data/training_thumbnail_4096_jpg/TUPAC-TR-005-4096.jpg
 
   Args:
     slide_number: The slide number.
@@ -154,7 +154,7 @@ def get_training_thumbnail_path(slide_number):
   """
   padded_sl_num = str(slide_number).zfill(3)
   img_path = DEST_TRAIN_THUMBNAIL_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + DEST_TRAIN_SUFFIX + str(
-    DEST_TRAIN_SIZE) + "." + DEST_TRAIN_EXT
+    DEST_TRAIN_SIZE) + "." + THUMBNAIL_EXT
   return img_path
 
 
@@ -173,12 +173,12 @@ def get_training_image_path_scale_factor(slide_number, large_w=None, large_h=Non
 def get_training_thumbnail_path_scale_factor(slide_number, large_w=None, large_h=None, small_w=None, small_h=None):
   padded_sl_num = str(slide_number).zfill(3)
   if large_w is None and large_h is None and small_w is None and small_h is None:
-    wilcard_path = DEST_TRAIN_THUMBNAIL_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "*." + DEST_TRAIN_EXT
+    wilcard_path = DEST_TRAIN_THUMBNAIL_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "*." + THUMBNAIL_EXT
     img_path = glob.glob(wilcard_path)[0]
   else:
     img_path = DEST_TRAIN_THUMBNAIL_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
       SCALE_FACTOR) + "x-" + DEST_TRAIN_SUFFIX + str(
-      large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(small_h) + "." + DEST_TRAIN_EXT
+      large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(small_h) + "." + THUMBNAIL_EXT
   return img_path
 
 
@@ -222,11 +222,11 @@ def get_filter_thumbnail_path(slide_number, filter_number, filter_name_info):
     dir = FILTER_THUMBNAIL_DIR
   if not os.path.exists(dir):
     os.makedirs(dir)
-  img_path = dir + os.sep + get_filter_image_filename(slide_number, filter_number, filter_name_info)
+  img_path = dir + os.sep + get_filter_image_filename(slide_number, filter_number, filter_name_info, thumbnail=True)
   return img_path
 
 
-def get_filter_image_filename(slide_number, filter_number, filter_name_info):
+def get_filter_image_filename(slide_number, filter_number, filter_name_info, thumbnail=False):
   """
   Convert slide number, filter number, and text to a file name.
 
@@ -234,17 +234,22 @@ def get_filter_image_filename(slide_number, filter_number, filter_name_info):
     slide_number: The slide number.
     filter_number: The filter number.
     filter_name_info: Descriptive text describing filter.
+    thumbnail: If True, produce thumbnail filename.
 
   Returns:
     The filter image file name.
   """
+  if thumbnail == True:
+    ext = THUMBNAIL_EXT
+  else:
+    ext = DEST_TRAIN_EXT
   padded_sl_num = str(slide_number).zfill(3)
   padded_fi_num = str(filter_number).zfill(3)
   if RESIZE_ALL_BY_SCALE_FACTOR == True:
-    img_filename = TRAIN_PREFIX + padded_sl_num + "-" + padded_fi_num + "-" + FILTER_SUFFIX + filter_name_info + "." + DEST_TRAIN_EXT
+    img_filename = TRAIN_PREFIX + padded_sl_num + "-" + padded_fi_num + "-" + FILTER_SUFFIX + filter_name_info + "." + ext
   else:
     img_filename = TRAIN_PREFIX + padded_sl_num + "-" + padded_fi_num + "-" + FILTER_SUFFIX + str(
-      DEST_TRAIN_SIZE) + "-" + filter_name_info + "." + DEST_TRAIN_EXT
+      DEST_TRAIN_SIZE) + "-" + filter_name_info + "." + ext
   return img_filename
 
 
@@ -276,7 +281,7 @@ def get_tile_summary_thumbnail_path(slide_number):
   """
   if not os.path.exists(TILE_SUMMARY_THUMBNAIL_DIR):
     os.makedirs(TILE_SUMMARY_THUMBNAIL_DIR)
-  img_path = TILE_SUMMARY_THUMBNAIL_DIR + os.sep + get_tile_summary_image_filename(slide_number)
+  img_path = TILE_SUMMARY_THUMBNAIL_DIR + os.sep + get_tile_summary_image_filename(slide_number, thumbnail=True)
   return img_path
 
 
@@ -308,22 +313,28 @@ def get_tile_summary_on_original_thumbnail_path(slide_number):
   """
   if not os.path.exists(TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR):
     os.makedirs(TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR)
-  img_path = TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR + os.sep + get_tile_summary_image_filename(slide_number)
+  img_path = TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR + os.sep + get_tile_summary_image_filename(slide_number,
+                                                                                               thumbnail=True)
   return img_path
 
 
-def get_tile_summary_image_filename(slide_number):
+def get_tile_summary_image_filename(slide_number, thumbnail=False):
   """
   Convert slide number to a tile summary image file name.
 
   Args:
     slide_number: The slide number.
+    thumbnail: If True, produce thumbnail filename.
 
   Returns:
     The tile summary image file name.
   """
+  if thumbnail == True:
+    ext = THUMBNAIL_EXT
+  else:
+    ext = DEST_TRAIN_EXT
   padded_sl_num = str(slide_number).zfill(3)
-  img_filename = TRAIN_PREFIX + padded_sl_num + "-" + TILE_SUMMARY_SUFFIX + "." + DEST_TRAIN_EXT
+  img_filename = TRAIN_PREFIX + padded_sl_num + "-" + TILE_SUMMARY_SUFFIX + "." + ext
   return img_filename
 
 
@@ -363,16 +374,15 @@ def get_filter_thumbnail_result(slide_number):
   """
   padded_sl_num = str(slide_number).zfill(3)
   if RESIZE_ALL_BY_SCALE_FACTOR == True:
-
     training_img_path = get_training_image_path_scale_factor(slide_number)
     large_w, large_h, small_w, small_h = parse_dimensions_from_training_image_filename(training_img_path)
     img_path = FILTER_THUMBNAIL_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
       SCALE_FACTOR) + "x-" + FILTER_SUFFIX + str(large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(
-      small_h) + "-" + FILTER_RESULT_TEXT + "." + DEST_TRAIN_EXT
+      small_h) + "-" + FILTER_RESULT_TEXT + "." + THUMBNAIL_EXT
   else:
     img_path = FILTER_THUMBNAIL_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + FILTER_SUFFIX + str(
       DEST_TRAIN_SIZE) + \
-               "-" + FILTER_RESULT_TEXT + "." + DEST_TRAIN_EXT
+               "-" + FILTER_RESULT_TEXT + "." + THUMBNAIL_EXT
   return img_path
 
 
