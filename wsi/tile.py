@@ -390,12 +390,13 @@ def generate_tiled_html_result(slide_nums):
   Args:
     slide_nums: List of slide numbers.
   """
+  slide_nums = sorted(slide_nums)
   if slide.TILE_SUMMARY_PAGINATE == False:
     html = ""
     html += filter.html_header("Tiled Images")
 
     html += "  <table>\n"
-    for slide_num in sorted(slide_nums):
+    for slide_num in slide_nums:
       html += image_row(slide_num)
     html += "  </table>\n"
 
@@ -427,7 +428,7 @@ def generate_tiled_html_result(slide_nums):
       html += "</div>"
 
       html += "  <table>\n"
-      for slide_num in sorted(page_slide_nums):
+      for slide_num in page_slide_nums:
         html += image_row(slide_num)
       html += "  </table>\n"
 
@@ -449,7 +450,8 @@ def generate_tiled_html_result(slide_nums):
 # singleprocess_images_to_tile_summaries()
 # multiprocess_images_to_tile_summaries(image_num_list=[5,10,15,20,25,30])
 # multiprocess_images_to_tile_summaries(save=False, display=False, html=True)
-multiprocess_images_to_tile_summaries()
+# multiprocess_images_to_tile_summaries()
 # summary(1, display=True, save=True)
 # generate_tiled_html_result(slide_nums=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
 # generate_tiled_html_result(slide_nums=[1,2,3,4,5])
+# generate_tiled_html_result(slide_nums=[10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
