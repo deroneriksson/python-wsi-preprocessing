@@ -1208,20 +1208,21 @@ def image_cell(slide_num, filter_num, display_text, file_text):
          "    </td>\n"
 
 
-def html_header():
+def html_header(page_title):
   """
-  Generate an HTML header for previewing filtered images.
+  Generate an HTML header for previewing images.
 
   Returns:
-    HTML header for viewing processed images.
+    HTML header for viewing images.
   """
   html = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" " + \
          "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" + \
          "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n" + \
          "  <head>\n" + \
-         "    <title>Filtered Images</title>\n" + \
+         "    <title>" + page_title + "</title>\n" + \
          "    <style type=\"text/css\">\n" + \
-         "     img { max-width: 400px; max-height: 400px; border: 2px solid black; }\n" + \
+         "     img { max-width: " + str(slide.THUMBNAIL_SIZE) + "px; max-height: " + \
+         str(slide.THUMBNAIL_SIZE) + "px; border: 2px solid black; }\n" + \
          "     td { border: 2px solid black; }\n" + \
          "    </style>\n" + \
          "  </head>\n" + \
@@ -1233,10 +1234,10 @@ def html_header():
 
 def html_footer():
   """
-  Generate an HTML footer for previewing filtered images.
+  Generate an HTML footer for previewing images.
 
   Returns:
-    HTML footer for viewing processed images.
+    HTML footer for viewing images.
   """
   html = "</table>\n" + \
          "<script>lazyload();</script>\n" + \
@@ -1275,7 +1276,7 @@ def generate_filter_html_page(html_page_info):
     html_page_info: Dictionary of image information.
   """
   html = ""
-  html += html_header()
+  html += html_header("Filtered Images")
 
   row = 0
   for key in sorted(html_page_info):
@@ -1450,6 +1451,7 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 
 # singleprocess_apply_filters_to_images(image_num_list=[1,2,3,4])
 
+# multiprocess_apply_filters_to_images(save=False, display=False, html=True)
 # multiprocess_apply_filters_to_images()
 # multiprocess_apply_filters_to_images(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
 # img, _ = apply_filters_to_image(4, display=True, save=False)

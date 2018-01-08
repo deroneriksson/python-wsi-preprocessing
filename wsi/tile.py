@@ -335,43 +335,6 @@ def multiprocess_images_to_tile_summaries(save=True, display=False, html=True, i
   print("Time to generate tile previews (multiprocess): %s\n" % str(timer.elapsed()))
 
 
-def html_header():
-  """
-  Generate an HTML header for viewing tiled images.
-
-  Returns:
-    HTML header for viewing tiled images.
-  """
-  html = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" " + \
-         "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" + \
-         "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n" + \
-         "  <head>\n" + \
-         "    <title>Tiled Images</title>\n" + \
-         "    <style type=\"text/css\">\n" + \
-         "     img { max-width: 400px; max-height: 400px; border: 2px solid black; }\n" + \
-         "     td { border: 2px solid black; }\n" + \
-         "    </style>\n" + \
-         "  </head>\n" + \
-         "  <body>\n" + \
-         "  <script src=\"../js/lazyload.js\"></script>\n" + \
-         "  <table>\n"
-  return html
-
-
-def html_footer():
-  """
-  Generate an HTML footer for viewing tiled images.
-
-  Returns:
-    HTML footer for viewing tiled images.
-  """
-  html = "</table>\n" + \
-         "<script>lazyload();</script>\n" + \
-         "</body>\n" + \
-         "</html>\n"
-  return html
-
-
 def image_row(slide_num):
   """
   Generate HTML for viewing a tiled image.
@@ -428,13 +391,13 @@ def generate_tiled_html_page(slide_nums):
     slide_nums: List of slide numbers.
   """
   html = ""
-  html += html_header()
+  html += filter.html_header("Tiled Images")
 
   row = 0
   for slide_num in sorted(slide_nums):
     html += image_row(slide_num)
 
-  html += html_footer()
+  html += filter.html_footer()
   text_file = open("tiles.html", "w")
   text_file.write(html)
   text_file.close()
