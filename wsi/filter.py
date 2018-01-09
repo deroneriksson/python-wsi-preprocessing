@@ -31,11 +31,9 @@ import skimage.filters as sk_filters
 import skimage.future as sk_future
 import skimage.morphology as sk_morphology
 import skimage.segmentation as sk_segmentation
-from datetime import time
 
 import wsi.slide as slide
 from wsi.slide import Time
-import PIL
 from PIL import Image, ImageDraw, ImageFont
 
 # If True, display NumPy array stats for filters (min, max, mean, is_binary).
@@ -135,7 +133,7 @@ def np_info(np_arr, name=None, elapsed=None):
   if elapsed is None:
     elapsed = "---"
 
-  if DISPLAY_FILTER_STATS == False:
+  if DISPLAY_FILTER_STATS is False:
     print("%-20s | Time: %-14s  Type: %-7s Shape: %s" % (name, str(elapsed), np_arr.dtype, np_arr.shape))
   else:
     # np_arr = np.asarray(np_arr)
@@ -380,7 +378,7 @@ def filter_contrast_stretch(np_img, low=40, high=60):
     high: Range high value (0 to 255).
 
   Returns:
-    Image with contrast enhanced.
+    Image as NumPy array with contrast enhanced.
   """
   t = Time()
   low_p, high_p = np.percentile(np_img, (low * 100 / 255, high * 100 / 255))
@@ -656,8 +654,6 @@ def filter_binary_closing(np_img, disk_size=3, iterations=1, output_type="uint8"
   return result
 
 
-# NOTE: Potentially could feed in RGB image with mask (such as hysteresis threshold) applied. Then, in a following
-# step, could filter out segments that aren't pink or purple enough.
 def filter_kmeans_segmentation(np_img, compactness=10, n_segments=800):
   """
   Use K-means segmentation (color/space proximity) to segment RGB image where each segment is
@@ -688,6 +684,7 @@ def filter_rag_threshold(np_img, compactness=10, n_segments=800, threshold=9):
     np_img: Binary image as a NumPy array.
     compactness: Color proximity versus space proximity factor.
     n_segments: The number of segments.
+    threshold: Threshold value for combining regions.
 
   Returns:
     NumPy array (uint8) representing 3-channel RGB image where each segment has been colored based on the average
@@ -1056,7 +1053,7 @@ def display_img(np_img, text=None, font_path="/Library/Fonts/Arial Bold.ttf", si
   draw = ImageDraw.Draw(result)
   if text is not None:
     font = ImageFont.truetype(font_path, size)
-    if bg == True:
+    if bg:
       (x, y) = draw.textsize(text, font)
       draw.rectangle([(0, 0), (x + 1, y + 1)], fill=background, outline=border)
     draw.text((0, 0), text, color, font=font)
@@ -1083,7 +1080,7 @@ def apply_filters_to_image(slide_num, save=True, display=False):
 
   if save and not os.path.exists(slide.FILTER_DIR):
     os.makedirs(slide.FILTER_DIR)
-  if slide.RESIZE_ALL_BY_SCALE_FACTOR == True:
+  if slide.RESIZE_ALL_BY_SCALE_FACTOR:
     img_path = slide.get_training_image_path_scale_factor(slide_num)
   else:
     img_path = slide.get_training_image_path(slide_num)
@@ -1197,10 +1194,11 @@ def image_cell(slide_num, filter_num, display_text, file_text):
     file_text: Filter name for file.
 
   Returns:
-    HTML for viewing a processed image.
+    HTML for a table cell for viewing a filtered image.
   """
   return "    <td>\n" + \
-         "      <a target=\"_blank\" href=\"" + slide.get_filter_image_path(slide_num, filter_num, file_text) + "\">\n" + \
+         "      <a target=\"_blank\" href=\"" + slide.get_filter_image_path(slide_num, filter_num,
+                                                                            file_text) + "\">\n" + \
          "        " + display_text + "<br/>\n" + \
          "        " + slide.get_filter_image_filename(slide_num, filter_num, file_text) + "<br/>\n" + \
          "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + \
@@ -1269,7 +1267,7 @@ def save_filtered_image(np_img, slide_num, filter_num, filter_text):
 
 def generate_filter_html_result(html_page_info):
   """
-  Generate HTML to view the filtered images.
+  Generate HTML to view the filtered images. If slide.FILTER_PAGINATE is True, the results will be paginated.
 
   Args:
     html_page_info: Dictionary of image information.
@@ -1315,13 +1313,13 @@ def generate_filter_html_result(html_page_info):
       html += html_header("Filtered Images, Page %d" % page_num)
 
       html += "<div style=\"font-size: 20px\">"
-      if (page_num > 1):
-        if (page_num == 2):
+      if page_num > 1:
+        if page_num == 2:
           html += "<a href=\"filters.html\">&lt;</a> "
         else:
           html += "<a href=\"filters-%d.html\">&lt;</a> " % (page_num - 1)
       html += "Page %d" % page_num
-      if (page_num < num_pages):
+      if page_num < num_pages:
         html += " <a href=\"filters-%d.html\">&gt;</a> " % (page_num + 1)
       html += "</div>"
 
@@ -1358,13 +1356,13 @@ def apply_filters_to_image_list(image_num_list, save, display):
     display: If True, display filtered images to screen.
 
   Returns:
-    The starting index and the ending index of the slides that were converted to images.
+    Tuple consisting of 1) a list of image numbers, and 2) a dictionary of image filter information.
   """
   html_page_info = dict()
   for slide_num in image_num_list:
     _, info = apply_filters_to_image(slide_num, save=save, display=display)
     html_page_info.update(info)
-  return (image_num_list, html_page_info)
+  return image_num_list, html_page_info
 
 
 def apply_filters_to_image_range(start_ind, end_ind, save, display):
@@ -1378,13 +1376,14 @@ def apply_filters_to_image_range(start_ind, end_ind, save, display):
     display: If True, display filtered images to screen.
 
   Returns:
-    The starting index and the ending index of the slides that were converted to images.
+    Tuple consisting of 1) staring index of slides converted to images, 2) ending index of slides converted to images,
+    and 3) a dictionary of image filter information.
   """
   html_page_info = dict()
   for slide_num in range(start_ind, end_ind + 1):
     _, info = apply_filters_to_image(slide_num, save=save, display=display)
     html_page_info.update(info)
-  return (start_ind, end_ind, html_page_info)
+  return start_ind, end_ind, html_page_info
 
 
 def singleprocess_apply_filters_to_images(save=True, display=False, html=True, image_num_list=None):
@@ -1486,7 +1485,6 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
     generate_filter_html_result(html_page_info)
 
   print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
-
 
 # apply_filters_to_image(1)
 # rgb, _ = apply_filters_to_image(337, display=False, save=False)
