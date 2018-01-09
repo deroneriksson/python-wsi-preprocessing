@@ -3,3 +3,5 @@
 .idea/
 docs/_site
 **/__pycache__
+**/filters*.html
+**/tiles*.html
