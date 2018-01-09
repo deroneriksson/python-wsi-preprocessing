@@ -353,28 +353,28 @@ def image_row(slide_num):
     training_thumb_path = slide.get_training_thumbnail_path(slide_num)
   return "  <tr>\n" + \
          "    <td>\n" + \
-         "      <a href=\"" + training_image_path + "\">\n" + \
+         "      <a target=\"_blank\" href=\"" + training_image_path + "\">\n" + \
          "        " + "S%03d " % slide_num + "Original" + "<br/>\n" + \
          "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + \
          training_thumb_path + "\" />\n" + \
          "      </a>\n" + \
          "    </td>\n" + \
          "    <td>\n" + \
-         "      <a href=\"" + slide.get_filter_image_result(slide_num) + "\">\n" + \
+         "      <a target=\"_blank\" href=\"" + slide.get_filter_image_result(slide_num) + "\">\n" + \
          "        " + "S%03d " % slide_num + "Filtered" + "<br/>\n" + \
          "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + \
          slide.get_filter_thumbnail_result(slide_num) + "\" />\n" + \
          "      </a>\n" + \
          "    </td>\n" + \
          "    <td>\n" + \
-         "      <a href=\"" + slide.get_tile_summary_image_path(slide_num) + "\">\n" + \
+         "      <a target=\"_blank\" href=\"" + slide.get_tile_summary_image_path(slide_num) + "\">\n" + \
          "        " + "S%03d " % slide_num + "Tiled" + "<br/>\n" + \
          "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + \
          slide.get_tile_summary_thumbnail_path(slide_num) + "\" />\n" + \
          "      </a>\n" + \
          "    </td>\n" + \
          "    <td>\n" + \
-         "      <a href=\"" + slide.get_tile_summary_on_original_image_path(slide_num) + "\">\n" + \
+         "      <a target=\"_blank\" href=\"" + slide.get_tile_summary_on_original_image_path(slide_num) + "\">\n" + \
          "        " + "S%03d " % slide_num + "Original Tiled" + "<br/>\n" + \
          "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + \
          slide.get_tile_summary_on_original_thumbnail_path(slide_num) + "\" />\n" + \
