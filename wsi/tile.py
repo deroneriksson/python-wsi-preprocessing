@@ -391,7 +391,7 @@ def generate_tiled_html_result(slide_nums):
     slide_nums: List of slide numbers.
   """
   slide_nums = sorted(slide_nums)
-  if slide.TILE_SUMMARY_PAGINATE == False:
+  if not slide.TILE_SUMMARY_PAGINATE:
     html = ""
     html += filter.html_header("Tiled Images")
 
@@ -439,7 +439,6 @@ def generate_tiled_html_result(slide_nums):
         text_file = open("tiles-%d.html" % page_num, "w")
       text_file.write(html)
       text_file.close()
-
 
 # summary(1, save=True)
 # summary(26, save=True)
