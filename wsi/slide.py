@@ -33,8 +33,8 @@ from PIL import Image
 import re
 import sys
 
-# BASE_DIR = ".." + os.sep + "data"
-BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
+BASE_DIR = ".." + os.sep + "data"
+# BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
 TRAIN_PREFIX = "TUPAC-TR-"
 SRC_TRAIN_DIR = BASE_DIR + os.sep + "training_slides"
 SRC_TRAIN_EXT = "svs"
@@ -59,6 +59,7 @@ FILTER_THUMBNAIL_DIR = BASE_DIR + os.sep + "filter_thumbnail_" + str(DEST_TRAIN_
 FILTER_THUMBNAIL_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "filter_thumbnail_" + THUMBNAIL_EXT
 FILTER_PAGINATION_SIZE = 50
 FILTER_PAGINATE = True
+FILTER_HTML_DIR = BASE_DIR
 
 TILE_SUMMARY_DIR = BASE_DIR + os.sep + "tile_summary_" + DEST_TRAIN_EXT
 TILE_SUMMARY_ON_ORIGINAL_DIR = BASE_DIR + os.sep + "tile_summary_on_original_" + DEST_TRAIN_EXT
@@ -67,6 +68,7 @@ TILE_SUMMARY_THUMBNAIL_DIR = BASE_DIR + os.sep + "tile_summary_thumbnail_" + THU
 TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR = BASE_DIR + os.sep + "tile_summary_on_original_thumbnail_" + THUMBNAIL_EXT
 TILE_SUMMARY_PAGINATION_SIZE = 50
 TILE_SUMMARY_PAGINATE = True
+TILE_SUMMARY_HTML_DIR = BASE_DIR
 
 STATS_DIR = BASE_DIR + os.sep + "svs_stats"
 

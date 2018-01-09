@@ -1291,7 +1291,7 @@ def generate_filter_html_result(html_page_info):
 
     html += "  </table>\n"
     html += html_footer()
-    text_file = open("filters.html", "w")
+    text_file = open(slide.FILTER_HTML_DIR + os.sep + "filters.html", "w")
     text_file.write(html)
     text_file.close()
   else:
@@ -1339,9 +1339,9 @@ def generate_filter_html_result(html_page_info):
 
       html += html_footer()
       if page_num == 1:
-        text_file = open("filters.html", "w")
+        text_file = open(slide.FILTER_HTML_DIR + os.sep + "filters.html", "w")
       else:
-        text_file = open("filters-%d.html" % page_num, "w")
+        text_file = open(slide.FILTER_HTML_DIR + os.sep + "filters-%d.html" % page_num, "w")
       text_file.write(html)
       text_file.close()
 
@@ -1485,6 +1485,7 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
     generate_filter_html_result(html_page_info)
 
   print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
+
 
 # apply_filters_to_image(1)
 # rgb, _ = apply_filters_to_image(337, display=False, save=False)
