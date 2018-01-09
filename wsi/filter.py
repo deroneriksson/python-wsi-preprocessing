@@ -1200,7 +1200,7 @@ def image_cell(slide_num, filter_num, display_text, file_text):
     HTML for viewing a processed image.
   """
   return "    <td>\n" + \
-         "      <a href=\"" + slide.get_filter_image_path(slide_num, filter_num, file_text) + "\">\n" + \
+         "      <a target=\"_blank\" href=\"" + slide.get_filter_image_path(slide_num, filter_num, file_text) + "\">\n" + \
          "        " + display_text + "<br/>\n" + \
          "        " + slide.get_filter_image_filename(slide_num, filter_num, file_text) + "<br/>\n" + \
          "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + \
