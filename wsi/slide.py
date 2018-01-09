@@ -233,7 +233,7 @@ def get_filter_image_path(slide_number, filter_number, filter_name_info):
   Returns:
     Path to the filter image file.
   """
-  if RESIZE_ALL_BY_SCALE_FACTOR == True:
+  if RESIZE_ALL_BY_SCALE_FACTOR:
     dir = FILTER_DIR_SCALE_FACTOR
   else:
     dir = FILTER_DIR
@@ -258,7 +258,7 @@ def get_filter_thumbnail_path(slide_number, filter_number, filter_name_info):
   Returns:
     Path to the filter thumbnail file.
   """
-  if RESIZE_ALL_BY_SCALE_FACTOR == True:
+  if RESIZE_ALL_BY_SCALE_FACTOR:
     dir = FILTER_THUMBNAIL_DIR_SCALE_FACTOR
   else:
     dir = FILTER_THUMBNAIL_DIR
@@ -285,13 +285,13 @@ def get_filter_image_filename(slide_number, filter_number, filter_name_info, thu
   Returns:
     The filter image or thumbnail file name.
   """
-  if thumbnail == True:
+  if thumbnail:
     ext = THUMBNAIL_EXT
   else:
     ext = DEST_TRAIN_EXT
   padded_sl_num = str(slide_number).zfill(3)
   padded_fi_num = str(filter_number).zfill(3)
-  if RESIZE_ALL_BY_SCALE_FACTOR == True:
+  if RESIZE_ALL_BY_SCALE_FACTOR:
     img_filename = TRAIN_PREFIX + padded_sl_num + "-" + padded_fi_num + "-" + FILTER_SUFFIX + filter_name_info + "." + ext
   else:
     img_filename = TRAIN_PREFIX + padded_sl_num + "-" + padded_fi_num + "-" + FILTER_SUFFIX + str(
@@ -391,7 +391,7 @@ def get_tile_summary_image_filename(slide_number, thumbnail=False):
   Returns:
     The tile summary image file name.
   """
-  if thumbnail == True:
+  if thumbnail:
     ext = THUMBNAIL_EXT
   else:
     ext = DEST_TRAIN_EXT
@@ -414,8 +414,7 @@ def get_filter_image_result(slide_number):
     Path to the filter image file.
   """
   padded_sl_num = str(slide_number).zfill(3)
-  if RESIZE_ALL_BY_SCALE_FACTOR == True:
-
+  if RESIZE_ALL_BY_SCALE_FACTOR:
     training_img_path = get_training_image_path_scale_factor(slide_number)
     large_w, large_h, small_w, small_h = parse_dimensions_from_training_image_filename(training_img_path)
     img_path = FILTER_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
@@ -441,7 +440,7 @@ def get_filter_thumbnail_result(slide_number):
     Path to the filter thumbnail file.
   """
   padded_sl_num = str(slide_number).zfill(3)
-  if RESIZE_ALL_BY_SCALE_FACTOR == True:
+  if RESIZE_ALL_BY_SCALE_FACTOR:
     training_img_path = get_training_image_path_scale_factor(slide_number)
     large_w, large_h, small_w, small_h = parse_dimensions_from_training_image_filename(training_img_path)
     img_path = FILTER_THUMBNAIL_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
@@ -504,7 +503,7 @@ def training_slide_to_image(slide_number):
   # print("LEVEL COUNT: " + str(slide.level_count))
   # print("LEVEL DIMENSIONS: " + str(slide.level_dimensions))
   # print("LEVEL DOWNSAMPLES: " + str(slide.level_downsamples))
-  if RESIZE_ALL_BY_SCALE_FACTOR == True:
+  if RESIZE_ALL_BY_SCALE_FACTOR:
     large_w, large_h = slide.dimensions
     new_w = math.floor(large_w / SCALE_FACTOR)
     new_h = math.floor(large_h / SCALE_FACTOR)
@@ -626,7 +625,7 @@ def multiprocess_training_slides_to_images():
 
   for result in results:
     (start_ind, end_ind) = result.get()
-    if (start_ind == end_ind):
+    if start_ind == end_ind:
       print("Done converting slide %d" % start_ind)
     else:
       print("Done converting slides %d through %d" % (start_ind, end_ind))
