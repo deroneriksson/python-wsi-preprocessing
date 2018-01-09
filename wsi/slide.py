@@ -161,6 +161,23 @@ def get_training_thumbnail_path(slide_number):
 
 
 def get_training_image_path_scale_factor(slide_number, large_w=None, large_h=None, small_w=None, small_h=None):
+  """
+  Convert slide number and optional dimensions to a scaling factor training image path. If no dimensions are supplied,
+  the corresponding file based on the slide number will be looked up in the file system using a wildcard.
+
+  Example:
+    5 -> ../data/training_png/TUPAC-TR-005-32x-49920x108288-1560x3384.png
+
+  Args:
+    slide_number: The slide number.
+    large_w: Large image width.
+    large_h: Large image height.
+    small_w: Small image width.
+    small_h: Small image height.
+
+  Returns:
+     Path to the image file.
+  """
   padded_sl_num = str(slide_number).zfill(3)
   if large_w is None and large_h is None and small_w is None and small_h is None:
     wilcard_path = DEST_TRAIN_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "*." + DEST_TRAIN_EXT
@@ -173,6 +190,23 @@ def get_training_image_path_scale_factor(slide_number, large_w=None, large_h=Non
 
 
 def get_training_thumbnail_path_scale_factor(slide_number, large_w=None, large_h=None, small_w=None, small_h=None):
+  """
+  Convert slide number and optional dimensions to a scaling factor training thumbnail path. If no dimensions are
+  supplied, the corresponding file based on the slide number will be looked up in the file system using a wildcard.
+
+  Example:
+    5 -> ../data/training_thumbnail_jpg/TUPAC-TR-005-32x-49920x108288-1560x3384.jpg
+
+  Args:
+    slide_number: The slide number.
+    large_w: Large image width.
+    large_h: Large image height.
+    small_w: Small image width.
+    small_h: Small image height.
+
+  Returns:
+     Path to the thumbnail file.
+  """
   padded_sl_num = str(slide_number).zfill(3)
   if large_w is None and large_h is None and small_w is None and small_h is None:
     wilcard_path = DEST_TRAIN_THUMBNAIL_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "*." + THUMBNAIL_EXT
@@ -186,7 +220,10 @@ def get_training_thumbnail_path_scale_factor(slide_number, large_w=None, large_h
 
 def get_filter_image_path(slide_number, filter_number, filter_name_info):
   """
-  Convert slide number, filter number, and text to a path to a file.
+  Convert slide number, filter number, and text to a path to a filter image file.
+
+  Example:
+    5, 1, "rgb" -> ../data/filter_png/TUPAC-TR-005-001-rgb.png
 
   Args:
     slide_number: The slide number.
@@ -208,7 +245,10 @@ def get_filter_image_path(slide_number, filter_number, filter_name_info):
 
 def get_filter_thumbnail_path(slide_number, filter_number, filter_name_info):
   """
-  Convert slide number, filter number, and text to a path to a thumbnail file.
+  Convert slide number, filter number, and text to a path to a filter thumbnail file.
+
+  Example:
+    5, 1, "rgb" -> ../data/filter_thumbnail_jpg/TUPAC-TR-005-001-rgb.jpg
 
   Args:
     slide_number: The slide number.
@@ -230,7 +270,11 @@ def get_filter_thumbnail_path(slide_number, filter_number, filter_name_info):
 
 def get_filter_image_filename(slide_number, filter_number, filter_name_info, thumbnail=False):
   """
-  Convert slide number, filter number, and text to a file name.
+  Convert slide number, filter number, and text to a filter file name.
+
+  Example:
+    5, 1, "rgb", False -> TUPAC-TR-005-001-rgb.png
+    5, 1, "rgb", True -> TUPAC-TR-005-001-rgb.jpg
 
   Args:
     slide_number: The slide number.
@@ -239,7 +283,7 @@ def get_filter_image_filename(slide_number, filter_number, filter_name_info, thu
     thumbnail: If True, produce thumbnail filename.
 
   Returns:
-    The filter image file name.
+    The filter image or thumbnail file name.
   """
   if thumbnail == True:
     ext = THUMBNAIL_EXT
@@ -259,6 +303,9 @@ def get_tile_summary_image_path(slide_number):
   """
   Convert slide number to a path to a tile summary image file.
 
+  Example:
+    5 -> ../data/tile_summary_png/TUPAC-TR-005-tile_summary.png
+
   Args:
     slide_number: The slide number.
 
@@ -274,6 +321,9 @@ def get_tile_summary_image_path(slide_number):
 def get_tile_summary_thumbnail_path(slide_number):
   """
   Convert slide number to a path to a tile summary thumbnail file.
+
+  Example:
+    5 -> ../data/tile_summary_thumbnail_jpg/TUPAC-TR-005-tile_summary.jpg
 
   Args:
     slide_number: The slide number.
@@ -291,6 +341,9 @@ def get_tile_summary_on_original_image_path(slide_number):
   """
   Convert slide number to a path to a tile summary on original image file.
 
+  Example:
+    5 -> ../data/tile_summary_on_original_png/TUPAC-TR-005-tile_summary.png
+
   Args:
     slide_number: The slide number.
 
@@ -306,6 +359,9 @@ def get_tile_summary_on_original_image_path(slide_number):
 def get_tile_summary_on_original_thumbnail_path(slide_number):
   """
   Convert slide number to a path to a tile summary on original thumbnail file.
+
+  Example:
+    5 -> ../data/tile_summary_on_original_thumbnail_jpg/TUPAC-TR-005-tile_summary.jpg
 
   Args:
     slide_number: The slide number.
@@ -323,6 +379,10 @@ def get_tile_summary_on_original_thumbnail_path(slide_number):
 def get_tile_summary_image_filename(slide_number, thumbnail=False):
   """
   Convert slide number to a tile summary image file name.
+
+  Example:
+    5, False -> TUPAC-TR-005-tile_summary.png
+    5, True -> TUPAC-TR-005-tile_summary.jpg
 
   Args:
     slide_number: The slide number.
@@ -343,6 +403,9 @@ def get_tile_summary_image_filename(slide_number, thumbnail=False):
 def get_filter_image_result(slide_number):
   """
   Convert slide number to the path to the file that is the final result of filtering.
+
+  Example:
+    5 -> ../data/filter_png/TUPAC-TR-005-32x-49920x108288-1560x3384-filtered.png
 
   Args:
     slide_number: The slide number.
@@ -367,6 +430,9 @@ def get_filter_image_result(slide_number):
 def get_filter_thumbnail_result(slide_number):
   """
   Convert slide number to the path to the file that is the final thumbnail result of filtering.
+
+  Example:
+    5 -> ../data/filter_thumbnail_jpg/TUPAC-TR-005-32x-49920x108288-1560x3384-filtered.jpg
 
   Args:
     slide_number: The slide number.
@@ -774,6 +840,7 @@ class Time:
     self.end = datetime.datetime.now()
     time_elapsed = self.end - self.start
     return time_elapsed
+
 
 # singleprocess_training_slides_to_images()
 # multiprocess_training_slides_to_images()
