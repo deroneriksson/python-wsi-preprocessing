@@ -34,9 +34,6 @@ TISSUE_LOW_THRESHOLD_PERCENT = 5
 ROW_TILE_SIZE = 1024
 COL_TILE_SIZE = 1024
 
-ROW_TILE_SIZE_BASED_ON_SUMMARY_IMAGE_SIZE = 128
-COL_TILE_SIZE_BASED_ON_SUMMARY_IMAGE_SIZE = 128
-
 DISPLAY_TILE_LABELS = False  # If True, add text such as tissue percentage to summary tiles. Requires large tile size.
 
 TILE_BORDER_SIZE = 2  # The size of the colored rectangular border around summary tiles.
@@ -121,10 +118,7 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
   summary = filter.np_to_pil(summary_img)
   draw = ImageDraw.Draw(summary)
 
-  if slide.RESIZE_ALL_BY_SCALE_FACTOR:
-    original_img_path = slide.get_training_image_path_scale_factor(slide_num)
-  else:
-    original_img_path = slide.get_training_image_path(slide_num)
+  original_img_path = slide.get_training_image_path_scale_factor(slide_num)
   orig_img = slide.open_image(original_img_path)
   draw_orig = ImageDraw.Draw(orig_img)
 
@@ -219,12 +213,8 @@ def summary(slide_num, save=False, display=True):
 
   rows, cols, _ = np_img.shape
 
-  if slide.RESIZE_ALL_BY_SCALE_FACTOR:
-    row_tile_size = round(ROW_TILE_SIZE / slide.SCALE_FACTOR)  # use round?
-    col_tile_size = round(COL_TILE_SIZE / slide.SCALE_FACTOR)  # use round?
-  else:
-    row_tile_size = ROW_TILE_SIZE_BASED_ON_SUMMARY_IMAGE_SIZE
-    col_tile_size = COL_TILE_SIZE_BASED_ON_SUMMARY_IMAGE_SIZE
+  row_tile_size = round(ROW_TILE_SIZE / slide.SCALE_FACTOR)  # use round?
+  col_tile_size = round(COL_TILE_SIZE / slide.SCALE_FACTOR)  # use round?
 
   tile_indices = get_tile_indices(rows, cols, row_tile_size, col_tile_size)
   tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, display=display, save=save)
@@ -364,12 +354,8 @@ def image_row(slide_num):
   Returns:
     HTML table row for viewing a tiled image.
   """
-  if slide.RESIZE_ALL_BY_SCALE_FACTOR == True:
-    orig_img = slide.get_training_image_path_scale_factor(slide_num)
-    orig_thumb = slide.get_training_thumbnail_path_scale_factor(slide_num)
-  else:
-    orig_img = slide.get_training_image_path(slide_num)
-    orig_thumb = slide.get_training_thumbnail_path(slide_num)
+  orig_img = slide.get_training_image_path_scale_factor(slide_num)
+  orig_thumb = slide.get_training_thumbnail_path_scale_factor(slide_num)
   filt_img = slide.get_filter_image_result(slide_num)
   filt_thumb = slide.get_filter_thumbnail_result(slide_num)
   sum_img = slide.get_tile_summary_image_path(slide_num)
@@ -467,7 +453,7 @@ def generate_tiled_html_result(slide_nums):
 # singleprocess_images_to_tile_summaries()
 # multiprocess_images_to_tile_summaries(image_num_list=[5,10,15,20,25,30])
 # multiprocess_images_to_tile_summaries(save=False, display=False, html=True)
-multiprocess_images_to_tile_summaries()
+# multiprocess_images_to_tile_summaries()
 # summary(1, display=True, save=True)
 # generate_tiled_html_result(slide_nums=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
 # generate_tiled_html_result(slide_nums=[1,2,3,4,5])

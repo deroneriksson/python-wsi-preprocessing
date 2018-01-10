@@ -1078,12 +1078,9 @@ def apply_filters_to_image(slide_num, save=True, display=False):
 
   info = dict()
 
-  if save and not os.path.exists(slide.FILTER_DIR):
-    os.makedirs(slide.FILTER_DIR)
-  if slide.RESIZE_ALL_BY_SCALE_FACTOR:
-    img_path = slide.get_training_image_path_scale_factor(slide_num)
-  else:
-    img_path = slide.get_training_image_path(slide_num)
+  if save and not os.path.exists(slide.FILTER_DIR_SCALE_FACTOR):
+    os.makedirs(slide.FILTER_DIR_SCALE_FACTOR)
+  img_path = slide.get_training_image_path_scale_factor(slide_num)
   img = slide.open_image(img_path)
 
   rgb = pil_to_np_rgb(img)
@@ -1433,8 +1430,8 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
   timer = Time()
   print("Applying filters to images (multiprocess)\n")
 
-  if save and not os.path.exists(slide.FILTER_DIR):
-    os.makedirs(slide.FILTER_DIR)
+  if save and not os.path.exists(slide.FILTER_DIR_SCALE_FACTOR):
+    os.makedirs(slide.FILTER_DIR_SCALE_FACTOR)
 
   # how many processes to use
   num_processes = multiprocessing.cpu_count()
