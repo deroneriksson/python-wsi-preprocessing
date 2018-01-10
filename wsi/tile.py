@@ -264,7 +264,7 @@ def singleprocess_images_to_tile_summaries(save=True, display=False, html=True, 
   print("Time to generate tile summaries: %s\n" % str(t.elapsed()))
 
   if html:
-    generate_tiled_html_page(image_num_list)
+    generate_tiled_html_result(image_num_list)
 
 
 def multiprocess_images_to_tile_summaries(save=True, display=False, html=True, image_num_list=None):
