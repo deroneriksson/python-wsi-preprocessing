@@ -410,11 +410,11 @@ def parse_dimensions_from_image_filename(filename):
   Returns:
     Tuple consisting of the original width, original height, the converted width, and the converted height.
   """
-  m = re.match(".*-(.*)x(.*)-(.*)x(.*)\..*", filename)
-  large_w = m.group(1)
-  large_h = m.group(2)
-  small_w = m.group(3)
-  small_h = m.group(4)
+  m = re.match(".*-([\d]*)x([\d]*)-([\d]*)x([\d]*).*\..*", filename)
+  large_w = int(m.group(1))
+  large_h = int(m.group(2))
+  small_w = int(m.group(3))
+  small_h = int(m.group(4))
   return large_w, large_h, small_w, small_h
 
 
