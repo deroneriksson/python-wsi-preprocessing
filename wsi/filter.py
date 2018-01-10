@@ -1201,10 +1201,20 @@ def image_cell(slide_num, filter_num, display_text, file_text):
                                                                             file_text) + "\">\n" + \
          "        " + display_text + "<br/>\n" + \
          "        " + slide.get_filter_image_filename(slide_num, filter_num, file_text) + "<br/>\n" + \
-         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + \
+         "        <img class=\"lazyload\" src=\"" + b64_img() + "\" data-src=\"" + \
          slide.get_filter_thumbnail_path(slide_num, filter_num, file_text) + "\" />\n" + \
          "      </a>\n" + \
          "    </td>\n"
+
+
+def b64_img():
+  """
+  Obtain base-64 encoded image for display before lazy loading.
+
+  Returns:
+    Base-64 encoded GIF image to display before lazy loading.
+  """
+  return "data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs="
 
 
 def html_header(page_title):
@@ -1485,7 +1495,6 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
     generate_filter_html_result(html_page_info)
 
   print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
-
 
 # apply_filters_to_image(1)
 # rgb, _ = apply_filters_to_image(337, display=False, save=False)

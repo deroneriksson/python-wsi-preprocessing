@@ -219,7 +219,7 @@ def summary(slide_num, save=False, display=True):
 
   rows, cols, _ = np_img.shape
 
-  if slide.RESIZE_ALL_BY_SCALE_FACTOR == True:
+  if slide.RESIZE_ALL_BY_SCALE_FACTOR:
     row_tile_size = round(ROW_TILE_SIZE / slide.SCALE_FACTOR)  # use round?
     col_tile_size = round(COL_TILE_SIZE / slide.SCALE_FACTOR)  # use round?
   else:
@@ -374,29 +374,28 @@ def image_row(slide_num):
          "    <td>\n" + \
          "      <a target=\"_blank\" href=\"" + training_image_path + "\">\n" + \
          "        " + "S%03d " % slide_num + "Original" + "<br/>\n" + \
-         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + \
-         training_thumb_path + "\" />\n" + \
+         "        <img class=\"lazyload\" src=\"" + filter.b64_img() + "\" data-src=\"" + training_thumb_path + "\" />\n" + \
          "      </a>\n" + \
          "    </td>\n" + \
          "    <td>\n" + \
          "      <a target=\"_blank\" href=\"" + slide.get_filter_image_result(slide_num) + "\">\n" + \
          "        " + "S%03d " % slide_num + "Filtered" + "<br/>\n" + \
-         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + \
-         slide.get_filter_thumbnail_result(slide_num) + "\" />\n" + \
+         "        <img class=\"lazyload\" src=\"" + filter.b64_img() + "\" data-src=\"" + slide.get_filter_thumbnail_result(
+    slide_num) + "\" />\n" + \
          "      </a>\n" + \
          "    </td>\n" + \
          "    <td>\n" + \
          "      <a target=\"_blank\" href=\"" + slide.get_tile_summary_image_path(slide_num) + "\">\n" + \
          "        " + "S%03d " % slide_num + "Tiled" + "<br/>\n" + \
-         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + \
-         slide.get_tile_summary_thumbnail_path(slide_num) + "\" />\n" + \
+         "        <img class=\"lazyload\" src=\"" + filter.b64_img() + "\" data-src=\"" + slide.get_tile_summary_thumbnail_path(
+    slide_num) + "\" />\n" + \
          "      </a>\n" + \
          "    </td>\n" + \
          "    <td>\n" + \
          "      <a target=\"_blank\" href=\"" + slide.get_tile_summary_on_original_image_path(slide_num) + "\">\n" + \
          "        " + "S%03d " % slide_num + "Original Tiled" + "<br/>\n" + \
-         "        <img class=\"lazyload\" src=\"data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs=\" data-src=\"" + \
-         slide.get_tile_summary_on_original_thumbnail_path(slide_num) + "\" />\n" + \
+         "        <img class=\"lazyload\" src=\"" + filter.b64_img() + "\" data-src=\"" + slide.get_tile_summary_on_original_thumbnail_path(
+    slide_num) + "\" />\n" + \
          "      </a>\n" + \
          "    </td>\n" + \
          "  </tr>\n"
@@ -468,7 +467,7 @@ def generate_tiled_html_result(slide_nums):
 # singleprocess_images_to_tile_summaries()
 # multiprocess_images_to_tile_summaries(image_num_list=[5,10,15,20,25,30])
 # multiprocess_images_to_tile_summaries(save=False, display=False, html=True)
-# multiprocess_images_to_tile_summaries()
+multiprocess_images_to_tile_summaries()
 # summary(1, display=True, save=True)
 # generate_tiled_html_result(slide_nums=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
 # generate_tiled_html_result(slide_nums=[1,2,3,4,5])
