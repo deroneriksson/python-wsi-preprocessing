@@ -26,7 +26,7 @@ import os
 import wsi.filter as filter
 import wsi.slide as slide
 from wsi.slide import Time
-from PIL import Image, ImageDraw, ImageFont
+from PIL import ImageDraw, ImageFont
 
 TISSUE_THRESHOLD_PERCENT = 50
 TISSUE_LOW_THRESHOLD_PERCENT = 5
@@ -37,9 +37,9 @@ COL_TILE_SIZE = 1024
 ROW_TILE_SIZE_BASED_ON_SUMMARY_IMAGE_SIZE = 128
 COL_TILE_SIZE_BASED_ON_SUMMARY_IMAGE_SIZE = 128
 
-DISPLAY_TILE_LABELS = False
+DISPLAY_TILE_LABELS = False  # If True, add text such as tissue percentage to summary tiles. Requires large tile size.
 
-TILE_BORDER_SIZE = 2
+TILE_BORDER_SIZE = 2  # The size of the colored rectangular border around summary tiles.
 
 
 def get_num_tiles(rows, cols, row_tile_size, col_tile_size):
@@ -92,6 +92,25 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
                  thresh_color=(0, 255, 0), below_thresh_color=(255, 255, 0), below_lower_thresh_color=(255, 165, 0),
                  no_tissue_color=(255, 0, 0), text_color=(255, 255, 255), text_size=22,
                  font_path="/Library/Fonts/Arial Bold.ttf"):
+  """
+  Generate summary image/thumbnail showing a 'heatmap' representation of the tissue segmentation of all tiles.
+
+  Args:
+    slide_num: The slide number.
+    np_img: Image as a NumPy array.
+    tile_indices: List of tuples consisting of starting row, ending row, starting column, ending column.
+    row_tile_size: Number of pixels in a tile row.
+    col_tile_size: Number of pixels in a tile column.
+    display: If True, display tile summary to screen.
+    save: If True, save tile summary image.
+    thresh_color: Color representing tissue % above or equal to thresh (default green).
+    below_thresh_color: Color representing tissue % below threshold and above or equal to lower thresh (default yellow).
+    below_lower_thresh_color: Color representing tissue % below lower threshold and above 0 (default orange).
+    no_tissue_color: Color representing no tissue (default red).
+    text_color: Font color (default white).
+    text_size: Font size.
+    font_path: Path to the font to use.
+  """
   rows, cols, _ = np_img.shape
   num_row_tiles, num_col_tiles = get_num_tiles(rows, cols, row_tile_size, col_tile_size)
   summary_img = np.zeros([row_tile_size * num_row_tiles, col_tile_size * num_col_tiles, np_img.shape[2]],
@@ -102,7 +121,7 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
   summary = filter.np_to_pil(summary_img)
   draw = ImageDraw.Draw(summary)
 
-  if slide.RESIZE_ALL_BY_SCALE_FACTOR == True:
+  if slide.RESIZE_ALL_BY_SCALE_FACTOR:
     original_img_path = slide.get_training_image_path_scale_factor(slide_num)
   else:
     original_img_path = slide.get_training_image_path(slide_num)
@@ -116,7 +135,7 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
     np_tile = np_img[r_s:r_e, c_s:c_e]
     tissue_percentage = filter.tissue_percent(np_tile)
     print("TILE [%d:%d, %d:%d]: Tissue %f%%" % (r_s, r_e, c_s, c_e, tissue_percentage))
-    if (tissue_percentage >= TISSUE_THRESHOLD_PERCENT):
+    if tissue_percentage >= TISSUE_THRESHOLD_PERCENT:
       tile_border(draw, r_s, r_e, c_s, c_e, thresh_color)
       tile_border(draw_orig, r_s, r_e, c_s, c_e, thresh_color)
     elif (tissue_percentage >= TISSUE_LOW_THRESHOLD_PERCENT) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
@@ -129,7 +148,7 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
       tile_border(draw, r_s, r_e, c_s, c_e, no_tissue_color)
       tile_border(draw_orig, r_s, r_e, c_s, c_e, no_tissue_color)
     # filter.display_img(np_tile, text=label, size=14, bg=True)
-    if DISPLAY_TILE_LABELS == True:
+    if DISPLAY_TILE_LABELS:
       label = "#%d\n%4.2f%%" % (count, tissue_percentage)
       font = ImageFont.truetype(font_path, size=text_size)
       draw.text((c_s + 2, r_s + 2), label, text_color, font=font)
@@ -343,7 +362,7 @@ def image_row(slide_num):
     slide_num: The slide number.
 
   Returns:
-    HTML for viewing a tiled image.
+    HTML table row for viewing a tiled image.
   """
   if slide.RESIZE_ALL_BY_SCALE_FACTOR == True:
     training_image_path = slide.get_training_image_path_scale_factor(slide_num)
@@ -417,13 +436,13 @@ def generate_tiled_html_result(slide_nums):
       html += filter.html_header("Tiled Images, Page %d" % page_num)
 
       html += "<div style=\"font-size: 20px\">"
-      if (page_num > 1):
-        if (page_num == 2):
+      if page_num > 1:
+        if page_num == 2:
           html += "<a href=\"tiles.html\">&lt;</a> "
         else:
           html += "<a href=\"tiles-%d.html\">&lt;</a> " % (page_num - 1)
       html += "Page %d" % page_num
-      if (page_num < num_pages):
+      if page_num < num_pages:
         html += " <a href=\"tiles-%d.html\">&gt;</a> " % (page_num + 1)
       html += "</div>"
 
