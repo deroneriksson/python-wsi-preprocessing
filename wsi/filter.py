@@ -1197,7 +1197,7 @@ def image_cell(slide_num, filter_num, display_text, file_text):
   filt_thumb = slide.get_filter_thumbnail_path(slide_num, filter_num, file_text)
   img_name = slide.get_filter_image_filename(slide_num, filter_num, file_text)
   return "      <td>\n" + \
-         "        <a target=\"_blank\" href=\"%s\">%s<br/>\n%s<br/>\n" % (filt_img, display_text, img_name) + \
+         "        <a target=\"_blank\" href=\"%s\">%s<br/>\n" % (filt_img, display_text) + \
          "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (b64_img(), filt_thumb) + \
          "        </a>\n" + \
          "      </td>\n"
@@ -1224,10 +1224,9 @@ def html_header(page_title):
          "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" + \
          "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n" + \
          "  <head>\n" + \
-         "    <title>" + page_title + "</title>\n" + \
+         "    <title>%s</title>\n" % page_title + \
          "    <style type=\"text/css\">\n" + \
-         "     img { max-width: " + str(slide.THUMBNAIL_SIZE) + "px; max-height: " + \
-         str(slide.THUMBNAIL_SIZE) + "px; border: 2px solid black; }\n" + \
+         "     img { border: 2px solid black; }\n" + \
          "     td { border: 2px solid black; }\n" + \
          "    </style>\n" + \
          "  </head>\n" + \
@@ -1491,7 +1490,6 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
     generate_filter_html_result(html_page_info)
 
   print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
-
 
 # apply_filters_to_image(1)
 # rgb, _ = apply_filters_to_image(337, display=False, save=False)
