@@ -118,7 +118,7 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
   summary = filter.np_to_pil(summary_img)
   draw = ImageDraw.Draw(summary)
 
-  original_img_path = slide.get_training_image_path_scale_factor(slide_num)
+  original_img_path = slide.get_training_image_path(slide_num)
   orig_img = slide.open_image(original_img_path)
   draw_orig = ImageDraw.Draw(orig_img)
 
@@ -354,8 +354,8 @@ def image_row(slide_num):
   Returns:
     HTML table row for viewing a tiled image.
   """
-  orig_img = slide.get_training_image_path_scale_factor(slide_num)
-  orig_thumb = slide.get_training_thumbnail_path_scale_factor(slide_num)
+  orig_img = slide.get_training_image_path(slide_num)
+  orig_thumb = slide.get_training_thumbnail_path(slide_num)
   filt_img = slide.get_filter_image_result(slide_num)
   filt_thumb = slide.get_filter_thumbnail_result(slide_num)
   sum_img = slide.get_tile_summary_image_path(slide_num)

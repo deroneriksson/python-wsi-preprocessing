@@ -41,16 +41,16 @@ SRC_TRAIN_EXT = "svs"
 DEST_TRAIN_SUFFIX = ""  # Example: "train-"
 DEST_TRAIN_EXT = "png"
 SCALE_FACTOR = 32
-DEST_TRAIN_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "training_" + DEST_TRAIN_EXT
+DEST_TRAIN_DIR = BASE_DIR + os.sep + "training_" + DEST_TRAIN_EXT
 THUMBNAIL_SIZE = 300
 THUMBNAIL_EXT = "jpg"
 
-DEST_TRAIN_THUMBNAIL_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "training_thumbnail_" + THUMBNAIL_EXT
+DEST_TRAIN_THUMBNAIL_DIR = BASE_DIR + os.sep + "training_thumbnail_" + THUMBNAIL_EXT
 
 FILTER_SUFFIX = ""  # Example: "filter-"
 FILTER_RESULT_TEXT = "filtered"
-FILTER_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "filter_" + DEST_TRAIN_EXT
-FILTER_THUMBNAIL_DIR_SCALE_FACTOR = BASE_DIR + os.sep + "filter_thumbnail_" + THUMBNAIL_EXT
+FILTER_DIR = BASE_DIR + os.sep + "filter_" + DEST_TRAIN_EXT
+FILTER_THUMBNAIL_DIR = BASE_DIR + os.sep + "filter_thumbnail_" + THUMBNAIL_EXT
 FILTER_PAGINATION_SIZE = 50
 FILTER_PAGINATE = True
 FILTER_HTML_DIR = BASE_DIR
@@ -118,9 +118,9 @@ def get_training_slide_path(slide_number):
   return slide_filepath
 
 
-def get_training_image_path_scale_factor(slide_number, large_w=None, large_h=None, small_w=None, small_h=None):
+def get_training_image_path(slide_number, large_w=None, large_h=None, small_w=None, small_h=None):
   """
-  Convert slide number and optional dimensions to a scaling factor training image path. If no dimensions are supplied,
+  Convert slide number and optional dimensions to a training image path. If no dimensions are supplied,
   the corresponding file based on the slide number will be looked up in the file system using a wildcard.
 
   Example:
@@ -138,18 +138,18 @@ def get_training_image_path_scale_factor(slide_number, large_w=None, large_h=Non
   """
   padded_sl_num = str(slide_number).zfill(3)
   if large_w is None and large_h is None and small_w is None and small_h is None:
-    wilcard_path = DEST_TRAIN_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "*." + DEST_TRAIN_EXT
+    wilcard_path = DEST_TRAIN_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "*." + DEST_TRAIN_EXT
     img_path = glob.glob(wilcard_path)[0]
   else:
-    img_path = DEST_TRAIN_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
+    img_path = DEST_TRAIN_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
       SCALE_FACTOR) + "x-" + DEST_TRAIN_SUFFIX + str(
       large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(small_h) + "." + DEST_TRAIN_EXT
   return img_path
 
 
-def get_training_thumbnail_path_scale_factor(slide_number, large_w=None, large_h=None, small_w=None, small_h=None):
+def get_training_thumbnail_path(slide_number, large_w=None, large_h=None, small_w=None, small_h=None):
   """
-  Convert slide number and optional dimensions to a scaling factor training thumbnail path. If no dimensions are
+  Convert slide number and optional dimensions to a training thumbnail path. If no dimensions are
   supplied, the corresponding file based on the slide number will be looked up in the file system using a wildcard.
 
   Example:
@@ -167,10 +167,10 @@ def get_training_thumbnail_path_scale_factor(slide_number, large_w=None, large_h
   """
   padded_sl_num = str(slide_number).zfill(3)
   if large_w is None and large_h is None and small_w is None and small_h is None:
-    wilcard_path = DEST_TRAIN_THUMBNAIL_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "*." + THUMBNAIL_EXT
+    wilcard_path = DEST_TRAIN_THUMBNAIL_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "*." + THUMBNAIL_EXT
     img_path = glob.glob(wilcard_path)[0]
   else:
-    img_path = DEST_TRAIN_THUMBNAIL_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
+    img_path = DEST_TRAIN_THUMBNAIL_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
       SCALE_FACTOR) + "x-" + DEST_TRAIN_SUFFIX + str(
       large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(small_h) + "." + THUMBNAIL_EXT
   return img_path
@@ -191,7 +191,7 @@ def get_filter_image_path(slide_number, filter_number, filter_name_info):
   Returns:
     Path to the filter image file.
   """
-  dir = FILTER_DIR_SCALE_FACTOR
+  dir = FILTER_DIR
   if not os.path.exists(dir):
     os.makedirs(dir)
   img_path = dir + os.sep + get_filter_image_filename(slide_number, filter_number, filter_name_info)
@@ -213,7 +213,7 @@ def get_filter_thumbnail_path(slide_number, filter_number, filter_name_info):
   Returns:
     Path to the filter thumbnail file.
   """
-  dir = FILTER_THUMBNAIL_DIR_SCALE_FACTOR
+  dir = FILTER_THUMBNAIL_DIR
   if not os.path.exists(dir):
     os.makedirs(dir)
   img_path = dir + os.sep + get_filter_image_filename(slide_number, filter_number, filter_name_info, thumbnail=True)
@@ -345,7 +345,7 @@ def get_tile_summary_image_filename(slide_number, thumbnail=False):
     ext = DEST_TRAIN_EXT
   padded_sl_num = str(slide_number).zfill(3)
 
-  training_img_path = get_training_image_path_scale_factor(slide_number)
+  training_img_path = get_training_image_path(slide_number)
   large_w, large_h, small_w, small_h = parse_dimensions_from_training_image_filename(training_img_path)
   img_filename = TRAIN_PREFIX + padded_sl_num + "-" + str(SCALE_FACTOR) + "x-" + str(large_w) + "x" + str(
     large_h) + "-" + str(small_w) + "x" + str(small_h) + "-" + TILE_SUMMARY_SUFFIX + "." + ext
@@ -367,9 +367,9 @@ def get_filter_image_result(slide_number):
     Path to the filter image file.
   """
   padded_sl_num = str(slide_number).zfill(3)
-  training_img_path = get_training_image_path_scale_factor(slide_number)
+  training_img_path = get_training_image_path(slide_number)
   large_w, large_h, small_w, small_h = parse_dimensions_from_training_image_filename(training_img_path)
-  img_path = FILTER_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
+  img_path = FILTER_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
     SCALE_FACTOR) + "x-" + FILTER_SUFFIX + str(large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(
     small_h) + "-" + FILTER_RESULT_TEXT + "." + DEST_TRAIN_EXT
   return img_path
@@ -389,9 +389,9 @@ def get_filter_thumbnail_result(slide_number):
     Path to the filter thumbnail file.
   """
   padded_sl_num = str(slide_number).zfill(3)
-  training_img_path = get_training_image_path_scale_factor(slide_number)
+  training_img_path = get_training_image_path(slide_number)
   large_w, large_h, small_w, small_h = parse_dimensions_from_training_image_filename(training_img_path)
-  img_path = FILTER_THUMBNAIL_DIR_SCALE_FACTOR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
+  img_path = FILTER_THUMBNAIL_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
     SCALE_FACTOR) + "x-" + FILTER_SUFFIX + str(large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(
     small_h) + "-" + FILTER_RESULT_TEXT + "." + THUMBNAIL_EXT
   return img_path
@@ -458,13 +458,13 @@ def training_slide_to_image(slide_number):
   # print("BEST LEVEL: " + str(level))
   # print("WSI LEVEL SIZE: " + str(whole_slide_image.size))
   # print("IMG SIZE: " + str(img.size))
-  img_path = get_training_image_path_scale_factor(slide_number, large_w, large_h, new_w, new_h)
+  img_path = get_training_image_path(slide_number, large_w, large_h, new_w, new_h)
   print("Saving image to: " + img_path)
-  if not os.path.exists(DEST_TRAIN_DIR_SCALE_FACTOR):
-    os.makedirs(DEST_TRAIN_DIR_SCALE_FACTOR)
+  if not os.path.exists(DEST_TRAIN_DIR):
+    os.makedirs(DEST_TRAIN_DIR)
   img.save(img_path)
 
-  thumbnail_path = get_training_thumbnail_path_scale_factor(slide_number, large_w, large_h, new_w, new_h)
+  thumbnail_path = get_training_thumbnail_path(slide_number, large_w, large_h, new_w, new_h)
   save_thumbnail(img, THUMBNAIL_SIZE, thumbnail_path)
 
 
