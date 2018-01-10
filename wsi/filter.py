@@ -1196,15 +1196,14 @@ def image_cell(slide_num, filter_num, display_text, file_text):
   Returns:
     HTML for a table cell for viewing a filtered image.
   """
-  return "    <td>\n" + \
-         "      <a target=\"_blank\" href=\"" + slide.get_filter_image_path(slide_num, filter_num,
-                                                                            file_text) + "\">\n" + \
-         "        " + display_text + "<br/>\n" + \
-         "        " + slide.get_filter_image_filename(slide_num, filter_num, file_text) + "<br/>\n" + \
-         "        <img class=\"lazyload\" src=\"" + b64_img() + "\" data-src=\"" + \
-         slide.get_filter_thumbnail_path(slide_num, filter_num, file_text) + "\" />\n" + \
-         "      </a>\n" + \
-         "    </td>\n"
+  filt_img = slide.get_filter_image_path(slide_num, filter_num, file_text)
+  filt_thumb = slide.get_filter_thumbnail_path(slide_num, filter_num, file_text)
+  img_name = slide.get_filter_image_filename(slide_num, filter_num, file_text)
+  return "      <td>\n" + \
+         "        <a target=\"_blank\" href=\"%s\">%s<br/>\n%s<br/>\n" % (filt_img, display_text, img_name) + \
+         "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (b64_img(), filt_thumb) + \
+         "        </a>\n" + \
+         "      </td>\n"
 
 
 def b64_img():
@@ -1292,12 +1291,12 @@ def generate_filter_html_result(html_page_info):
       value = html_page_info[key]
       current_row = value[0]
       if current_row > row:
-        html += "  <tr>\n"
+        html += "    <tr>\n"
         row = current_row
       html += image_cell(value[0], value[1], value[2], value[3])
       next_key = key + 1
       if next_key not in html_page_info:
-        html += "  </tr>\n"
+        html += "    </tr>\n"
 
     html += "  </table>\n"
     html += html_footer()
@@ -1322,7 +1321,7 @@ def generate_filter_html_result(html_page_info):
       html = ""
       html += html_header("Filtered Images, Page %d" % page_num)
 
-      html += "<div style=\"font-size: 20px\">"
+      html += "  <div style=\"font-size: 20px\">"
       if page_num > 1:
         if page_num == 2:
           html += "<a href=\"filters.html\">&lt;</a> "
@@ -1331,7 +1330,7 @@ def generate_filter_html_result(html_page_info):
       html += "Page %d" % page_num
       if page_num < num_pages:
         html += " <a href=\"filters-%d.html\">&gt;</a> " % (page_num + 1)
-      html += "</div>"
+      html += "</div>\n"
 
       html += "  <table>\n"
       for slide_num in page_slide_nums:
@@ -1495,6 +1494,7 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
     generate_filter_html_result(html_page_info)
 
   print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
+
 
 # apply_filters_to_image(1)
 # rgb, _ = apply_filters_to_image(337, display=False, save=False)
