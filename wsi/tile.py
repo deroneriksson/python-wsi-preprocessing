@@ -365,40 +365,39 @@ def image_row(slide_num):
     HTML table row for viewing a tiled image.
   """
   if slide.RESIZE_ALL_BY_SCALE_FACTOR == True:
-    training_image_path = slide.get_training_image_path_scale_factor(slide_num)
-    training_thumb_path = slide.get_training_thumbnail_path_scale_factor(slide_num)
+    orig_img = slide.get_training_image_path_scale_factor(slide_num)
+    orig_thumb = slide.get_training_thumbnail_path_scale_factor(slide_num)
   else:
-    training_image_path = slide.get_training_image_path(slide_num)
-    training_thumb_path = slide.get_training_thumbnail_path(slide_num)
-  return "  <tr>\n" + \
-         "    <td>\n" + \
-         "      <a target=\"_blank\" href=\"" + training_image_path + "\">\n" + \
-         "        " + "S%03d " % slide_num + "Original" + "<br/>\n" + \
-         "        <img class=\"lazyload\" src=\"" + filter.b64_img() + "\" data-src=\"" + training_thumb_path + "\" />\n" + \
-         "      </a>\n" + \
-         "    </td>\n" + \
-         "    <td>\n" + \
-         "      <a target=\"_blank\" href=\"" + slide.get_filter_image_result(slide_num) + "\">\n" + \
-         "        " + "S%03d " % slide_num + "Filtered" + "<br/>\n" + \
-         "        <img class=\"lazyload\" src=\"" + filter.b64_img() + "\" data-src=\"" + slide.get_filter_thumbnail_result(
-    slide_num) + "\" />\n" + \
-         "      </a>\n" + \
-         "    </td>\n" + \
-         "    <td>\n" + \
-         "      <a target=\"_blank\" href=\"" + slide.get_tile_summary_image_path(slide_num) + "\">\n" + \
-         "        " + "S%03d " % slide_num + "Tiled" + "<br/>\n" + \
-         "        <img class=\"lazyload\" src=\"" + filter.b64_img() + "\" data-src=\"" + slide.get_tile_summary_thumbnail_path(
-    slide_num) + "\" />\n" + \
-         "      </a>\n" + \
-         "    </td>\n" + \
-         "    <td>\n" + \
-         "      <a target=\"_blank\" href=\"" + slide.get_tile_summary_on_original_image_path(slide_num) + "\">\n" + \
-         "        " + "S%03d " % slide_num + "Original Tiled" + "<br/>\n" + \
-         "        <img class=\"lazyload\" src=\"" + filter.b64_img() + "\" data-src=\"" + slide.get_tile_summary_on_original_thumbnail_path(
-    slide_num) + "\" />\n" + \
-         "      </a>\n" + \
-         "    </td>\n" + \
-         "  </tr>\n"
+    orig_img = slide.get_training_image_path(slide_num)
+    orig_thumb = slide.get_training_thumbnail_path(slide_num)
+  filt_img = slide.get_filter_image_result(slide_num)
+  filt_thumb = slide.get_filter_thumbnail_result(slide_num)
+  sum_img = slide.get_tile_summary_image_path(slide_num)
+  sum_thumb = slide.get_tile_summary_thumbnail_path(slide_num)
+  osum_img = slide.get_tile_summary_on_original_image_path(slide_num)
+  osum_thumb = slide.get_tile_summary_on_original_thumbnail_path(slide_num)
+  return "    <tr>\n" + \
+         "      <td>\n" + \
+         "        <a target=\"_blank\" href=\"%s\">S%03d Original<br/>\n" % (orig_img, slide_num) + \
+         "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), orig_thumb) + \
+         "        </a>\n" + \
+         "      </td>\n" + \
+         "      <td>\n" + \
+         "        <a target=\"_blank\" href=\"%s\">S%03d Filtered<br/>\n" % (filt_img, slide_num) + \
+         "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), filt_thumb) + \
+         "        </a>\n" + \
+         "      </td>\n" + \
+         "      <td>\n" + \
+         "        <a target=\"_blank\" href=\"%s\">S%03d Tiled<br/>\n" % (sum_img, slide_num) + \
+         "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), sum_thumb) + \
+         "        </a>\n" + \
+         "      </td>\n" + \
+         "      <td>\n" + \
+         "        <a target=\"_blank\" href=\"%s\">S%03d Original Tiled<br/>\n" % (osum_img, slide_num) + \
+         "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), osum_thumb) + \
+         "        </a>\n" + \
+         "      </td>\n" + \
+         "    </tr>\n"
 
 
 def generate_tiled_html_result(slide_nums):
@@ -434,7 +433,7 @@ def generate_tiled_html_result(slide_nums):
       html = ""
       html += filter.html_header("Tiled Images, Page %d" % page_num)
 
-      html += "<div style=\"font-size: 20px\">"
+      html += "  <div style=\"font-size: 20px\">"
       if page_num > 1:
         if page_num == 2:
           html += "<a href=\"tiles.html\">&lt;</a> "
@@ -443,7 +442,7 @@ def generate_tiled_html_result(slide_nums):
       html += "Page %d" % page_num
       if page_num < num_pages:
         html += " <a href=\"tiles-%d.html\">&gt;</a> " % (page_num + 1)
-      html += "</div>"
+      html += "</div>\n"
 
       html += "  <table>\n"
       for slide_num in page_slide_nums:
@@ -457,6 +456,7 @@ def generate_tiled_html_result(slide_nums):
         text_file = open(slide.TILE_SUMMARY_HTML_DIR + os.sep + "tiles-%d.html" % page_num, "w")
       text_file.write(html)
       text_file.close()
+
 
 # summary(1, save=True)
 # summary(26, save=True)
