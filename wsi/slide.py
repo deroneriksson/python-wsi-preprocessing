@@ -346,7 +346,7 @@ def get_tile_summary_image_filename(slide_number, thumbnail=False):
   padded_sl_num = str(slide_number).zfill(3)
 
   training_img_path = get_training_image_path(slide_number)
-  large_w, large_h, small_w, small_h = parse_dimensions_from_training_image_filename(training_img_path)
+  large_w, large_h, small_w, small_h = parse_dimensions_from_image_filename(training_img_path)
   img_filename = TRAIN_PREFIX + padded_sl_num + "-" + str(SCALE_FACTOR) + "x-" + str(large_w) + "x" + str(
     large_h) + "-" + str(small_w) + "x" + str(small_h) + "-" + TILE_SUMMARY_SUFFIX + "." + ext
 
@@ -368,7 +368,7 @@ def get_filter_image_result(slide_number):
   """
   padded_sl_num = str(slide_number).zfill(3)
   training_img_path = get_training_image_path(slide_number)
-  large_w, large_h, small_w, small_h = parse_dimensions_from_training_image_filename(training_img_path)
+  large_w, large_h, small_w, small_h = parse_dimensions_from_image_filename(training_img_path)
   img_path = FILTER_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
     SCALE_FACTOR) + "x-" + FILTER_SUFFIX + str(large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(
     small_h) + "-" + FILTER_RESULT_TEXT + "." + DEST_TRAIN_EXT
@@ -390,19 +390,22 @@ def get_filter_thumbnail_result(slide_number):
   """
   padded_sl_num = str(slide_number).zfill(3)
   training_img_path = get_training_image_path(slide_number)
-  large_w, large_h, small_w, small_h = parse_dimensions_from_training_image_filename(training_img_path)
+  large_w, large_h, small_w, small_h = parse_dimensions_from_image_filename(training_img_path)
   img_path = FILTER_THUMBNAIL_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
     SCALE_FACTOR) + "x-" + FILTER_SUFFIX + str(large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(
     small_h) + "-" + FILTER_RESULT_TEXT + "." + THUMBNAIL_EXT
   return img_path
 
 
-def parse_dimensions_from_training_image_filename(filename):
+def parse_dimensions_from_image_filename(filename):
   """
-  Parse the training image filename to extract the original width and height and the converted width and height.
+  Parse an image filename to extract the original width and height and the converted width and height.
+
+  Example:
+    "TUPAC-TR-011-32x-97103x79079-3034x2471-tile_summary.png" -> (97103, 79079, 3034, 2471)
 
   Args:
-    filename: The training image filename.
+    filename: The image filename.
 
   Returns:
     Tuple consisting of the original width, original height, the converted width, and the converted height.
