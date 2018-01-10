@@ -399,6 +399,15 @@ def get_tile_summary_image_filename(slide_number, thumbnail=False):
     ext = DEST_TRAIN_EXT
   padded_sl_num = str(slide_number).zfill(3)
   img_filename = TRAIN_PREFIX + padded_sl_num + "-" + TILE_SUMMARY_SUFFIX + "." + ext
+
+  if RESIZE_ALL_BY_SCALE_FACTOR:
+    training_img_path = get_training_image_path_scale_factor(slide_number)
+    large_w, large_h, small_w, small_h = parse_dimensions_from_training_image_filename(training_img_path)
+    img_filename = TRAIN_PREFIX + padded_sl_num + "-" + str(SCALE_FACTOR) + "x-" + FILTER_SUFFIX + str(
+      large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(small_h) + "-" + TILE_SUMMARY_SUFFIX + "." + ext
+  else:
+    img_filename = TRAIN_PREFIX + padded_sl_num + "-" + TILE_SUMMARY_SUFFIX + "." + ext
+
   return img_filename
 
 
@@ -841,7 +850,6 @@ class Time:
     self.end = datetime.datetime.now()
     time_elapsed = self.end - self.start
     return time_elapsed
-
 
 # singleprocess_training_slides_to_images()
 # multiprocess_training_slides_to_images()
