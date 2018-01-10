@@ -472,6 +472,14 @@ def training_slide_to_image(slide_number):
 
 
 def save_thumbnail(pil_img, size, path):
+  """
+  Save a thumbnail of a PIL image, specifying the maximum width or height of the thumbnail.
+
+  Args:
+    pil_img: The PIL image to save as a thumbnail.
+    size:  The maximum width or height of the thumbnail.
+    path: The path to the thumbnail.
+  """
   max_size = tuple(round(size * d / max(pil_img.size)) for d in pil_img.size)
   img = pil_img.resize(max_size, PIL.Image.BILINEAR)
   print("Saving thumbnail to: " + path)
