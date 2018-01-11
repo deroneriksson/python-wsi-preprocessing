@@ -145,7 +145,8 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
     if DISPLAY_TILE_LABELS:
       label = "#%d\n%4.2f%%\n[%d,%d] x\n[%d,%d]" % (count, tissue_percentage, r_s, c_s, r_e, c_e)
       font = ImageFont.truetype(font_path, size=text_size)
-      draw.text((c_s + 3, r_s + 3), label, (0,0,0), font=font)
+      draw.text((c_s + 4, r_s + 4), label, (0, 0, 0), font=font)
+      draw.text((c_s + 3, r_s + 3), label, (0, 0, 0), font=font)
       draw.text((c_s + 2, r_s + 2), label, text_color, font=font)
   if display:
     summary.show()
