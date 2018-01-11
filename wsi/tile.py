@@ -87,7 +87,7 @@ def get_tile_indices(rows, cols, row_tile_size, col_tile_size):
 
 def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, display=True, save=False,
                  thresh_color=(0, 255, 0), below_thresh_color=(255, 255, 0), below_lower_thresh_color=(255, 165, 0),
-                 no_tissue_color=(255, 0, 0), text_color=(255, 255, 255), text_size=22,
+                 no_tissue_color=(255, 0, 0), text_color=(255, 255, 255), text_size=18,
                  font_path="/Library/Fonts/Arial Bold.ttf"):
   """
   Generate summary image/thumbnail showing a 'heatmap' representation of the tissue segmentation of all tiles.
@@ -143,8 +143,9 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
       tile_border(draw_orig, r_s, r_e, c_s, c_e, no_tissue_color)
     # filter.display_img(np_tile, text=label, size=14, bg=True)
     if DISPLAY_TILE_LABELS:
-      label = "#%d\n%4.2f%%" % (count, tissue_percentage)
+      label = "#%d\n%4.2f%%\n[%d,%d] x\n[%d,%d]" % (count, tissue_percentage, r_s, c_s, r_e, c_e)
       font = ImageFont.truetype(font_path, size=text_size)
+      draw.text((c_s + 3, r_s + 3), label, (0,0,0), font=font)
       draw.text((c_s + 2, r_s + 2), label, text_color, font=font)
   if display:
     summary.show()
@@ -451,10 +452,9 @@ def generate_tiled_html_result(slide_nums):
 # singleprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
 # multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
 # singleprocess_images_to_tile_summaries()
-# multiprocess_images_to_tile_summaries(image_num_list=[5,10,15,20,25,30])
+# multiprocess_images_to_tile_summaries(image_num_list=[1,2,3,4,5])
 # multiprocess_images_to_tile_summaries(save=False, display=False, html=True)
 # multiprocess_images_to_tile_summaries()
 # summary(1, display=True, save=True)
 # generate_tiled_html_result(slide_nums=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
-# generate_tiled_html_result(slide_nums=[1,2,3,4,5])
 # generate_tiled_html_result(slide_nums=[10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
