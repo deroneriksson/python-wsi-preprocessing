@@ -85,6 +85,34 @@ def get_tile_indices(rows, cols, row_tile_size, col_tile_size):
   return indices
 
 
+def create_summary_pil_img(np_img, title_area_height, row_tile_size, col_tile_size, num_row_tiles, num_col_tiles):
+  """
+  Create a PIL summary image including top title area and right side and bottom padding.
+
+  Args:
+    np_img: Image as a NumPy array.
+    title_area_height: Height of the title area at the top of the summary image.
+    row_tile_size: The tile size in rows.
+    col_tile_size: The tile size in columns.
+    num_row_tiles: The number of row tiles.
+    num_col_tiles: The number of column tiles.
+
+  Returns:
+    Summary image as a PIL image. This image contains the image data specified by the np_img input and also has
+    potentially a top title area and right side and bottom padding.
+  """
+  r = row_tile_size * num_row_tiles + title_area_height
+  c = col_tile_size * num_col_tiles
+  summary_img = np.zeros([r, c, np_img.shape[2]], dtype=np.uint8)
+  # add gray edges so that tile text does not get cut off
+  summary_img.fill(120)
+  # color title area white
+  summary_img[0:title_area_height, 0:summary_img.shape[1]].fill(255)
+  summary_img[title_area_height:np_img.shape[0] + title_area_height, 0:np_img.shape[1]] = np_img
+  summary = filter.np_to_pil(summary_img)
+  return summary
+
+
 def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, display=True, save=False,
                  thresh_color=(0, 255, 0), below_thresh_color=(255, 255, 0), below_lower_thresh_color=(255, 165, 0),
                  no_tissue_color=(255, 0, 0), text_color=(255, 255, 255), text_size=18,
@@ -111,18 +139,14 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
   z = 300  # height of area at top of summary slide
   rows, cols, _ = np_img.shape
   num_row_tiles, num_col_tiles = get_num_tiles(rows, cols, row_tile_size, col_tile_size)
-  summary_img = np.zeros([row_tile_size * num_row_tiles + z, col_tile_size * num_col_tiles, np_img.shape[2]],
-                         dtype=np.uint8)
-  # add gray edges so that summary text does not get cut off
-  summary_img.fill(120)
-  summary_img[0:z, 0:summary_img.shape[1]].fill(255)
-  summary_img[z:np_img.shape[0] + z, 0:np_img.shape[1]] = np_img
-  summary = filter.np_to_pil(summary_img)
+  summary = create_summary_pil_img(np_img, z, row_tile_size, col_tile_size, num_row_tiles, num_col_tiles)
   draw = ImageDraw.Draw(summary)
 
   original_img_path = slide.get_training_image_path(slide_num)
   orig_img = slide.open_image(original_img_path)
-  draw_orig = ImageDraw.Draw(orig_img)
+  np_orig = filter.pil_to_np_rgb(orig_img)
+  summary_orig = create_summary_pil_img(np_orig, z, row_tile_size, col_tile_size, num_row_tiles, num_col_tiles)
+  draw_orig = ImageDraw.Draw(summary_orig)
 
   count = 0
   high = 0
@@ -137,19 +161,19 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
     print("TILE [%d:%d, %d:%d]: Tissue %f%%" % (r_s, r_e, c_s, c_e, tissue_percentage))
     if tissue_percentage >= TISSUE_THRESHOLD_PERCENT:
       tile_border(draw, r_s + z, r_e + z, c_s, c_e, thresh_color)
-      tile_border(draw_orig, r_s, r_e, c_s, c_e, thresh_color)
+      tile_border(draw_orig, r_s + z, r_e + z, c_s, c_e, thresh_color)
       high += 1
     elif (tissue_percentage >= TISSUE_LOW_THRESHOLD_PERCENT) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
       tile_border(draw, r_s + z, r_e + z, c_s, c_e, below_thresh_color)
-      tile_border(draw_orig, r_s, r_e, c_s, c_e, below_thresh_color)
+      tile_border(draw_orig, r_s + z, r_e + z, c_s, c_e, below_thresh_color)
       medium += 1
     elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESHOLD_PERCENT):
       tile_border(draw, r_s + z, r_e + z, c_s, c_e, below_lower_thresh_color)
-      tile_border(draw_orig, r_s, r_e, c_s, c_e, below_lower_thresh_color)
+      tile_border(draw_orig, r_s + z, r_e + z, c_s, c_e, below_lower_thresh_color)
       low += 1
     else:
       tile_border(draw, r_s + z, r_e + z, c_s, c_e, no_tissue_color)
-      tile_border(draw_orig, r_s, r_e, c_s, c_e, no_tissue_color)
+      tile_border(draw_orig, r_s + z, r_e + z, c_s, c_e, no_tissue_color)
       none += 1
     # filter.display_img(np_tile, text=label, size=14, bg=True)
     if DISPLAY_TILE_LABELS:
@@ -173,17 +197,19 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
                  " %5d (%5.2f%%) tiles >=%d%% tissue\n" % (high, high / count * 100, TISSUE_THRESHOLD_PERCENT) + \
                  " %5d (%5.2f%%) tiles >=%d%% and <%d%% tissue\n" % (
                    medium, medium / count * 100, TISSUE_LOW_THRESHOLD_PERCENT, TISSUE_THRESHOLD_PERCENT) + \
-                 " %5d (%5.2f%%) tiles >0%% and <%d%% tissue\n" % (low, low / count * 100, TISSUE_LOW_THRESHOLD_PERCENT) + \
+                 " %5d (%5.2f%%) tiles >0%% and <%d%% tissue\n" % (
+                   low, low / count * 100, TISSUE_LOW_THRESHOLD_PERCENT) + \
                  " %5d (%5.2f%%) tiles =0%% tissue" % (none, none / count * 100)
   summary_font = ImageFont.truetype("/Library/Fonts/Courier New Bold.ttf", size=24)
   draw.text((5, 5), summary_text, (0, 0, 0), font=summary_font)
+  draw_orig.text((5, 5), summary_text, (0, 0, 0), font=summary_font)
 
   if display:
     summary.show()
-    orig_img.show()
+    summary_orig.show()
   if save:
     save_tile_summary_image(summary, slide_num)
-    save_tile_summary_on_original_image(orig_img, slide_num)
+    save_tile_summary_on_original_image(summary_orig, slide_num)
 
 
 def tile_border(draw, r_s, r_e, c_s, c_e, color):
