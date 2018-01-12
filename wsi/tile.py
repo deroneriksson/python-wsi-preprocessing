@@ -26,6 +26,7 @@ import os
 import wsi.filter as filter
 import wsi.slide as slide
 from wsi.slide import Time
+import PIL
 from PIL import ImageDraw, ImageFont
 
 TISSUE_THRESHOLD_PERCENT = 80
@@ -34,7 +35,11 @@ TISSUE_LOW_THRESHOLD_PERCENT = 10
 ROW_TILE_SIZE = 1024
 COL_TILE_SIZE = 1024
 
-DISPLAY_TILE_LABELS = False  # If True, add text such as tissue percentage to summary tiles. Requires large tile size.
+# Currently only works well for tile sizes >= 4096
+# 2048 works decently by 2x image scaling except for displaying very large images such as S001
+# One possibility would be to break the image into multiple images and use an image map on the thumbnail to navigate
+# to the different sections of the image
+DISPLAY_TILE_LABELS = False
 
 TILE_BORDER_SIZE = 2  # The size of the colored rectangular border around summary tiles.
 
@@ -175,14 +180,7 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
       tile_border(draw, r_s + z, r_e + z, c_s, c_e, no_tissue_color)
       tile_border(draw_orig, r_s + z, r_e + z, c_s, c_e, no_tissue_color)
       none += 1
-    # filter.display_img(np_tile, text=label, size=14, bg=True)
-    if DISPLAY_TILE_LABELS:
-      label = "#%d\nR%d C%d\n%4.2f%%\n[%d,%d] x\n[%d,%d]\n%dx%d" % (
-        count, r, c, tissue_percentage, c_s, r_s, c_e, r_e, c_e - c_s, r_e - r_s)
-      font = ImageFont.truetype(font_path, size=text_size)
-      draw.text((c_s + 4, r_s + 4 + z), label, (0, 0, 0), font=font)
-      draw.text((c_s + 3, r_s + 3 + z), label, (0, 0, 0), font=font)
-      draw.text((c_s + 2, r_s + 2 + z), label, text_color, font=font)
+      # filter.display_img(np_tile, text=label, size=14, bg=True)
 
   filt_img = slide.get_filter_image_result(slide_num)
   o_w, o_h, w, h = slide.parse_dimensions_from_image_filename(filt_img)
@@ -204,6 +202,29 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
   summary_font = ImageFont.truetype("/Library/Fonts/Courier New Bold.ttf", size=24)
   draw.text((5, 5), summary_text, (0, 0, 0), font=summary_font)
   draw_orig.text((5, 5), summary_text, (0, 0, 0), font=summary_font)
+
+  if DISPLAY_TILE_LABELS:
+    # resize image if 2048 for text display on tiles
+    if COL_TILE_SIZE == 2048:
+      f = 2
+      w, h = summary.size
+      w = w * f
+      h = h * f
+      summary = summary.resize((w, h), PIL.Image.BILINEAR)
+      draw = ImageDraw.Draw(summary)
+    else:
+      f = 1
+    count = 0
+    for t in tile_indices:
+      r_s, r_e, c_s, c_e, r, c = t
+      np_tile = np_img[r_s:r_e, c_s:c_e]
+      tissue_percentage = filter.tissue_percent(np_tile)
+      label = "#%d\nR%d C%d\n%4.2f%%\n[%d,%d] x\n[%d,%d]\n%dx%d" % (
+        count, r, c, tissue_percentage, c_s, r_s, c_e, r_e, c_e - c_s, r_e - r_s)
+      font = ImageFont.truetype(font_path, size=text_size)
+      draw.text(((c_s + 4) * f, (r_s + 4 + z) * f), label, (0, 0, 0), font=font)
+      draw.text(((c_s + 3) * f, (r_s + 3 + z) * f), label, (0, 0, 0), font=font)
+      draw.text(((c_s + 2) * f, (r_s + 2 + z) * f), label, text_color, font=font)
 
   if display:
     summary.show()
