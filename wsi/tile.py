@@ -61,7 +61,7 @@ def get_num_tiles(rows, cols, row_tile_size, col_tile_size):
 
 def get_tile_indices(rows, cols, row_tile_size, col_tile_size):
   """
-  Obtain a list of tile coordinates (starting row, ending row, starting column, ending column).
+  Obtain a list of tile coordinates (starting row, ending row, starting column, ending column, row number, column number).
 
   Args:
     rows: Number of rows.
@@ -71,7 +71,7 @@ def get_tile_indices(rows, cols, row_tile_size, col_tile_size):
 
   Returns:
     List of tuples representing tile coordinates consisting of starting row, ending row,
-    starting column, ending column.
+    starting column, ending column, row number, column number.
   """
   indices = list()
   num_row_tiles, num_col_tiles = get_num_tiles(rows, cols, row_tile_size, col_tile_size)
@@ -81,7 +81,7 @@ def get_tile_indices(rows, cols, row_tile_size, col_tile_size):
     for c in range(0, num_col_tiles):
       start_c = c * col_tile_size
       end_c = ((c + 1) * col_tile_size) if (c < num_col_tiles - 1) else cols
-      indices.append((start_r, end_r, start_c, end_c))
+      indices.append((start_r, end_r, start_c, end_c, r + 1, c + 1))
   return indices
 
 
@@ -115,7 +115,7 @@ def create_summary_pil_img(np_img, title_area_height, row_tile_size, col_tile_si
 
 def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, display=True, save=False,
                  thresh_color=(0, 255, 0), below_thresh_color=(255, 255, 0), below_lower_thresh_color=(255, 165, 0),
-                 no_tissue_color=(255, 0, 0), text_color=(255, 255, 255), text_size=18,
+                 no_tissue_color=(255, 0, 0), text_color=(255, 255, 255), text_size=16,
                  font_path="/Library/Fonts/Arial Bold.ttf"):
   """
   Generate summary image/thumbnail showing a 'heatmap' representation of the tissue segmentation of all tiles.
@@ -155,10 +155,10 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
   none = 0
   for t in tile_indices:
     count += 1
-    r_s, r_e, c_s, c_e = t
+    r_s, r_e, c_s, c_e, r, c = t
     np_tile = np_img[r_s:r_e, c_s:c_e]
     tissue_percentage = filter.tissue_percent(np_tile)
-    print("TILE [%d:%d, %d:%d]: Tissue %f%%" % (r_s, r_e, c_s, c_e, tissue_percentage))
+    # print("TILE [%d:%d, %d:%d]: Tissue %f%%" % (r_s, r_e, c_s, c_e, tissue_percentage))
     if tissue_percentage >= TISSUE_THRESHOLD_PERCENT:
       tile_border(draw, r_s + z, r_e + z, c_s, c_e, thresh_color)
       tile_border(draw_orig, r_s + z, r_e + z, c_s, c_e, thresh_color)
@@ -177,7 +177,8 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
       none += 1
     # filter.display_img(np_tile, text=label, size=14, bg=True)
     if DISPLAY_TILE_LABELS:
-      label = "#%d\n%4.2f%%\n[%d,%d] x\n[%d,%d]" % (count, tissue_percentage, r_s, c_s, r_e, c_e)
+      label = "#%d\nR%d C%d\n%4.2f%%\n[%d,%d] x\n[%d,%d]\n%dx%d" % (
+        count, r, c, tissue_percentage, c_s, r_s, c_e, r_e, c_e - c_s, r_e - r_s)
       font = ImageFont.truetype(font_path, size=text_size)
       draw.text((c_s + 4, r_s + 4 + z), label, (0, 0, 0), font=font)
       draw.text((c_s + 3, r_s + 3 + z), label, (0, 0, 0), font=font)
