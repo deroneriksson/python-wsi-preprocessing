@@ -118,7 +118,7 @@ def create_summary_pil_img(np_img, title_area_height, row_tile_size, col_tile_si
   return summary
 
 
-def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, display=True, save=False,
+def tile_summary(tile_sum, slide_num, np_img, tile_indices, row_tile_size, col_tile_size, display=True, save=False,
                  thresh_color=(0, 255, 0), below_thresh_color=(255, 255, 0), below_lower_thresh_color=(255, 165, 0),
                  no_tissue_color=(255, 0, 0), text_color=(255, 255, 255), text_size=16,
                  font_path="/Library/Fonts/Arial Bold.ttf"):
@@ -128,7 +128,8 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
   Args:
     slide_num: The slide number.
     np_img: Image as a NumPy array.
-    tile_indices: List of tuples consisting of starting row, ending row, starting column, ending column.
+    tile_indices: List of tuples consisting of starting row, ending row, starting column, ending column, row number,
+                  column number.
     row_tile_size: Number of pixels in a tile row.
     col_tile_size: Number of pixels in a tile column.
     display: If True, display tile summary to screen.
@@ -182,26 +183,11 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
       none += 1
       # filter.display_img(np_tile, text=label, size=14, bg=True)
 
-  filt_img = slide.get_filter_image_result(slide_num)
-  o_w, o_h, w, h = slide.parse_dimensions_from_image_filename(filt_img)
-  summary_text = "Slide #%03d Tissue Segmentation Summary:\n" % slide_num + \
-                 "Original Dimensions: %dx%d\n" % (o_w, o_h) + \
-                 "Original Tile Size: %dx%d\n" % (COL_TILE_SIZE, ROW_TILE_SIZE) + \
-                 "Scale Factor: 1/%dx\n" % slide.SCALE_FACTOR + \
-                 "Scaled Dimensions: %dx%d\n" % (w, h) + \
-                 "Scaled Tile Size: %dx%d\n" % (col_tile_size, row_tile_size) + \
-                 "Total Mask: %3.2f%%, Total Tissue: %3.2f%%\n" % (
-                   filter.mask_percent(np_img), filter.tissue_percent(np_img)) + \
-                 "Tiles: %dx%d = %d\n" % (num_col_tiles, num_row_tiles, count) + \
-                 " %5d (%5.2f%%) tiles >=%d%% tissue\n" % (high, high / count * 100, TISSUE_THRESHOLD_PERCENT) + \
-                 " %5d (%5.2f%%) tiles >=%d%% and <%d%% tissue\n" % (
-                   medium, medium / count * 100, TISSUE_LOW_THRESHOLD_PERCENT, TISSUE_THRESHOLD_PERCENT) + \
-                 " %5d (%5.2f%%) tiles >0%% and <%d%% tissue\n" % (
-                   low, low / count * 100, TISSUE_LOW_THRESHOLD_PERCENT) + \
-                 " %5d (%5.2f%%) tiles =0%% tissue" % (none, none / count * 100)
+  summary = summary_text(tile_sum, count, high, medium, low, none)
+
   summary_font = ImageFont.truetype("/Library/Fonts/Courier New Bold.ttf", size=24)
-  draw.text((5, 5), summary_text, (0, 0, 0), font=summary_font)
-  draw_orig.text((5, 5), summary_text, (0, 0, 0), font=summary_font)
+  draw.text((5, 5), summary, (0, 0, 0), font=summary_font)
+  draw_orig.text((5, 5), summary, (0, 0, 0), font=summary_font)
 
   if DISPLAY_TILE_LABELS:
     # resize image if 2048 for text display on tiles
@@ -232,6 +218,24 @@ def tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, 
   if save:
     save_tile_summary_image(summary, slide_num)
     save_tile_summary_on_original_image(summary_orig, slide_num)
+
+
+def summary_text(tile_summary, count, high, medium, low, none):
+  return "Slide #%03d Tissue Segmentation Summary:\n" % tile_summary.slide_num + \
+         "Original Dimensions: %dx%d\n" % (tile_summary.orig_w, tile_summary.orig_h) + \
+         "Original Tile Size: %dx%d\n" % (tile_summary.orig_tile_w, tile_summary.orig_tile_h) + \
+         "Scale Factor: 1/%dx\n" % tile_summary.scale_factor + \
+         "Scaled Dimensions: %dx%d\n" % (tile_summary.scaled_w, tile_summary.scaled_h) + \
+         "Scaled Tile Size: %dx%d\n" % (tile_summary.scaled_tile_w, tile_summary.scaled_tile_w) + \
+         "Total Mask: %3.2f%%, Total Tissue: %3.2f%%\n" % (
+           tile_summary.mask_percentage(), tile_summary.tissue_percentage) + \
+         "Tiles: %dx%d = %d\n" % (tile_summary.num_col_tiles, tile_summary.num_row_tiles, count) + \
+         " %5d (%5.2f%%) tiles >=%d%% tissue\n" % (high, high / count * 100, TISSUE_THRESHOLD_PERCENT) + \
+         " %5d (%5.2f%%) tiles >=%d%% and <%d%% tissue\n" % (
+           medium, medium / count * 100, TISSUE_LOW_THRESHOLD_PERCENT, TISSUE_THRESHOLD_PERCENT) + \
+         " %5d (%5.2f%%) tiles >0%% and <%d%% tissue\n" % (
+           low, low / count * 100, TISSUE_LOW_THRESHOLD_PERCENT) + \
+         " %5d (%5.2f%%) tiles =0%% tissue" % (none, none / count * 100)
 
 
 def tile_border(draw, r_s, r_e, c_s, c_e, color):
@@ -296,8 +300,22 @@ def summary(slide_num, save=False, display=True):
   row_tile_size = round(ROW_TILE_SIZE / slide.SCALE_FACTOR)  # use round?
   col_tile_size = round(COL_TILE_SIZE / slide.SCALE_FACTOR)  # use round?
 
+  num_row_tiles, num_col_tiles = get_num_tiles(rows, cols, row_tile_size, col_tile_size)
+  o_w, o_h, w, h = slide.parse_dimensions_from_image_filename(img_path)
+  tile_sum = TileSummary(slide_num, o_w, o_h, COL_TILE_SIZE, ROW_TILE_SIZE, w, h, col_tile_size, row_tile_size,
+                         filter.tissue_percent(np_img), num_col_tiles, num_row_tiles)
+
   tile_indices = get_tile_indices(rows, cols, row_tile_size, col_tile_size)
-  tile_summary(slide_num, np_img, tile_indices, row_tile_size, col_tile_size, display=display, save=save)
+  for t in tile_indices:
+    r_s, r_e, c_s, c_e, r, c = t
+    np_tile = np_img[r_s:r_e, c_s:c_e]
+    t_p = filter.tissue_percent(np_tile)
+    o_c_s, o_r_s = slide.small_to_large_mapping((c_s, r_s), (o_w, o_h))
+    o_c_e, o_r_e = slide.small_to_large_mapping((c_e, r_e), (o_w, o_h))
+    tile_info = TileInfo(r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p)
+    tile_sum.tiles.append(tile_info)
+
+  tile_summary(tile_sum, slide_num, np_img, tile_indices, row_tile_size, col_tile_size, display=display, save=save)
 
 
 def image_list_to_tile_summaries(image_num_list, save=True, display=False):
@@ -522,6 +540,80 @@ def generate_tiled_html_result(slide_nums):
         text_file = open(slide.TILE_SUMMARY_HTML_DIR + os.sep + "tiles-%d.html" % page_num, "w")
       text_file.write(html)
       text_file.close()
+
+
+class TileSummary:
+  """
+  Class for tile summary information.
+  """
+
+  slide_num = None
+  orig_w = None
+  orig_h = None
+  orig_tile_w = None
+  orig_tile_h = None
+  scale_factor = slide.SCALE_FACTOR
+  scaled_w = None
+  scaled_h = None
+  scaled_tile_w = None
+  scaled_tile_h = None
+  mask_percentage = None
+  num_row_tiles = None
+  num_col_tiles = None
+
+  def __init__(self, s_n, o_w, o_h, o_t_w, o_t_h, s_w, s_h, s_t_w, s_t_h, t_p, n_c_t, n_r_t):
+    self.slide_num = s_n
+    self.orig_w = o_w
+    self.orig_h = o_h
+    self.orig_tile_w = o_t_w
+    self.orig_tile_h = o_t_h
+    self.scaled_w = s_w
+    self.scaled_h = s_h
+    self.scaled_tile_w = s_t_w
+    self.scaled_tile_h = s_t_h
+    self.tissue_percentage = t_p
+    self.num_col_tiles = n_c_t
+    self.num_row_tiles = n_r_t
+    self.tiles = []
+
+  def mask_percentage(self):
+    return 100 - self.tissue_percentage
+
+  def num_tiles(self):
+    return self.num_row_tiles * self.num_col_tiles
+
+
+class TileInfo:
+  """
+  Class for information about a tile.
+  """
+  r = None
+  c = None
+  r_s = None
+  r_e = None
+  c_s = None
+  c_e = None
+  o_r_s = None
+  o_r_e = None
+  o_c_s = None
+  o_c_e = None
+  tissue_percentage = None
+
+  def __init__(self, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p):
+    self.r = r
+    self.c = c
+    self.r_s = r_s
+    self.r_e = r_e
+    self.c_s = c_s
+    self.c_e = c_e
+    self.o_r_s = o_r_s
+    self.o_r_e = o_r_e
+    self.o_c_s = o_c_s
+    self.o_c_e = o_c_e
+    self.tissue_percentage = t_p
+
+  def mask_percentage(self):
+    return 100 - self.tissue_percentage
 
 
 # summary(1, save=True)
