@@ -118,7 +118,7 @@ def create_summary_pil_img(np_img, title_area_height, row_tile_size, col_tile_si
   return summary
 
 
-def tile_summary(tile_sum, slide_num, np_img, tile_indices, display=True, save=False,
+def tile_summary(tile_sum, slide_num, np_img, display=True, save=False,
                  thresh_color=(0, 255, 0), below_thresh_color=(255, 255, 0), below_lower_thresh_color=(255, 165, 0),
                  no_tissue_color=(255, 0, 0), text_color=(255, 255, 255), text_size=16,
                  font_path="/Library/Fonts/Arial Bold.ttf"):
@@ -162,27 +162,26 @@ def tile_summary(tile_sum, slide_num, np_img, tile_indices, display=True, save=F
   medium = 0
   low = 0
   none = 0
-  for t in tile_indices:
+  for t in tile_sum.tiles:
     count += 1
-    r_s, r_e, c_s, c_e, r, c = t
-    np_tile = np_img[r_s:r_e, c_s:c_e]
+    np_tile = np_img[t.r_s:t.r_e, t.c_s:t.c_e]
     tissue_percentage = filter.tissue_percent(np_tile)
     # print("TILE [%d:%d, %d:%d]: Tissue %f%%" % (r_s, r_e, c_s, c_e, tissue_percentage))
     if tissue_percentage >= TISSUE_THRESHOLD_PERCENT:
-      tile_border(draw, r_s + z, r_e + z, c_s, c_e, thresh_color)
-      tile_border(draw_orig, r_s + z, r_e + z, c_s, c_e, thresh_color)
+      tile_border(draw, t.r_s + z, t.r_e + z, t.c_s, t.c_e, thresh_color)
+      tile_border(draw_orig, t.r_s + z, t.r_e + z, t.c_s, t.c_e, thresh_color)
       high += 1
     elif (tissue_percentage >= TISSUE_LOW_THRESHOLD_PERCENT) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
-      tile_border(draw, r_s + z, r_e + z, c_s, c_e, below_thresh_color)
-      tile_border(draw_orig, r_s + z, r_e + z, c_s, c_e, below_thresh_color)
+      tile_border(draw, t.r_s + z, t.r_e + z, t.c_s, t.c_e, below_thresh_color)
+      tile_border(draw_orig, t.r_s + z, t.r_e + z, t.c_s, t.c_e, below_thresh_color)
       medium += 1
     elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESHOLD_PERCENT):
-      tile_border(draw, r_s + z, r_e + z, c_s, c_e, below_lower_thresh_color)
-      tile_border(draw_orig, r_s + z, r_e + z, c_s, c_e, below_lower_thresh_color)
+      tile_border(draw, t.r_s + z, t.r_e + z, t.c_s, t.c_e, below_lower_thresh_color)
+      tile_border(draw_orig, t.r_s + z, t.r_e + z, t.c_s, t.c_e, below_lower_thresh_color)
       low += 1
     else:
-      tile_border(draw, r_s + z, r_e + z, c_s, c_e, no_tissue_color)
-      tile_border(draw_orig, r_s + z, r_e + z, c_s, c_e, no_tissue_color)
+      tile_border(draw, t.r_s + z, t.r_e + z, t.c_s, t.c_e, no_tissue_color)
+      tile_border(draw_orig, t.r_s + z, t.r_e + z, t.c_s, t.c_e, no_tissue_color)
       none += 1
       # filter.display_img(np_tile, text=label, size=14, bg=True)
 
@@ -318,7 +317,7 @@ def summary(slide_num, save=False, display=True):
     tile_info = TileInfo(r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p)
     tile_sum.tiles.append(tile_info)
 
-  tile_summary(tile_sum, slide_num, np_img, tile_indices, display=display, save=save)
+  tile_summary(tile_sum, slide_num, np_img, display=display, save=save)
 
 
 def image_list_to_tile_summaries(image_num_list, save=True, display=False):
