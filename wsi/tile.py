@@ -168,22 +168,19 @@ def tile_summary(tile_sum, slide_num, np_img, display=True, save=False,
     tissue_percentage = filter.tissue_percent(np_tile)
     # print("TILE [%d:%d, %d:%d]: Tissue %f%%" % (r_s, r_e, c_s, c_e, tissue_percentage))
     if tissue_percentage >= TISSUE_THRESHOLD_PERCENT:
-      tile_border(draw, t.r_s + z, t.r_e + z, t.c_s, t.c_e, thresh_color)
-      tile_border(draw_orig, t.r_s + z, t.r_e + z, t.c_s, t.c_e, thresh_color)
+      border_color = thresh_color
       high += 1
     elif (tissue_percentage >= TISSUE_LOW_THRESHOLD_PERCENT) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
-      tile_border(draw, t.r_s + z, t.r_e + z, t.c_s, t.c_e, below_thresh_color)
-      tile_border(draw_orig, t.r_s + z, t.r_e + z, t.c_s, t.c_e, below_thresh_color)
+      border_color = below_thresh_color
       medium += 1
     elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESHOLD_PERCENT):
-      tile_border(draw, t.r_s + z, t.r_e + z, t.c_s, t.c_e, below_lower_thresh_color)
-      tile_border(draw_orig, t.r_s + z, t.r_e + z, t.c_s, t.c_e, below_lower_thresh_color)
+      border_color = below_lower_thresh_color
       low += 1
     else:
-      tile_border(draw, t.r_s + z, t.r_e + z, t.c_s, t.c_e, no_tissue_color)
-      tile_border(draw_orig, t.r_s + z, t.r_e + z, t.c_s, t.c_e, no_tissue_color)
+      border_color = no_tissue_color
       none += 1
-      # filter.display_img(np_tile, text=label, size=14, bg=True)
+    tile_border(draw, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color)
+    tile_border(draw_orig, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color)
 
   summary_txt = summary_text(tile_sum, count, high, medium, low, none)
 
