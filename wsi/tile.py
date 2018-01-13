@@ -200,16 +200,16 @@ def tile_summary(tile_sum, slide_num, np_img, display=True, save=False,
     else:
       f = 1
     count = 0
-    for t in tile_indices:
-      r_s, r_e, c_s, c_e, r, c = t
-      np_tile = np_img[r_s:r_e, c_s:c_e]
+    for t in tile_sum.tiles:
+      count += 1
+      np_tile = np_img[t.r_s:t.r_e, t.c_s:t.c_e]
       tissue_percentage = filter.tissue_percent(np_tile)
       label = "#%d\nR%d C%d\n%4.2f%%\n[%d,%d] x\n[%d,%d]\n%dx%d" % (
-        count, r, c, tissue_percentage, c_s, r_s, c_e, r_e, c_e - c_s, r_e - r_s)
+        count, t.r, t.c, tissue_percentage, t.c_s, t.r_s, t.c_e, t.r_e, t.c_e - t.c_s, t.r_e - t.r_s)
       font = ImageFont.truetype(font_path, size=text_size)
-      draw.text(((c_s + 4) * f, (r_s + 4 + z) * f), label, (0, 0, 0), font=font)
-      draw.text(((c_s + 3) * f, (r_s + 3 + z) * f), label, (0, 0, 0), font=font)
-      draw.text(((c_s + 2) * f, (r_s + 2 + z) * f), label, text_color, font=font)
+      draw.text(((t.c_s + 4) * f, (t.r_s + 4 + z) * f), label, (0, 0, 0), font=font)
+      draw.text(((t.c_s + 3) * f, (t.r_s + 3 + z) * f), label, (0, 0, 0), font=font)
+      draw.text(((t.c_s + 2) * f, (t.r_s + 2 + z) * f), label, text_color, font=font)
 
   if display:
     summary.show()
