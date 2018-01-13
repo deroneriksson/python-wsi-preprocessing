@@ -183,11 +183,11 @@ def tile_summary(tile_sum, slide_num, np_img, tile_indices, row_tile_size, col_t
       none += 1
       # filter.display_img(np_tile, text=label, size=14, bg=True)
 
-  summary = summary_text(tile_sum, count, high, medium, low, none)
+  summary_txt = summary_text(tile_sum, count, high, medium, low, none)
 
   summary_font = ImageFont.truetype("/Library/Fonts/Courier New Bold.ttf", size=24)
-  draw.text((5, 5), summary, (0, 0, 0), font=summary_font)
-  draw_orig.text((5, 5), summary, (0, 0, 0), font=summary_font)
+  draw.text((5, 5), summary_txt, (0, 0, 0), font=summary_font)
+  draw_orig.text((5, 5), summary_txt, (0, 0, 0), font=summary_font)
 
   if DISPLAY_TILE_LABELS:
     # resize image if 2048 for text display on tiles
