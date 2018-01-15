@@ -236,6 +236,17 @@ def summary_text(tile_summary, count, high, medium, low, none):
 
 
 def tile_border(draw, r_s, r_e, c_s, c_e, color):
+  """
+  Draw a border around a tile with width TILE_BORDER_SIZE.
+
+  Args:
+    draw: Draw object for drawing on PIL image.
+    r_s: Row starting pixel.
+    r_e: Row ending pixel.
+    c_s: Column starting pixel.
+    c_e: Column ending pixel.
+    color: Color of the border.
+  """
   for x in range(0, TILE_BORDER_SIZE):
     draw.rectangle([(c_s + x, r_s + x), (c_e - 1 - x, r_e - 1 - x)], outline=color)
 
@@ -298,6 +309,17 @@ def summary(slide_num, save=False, display=True):
 
 
 def compute_tile_summary(slide_num, np_img):
+  """
+  Generate a tile summary consisting of summary statistics and also information about each tile such as tissue
+  percentage and coordinates.
+
+  Args:
+    slide_num: The slide number.
+    np_img: Image as a NumPy array.
+
+  Returns:
+    TileSummary object which includes a list of TileInfo objects containing information about each tile.
+  """
   img_path = slide.get_filter_image_result(slide_num)
   o_w, o_h, w, h = slide.parse_dimensions_from_image_filename(img_path)
 
