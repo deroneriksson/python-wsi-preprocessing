@@ -64,6 +64,9 @@ TILE_SUMMARY_PAGINATION_SIZE = 50
 TILE_SUMMARY_PAGINATE = True
 TILE_SUMMARY_HTML_DIR = BASE_DIR
 
+TILE_DATA_DIR = BASE_DIR + os.sep + "tile_data"
+TILE_DATA_SUFFIX = "tile_data"
+
 STATS_DIR = BASE_DIR + os.sep + "svs_stats"
 
 
@@ -351,6 +354,48 @@ def get_tile_summary_image_filename(slide_number, thumbnail=False):
     large_h) + "-" + str(small_w) + "x" + str(small_h) + "-" + TILE_SUMMARY_SUFFIX + "." + ext
 
   return img_filename
+
+
+def get_tile_data_filename(slide_number):
+  """
+  Convert slide number to a tile data file name.
+
+  Example:
+    5 -> TUPAC-TR-005-32x-49920x108288-1560x3384-tile_data.csv
+
+  Args:
+    slide_number: The slide number.
+
+  Returns:
+    The tile data file name.
+  """
+  padded_sl_num = str(slide_number).zfill(3)
+
+  training_img_path = get_training_image_path(slide_number)
+  large_w, large_h, small_w, small_h = parse_dimensions_from_image_filename(training_img_path)
+  data_filename = TRAIN_PREFIX + padded_sl_num + "-" + str(SCALE_FACTOR) + "x-" + str(large_w) + "x" + str(
+    large_h) + "-" + str(small_w) + "x" + str(small_h) + "-" + TILE_DATA_SUFFIX + ".csv"
+
+  return data_filename
+
+
+def get_tile_data_path(slide_number):
+  """
+  Convert slide number to a path to a tile data file.
+
+  Example:
+    5 -> ../data/tile_data/TUPAC-TR-005-32x-49920x108288-1560x3384-tile_data.csv
+
+  Args:
+    slide_number: The slide number.
+
+  Returns:
+    Path to the tile data file.
+  """
+  if not os.path.exists(TILE_DATA_DIR):
+    os.makedirs(TILE_DATA_DIR)
+  file_path = TILE_DATA_DIR + os.sep + get_tile_data_filename(slide_number)
+  return file_path
 
 
 def get_filter_image_result(slide_number):
