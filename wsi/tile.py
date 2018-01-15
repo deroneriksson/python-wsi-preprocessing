@@ -164,8 +164,7 @@ def tile_summary(tile_sum, slide_num, np_img, display=True, save=False,
   none = 0
   for t in tile_sum.tiles:
     count += 1
-    np_tile = np_img[t.r_s:t.r_e, t.c_s:t.c_e]
-    tissue_percentage = filter.tissue_percent(np_tile)
+    tissue_percentage = t.tissue_percentage
     # print("TILE [%d:%d, %d:%d]: Tissue %f%%" % (r_s, r_e, c_s, c_e, tissue_percentage))
     if tissue_percentage >= TISSUE_THRESHOLD_PERCENT:
       border_color = thresh_color
@@ -202,10 +201,8 @@ def tile_summary(tile_sum, slide_num, np_img, display=True, save=False,
     count = 0
     for t in tile_sum.tiles:
       count += 1
-      np_tile = np_img[t.r_s:t.r_e, t.c_s:t.c_e]
-      tissue_percentage = filter.tissue_percent(np_tile)
       label = "#%d\nR%d C%d\n%4.2f%%\n[%d,%d] x\n[%d,%d]\n%dx%d" % (
-        count, t.r, t.c, tissue_percentage, t.c_s, t.r_s, t.c_e, t.r_e, t.c_e - t.c_s, t.r_e - t.r_s)
+        count, t.r, t.c, t.tissue_percentage, t.c_s, t.r_s, t.c_e, t.r_e, t.c_e - t.c_s, t.r_e - t.r_s)
       font = ImageFont.truetype(font_path, size=text_size)
       draw.text(((t.c_s + 4) * f, (t.r_s + 4 + z) * f), label, (0, 0, 0), font=font)
       draw.text(((t.c_s + 3) * f, (t.r_s + 3 + z) * f), label, (0, 0, 0), font=font)
@@ -570,19 +567,20 @@ class TileSummary:
   num_row_tiles = None
   num_col_tiles = None
 
-  def __init__(self, s_n, o_w, o_h, o_t_w, o_t_h, s_w, s_h, s_t_w, s_t_h, t_p, n_c_t, n_r_t):
-    self.slide_num = s_n
-    self.orig_w = o_w
-    self.orig_h = o_h
-    self.orig_tile_w = o_t_w
-    self.orig_tile_h = o_t_h
-    self.scaled_w = s_w
-    self.scaled_h = s_h
-    self.scaled_tile_w = s_t_w
-    self.scaled_tile_h = s_t_h
-    self.tissue_percentage = t_p
-    self.num_col_tiles = n_c_t
-    self.num_row_tiles = n_r_t
+  def __init__(self, slide_num, orig_w, orig_h, orig_tile_w, orig_tile_h, scaled_w, scaled_h, scaled_tile_w,
+               scaled_tile_h, tissue_percentage, num_col_tiles, num_row_tiles):
+    self.slide_num = slide_num
+    self.orig_w = orig_w
+    self.orig_h = orig_h
+    self.orig_tile_w = orig_tile_w
+    self.orig_tile_h = orig_tile_h
+    self.scaled_w = scaled_w
+    self.scaled_h = scaled_h
+    self.scaled_tile_w = scaled_tile_w
+    self.scaled_tile_h = scaled_tile_h
+    self.tissue_percentage = tissue_percentage
+    self.num_col_tiles = num_col_tiles
+    self.num_row_tiles = num_row_tiles
     self.tiles = []
 
   def mask_percentage(self):
