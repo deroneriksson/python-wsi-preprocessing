@@ -118,12 +118,13 @@ def create_summary_pil_img(np_img, title_area_height, row_tile_size, col_tile_si
   return summary
 
 
-def tile_summary(tile_sum, slide_num, np_img, display=True, save=False,
-                 thresh_color=(0, 255, 0), below_thresh_color=(255, 255, 0), below_lower_thresh_color=(255, 165, 0),
-                 no_tissue_color=(255, 0, 0), text_color=(255, 255, 255), text_size=16,
-                 font_path="/Library/Fonts/Arial Bold.ttf"):
+def generate_tile_summary_images(tile_sum, slide_num, np_img, display=True, save=False,
+                                 thresh_color=(0, 255, 0), below_thresh_color=(255, 255, 0),
+                                 below_lower_thresh_color=(255, 165, 0),
+                                 no_tissue_color=(255, 0, 0), text_color=(255, 255, 255), text_size=16,
+                                 font_path="/Library/Fonts/Arial Bold.ttf"):
   """
-  Generate summary image/thumbnail showing a 'heatmap' representation of the tissue segmentation of all tiles.
+  Generate summary images/thumbnails showing a 'heatmap' representation of the tissue segmentation of all tiles.
 
   Args:
     slide_num: The slide number.
@@ -291,13 +292,20 @@ def summary(slide_num, save=False, display=True):
   img = slide.open_image(img_path)
   np_img = filter.pil_to_np_rgb(img)
 
-  rows, cols, _ = np_img.shape
+  tile_sum = compute_tile_summary(slide_num, np_img)
+
+  generate_tile_summary_images(tile_sum, slide_num, np_img, display=display, save=save)
+
+
+def compute_tile_summary(slide_num, np_img):
+  img_path = slide.get_filter_image_result(slide_num)
+  o_w, o_h, w, h = slide.parse_dimensions_from_image_filename(img_path)
 
   row_tile_size = round(ROW_TILE_SIZE / slide.SCALE_FACTOR)  # use round?
   col_tile_size = round(COL_TILE_SIZE / slide.SCALE_FACTOR)  # use round?
 
-  num_row_tiles, num_col_tiles = get_num_tiles(rows, cols, row_tile_size, col_tile_size)
-  o_w, o_h, w, h = slide.parse_dimensions_from_image_filename(img_path)
+  num_row_tiles, num_col_tiles = get_num_tiles(h, w, row_tile_size, col_tile_size)
+
   tile_sum = TileSummary(slide_num=slide_num,
                          orig_w=o_w,
                          orig_h=o_h,
@@ -311,7 +319,7 @@ def summary(slide_num, save=False, display=True):
                          num_col_tiles=num_col_tiles,
                          num_row_tiles=num_row_tiles)
 
-  tile_indices = get_tile_indices(rows, cols, row_tile_size, col_tile_size)
+  tile_indices = get_tile_indices(h, w, row_tile_size, col_tile_size)
   for t in tile_indices:
     r_s, r_e, c_s, c_e, r, c = t
     np_tile = np_img[r_s:r_e, c_s:c_e]
@@ -321,7 +329,7 @@ def summary(slide_num, save=False, display=True):
     tile_info = TileInfo(r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p)
     tile_sum.tiles.append(tile_info)
 
-  tile_summary(tile_sum, slide_num, np_img, display=display, save=save)
+  return tile_sum
 
 
 def image_list_to_tile_summaries(image_num_list, save=True, display=False):
