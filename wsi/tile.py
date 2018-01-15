@@ -301,8 +301,18 @@ def summary(slide_num, save=False, display=True):
 
   num_row_tiles, num_col_tiles = get_num_tiles(rows, cols, row_tile_size, col_tile_size)
   o_w, o_h, w, h = slide.parse_dimensions_from_image_filename(img_path)
-  tile_sum = TileSummary(slide_num, o_w, o_h, COL_TILE_SIZE, ROW_TILE_SIZE, w, h, col_tile_size, row_tile_size,
-                         filter.tissue_percent(np_img), num_col_tiles, num_row_tiles)
+  tile_sum = TileSummary(slide_num=slide_num,
+                         orig_w=o_w,
+                         orig_h=o_h,
+                         orig_tile_w=COL_TILE_SIZE,
+                         orig_tile_h=ROW_TILE_SIZE,
+                         scaled_w=w,
+                         scaled_h=h,
+                         scaled_tile_w=col_tile_size,
+                         scaled_tile_h=row_tile_size,
+                         tissue_percentage=filter.tissue_percent(np_img),
+                         num_col_tiles=num_col_tiles,
+                         num_row_tiles=num_row_tiles)
 
   tile_indices = get_tile_indices(rows, cols, row_tile_size, col_tile_size)
   for t in tile_indices:
