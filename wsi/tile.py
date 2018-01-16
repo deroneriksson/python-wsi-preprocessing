@@ -316,11 +316,9 @@ def save_tile_data(tile_summary):
   csv += "\n\n\nTile Num,Row,Column,Tissue %,Col Start,Row Start,Col End,Row End,Col Size,Row Size," + \
          "Original Col Start,Original Row Start,Original Col End,Original Row End,Original Col Size,Original Row Size\n"
 
-  count = 0
   for t in tile_summary.tiles:
-    count += 1
     line = "%d,%d,%d,%4.2f,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n" % (
-      count, t.r, t.c, t.tissue_percentage, t.c_s, t.r_s, t.c_e, t.r_e, t.c_e - t.c_s, t.r_e - t.r_s,
+      t.tile_num, t.r, t.c, t.tissue_percentage, t.c_s, t.r_s, t.c_e, t.r_e, t.c_e - t.c_s, t.r_e - t.r_s,
       t.o_c_s, t.o_r_s, t.o_c_e, t.o_r_e, t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s)
     csv += line
 
@@ -376,13 +374,13 @@ def compute_tile_summary(slide_num, np_img=None):
   none = 0
   tile_indices = get_tile_indices(h, w, row_tile_size, col_tile_size)
   for t in tile_indices:
-    count += 1
+    count += 1  # tile_num
     r_s, r_e, c_s, c_e, r, c = t
     np_tile = np_img[r_s:r_e, c_s:c_e]
     t_p = filter.tissue_percent(np_tile)
     o_c_s, o_r_s = slide.small_to_large_mapping((c_s, r_s), (o_w, o_h))
     o_c_e, o_r_e = slide.small_to_large_mapping((c_e, r_e), (o_w, o_h))
-    tile_info = TileInfo(r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p)
+    tile_info = TileInfo(count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p)
     tile_sum.tiles.append(tile_info)
 
     if t_p >= TISSUE_THRESHOLD_PERCENT:
@@ -680,11 +678,16 @@ class TileSummary:
   def num_tiles(self):
     return self.num_row_tiles * self.num_col_tiles
 
+  def tiles_by_tissue_percentage(self):
+    sorted_list = sorted(self.tiles, key=lambda t: t.tissue_percentage, reverse=True)
+    return sorted_list
+
 
 class TileInfo:
   """
   Class for information about a tile.
   """
+  tile_num = None
   r = None
   c = None
   r_s = None
@@ -697,7 +700,8 @@ class TileInfo:
   o_c_e = None
   tissue_percentage = None
 
-  def __init__(self, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p):
+  def __init__(self, tile_num, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p):
+    self.tile_num = tile_num
     self.r = r
     self.c = c
     self.r_s = r_s
@@ -710,6 +714,12 @@ class TileInfo:
     self.o_c_e = o_c_e
     self.tissue_percentage = t_p
 
+  def __str__(self):
+    return "[Tile #%d, Row #%d, Column #%d, Tissue %4.2f%%]" % (self.tile_num, self.r, self.c, self.tissue_percentage)
+
+  def __repr__(self):
+    return self.__str__()
+
   def mask_percentage(self):
     return 100 - self.tissue_percentage
 
@@ -721,11 +731,14 @@ class TileInfo:
 # singleprocess_images_to_tile_summaries(image_num_list=[1, 2, 3])
 # multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
 # singleprocess_images_to_tile_summaries()
-# multiprocess_images_to_tile_summaries(image_num_list=[1,2,3,4,5], save=True, save_data=True, display=False)
+# multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, display=False)
 # multiprocess_images_to_tile_summaries(save=False, display=False, html=True)
 # multiprocess_images_to_tile_summaries()
 # summary(1, display=True, save=True)
 # generate_tiled_html_result(slide_nums=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
 # generate_tiled_html_result(slide_nums=[10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
-tile_sum = compute_tile_summary(5)
-print(str(tile_sum))
+# tile_sum = compute_tile_summary(5)
+# print(str(tile_sum))
+# print(str(tile_sum.tiles))
+# sorted_tiles = tile_sum.tiles_by_tissue_percentage()
+# print(str(sorted_tiles))
