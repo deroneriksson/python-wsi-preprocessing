@@ -457,7 +457,7 @@ def singleprocess_images_to_tile_summaries(display=False, save=True, save_data=T
   print("Time to generate tile summaries: %s\n" % str(t.elapsed()))
 
   if html:
-    generate_tiled_html_result(image_num_list)
+    generate_tiled_html_result(image_num_list, save_data)
 
 
 def multiprocess_images_to_tile_summaries(display=False, save=True, save_data=True, html=True, image_num_list=None):
@@ -465,8 +465,9 @@ def multiprocess_images_to_tile_summaries(display=False, save=True, save_data=Tr
   Generate tile summaries for all training images using multiple processes (one process per core).
 
   Args:
-    save: If True, save images.
     display: If True, display images to screen (multiprocessed display not recommended).
+    save: If True, save images.
+    save_data: If True, save tile data to csv file.
     html: If True, generate HTML page to display tiled images.
     image_num_list: Optionally specify a list of image slide numbers.
   """
@@ -523,17 +524,18 @@ def multiprocess_images_to_tile_summaries(display=False, save=True, save_data=Tr
     print("Done tiling slides: %s" % image_nums)
 
   if html:
-    generate_tiled_html_result(slide_nums)
+    generate_tiled_html_result(slide_nums, save_data)
 
   print("Time to generate tile previews (multiprocess): %s\n" % str(timer.elapsed()))
 
 
-def image_row(slide_num):
+def image_row(slide_num, data_link):
   """
   Generate HTML for viewing a tiled image.
 
   Args:
     slide_num: The slide number.
+    data_link: If True, add link to tile data csv file.
 
   Returns:
     HTML table row for viewing a tiled image.
@@ -546,7 +548,7 @@ def image_row(slide_num):
   sum_thumb = slide.get_tile_summary_thumbnail_path(slide_num)
   osum_img = slide.get_tile_summary_on_original_image_path(slide_num)
   osum_thumb = slide.get_tile_summary_on_original_thumbnail_path(slide_num)
-  return "    <tr>\n" + \
+  html = "    <tr>\n" + \
          "      <td>\n" + \
          "        <a target=\"_blank\" href=\"%s\">S%03d Original<br/>\n" % (orig_img, slide_num) + \
          "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), orig_thumb) + \
@@ -556,26 +558,39 @@ def image_row(slide_num):
          "        <a target=\"_blank\" href=\"%s\">S%03d Filtered<br/>\n" % (filt_img, slide_num) + \
          "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), filt_thumb) + \
          "        </a>\n" + \
-         "      </td>\n" + \
-         "      <td>\n" + \
-         "        <a target=\"_blank\" href=\"%s\">S%03d Tiled<br/>\n" % (sum_img, slide_num) + \
-         "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), sum_thumb) + \
-         "        </a>\n" + \
-         "      </td>\n" + \
-         "      <td>\n" + \
-         "        <a target=\"_blank\" href=\"%s\">S%03d Original Tiled<br/>\n" % (osum_img, slide_num) + \
-         "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), osum_thumb) + \
-         "        </a>\n" + \
-         "      </td>\n" + \
-         "    </tr>\n"
+         "      </td>\n"
+  if data_link:
+    data_file = slide.get_tile_data_path(slide_num)
+    html += "      <td>\n" + \
+            "        <a target=\"_blank\" href=\"%s\">S%03d Tiled</a> " % (sum_img, slide_num) + \
+            "        (<a target=\"_blank\" href=\"%s\">Data</a>)<br/>\n" % data_file + \
+            "        <a target=\"_blank\" href=\"%s\">" % sum_img + \
+            "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), sum_thumb) + \
+            "        </a>\n" + \
+            "      </td>\n"
+  else:
+    html += "      <td>\n" + \
+            "        <a target=\"_blank\" href=\"%s\">S%03d Tiled<br/>\n" % (sum_img, slide_num) + \
+            "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), sum_thumb) + \
+            "        </a>\n" + \
+            "      </td>\n"
+
+  html += "      <td>\n" + \
+          "        <a target=\"_blank\" href=\"%s\">S%03d Original Tiled<br/>\n" % (osum_img, slide_num) + \
+          "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), osum_thumb) + \
+          "        </a>\n" + \
+          "      </td>\n" + \
+          "    </tr>\n"
+  return html
 
 
-def generate_tiled_html_result(slide_nums):
+def generate_tiled_html_result(slide_nums, data_link):
   """
   Generate HTML to view the tiled images.
 
   Args:
     slide_nums: List of slide numbers.
+    data_link: If True, add link to tile data csv file.
   """
   slide_nums = sorted(slide_nums)
   if not slide.TILE_SUMMARY_PAGINATE:
@@ -584,7 +599,7 @@ def generate_tiled_html_result(slide_nums):
 
     html += "  <table>\n"
     for slide_num in slide_nums:
-      html += image_row(slide_num)
+      html += image_row(slide_num, data_link)
     html += "  </table>\n"
 
     html += filter.html_footer()
@@ -616,7 +631,7 @@ def generate_tiled_html_result(slide_nums):
 
       html += "  <table>\n"
       for slide_num in page_slide_nums:
-        html += image_row(slide_num)
+        html += image_row(slide_num, data_link)
       html += "  </table>\n"
 
       html += filter.html_footer()
@@ -718,7 +733,7 @@ class TileInfo:
     return "[Tile #%d, Row #%d, Column #%d, Tissue %4.2f%%]" % (self.tile_num, self.r, self.c, self.tissue_percentage)
 
   def __repr__(self):
-    return self.__str__()
+    return "\n" + self.__str__()
 
   def mask_percentage(self):
     return 100 - self.tissue_percentage
@@ -733,7 +748,7 @@ class TileInfo:
 # singleprocess_images_to_tile_summaries()
 # multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, display=False)
 # multiprocess_images_to_tile_summaries(save=False, display=False, html=True)
-# multiprocess_images_to_tile_summaries()
+multiprocess_images_to_tile_summaries()
 # summary(1, display=True, save=True)
 # generate_tiled_html_result(slide_nums=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
 # generate_tiled_html_result(slide_nums=[10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
