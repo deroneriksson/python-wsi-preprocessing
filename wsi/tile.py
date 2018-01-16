@@ -332,7 +332,7 @@ def save_tile_data(tile_summary):
   print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Data", str(time.elapsed()), data_path))
 
 
-def compute_tile_summary(slide_num, np_img):
+def compute_tile_summary(slide_num, np_img=None):
   """
   Generate a tile summary consisting of summary statistics and also information about each tile such as tissue
   percentage and coordinates.
@@ -346,6 +346,10 @@ def compute_tile_summary(slide_num, np_img):
   """
   img_path = slide.get_filter_image_result(slide_num)
   o_w, o_h, w, h = slide.parse_dimensions_from_image_filename(img_path)
+
+  if np_img is None:
+    img = slide.open_image(img_path)
+    np_img = filter.pil_to_np_rgb(img)
 
   row_tile_size = round(ROW_TILE_SIZE / slide.SCALE_FACTOR)  # use round?
   col_tile_size = round(COL_TILE_SIZE / slide.SCALE_FACTOR)  # use round?
@@ -667,6 +671,9 @@ class TileSummary:
     self.num_row_tiles = num_row_tiles
     self.tiles = []
 
+  def __str__(self):
+    return summary_text(self)
+
   def mask_percentage(self):
     return 100 - self.tissue_percentage
 
@@ -720,3 +727,5 @@ class TileInfo:
 # summary(1, display=True, save=True)
 # generate_tiled_html_result(slide_nums=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
 # generate_tiled_html_result(slide_nums=[10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
+tile_sum = compute_tile_summary(5)
+print(str(tile_sum))
