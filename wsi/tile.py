@@ -299,15 +299,23 @@ def summary(slide_num, save=False, display=True):
 
 
 def save_tile_data(tile_summary):
+  """
+  Save tile data to csv file.
+
+  Args
+    tile_summary: TimeSummary object.
+  """
   csv = summary_text(tile_summary)
 
-  csv += "\n\n\nTile Num,Row,Column,Tissue %,Col Start, Row Start, Col End, Row End, Col Size, Row Size\n"
+  csv += "\n\n\nTile Num,Row,Column,Tissue %,Col Start, Row Start, Col End, Row End, Col Size, Row Size," + \
+         "Original Col Start, Original Row Start, Original Col End, Original Row End, Original Col Size, Original Row Size\n"
 
   count = 0
   for t in tile_summary.tiles:
     count += 1
-    line = "%d,%d,%d,%4.2f,%d,%d,%d,%d,%d,%d\n" % (
-      count, t.r, t.c, t.tissue_percentage, t.c_s, t.r_s, t.c_e, t.r_e, t.c_e - t.c_s, t.r_e - t.r_s)
+    line = "%d,%d,%d,%4.2f,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n" % (
+      count, t.r, t.c, t.tissue_percentage, t.c_s, t.r_s, t.c_e, t.r_e, t.c_e - t.c_s, t.r_e - t.r_s,
+      t.o_c_s, t.o_r_s, t.o_c_e, t.o_r_e, t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s)
     csv += line
 
   data_path = slide.get_tile_data_path(tile_summary.slide_num)
