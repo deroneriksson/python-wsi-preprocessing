@@ -43,6 +43,11 @@ DISPLAY_TILE_LABELS = False
 
 TILE_BORDER_SIZE = 2  # The size of the colored rectangular border around summary tiles.
 
+THRESH_COLOR = (0, 255, 0)
+BELOW_THRESH_COLOR = (255, 255, 0)
+BELOW_LOWER_THRESH_COLOR = (255, 165, 0)
+NO_TISSUE_COLOR = (255, 0, 0)
+
 
 def get_num_tiles(rows, cols, row_tile_size, col_tile_size):
   """
@@ -118,11 +123,8 @@ def create_summary_pil_img(np_img, title_area_height, row_tile_size, col_tile_si
   return summary
 
 
-def generate_tile_summary_images(tile_sum, slide_num, np_img, display=True, save=False,
-                                 thresh_color=(0, 255, 0), below_thresh_color=(255, 255, 0),
-                                 below_lower_thresh_color=(255, 165, 0),
-                                 no_tissue_color=(255, 0, 0), text_color=(255, 255, 255), text_size=16,
-                                 font_path="/Library/Fonts/Arial Bold.ttf"):
+def generate_tile_summary_images(tile_sum, slide_num, np_img, display=True, save=False, text_color=(255, 255, 255),
+                                 text_size=16, font_path="/Library/Fonts/Arial Bold.ttf"):
   """
   Generate summary images/thumbnails showing a 'heatmap' representation of the tissue segmentation of all tiles.
 
@@ -135,10 +137,6 @@ def generate_tile_summary_images(tile_sum, slide_num, np_img, display=True, save
     col_tile_size: Number of pixels in a tile column.
     display: If True, display tile summary to screen.
     save: If True, save tile summary image.
-    thresh_color: Color representing tissue % above or equal to thresh (default green).
-    below_thresh_color: Color representing tissue % below threshold and above or equal to lower thresh (default yellow).
-    below_lower_thresh_color: Color representing tissue % below lower threshold and above 0 (default orange).
-    no_tissue_color: Color representing no tissue (default red).
     text_color: Font color (default white).
     text_size: Font size.
     font_path: Path to the font to use.
@@ -158,31 +156,21 @@ def generate_tile_summary_images(tile_sum, slide_num, np_img, display=True, save
   summary_orig = create_summary_pil_img(np_orig, z, row_tile_size, col_tile_size, num_row_tiles, num_col_tiles)
   draw_orig = ImageDraw.Draw(summary_orig)
 
-  count = 0
-  high = 0
-  medium = 0
-  low = 0
-  none = 0
   for t in tile_sum.tiles:
-    count += 1
     tissue_percentage = t.tissue_percentage
     # print("TILE [%d:%d, %d:%d]: Tissue %f%%" % (r_s, r_e, c_s, c_e, tissue_percentage))
     if tissue_percentage >= TISSUE_THRESHOLD_PERCENT:
-      border_color = thresh_color
-      high += 1
+      border_color = THRESH_COLOR
     elif (tissue_percentage >= TISSUE_LOW_THRESHOLD_PERCENT) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
-      border_color = below_thresh_color
-      medium += 1
+      border_color = BELOW_THRESH_COLOR
     elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESHOLD_PERCENT):
-      border_color = below_lower_thresh_color
-      low += 1
+      border_color = BELOW_LOWER_THRESH_COLOR
     else:
-      border_color = no_tissue_color
-      none += 1
+      border_color = NO_TISSUE_COLOR
     tile_border(draw, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color)
     tile_border(draw_orig, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color)
 
-  summary_txt = summary_text(tile_sum, count, high, medium, low, none)
+  summary_txt = summary_text(tile_sum)
 
   summary_font = ImageFont.truetype("/Library/Fonts/Courier New Bold.ttf", size=24)
   draw.text((5, 5), summary_txt, (0, 0, 0), font=summary_font)
@@ -217,7 +205,7 @@ def generate_tile_summary_images(tile_sum, slide_num, np_img, display=True, save
     save_tile_summary_on_original_image(summary_orig, slide_num)
 
 
-def summary_text(tile_summary, count, high, medium, low, none):
+def summary_text(tile_summary):
   return "Slide #%03d Tissue Segmentation Summary:\n" % tile_summary.slide_num + \
          "Original Dimensions: %dx%d\n" % (tile_summary.orig_w, tile_summary.orig_h) + \
          "Original Tile Size: %dx%d\n" % (tile_summary.orig_tile_w, tile_summary.orig_tile_h) + \
@@ -226,13 +214,15 @@ def summary_text(tile_summary, count, high, medium, low, none):
          "Scaled Tile Size: %dx%d\n" % (tile_summary.scaled_tile_w, tile_summary.scaled_tile_w) + \
          "Total Mask: %3.2f%%, Total Tissue: %3.2f%%\n" % (
            tile_summary.mask_percentage(), tile_summary.tissue_percentage) + \
-         "Tiles: %dx%d = %d\n" % (tile_summary.num_col_tiles, tile_summary.num_row_tiles, count) + \
-         " %5d (%5.2f%%) tiles >=%d%% tissue\n" % (high, high / count * 100, TISSUE_THRESHOLD_PERCENT) + \
+         "Tiles: %dx%d = %d\n" % (tile_summary.num_col_tiles, tile_summary.num_row_tiles, tile_summary.count) + \
+         " %5d (%5.2f%%) tiles >=%d%% tissue\n" % (
+           tile_summary.high, tile_summary.high / tile_summary.count * 100, TISSUE_THRESHOLD_PERCENT) + \
          " %5d (%5.2f%%) tiles >=%d%% and <%d%% tissue\n" % (
-           medium, medium / count * 100, TISSUE_LOW_THRESHOLD_PERCENT, TISSUE_THRESHOLD_PERCENT) + \
+           tile_summary.medium, tile_summary.medium / tile_summary.count * 100, TISSUE_LOW_THRESHOLD_PERCENT,
+           TISSUE_THRESHOLD_PERCENT) + \
          " %5d (%5.2f%%) tiles >0%% and <%d%% tissue\n" % (
-           low, low / count * 100, TISSUE_LOW_THRESHOLD_PERCENT) + \
-         " %5d (%5.2f%%) tiles =0%% tissue" % (none, none / count * 100)
+           tile_summary.low, tile_summary.low / tile_summary.count * 100, TISSUE_LOW_THRESHOLD_PERCENT) + \
+         " %5d (%5.2f%%) tiles =0%% tissue" % (tile_summary.none, tile_summary.none / tile_summary.count * 100)
 
 
 def tile_border(draw, r_s, r_e, c_s, c_e, color):
@@ -304,8 +294,26 @@ def summary(slide_num, save=False, display=True):
   np_img = filter.pil_to_np_rgb(img)
 
   tile_sum = compute_tile_summary(slide_num, np_img)
-
+  save_tile_data(tile_sum)
   generate_tile_summary_images(tile_sum, slide_num, np_img, display=display, save=save)
+
+
+def save_tile_data(tile_summary):
+  csv = summary_text(tile_summary)
+
+  csv += "\n\n\nTile Num,Row,Column,Tissue %,Col Start, Row Start, Col End, Row End, Col Size, Row Size\n"
+
+  count = 0
+  for t in tile_summary.tiles:
+    count += 1
+    line = "%d,%d,%d,%4.2f,%d,%d,%d,%d,%d,%d\n" % (
+      count, t.r, t.c, t.tissue_percentage, t.c_s, t.r_s, t.c_e, t.r_e, t.c_e - t.c_s, t.r_e - t.r_s)
+    csv += line
+
+  data_path = slide.get_tile_data_path(tile_summary.slide_num)
+  csv_file = open(data_path, "w")
+  csv_file.write(csv)
+  csv_file.close()
 
 
 def compute_tile_summary(slide_num, np_img):
@@ -341,8 +349,14 @@ def compute_tile_summary(slide_num, np_img):
                          num_col_tiles=num_col_tiles,
                          num_row_tiles=num_row_tiles)
 
+  count = 0
+  high = 0
+  medium = 0
+  low = 0
+  none = 0
   tile_indices = get_tile_indices(h, w, row_tile_size, col_tile_size)
   for t in tile_indices:
+    count += 1
     r_s, r_e, c_s, c_e, r, c = t
     np_tile = np_img[r_s:r_e, c_s:c_e]
     t_p = filter.tissue_percent(np_tile)
@@ -350,6 +364,21 @@ def compute_tile_summary(slide_num, np_img):
     o_c_e, o_r_e = slide.small_to_large_mapping((c_e, r_e), (o_w, o_h))
     tile_info = TileInfo(r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p)
     tile_sum.tiles.append(tile_info)
+
+    if t_p >= TISSUE_THRESHOLD_PERCENT:
+      high += 1
+    elif (t_p >= TISSUE_LOW_THRESHOLD_PERCENT) and (t_p < TISSUE_THRESHOLD_PERCENT):
+      medium += 1
+    elif (t_p > 0) and (t_p < TISSUE_LOW_THRESHOLD_PERCENT):
+      low += 1
+    else:
+      none += 1
+
+  tile_sum.count = count
+  tile_sum.high = high
+  tile_sum.medium = medium
+  tile_sum.low = low
+  tile_sum.none = none
 
   return tile_sum
 
@@ -596,6 +625,12 @@ class TileSummary:
   mask_percentage = None
   num_row_tiles = None
   num_col_tiles = None
+
+  count = 0
+  high = 0
+  medium = 0
+  low = 0
+  none = 0
 
   def __init__(self, slide_num, orig_w, orig_h, orig_tile_w, orig_tile_h, scaled_w, scaled_h, scaled_tile_w,
                scaled_tile_h, tissue_percentage, num_col_tiles, num_row_tiles):
