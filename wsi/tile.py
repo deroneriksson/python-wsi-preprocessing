@@ -494,6 +494,13 @@ def compute_tile_summary(slide_num, np_img=None):
     t_p = filter.tissue_percent(np_tile)
     o_c_s, o_r_s = slide.small_to_large_mapping((c_s, r_s), (o_w, o_h))
     o_c_e, o_r_e = slide.small_to_large_mapping((c_e, r_e), (o_w, o_h))
+
+    # pixel adjustment in case tile dimension too large (for example, 1025 instead of 1024)
+    if (o_c_e - o_c_s) > COL_TILE_SIZE:
+      o_c_e -= 1
+    if (o_r_e - o_r_s) > ROW_TILE_SIZE:
+      o_r_e -= 1
+
     tile_info = TileInfo(count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p)
     tile_sum.tiles.append(tile_info)
 
