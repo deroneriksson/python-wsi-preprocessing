@@ -28,6 +28,7 @@ import wsi.slide as slide
 from wsi.slide import Time
 import PIL
 from PIL import ImageDraw, ImageFont
+from enum import Enum
 
 TISSUE_THRESHOLD_PERCENT = 80
 TISSUE_LOW_THRESHOLD_PERCENT = 10
@@ -426,13 +427,13 @@ def save_tile_data(tile_summary):
 
   csv = summary_text(tile_summary)
 
-  csv += "\n\n\nTile Num,Row,Column,Tissue %,Col Start,Row Start,Col End,Row End,Col Size,Row Size," + \
+  csv += "\n\n\nTile Num,Row,Column,Tissue %,Tissue Quantity,Col Start,Row Start,Col End,Row End,Col Size,Row Size," + \
          "Original Col Start,Original Row Start,Original Col End,Original Row End,Original Col Size,Original Row Size\n"
 
   for t in tile_summary.tiles:
-    line = "%d,%d,%d,%4.2f,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n" % (
-      t.tile_num, t.r, t.c, t.tissue_percentage, t.c_s, t.r_s, t.c_e, t.r_e, t.c_e - t.c_s, t.r_e - t.r_s,
-      t.o_c_s, t.o_r_s, t.o_c_e, t.o_r_e, t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s)
+    line = "%d,%d,%d,%4.2f,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n" % (
+      t.tile_num, t.r, t.c, t.tissue_percentage, t.tissue_quantity().name, t.c_s, t.r_s, t.c_e, t.r_e, t.c_e - t.c_s,
+      t.r_e - t.r_s, t.o_c_s, t.o_r_s, t.o_c_e, t.o_r_e, t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s)
     csv += line
 
   data_path = slide.get_tile_data_path(tile_summary.slide_num)
@@ -496,13 +497,14 @@ def compute_tile_summary(slide_num, np_img=None):
     tile_info = TileInfo(count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p)
     tile_sum.tiles.append(tile_info)
 
-    if t_p >= TISSUE_THRESHOLD_PERCENT:
+    amount = tissue_quantity(t_p)
+    if amount == TissueQuantity.HIGH:
       high += 1
-    elif (t_p >= TISSUE_LOW_THRESHOLD_PERCENT) and (t_p < TISSUE_THRESHOLD_PERCENT):
+    elif amount == TissueQuantity.MEDIUM:
       medium += 1
-    elif (t_p > 0) and (t_p < TISSUE_LOW_THRESHOLD_PERCENT):
+    elif amount == TissueQuantity.LOW:
       low += 1
-    else:
+    elif amount == TissueQuantity.NONE:
       none += 1
 
   tile_sum.count = count
@@ -512,6 +514,26 @@ def compute_tile_summary(slide_num, np_img=None):
   tile_sum.none = none
 
   return tile_sum
+
+
+def tissue_quantity(tissue_percentage):
+  """
+  Obtain TissueQuantity enum member (HIGH, MEDIUM, LOW, or NONE) for corresponding tissue percentage.
+
+  Args:
+    tissue_percentage: The tile tissue percentage.
+
+  Returns:
+    TissueQuantity enum member (HIGH, MEDIUM, LOW, or NONE).
+  """
+  if tissue_percentage >= TISSUE_THRESHOLD_PERCENT:
+    return TissueQuantity.HIGH
+  elif (tissue_percentage >= TISSUE_LOW_THRESHOLD_PERCENT) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
+    return TissueQuantity.MEDIUM
+  elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESHOLD_PERCENT):
+    return TissueQuantity.LOW
+  else:
+    return TissueQuantity.NONE
 
 
 def image_list_to_tile_summaries(image_num_list, display=False, save=True, save_data=True):
@@ -872,6 +894,16 @@ class TileInfo:
 
   def mask_percentage(self):
     return 100 - self.tissue_percentage
+
+  def tissue_quantity(self):
+    return tissue_quantity(self.tissue_percentage)
+
+
+class TissueQuantity(Enum):
+  NONE = 0
+  LOW = 1
+  MEDIUM = 2
+  HIGH = 3
 
 
 # summary(1, save=True)
