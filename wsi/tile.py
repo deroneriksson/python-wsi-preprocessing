@@ -239,7 +239,6 @@ def generate_top_tile_images(tile_sum, slide_num, np_img, display=True, save=Fal
 
   for t in top_tiles:
     tissue_percentage = t.tissue_percentage
-    # print("TILE [%d:%d, %d:%d]: Tissue %f%%" % (r_s, r_e, c_s, c_e, tissue_percentage))
     if tissue_percentage >= TISSUE_THRESHOLD_PERCENT:
       border_color = THRESH_COLOR
     elif (tissue_percentage >= TISSUE_LOW_THRESHOLD_PERCENT) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
@@ -658,6 +657,10 @@ def image_row(slide_num, data_link):
   sum_thumb = slide.get_tile_summary_thumbnail_path(slide_num)
   osum_img = slide.get_tile_summary_on_original_image_path(slide_num)
   osum_thumb = slide.get_tile_summary_on_original_thumbnail_path(slide_num)
+  top_img = slide.get_top_tiles_image_path(slide_num)
+  top_thumb = slide.get_top_tiles_thumbnail_path(slide_num)
+  otop_img = slide.get_top_tiles_on_original_image_path(slide_num)
+  otop_thumb = slide.get_top_tiles_on_original_thumbnail_path(slide_num)
   html = "    <tr>\n" + \
          "      <td>\n" + \
          "        <a target=\"_blank\" href=\"%s\">S%03d Original<br/>\n" % (orig_img, slide_num) + \
@@ -689,8 +692,21 @@ def image_row(slide_num, data_link):
           "        <a target=\"_blank\" href=\"%s\">S%03d Original Tiled<br/>\n" % (osum_img, slide_num) + \
           "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), osum_thumb) + \
           "        </a>\n" + \
-          "      </td>\n" + \
-          "    </tr>\n"
+          "      </td>\n"
+
+  html += "      <td>\n" + \
+          "        <a target=\"_blank\" href=\"%s\">S%03d Top Tiles<br/>\n" % (top_img, slide_num) + \
+          "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), top_thumb) + \
+          "        </a>\n" + \
+          "      </td>\n"
+
+  html += "      <td>\n" + \
+          "        <a target=\"_blank\" href=\"%s\">S%03d Original Top Tiles<br/>\n" % (otop_img, slide_num) + \
+          "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), otop_thumb) + \
+          "        </a>\n" + \
+          "      </td>\n"
+
+  html += "    </tr>\n"
   return html
 
 
