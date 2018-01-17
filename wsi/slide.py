@@ -130,9 +130,9 @@ def get_training_slide_path(slide_number):
   return slide_filepath
 
 
-def get_tile_image_path(slide_number, tile_info):
+def get_tile_image_path(tile_info):
   t = tile_info
-  padded_sl_num = str(slide_number).zfill(3)
+  padded_sl_num = str(t.slide_num).zfill(3)
   tile_path = TILE_DIR + os.sep + padded_sl_num + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + TILE_SUFFIX + "-r%d-c%d-x%d-y%d-w%d-h%d" % (
     t.r, t.c, t.o_c_s, t.o_r_s, t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s) + "." + DEST_TRAIN_EXT
   return tile_path

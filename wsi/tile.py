@@ -444,16 +444,19 @@ def save_tile_data(tile_summary):
   print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Data", str(time.elapsed()), data_path))
 
 
-def save_display_tile(slide_number, tile_info, save=False, display=True):
+def save_display_tile(tile_info, save=True, display=False):
   """
   Save and/or display a tile image.
 
   Args:
-    slide_number: The slide number.
+    tile_info: TileInfo object.
+    save: If True, save tile image.
+    display: If True, dispaly tile image.
   """
-  slide_filepath = slide.get_training_slide_path(slide_number)
-  s = slide.open_slide(slide_filepath)
   t = tile_info
+  slide_filepath = slide.get_training_slide_path(t.slide_num)
+  s = slide.open_slide(slide_filepath)
+
   x, y = t.o_c_s, t.o_r_s
   w, h = t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s
   tile_region = s.read_region((x, y), 0, (w, h))
@@ -461,7 +464,7 @@ def save_display_tile(slide_number, tile_info, save=False, display=True):
   tile_region = tile_region.convert("RGB")
 
   if save:
-    img_path = slide.get_tile_image_path(slide_number, t)
+    img_path = slide.get_tile_image_path(t)
     print("Saving tile to: " + img_path)
     dir = os.path.dirname(img_path)
     if not os.path.exists(dir):
@@ -529,7 +532,7 @@ def compute_tile_summary(slide_num, np_img=None):
     if (o_r_e - o_r_s) > ROW_TILE_SIZE:
       o_r_e -= 1
 
-    tile_info = TileInfo(count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p)
+    tile_info = TileInfo(slide_num, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p)
     tile_sum.tiles.append(tile_info)
 
     amount = tissue_quantity(t_p)
@@ -886,7 +889,7 @@ class TileSummary:
 
   def top_tiles(self):
     sorted_tiles = self.tiles_by_tissue_percentage()
-    top_tiles = sorted_tiles[:100]
+    top_tiles = sorted_tiles[:50]
     return top_tiles
 
 
@@ -894,6 +897,7 @@ class TileInfo:
   """
   Class for information about a tile.
   """
+  slide_num = None
   tile_num = None
   r = None
   c = None
@@ -907,7 +911,8 @@ class TileInfo:
   o_c_e = None
   tissue_percentage = None
 
-  def __init__(self, tile_num, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p):
+  def __init__(self, slide_num, tile_num, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p):
+    self.slide_num = slide_num
     self.tile_num = tile_num
     self.r = r
     self.c = c
@@ -956,4 +961,7 @@ class TissueQuantity(Enum):
 # generate_tiled_html_result(slide_nums=[10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
 tile_sum = compute_tile_summary(4)
 top = tile_sum.top_tiles()
-save_display_tile(4, top[0], save=True)
+t1 = Time()
+for t in top:
+  save_display_tile(t, save=True, display=False)
+print("%-20s | Time: %-14s" % ("Save Tiles", str(t1.elapsed())))
