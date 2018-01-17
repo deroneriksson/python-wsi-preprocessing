@@ -205,6 +205,76 @@ def generate_tile_summary_images(tile_sum, slide_num, np_img, display=True, save
     save_tile_summary_on_original_image(summary_orig, slide_num)
 
 
+def generate_top_tile_images(tile_sum, slide_num, np_img, display=True, save=False, text_color=(255, 255, 255),
+                             text_size=10, font_path="/Library/Fonts/Arial Bold.ttf"):
+  """
+  Generate summary images/thumbnails showing the top tissue segmentation tiles.
+
+  Args:
+    tile_sum: TileSummary object.
+    slide_num: The slide number.
+    np_img: Image as a NumPy array.
+    display: If True, display top tiles to screen.
+    save: If True, save top tiles images.
+    text_color: Font color (default white).
+    text_size: Font size.
+    font_path: Path to the font to use.
+  """
+  z = 300  # height of area at top of summary slide
+  rows = tile_sum.scaled_h
+  cols = tile_sum.scaled_w
+  row_tile_size = tile_sum.scaled_tile_h
+  col_tile_size = tile_sum.scaled_tile_w
+  num_row_tiles, num_col_tiles = get_num_tiles(rows, cols, row_tile_size, col_tile_size)
+  summary = create_summary_pil_img(np_img, z, row_tile_size, col_tile_size, num_row_tiles, num_col_tiles)
+  draw = ImageDraw.Draw(summary)
+
+  original_img_path = slide.get_training_image_path(slide_num)
+  orig_img = slide.open_image(original_img_path)
+  np_orig = filter.pil_to_np_rgb(orig_img)
+  summary_orig = create_summary_pil_img(np_orig, z, row_tile_size, col_tile_size, num_row_tiles, num_col_tiles)
+  draw_orig = ImageDraw.Draw(summary_orig)
+
+  top_tiles = tile_sum.top_tiles()
+
+  for t in top_tiles:
+    tissue_percentage = t.tissue_percentage
+    # print("TILE [%d:%d, %d:%d]: Tissue %f%%" % (r_s, r_e, c_s, c_e, tissue_percentage))
+    if tissue_percentage >= TISSUE_THRESHOLD_PERCENT:
+      border_color = THRESH_COLOR
+    elif (tissue_percentage >= TISSUE_LOW_THRESHOLD_PERCENT) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
+      border_color = BELOW_THRESH_COLOR
+    elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESHOLD_PERCENT):
+      border_color = BELOW_LOWER_THRESH_COLOR
+    else:
+      border_color = NO_TISSUE_COLOR
+    tile_border(draw, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color)
+    tile_border(draw_orig, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color)
+
+  summary_txt = summary_text(tile_sum)
+
+  summary_font = ImageFont.truetype("/Library/Fonts/Courier New Bold.ttf", size=24)
+  draw.text((5, 5), summary_txt, (0, 0, 0), font=summary_font)
+  draw_orig.text((5, 5), summary_txt, (0, 0, 0), font=summary_font)
+
+  for t in top_tiles:
+    label = "R%d\nC%d" % (t.r, t.c)
+    font = ImageFont.truetype(font_path, size=text_size)
+    # drop shadow behind text
+    draw.text(((t.c_s + 3), (t.r_s + 3 + z)), label, (0, 0, 0), font=font)
+    draw_orig.text(((t.c_s + 3), (t.r_s + 3 + z)), label, (0, 0, 0), font=font)
+
+    draw.text(((t.c_s + 2), (t.r_s + 2 + z)), label, text_color, font=font)
+    draw_orig.text(((t.c_s + 2), (t.r_s + 2 + z)), label, text_color, font=font)
+
+  if display:
+    summary.show()
+    summary_orig.show()
+  if save:
+    save_top_tiles_image(summary, slide_num)
+    save_top_tiles_on_original_image(summary_orig, slide_num)
+
+
 def summary_text(tile_summary):
   return "Slide #%03d Tissue Segmentation Summary:\n" % tile_summary.slide_num + \
          "Original Dimensions: %dx%d\n" % (tile_summary.orig_w, tile_summary.orig_h) + \
@@ -260,6 +330,25 @@ def save_tile_summary_image(pil_img, slide_num):
   print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Summary Thumbnail", str(t.elapsed()), thumbnail_filepath))
 
 
+def save_top_tiles_image(pil_img, slide_num):
+  """
+  Save a top tiles image and thumbnail to the file system.
+
+  Args:
+    pil_img: Image as a PIL Image.
+    slide_num: The slide number.
+  """
+  t = Time()
+  filepath = slide.get_top_tiles_image_path(slide_num)
+  pil_img.save(filepath)
+  print("%-20s | Time: %-14s  Name: %s" % ("Save Top Tiles Image", str(t.elapsed()), filepath))
+
+  t = Time()
+  thumbnail_filepath = slide.get_top_tiles_thumbnail_path(slide_num)
+  slide.save_thumbnail(pil_img, slide.THUMBNAIL_SIZE, thumbnail_filepath)
+  print("%-20s | Time: %-14s  Name: %s" % ("Save Top Tiles Thumbnail", str(t.elapsed()), thumbnail_filepath))
+
+
 def save_tile_summary_on_original_image(pil_img, slide_num):
   """
   Save a tile summary on original image and thumbnail to the file system.
@@ -278,6 +367,26 @@ def save_tile_summary_on_original_image(pil_img, slide_num):
   slide.save_thumbnail(pil_img, slide.THUMBNAIL_SIZE, thumbnail_filepath)
   print(
     "%-20s | Time: %-14s  Name: %s" % ("Save Tile Summary on Original Thumbnail", str(t.elapsed()), thumbnail_filepath))
+
+
+def save_top_tiles_on_original_image(pil_img, slide_num):
+  """
+  Save a top tiles on original image and thumbnail to the file system.
+
+  Args:
+    pil_img: Image as a PIL Image.
+    slide_num: The slide number.
+  """
+  t = Time()
+  filepath = slide.get_top_tiles_on_original_image_path(slide_num)
+  pil_img.save(filepath)
+  print("%-20s | Time: %-14s  Name: %s" % ("Save Top Tiles on Original Image", str(t.elapsed()), filepath))
+
+  t = Time()
+  thumbnail_filepath = slide.get_top_tiles_on_original_thumbnail_path(slide_num)
+  slide.save_thumbnail(pil_img, slide.THUMBNAIL_SIZE, thumbnail_filepath)
+  print(
+    "%-20s | Time: %-14s  Name: %s" % ("Save Top Tiles on Original Thumbnail", str(t.elapsed()), thumbnail_filepath))
 
 
 def summary(slide_num, display=True, save=False, save_data=True):
@@ -299,6 +408,7 @@ def summary(slide_num, display=True, save=False, save_data=True):
   if save_data:
     save_tile_data(tile_sum)
   generate_tile_summary_images(tile_sum, slide_num, np_img, display=display, save=save)
+  generate_top_tile_images(tile_sum, slide_num, np_img, display=display, save=save)
 
 
 def save_tile_data(tile_summary):
@@ -697,6 +807,11 @@ class TileSummary:
     sorted_list = sorted(self.tiles, key=lambda t: t.tissue_percentage, reverse=True)
     return sorted_list
 
+  def top_tiles(self):
+    sorted_tiles = self.tiles_by_tissue_percentage()
+    top_tiles = sorted_tiles[:100]
+    return top_tiles
+
 
 class TileInfo:
   """
@@ -743,13 +858,13 @@ class TileInfo:
 # summary(26, save=True)
 # image_list_to_tile_summaries([1, 2, 3, 4], display=True)
 # image_range_to_tile_summaries(1, 50)
-# singleprocess_images_to_tile_summaries(image_num_list=[1, 2, 3])
+# singleprocess_images_to_tile_summaries(image_num_list=[1,10,14], display=True, save=False)
 # multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
 # singleprocess_images_to_tile_summaries()
 # multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, display=False)
 # multiprocess_images_to_tile_summaries(save=False, display=False, html=True)
 multiprocess_images_to_tile_summaries()
-# summary(1, display=True, save=True)
+# summary(2, display=True, save=False)
 # generate_tiled_html_result(slide_nums=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
 # generate_tiled_html_result(slide_nums=[10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
 # tile_sum = compute_tile_summary(5)

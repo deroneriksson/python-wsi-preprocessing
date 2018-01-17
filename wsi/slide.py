@@ -70,6 +70,8 @@ TILE_DATA_SUFFIX = "tile_data"
 TOP_TILES_SUFFIX = "top_tiles"
 TOP_TILES_DIR = BASE_DIR + os.sep + "top_tiles_" + DEST_TRAIN_EXT
 TOP_TILES_THUMBNAIL_DIR = BASE_DIR + os.sep + "top_tiles_thumbnail_" + THUMBNAIL_EXT
+TOP_TILES_ON_ORIGINAL_DIR = BASE_DIR + os.sep + "top_tiles_on_original_" + DEST_TRAIN_EXT
+TOP_TILES_ON_ORIGINAL_THUMBNAIL_DIR = BASE_DIR + os.sep + "top_tiles_on_original_thumbnail_" + THUMBNAIL_EXT
 
 STATS_DIR = BASE_DIR + os.sep + "svs_stats"
 
@@ -328,6 +330,44 @@ def get_tile_summary_on_original_thumbnail_path(slide_number):
     os.makedirs(TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR)
   img_path = TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR + os.sep + get_tile_summary_image_filename(slide_number,
                                                                                                thumbnail=True)
+  return img_path
+
+
+def get_top_tiles_on_original_image_path(slide_number):
+  """
+  Convert slide number to a path to a top tiles on original image file.
+
+  Example:
+    5 -> ../data/top_tiles_on_original_png/TUPAC-TR-005-32x-49920x108288-1560x3384-top_tiles.png
+
+  Args:
+    slide_number: The slide number.
+
+  Returns:
+    Path to the top tiles on original image file.
+  """
+  if not os.path.exists(TOP_TILES_ON_ORIGINAL_DIR):
+    os.makedirs(TOP_TILES_ON_ORIGINAL_DIR)
+  img_path = TOP_TILES_ON_ORIGINAL_DIR + os.sep + get_top_tiles_image_filename(slide_number)
+  return img_path
+
+
+def get_top_tiles_on_original_thumbnail_path(slide_number):
+  """
+  Convert slide number to a path to a top tiles on original thumbnail file.
+
+  Example:
+    5 -> ../data/top_tiles_on_original_thumbnail_jpg/TUPAC-TR-005-32x-49920x108288-1560x3384-top_tiles.jpg
+
+  Args:
+    slide_number: The slide number.
+
+  Returns:
+    Path to the top tiles on original thumbnail file.
+  """
+  if not os.path.exists(TOP_TILES_ON_ORIGINAL_THUMBNAIL_DIR):
+    os.makedirs(TOP_TILES_ON_ORIGINAL_THUMBNAIL_DIR)
+  img_path = TOP_TILES_ON_ORIGINAL_THUMBNAIL_DIR + os.sep + get_top_tiles_image_filename(slide_number, thumbnail=True)
   return img_path
 
 
@@ -906,9 +946,3 @@ class Time:
 # training_slide_to_image(2)
 # training_slide_to_image(3)
 # training_slide_to_image(4)
-# x = get_top_tiles_image_filename(5)
-# print(x)
-# y = get_top_tiles_image_path(5)
-# print(y)
-# z = get_top_tiles_thumbnail_path(5)
-# print(z)
