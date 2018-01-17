@@ -157,16 +157,7 @@ def generate_tile_summary_images(tile_sum, slide_num, np_img, display=True, save
   draw_orig = ImageDraw.Draw(summary_orig)
 
   for t in tile_sum.tiles:
-    tissue_percentage = t.tissue_percentage
-    # print("TILE [%d:%d, %d:%d]: Tissue %f%%" % (r_s, r_e, c_s, c_e, tissue_percentage))
-    if tissue_percentage >= TISSUE_THRESHOLD_PERCENT:
-      border_color = THRESH_COLOR
-    elif (tissue_percentage >= TISSUE_LOW_THRESHOLD_PERCENT) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
-      border_color = BELOW_THRESH_COLOR
-    elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESHOLD_PERCENT):
-      border_color = BELOW_LOWER_THRESH_COLOR
-    else:
-      border_color = NO_TISSUE_COLOR
+    border_color = tile_border_color(t.tissue_percentage)
     tile_border(draw, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color)
     tile_border(draw_orig, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color)
 
@@ -238,15 +229,7 @@ def generate_top_tile_images(tile_sum, slide_num, np_img, display=True, save=Fal
   top_tiles = tile_sum.top_tiles()
 
   for t in top_tiles:
-    tissue_percentage = t.tissue_percentage
-    if tissue_percentage >= TISSUE_THRESHOLD_PERCENT:
-      border_color = THRESH_COLOR
-    elif (tissue_percentage >= TISSUE_LOW_THRESHOLD_PERCENT) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
-      border_color = BELOW_THRESH_COLOR
-    elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESHOLD_PERCENT):
-      border_color = BELOW_LOWER_THRESH_COLOR
-    else:
-      border_color = NO_TISSUE_COLOR
+    border_color = tile_border_color(t.tissue_percentage)
     tile_border(draw, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color)
     tile_border(draw_orig, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color)
 
@@ -272,6 +255,27 @@ def generate_top_tile_images(tile_sum, slide_num, np_img, display=True, save=Fal
   if save:
     save_top_tiles_image(summary, slide_num)
     save_top_tiles_on_original_image(summary_orig, slide_num)
+
+
+def tile_border_color(tissue_percentage):
+  """
+  Obtain the corresponding tile border color for a particular tile tissue percentage.
+
+  Args:
+    tissue_percentage: The tile tissue percentage
+
+  Returns:
+    The tile border color corresponding to the tile tissue percentage.
+  """
+  if tissue_percentage >= TISSUE_THRESHOLD_PERCENT:
+    border_color = THRESH_COLOR
+  elif (tissue_percentage >= TISSUE_LOW_THRESHOLD_PERCENT) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
+    border_color = BELOW_THRESH_COLOR
+  elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESHOLD_PERCENT):
+    border_color = BELOW_LOWER_THRESH_COLOR
+  else:
+    border_color = NO_TISSUE_COLOR
+  return border_color
 
 
 def summary_text(tile_summary):
