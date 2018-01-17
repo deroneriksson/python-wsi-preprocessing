@@ -444,6 +444,34 @@ def save_tile_data(tile_summary):
   print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Data", str(time.elapsed()), data_path))
 
 
+def save_display_tile(slide_number, tile_info, save=False, display=True):
+  """
+  Save and/or display a tile image.
+
+  Args:
+    slide_number: The slide number.
+  """
+  slide_filepath = slide.get_training_slide_path(slide_number)
+  s = slide.open_slide(slide_filepath)
+  t = tile_info
+  x, y = t.o_c_s, t.o_r_s
+  w, h = t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s
+  tile_region = s.read_region((x, y), 0, (w, h))
+  # RGBA to RGB
+  tile_region = tile_region.convert("RGB")
+
+  if save:
+    img_path = slide.get_tile_image_path(slide_number, t)
+    print("Saving tile to: " + img_path)
+    dir = os.path.dirname(img_path)
+    if not os.path.exists(dir):
+      os.makedirs(dir)
+    tile_region.save(img_path)
+
+  if display:
+    tile_region.show()
+
+
 def compute_tile_summary(slide_num, np_img=None):
   """
   Generate a tile summary consisting of summary statistics and also information about each tile such as tissue
@@ -922,12 +950,10 @@ class TissueQuantity(Enum):
 # singleprocess_images_to_tile_summaries()
 # multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, display=False)
 # multiprocess_images_to_tile_summaries(save=False, display=False, html=True)
-multiprocess_images_to_tile_summaries()
+# multiprocess_images_to_tile_summaries()
 # summary(2, display=True, save=False)
 # generate_tiled_html_result(slide_nums=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
 # generate_tiled_html_result(slide_nums=[10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
-# tile_sum = compute_tile_summary(5)
-# print(str(tile_sum))
-# print(str(tile_sum.tiles))
-# sorted_tiles = tile_sum.tiles_by_tissue_percentage()
-# print(str(sorted_tiles))
+tile_sum = compute_tile_summary(4)
+top = tile_sum.top_tiles()
+save_display_tile(4, top[0], save=True)
