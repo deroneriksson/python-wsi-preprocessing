@@ -73,6 +73,8 @@ TOP_TILES_THUMBNAIL_DIR = BASE_DIR + os.sep + "top_tiles_thumbnail_" + THUMBNAIL
 TOP_TILES_ON_ORIGINAL_DIR = BASE_DIR + os.sep + "top_tiles_on_original_" + DEST_TRAIN_EXT
 TOP_TILES_ON_ORIGINAL_THUMBNAIL_DIR = BASE_DIR + os.sep + "top_tiles_on_original_thumbnail_" + THUMBNAIL_EXT
 
+TILE_SUFFIX = "tile"
+
 STATS_DIR = BASE_DIR + os.sep + "svs_stats"
 
 
@@ -125,6 +127,14 @@ def get_training_slide_path(slide_number):
   padded_sl_num = str(slide_number).zfill(3)
   slide_filepath = SRC_TRAIN_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "." + SRC_TRAIN_EXT
   return slide_filepath
+
+
+def get_tile_image_path(slide_number, tile_info):
+  t = tile_info
+  padded_sl_num = str(slide_number).zfill(3)
+  tile_path = DEST_TRAIN_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + TILE_SUFFIX + "-r%d-c%d-x%d-y%d-w%d-h%d" % (
+    t.r, t.c, t.o_c_s, t.o_r_s, t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s) + "." + DEST_TRAIN_EXT
+  return tile_path
 
 
 def get_training_image_path(slide_number, large_w=None, large_h=None, small_w=None, small_h=None):
@@ -936,7 +946,6 @@ class Time:
     self.end = datetime.datetime.now()
     time_elapsed = self.end - self.start
     return time_elapsed
-
 
 # singleprocess_training_slides_to_images()
 # multiprocess_training_slides_to_images()
