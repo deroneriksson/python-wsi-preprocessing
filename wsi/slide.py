@@ -67,6 +67,10 @@ TILE_SUMMARY_HTML_DIR = BASE_DIR
 TILE_DATA_DIR = BASE_DIR + os.sep + "tile_data"
 TILE_DATA_SUFFIX = "tile_data"
 
+TOP_TILES_SUFFIX = "top_tiles"
+TOP_TILES_DIR = BASE_DIR + os.sep + "top_tiles_" + DEST_TRAIN_EXT
+TOP_TILES_THUMBNAIL_DIR = BASE_DIR + os.sep + "top_tiles_thumbnail_" + THUMBNAIL_EXT
+
 STATS_DIR = BASE_DIR + os.sep + "svs_stats"
 
 
@@ -354,6 +358,72 @@ def get_tile_summary_image_filename(slide_number, thumbnail=False):
     large_h) + "-" + str(small_w) + "x" + str(small_h) + "-" + TILE_SUMMARY_SUFFIX + "." + ext
 
   return img_filename
+
+
+def get_top_tiles_image_filename(slide_number, thumbnail=False):
+  """
+  Convert slide number to a top tiles image file name.
+
+  Example:
+    5, False -> TUPAC-TR-005-32x-49920x108288-1560x3384-top_tiles.png
+    5, True -> TUPAC-TR-005-32x-49920x108288-1560x3384-top_tiles.jpg
+
+  Args:
+    slide_number: The slide number.
+    thumbnail: If True, produce thumbnail filename.
+
+  Returns:
+    The top tiles image file name.
+  """
+  if thumbnail:
+    ext = THUMBNAIL_EXT
+  else:
+    ext = DEST_TRAIN_EXT
+  padded_sl_num = str(slide_number).zfill(3)
+
+  training_img_path = get_training_image_path(slide_number)
+  large_w, large_h, small_w, small_h = parse_dimensions_from_image_filename(training_img_path)
+  img_filename = TRAIN_PREFIX + padded_sl_num + "-" + str(SCALE_FACTOR) + "x-" + str(large_w) + "x" + str(
+    large_h) + "-" + str(small_w) + "x" + str(small_h) + "-" + TOP_TILES_SUFFIX + "." + ext
+
+  return img_filename
+
+
+def get_top_tiles_image_path(slide_number):
+  """
+  Convert slide number to a path to a top tiles image file.
+
+  Example:
+    5 -> ../data/top_tiles_png/TUPAC-TR-005-32x-49920x108288-1560x3384-top_tiles.png
+
+  Args:
+    slide_number: The slide number.
+
+  Returns:
+    Path to the top tiles image file.
+  """
+  if not os.path.exists(TOP_TILES_DIR):
+    os.makedirs(TOP_TILES_DIR)
+  img_path = TOP_TILES_DIR + os.sep + get_top_tiles_image_filename(slide_number)
+  return img_path
+
+
+def get_top_tiles_thumbnail_path(slide_number):
+  """
+  Convert slide number to a path to a tile summary thumbnail file.
+
+  Example:
+    5 -> ../data/top_tiles_thumbnail_jpg/TUPAC-TR-005-32x-49920x108288-1560x3384-top_tiles.jpg
+  Args:
+    slide_number: The slide number.
+
+  Returns:
+    Path to the top tiles thumbnail file.
+  """
+  if not os.path.exists(TOP_TILES_THUMBNAIL_DIR):
+    os.makedirs(TOP_TILES_THUMBNAIL_DIR)
+  img_path = TOP_TILES_THUMBNAIL_DIR + os.sep + get_top_tiles_image_filename(slide_number, thumbnail=True)
+  return img_path
 
 
 def get_tile_data_filename(slide_number):
@@ -827,6 +897,7 @@ class Time:
     time_elapsed = self.end - self.start
     return time_elapsed
 
+
 # singleprocess_training_slides_to_images()
 # multiprocess_training_slides_to_images()
 # slide_stats()
@@ -835,3 +906,9 @@ class Time:
 # training_slide_to_image(2)
 # training_slide_to_image(3)
 # training_slide_to_image(4)
+# x = get_top_tiles_image_filename(5)
+# print(x)
+# y = get_top_tiles_image_path(5)
+# print(y)
+# z = get_top_tiles_thumbnail_path(5)
+# print(z)
