@@ -475,6 +475,44 @@ def filter_rgb_to_hed(np_img, output_type="uint8"):
   return hed
 
 
+def filter_rgb_to_hsv(np_img):
+  """
+  Filter RGB channels to HSV (Hue, Saturation, Value).
+
+  Args:
+    np_img: RGB image as a NumPy array.
+
+  Returns:
+    Image as NumPy array in HSV representation.
+  """
+
+  t = Time()
+  hsv = sk_color.rgb2hsv(np_img)
+  np_info(hsv, "RGB to HSV", t.elapsed())
+  return hsv
+
+
+def filter_hsv_to_h(hsv, output_type="int"):
+  """
+  Obtain hue values from HSV NumPy array as a 1-dimensional array. If output as an int array, the original float
+  values are multiplied by 360 for their degree equivalents for simplicity. For more information, see
+  https://en.wikipedia.org/wiki/HSL_and_HSV
+
+  Args:
+    hsv: HSV image as a NumPy array.
+    output_type: Type of array to return (float or int).
+
+  Returns:
+    Hue values (float or int) as a 1-dimensional NumPy array.
+  """
+  h = hsv[:, :, 0]
+  h = h.flatten()
+  if output_type == "int":
+    h *= 360
+    h = h.astype("int")
+  return h
+
+
 def filter_hed_to_hematoxylin(np_img, output_type="uint8"):
   """
   Obtain Hematoxylin channel from HED NumPy array and rescale it (for example, to 0 to 255 for uint8) for increased
