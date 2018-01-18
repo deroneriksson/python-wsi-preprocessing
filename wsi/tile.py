@@ -326,12 +326,12 @@ def save_tile_summary_image(pil_img, slide_num):
   t = Time()
   filepath = slide.get_tile_summary_image_path(slide_num)
   pil_img.save(filepath)
-  print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Summary Image", str(t.elapsed()), filepath))
+  print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Sum", str(t.elapsed()), filepath))
 
   t = Time()
   thumbnail_filepath = slide.get_tile_summary_thumbnail_path(slide_num)
   slide.save_thumbnail(pil_img, slide.THUMBNAIL_SIZE, thumbnail_filepath)
-  print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Summary Thumbnail", str(t.elapsed()), thumbnail_filepath))
+  print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Sum Thumb", str(t.elapsed()), thumbnail_filepath))
 
 
 def save_top_tiles_image(pil_img, slide_num):
@@ -350,7 +350,7 @@ def save_top_tiles_image(pil_img, slide_num):
   t = Time()
   thumbnail_filepath = slide.get_top_tiles_thumbnail_path(slide_num)
   slide.save_thumbnail(pil_img, slide.THUMBNAIL_SIZE, thumbnail_filepath)
-  print("%-20s | Time: %-14s  Name: %s" % ("Save Top Tiles Thumbnail", str(t.elapsed()), thumbnail_filepath))
+  print("%-20s | Time: %-14s  Name: %s" % ("Save Top Tiles Thumb", str(t.elapsed()), thumbnail_filepath))
 
 
 def save_tile_summary_on_original_image(pil_img, slide_num):
@@ -364,13 +364,13 @@ def save_tile_summary_on_original_image(pil_img, slide_num):
   t = Time()
   filepath = slide.get_tile_summary_on_original_image_path(slide_num)
   pil_img.save(filepath)
-  print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Summary on Original Image", str(t.elapsed()), filepath))
+  print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Sum Orig", str(t.elapsed()), filepath))
 
   t = Time()
   thumbnail_filepath = slide.get_tile_summary_on_original_thumbnail_path(slide_num)
   slide.save_thumbnail(pil_img, slide.THUMBNAIL_SIZE, thumbnail_filepath)
   print(
-    "%-20s | Time: %-14s  Name: %s" % ("Save Tile Summary on Original Thumbnail", str(t.elapsed()), thumbnail_filepath))
+    "%-20s | Time: %-14s  Name: %s" % ("Save Tile Sum Orig T", str(t.elapsed()), thumbnail_filepath))
 
 
 def save_top_tiles_on_original_image(pil_img, slide_num):
@@ -384,13 +384,13 @@ def save_top_tiles_on_original_image(pil_img, slide_num):
   t = Time()
   filepath = slide.get_top_tiles_on_original_image_path(slide_num)
   pil_img.save(filepath)
-  print("%-20s | Time: %-14s  Name: %s" % ("Save Top Tiles on Original Image", str(t.elapsed()), filepath))
+  print("%-20s | Time: %-14s  Name: %s" % ("Save Top Orig", str(t.elapsed()), filepath))
 
   t = Time()
   thumbnail_filepath = slide.get_top_tiles_on_original_thumbnail_path(slide_num)
   slide.save_thumbnail(pil_img, slide.THUMBNAIL_SIZE, thumbnail_filepath)
   print(
-    "%-20s | Time: %-14s  Name: %s" % ("Save Top Tiles on Original Thumbnail", str(t.elapsed()), thumbnail_filepath))
+    "%-20s | Time: %-14s  Name: %s" % ("Save Top Orig Thumb", str(t.elapsed()), thumbnail_filepath))
 
 
 def summary(slide_num, display=True, save=False, save_data=True, save_top_tiles=True):
@@ -482,12 +482,13 @@ def save_display_tile(tile_info, save=True, display=False):
   tile_pil_img = tile_info_to_tile(tile_info)
 
   if save:
+    t = Time()
     img_path = slide.get_tile_image_path(tile_info)
-    print("Saving tile to: " + img_path)
     dir = os.path.dirname(img_path)
     if not os.path.exists(dir):
       os.makedirs(dir)
     tile_pil_img.save(img_path)
+    print("%-20s | Time: %-14s  Name: %s" % ("Save Tile", str(t.elapsed()), img_path))
 
   if display:
     tile_pil_img.show()
@@ -601,6 +602,7 @@ def image_list_to_tile_summaries(image_num_list, display=False, save=True, save_
     display: If True, display tile summary images to screen.
     save: If True, save tile summary images.
     save_data: If True, save tile data to csv file.
+    save_top_tiles: If True, save top tiles to files.
   """
   for slide_num in image_num_list:
     summary(slide_num, display, save, save_data, save_top_tiles)
@@ -617,6 +619,7 @@ def image_range_to_tile_summaries(start_ind, end_ind, display=False, save=True, 
     display: If True, display tile summary images to screen.
     save: If True, save tile summary images.
     save_data: If True, save tile data to csv file.
+    save_top_tiles: If True, save top tiles to files.
   """
   image_num_list = list()
   for slide_num in range(start_ind, end_ind + 1):
@@ -634,6 +637,7 @@ def singleprocess_images_to_tile_summaries(display=False, save=True, save_data=T
     display: If True, display tile summary images to screen.
     save: If True, save tile summary images.
     save_data: If True, save tile data to csv file.
+    save_top_tiles: If True, save top tiles to files.
     html: If True, generate HTML page to display tiled images
     image_num_list: Optionally specify a list of image slide numbers.
   """
@@ -661,6 +665,7 @@ def multiprocess_images_to_tile_summaries(display=False, save=True, save_data=Tr
     display: If True, display images to screen (multiprocessed display not recommended).
     save: If True, save images.
     save_data: If True, save tile data to csv file.
+    save_top_tiles: If True, save top tiles to files.
     html: If True, generate HTML page to display tiled images.
     image_num_list: Optionally specify a list of image slide numbers.
   """
@@ -981,9 +986,9 @@ class TissueQuantity(Enum):
 # image_range_to_tile_summaries(1, 50)
 # singleprocess_images_to_tile_summaries(image_num_list=[1,10,14], display=True, save=False)
 # multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
-singleprocess_images_to_tile_summaries(image_num_list=[6, 7, 8])
-# multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
-#                                       display=False, html=True)
+# singleprocess_images_to_tile_summaries(image_num_list=[6, 7, 8])
+multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
+                                      display=False, html=True)
 # multiprocess_images_to_tile_summaries(save=False, display=False, html=True)
 # multiprocess_images_to_tile_summaries()
 # summary(2, display=True, save=False)
