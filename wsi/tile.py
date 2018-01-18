@@ -952,6 +952,15 @@ class TileInfo:
   def tissue_quantity(self):
     return tissue_quantity(self.tissue_percentage)
 
+  def get_tile(self):
+    return tile_info_to_tile(self)
+
+  def save_tile(self):
+    save_display_tile(self, save=True, display=False)
+
+  def display_tile(self):
+    save_display_tile(self, save=False, display=True)
+
 
 class TissueQuantity(Enum):
   NONE = 0
@@ -975,7 +984,12 @@ class TissueQuantity(Enum):
 # generate_tiled_html_result(slide_nums=[10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
 tile_sum = compute_tile_summary(4)
 top = tile_sum.top_tiles()
+# top[0].tile().show()
+# top[1].tile().show()
+# top[0].display_tile()
+# top[0].save_tile()
 t1 = Time()
 for t in top:
-  save_display_tile(t, save=True, display=False)
+  # save_display_tile(t, save=True, display=False)
+  t.save_tile()
 print("%-20s | Time: %-14s" % ("Save Tiles", str(t1.elapsed())))
