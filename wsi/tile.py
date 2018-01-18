@@ -393,7 +393,7 @@ def save_top_tiles_on_original_image(pil_img, slide_num):
     "%-20s | Time: %-14s  Name: %s" % ("Save Top Tiles on Original Thumbnail", str(t.elapsed()), thumbnail_filepath))
 
 
-def summary(slide_num, display=True, save=False, save_data=True):
+def summary(slide_num, display=True, save=False, save_data=True, save_top_tiles=True):
   """
   Display and/or save a summary image of tiles.
 
@@ -402,6 +402,7 @@ def summary(slide_num, display=True, save=False, save_data=True):
     display: If True, display tile summary to screen.
     save: If True, save tile summary image.
     save_data: If True, save tile data to csv file.
+    save_top_tiles: If True, save top tiles to files.
 
   """
   img_path = slide.get_filter_image_result(slide_num)
@@ -413,6 +414,9 @@ def summary(slide_num, display=True, save=False, save_data=True):
     save_tile_data(tile_sum)
   generate_tile_summary_images(tile_sum, slide_num, np_img, display=display, save=save)
   generate_top_tile_images(tile_sum, slide_num, np_img, display=display, save=save)
+  if save_top_tiles:
+    for tile in tile_sum.top_tiles():
+      tile.save_tile()
 
 
 def save_tile_data(tile_summary):
@@ -588,7 +592,7 @@ def tissue_quantity(tissue_percentage):
     return TissueQuantity.NONE
 
 
-def image_list_to_tile_summaries(image_num_list, display=False, save=True, save_data=True):
+def image_list_to_tile_summaries(image_num_list, display=False, save=True, save_data=True, save_top_tiles=True):
   """
   Generate tile summaries for a list of images.
 
@@ -599,11 +603,11 @@ def image_list_to_tile_summaries(image_num_list, display=False, save=True, save_
     save_data: If True, save tile data to csv file.
   """
   for slide_num in image_num_list:
-    summary(slide_num, display, save, save_data)
+    summary(slide_num, display, save, save_data, save_top_tiles)
   return image_num_list
 
 
-def image_range_to_tile_summaries(start_ind, end_ind, display=False, save=True, save_data=True):
+def image_range_to_tile_summaries(start_ind, end_ind, display=False, save=True, save_data=True, save_top_tiles=True):
   """
   Generate tile summaries for a range of images.
 
@@ -616,12 +620,13 @@ def image_range_to_tile_summaries(start_ind, end_ind, display=False, save=True, 
   """
   image_num_list = list()
   for slide_num in range(start_ind, end_ind + 1):
-    summary(slide_num, display, save, save_data)
+    summary(slide_num, display, save, save_data, save_top_tiles)
     image_num_list.append(slide_num)
   return image_num_list
 
 
-def singleprocess_images_to_tile_summaries(display=False, save=True, save_data=True, html=True, image_num_list=None):
+def singleprocess_images_to_tile_summaries(display=False, save=True, save_data=True, save_top_tiles=True, html=True,
+                                           image_num_list=None):
   """
   Generate tile summaries for training images and optionally save/and or display the tile summaries.
 
@@ -636,10 +641,10 @@ def singleprocess_images_to_tile_summaries(display=False, save=True, save_data=T
   print("Generating tile summaries\n")
 
   if image_num_list is not None:
-    image_list_to_tile_summaries(image_num_list, display, save, save_data)
+    image_list_to_tile_summaries(image_num_list, display, save, save_data, save_top_tiles)
   else:
     num_training_slides = slide.get_num_training_slides()
-    image_num_list = image_range_to_tile_summaries(1, num_training_slides, display, save, save_data)
+    image_num_list = image_range_to_tile_summaries(1, num_training_slides, display, save, save_data, save_top_tiles)
 
   print("Time to generate tile summaries: %s\n" % str(t.elapsed()))
 
@@ -647,7 +652,8 @@ def singleprocess_images_to_tile_summaries(display=False, save=True, save_data=T
     generate_tiled_html_result(image_num_list, save_data)
 
 
-def multiprocess_images_to_tile_summaries(display=False, save=True, save_data=True, html=True, image_num_list=None):
+def multiprocess_images_to_tile_summaries(display=False, save=True, save_data=True, save_top_tiles=True, html=True,
+                                          image_num_list=None):
   """
   Generate tile summaries for all training images using multiple processes (one process per core).
 
@@ -687,10 +693,10 @@ def multiprocess_images_to_tile_summaries(display=False, save=True, save_data=Tr
     end_index = int(end_index)
     if image_num_list is not None:
       sublist = image_num_list[start_index - 1:end_index]
-      tasks.append((sublist, display, save, save_data))
+      tasks.append((sublist, display, save, save_data, save_top_tiles))
       print("Task #" + str(num_process) + ": Process slides " + str(sublist))
     else:
-      tasks.append((start_index, end_index, display, save, save_data))
+      tasks.append((start_index, end_index, display, save, save_data, save_top_tiles))
       if start_index == end_index:
         print("Task #" + str(num_process) + ": Process slide " + str(start_index))
       else:
@@ -975,21 +981,20 @@ class TissueQuantity(Enum):
 # image_range_to_tile_summaries(1, 50)
 # singleprocess_images_to_tile_summaries(image_num_list=[1,10,14], display=True, save=False)
 # multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
-# singleprocess_images_to_tile_summaries()
-# multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, display=False)
+singleprocess_images_to_tile_summaries(image_num_list=[6, 7, 8])
+# multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
+#                                       display=False, html=True)
 # multiprocess_images_to_tile_summaries(save=False, display=False, html=True)
 # multiprocess_images_to_tile_summaries()
 # summary(2, display=True, save=False)
 # generate_tiled_html_result(slide_nums=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
 # generate_tiled_html_result(slide_nums=[10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
-tile_sum = compute_tile_summary(4)
-top = tile_sum.top_tiles()
-# top[0].tile().show()
-# top[1].tile().show()
-# top[0].display_tile()
-# top[0].save_tile()
-t1 = Time()
-for t in top:
-  # save_display_tile(t, save=True, display=False)
-  t.save_tile()
-print("%-20s | Time: %-14s" % ("Save Tiles", str(t1.elapsed())))
+# tile_sum = compute_tile_summary(4)
+# top = tile_sum.top_tiles()
+# t1 = Time()
+# for t in top:
+#   # t.save_tile()
+#   # tile = t.get_tile()
+#   # print(str(tile))
+#   t.display_tile()
+# print("%-20s | Time: %-14s" % ("Save Tiles", str(t1.elapsed())))
