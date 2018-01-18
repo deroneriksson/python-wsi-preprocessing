@@ -393,9 +393,9 @@ def save_top_tiles_on_original_image(pil_img, slide_num):
     "%-20s | Time: %-14s  Name: %s" % ("Save Top Orig Thumb", str(t.elapsed()), thumbnail_filepath))
 
 
-def summary(slide_num, display=True, save=False, save_data=True, save_top_tiles=True):
+def summary_and_tiles(slide_num, display=True, save=False, save_data=True, save_top_tiles=True):
   """
-  Display and/or save a summary image of tiles.
+  Generate tile summary and top tiles for slide.
 
   Args:
     slide_num: The slide number.
@@ -593,9 +593,9 @@ def tissue_quantity(tissue_percentage):
     return TissueQuantity.NONE
 
 
-def image_list_to_tile_summaries(image_num_list, display=False, save=True, save_data=True, save_top_tiles=True):
+def image_list_to_tiles(image_num_list, display=False, save=True, save_data=True, save_top_tiles=True):
   """
-  Generate tile summaries for a list of images.
+  Generate tile summaries and tiles for a list of images.
 
   Args:
     image_num_list: List of image numbers.
@@ -605,13 +605,13 @@ def image_list_to_tile_summaries(image_num_list, display=False, save=True, save_
     save_top_tiles: If True, save top tiles to files.
   """
   for slide_num in image_num_list:
-    summary(slide_num, display, save, save_data, save_top_tiles)
+    summary_and_tiles(slide_num, display, save, save_data, save_top_tiles)
   return image_num_list
 
 
-def image_range_to_tile_summaries(start_ind, end_ind, display=False, save=True, save_data=True, save_top_tiles=True):
+def image_range_to_tiles(start_ind, end_ind, display=False, save=True, save_data=True, save_top_tiles=True):
   """
-  Generate tile summaries for a range of images.
+  Generate tile summaries and tiles for a range of images.
 
   Args:
     start_ind: Starting index (inclusive).
@@ -623,15 +623,15 @@ def image_range_to_tile_summaries(start_ind, end_ind, display=False, save=True, 
   """
   image_num_list = list()
   for slide_num in range(start_ind, end_ind + 1):
-    summary(slide_num, display, save, save_data, save_top_tiles)
+    summary_and_tiles(slide_num, display, save, save_data, save_top_tiles)
     image_num_list.append(slide_num)
   return image_num_list
 
 
-def singleprocess_images_to_tile_summaries(display=False, save=True, save_data=True, save_top_tiles=True, html=True,
+def singleprocess_filtered_images_to_tiles(display=False, save=True, save_data=True, save_top_tiles=True, html=True,
                                            image_num_list=None):
   """
-  Generate tile summaries for training images and optionally save/and or display the tile summaries.
+  Generate tile summaries and tiles for all training images using a single process.
 
   Args:
     display: If True, display tile summary images to screen.
@@ -645,10 +645,10 @@ def singleprocess_images_to_tile_summaries(display=False, save=True, save_data=T
   print("Generating tile summaries\n")
 
   if image_num_list is not None:
-    image_list_to_tile_summaries(image_num_list, display, save, save_data, save_top_tiles)
+    image_list_to_tiles(image_num_list, display, save, save_data, save_top_tiles)
   else:
     num_training_slides = slide.get_num_training_slides()
-    image_num_list = image_range_to_tile_summaries(1, num_training_slides, display, save, save_data, save_top_tiles)
+    image_num_list = image_range_to_tiles(1, num_training_slides, display, save, save_data, save_top_tiles)
 
   print("Time to generate tile summaries: %s\n" % str(t.elapsed()))
 
@@ -656,10 +656,10 @@ def singleprocess_images_to_tile_summaries(display=False, save=True, save_data=T
     generate_tiled_html_result(image_num_list, save_data)
 
 
-def multiprocess_images_to_tile_summaries(display=False, save=True, save_data=True, save_top_tiles=True, html=True,
+def multiprocess_filtered_images_to_tiles(display=False, save=True, save_data=True, save_top_tiles=True, html=True,
                                           image_num_list=None):
   """
-  Generate tile summaries for all training images using multiple processes (one process per core).
+  Generate tile summaries and tiles for all training images using multiple processes (one process per core).
 
   Args:
     display: If True, display images to screen (multiprocessed display not recommended).
@@ -711,9 +711,9 @@ def multiprocess_images_to_tile_summaries(display=False, save=True, save_data=Tr
   results = []
   for t in tasks:
     if image_num_list is not None:
-      results.append(pool.apply_async(image_list_to_tile_summaries, t))
+      results.append(pool.apply_async(image_list_to_tiles, t))
     else:
-      results.append(pool.apply_async(image_range_to_tile_summaries, t))
+      results.append(pool.apply_async(image_range_to_tiles, t))
 
   slide_nums = list()
   for result in results:
@@ -980,17 +980,17 @@ class TissueQuantity(Enum):
   HIGH = 3
 
 
-# summary(1, save=True)
+# summary_and_tiles(5, save=True)
 # summary(26, save=True)
 # image_list_to_tile_summaries([1, 2, 3, 4], display=True)
 # image_range_to_tile_summaries(1, 50)
-# singleprocess_images_to_tile_summaries(image_num_list=[1,10,14], display=True, save=False)
-# multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
-# singleprocess_images_to_tile_summaries(image_num_list=[6, 7, 8])
-multiprocess_images_to_tile_summaries(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
+# singleprocess_filtered_images_to_tiles(image_num_list=[1,10,14], display=True, save=False)
+# multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
+# singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
+multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
                                       display=False, html=True)
 # multiprocess_images_to_tile_summaries(save=False, display=False, html=True)
-# multiprocess_images_to_tile_summaries()
+# multiprocess_filtered_images_to_tiles()
 # summary(2, display=True, save=False)
 # generate_tiled_html_result(slide_nums=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
 # generate_tiled_html_result(slide_nums=[10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
