@@ -444,14 +444,15 @@ def save_tile_data(tile_summary):
   print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Data", str(time.elapsed()), data_path))
 
 
-def save_display_tile(tile_info, save=True, display=False):
+def tile_info_to_tile(tile_info):
   """
-  Save and/or display a tile image.
+  Convert tile information into the corresponding tile as a PIL image read from the whole-slide image file.
 
   Args:
     tile_info: TileInfo object.
-    save: If True, save tile image.
-    display: If True, dispaly tile image.
+
+  Return:
+    Tile as a PIL image.
   """
   t = tile_info
   slide_filepath = slide.get_training_slide_path(t.slide_num)
@@ -461,18 +462,31 @@ def save_display_tile(tile_info, save=True, display=False):
   w, h = t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s
   tile_region = s.read_region((x, y), 0, (w, h))
   # RGBA to RGB
-  tile_region = tile_region.convert("RGB")
+  pil_img = tile_region.convert("RGB")
+  return pil_img
+
+
+def save_display_tile(tile_info, save=True, display=False):
+  """
+  Save and/or display a tile image.
+
+  Args:
+    tile_info: TileInfo object.
+    save: If True, save tile image.
+    display: If True, dispaly tile image.
+  """
+  tile_pil_img = tile_info_to_tile(tile_info)
 
   if save:
-    img_path = slide.get_tile_image_path(t)
+    img_path = slide.get_tile_image_path(tile_info)
     print("Saving tile to: " + img_path)
     dir = os.path.dirname(img_path)
     if not os.path.exists(dir):
       os.makedirs(dir)
-    tile_region.save(img_path)
+    tile_pil_img.save(img_path)
 
   if display:
-    tile_region.show()
+    tile_pil_img.show()
 
 
 def compute_tile_summary(slide_num, np_img=None):
