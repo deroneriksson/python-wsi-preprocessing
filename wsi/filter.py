@@ -505,11 +505,13 @@ def filter_hsv_to_h(hsv, output_type="int"):
   Returns:
     Hue values (float or int) as a 1-dimensional NumPy array.
   """
+  t = Time()
   h = hsv[:, :, 0]
   h = h.flatten()
   if output_type == "int":
     h *= 360
     h = h.astype("int")
+  np_info(hsv, "HSV to H", t.elapsed())
   return h
 
 
