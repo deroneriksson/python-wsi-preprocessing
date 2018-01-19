@@ -475,24 +475,27 @@ def filter_rgb_to_hed(np_img, output_type="uint8"):
   return hed
 
 
-def filter_rgb_to_hsv(np_img):
+def filter_rgb_to_hsv(np_img, display_np_info=True):
   """
   Filter RGB channels to HSV (Hue, Saturation, Value).
 
   Args:
     np_img: RGB image as a NumPy array.
+    display_np_info: If True, display NumPy array info and filter time.
 
   Returns:
     Image as NumPy array in HSV representation.
   """
 
-  t = Time()
+  if display_np_info:
+    t = Time()
   hsv = sk_color.rgb2hsv(np_img)
-  np_info(hsv, "RGB to HSV", t.elapsed())
+  if display_np_info:
+    np_info(hsv, "RGB to HSV", t.elapsed())
   return hsv
 
 
-def filter_hsv_to_h(hsv, output_type="int"):
+def filter_hsv_to_h(hsv, output_type="int", display_np_info=True):
   """
   Obtain hue values from HSV NumPy array as a 1-dimensional array. If output as an int array, the original float
   values are multiplied by 360 for their degree equivalents for simplicity. For more information, see
@@ -501,17 +504,20 @@ def filter_hsv_to_h(hsv, output_type="int"):
   Args:
     hsv: HSV image as a NumPy array.
     output_type: Type of array to return (float or int).
+    display_np_info: If True, display NumPy array info and filter time.
 
   Returns:
     Hue values (float or int) as a 1-dimensional NumPy array.
   """
-  t = Time()
+  if display_np_info:
+    t = Time()
   h = hsv[:, :, 0]
   h = h.flatten()
   if output_type == "int":
     h *= 360
     h = h.astype("int")
-  np_info(hsv, "HSV to H", t.elapsed())
+  if display_np_info:
+    np_info(hsv, "HSV to H", t.elapsed())
   return h
 
 
@@ -815,7 +821,7 @@ def filter_red(rgb, red_lower_thresh, green_upper_thresh, blue_upper_thresh, out
     green_upper_thresh: Green channel upper threshold value.
     blue_upper_thresh: Blue channel upper threshold value.
     output_type: Type of array to return (bool, float, or uint8).
-    display_np_info: If True, display NumPy array info an filter time.
+    display_np_info: If True, display NumPy array info and filter time.
 
   Returns:
     NumPy array representing the mask.
@@ -882,7 +888,7 @@ def filter_green(rgb, red_upper_thresh, green_lower_thresh, blue_lower_thresh, o
     green_lower_thresh: Green channel lower threshold value.
     blue_lower_thresh: Blue channel lower threshold value.
     output_type: Type of array to return (bool, float, or uint8).
-    display_np_info: If True, display NumPy array info an filter time.
+    display_np_info: If True, display NumPy array info and filter time.
 
   Returns:
     NumPy array representing the mask.
@@ -953,7 +959,7 @@ def filter_blue(rgb, red_upper_thresh, green_upper_thresh, blue_lower_thresh, ou
     green_upper_thresh: Green channel upper threshold value.
     blue_lower_thresh: Blue channel lower threshold value.
     output_type: Type of array to return (bool, float, or uint8).
-    display_np_info: If True, display NumPy array info an filter time.
+    display_np_info: If True, display NumPy array info and filter time.
 
   Returns:
     NumPy array representing the mask.
