@@ -438,12 +438,13 @@ def save_tile_data(tile_summary):
   csv = summary_text(tile_summary)
 
   csv += "\n\n\nTile Num,Row,Column,Tissue %,Tissue Quantity,Col Start,Row Start,Col End,Row End,Col Size,Row Size," + \
-         "Original Col Start,Original Row Start,Original Col End,Original Row End,Original Col Size,Original Row Size\n"
+         "Original Col Start,Original Row Start,Original Col End,Original Row End,Original Col Size,Original Row Size," + \
+         "Color Factor,Score\n"
 
   for t in tile_summary.tiles:
-    line = "%d,%d,%d,%4.2f,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n" % (
+    line = "%d,%d,%d,%4.2f,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%4.2f,%4.2f\n" % (
       t.tile_num, t.r, t.c, t.tissue_percentage, t.tissue_quantity().name, t.c_s, t.r_s, t.c_e, t.r_e, t.c_e - t.c_s,
-      t.r_e - t.r_s, t.o_c_s, t.o_r_s, t.o_c_e, t.o_r_e, t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s)
+      t.r_e - t.r_s, t.o_c_s, t.o_r_s, t.o_c_e, t.o_r_e, t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s, t.color_factor, t.score)
     csv += line
 
   data_path = slide.get_tile_data_path(tile_summary.slide_num)
@@ -557,7 +558,11 @@ def compute_tile_summary(slide_num, np_img=None):
     if (o_r_e - o_r_s) > ROW_TILE_SIZE:
       o_r_e -= 1
 
-    tile_info = TileInfo(slide_num, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p)
+    color_factor = purple_vs_pink_factor(np_tile, t_p)
+    score = t_p * color_factor
+
+    tile_info = TileInfo(slide_num, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p, color_factor,
+                         score)
     tile_sum.tiles.append(tile_info)
 
     amount = tissue_quantity(t_p)
@@ -932,9 +937,65 @@ def rgb_to_hues(rgb):
   Returns:
     1-dimensional array of hue values in degrees
   """
-  hsv = filter.filter_rgb_to_hsv(rgb)
-  h = filter.filter_hsv_to_h(hsv)
+  hsv = filter.filter_rgb_to_hsv(rgb, display_np_info=False)
+  h = filter.filter_hsv_to_h(hsv, display_np_info=False)
   return h
+
+
+def purple_vs_pink_factor(rgb, tissue_percentage):
+  """
+  Function to favor purple (hematoxylin) over pink (eosin) staining.
+
+  Args:
+    rgb: Image as RGB NumPy array
+    tissue_percentage: Amount of tissue on the tile
+
+  Returns:
+    Factor, where >1 to boost purple slide scores, <1 to reduce pink slide scores, or 1 no effect.
+  """
+
+  factor = 1
+  # only applies to slides with a high quantity of tissue
+  if tissue_percentage < TISSUE_THRESHOLD_PERCENT:
+    return factor
+
+  PURPLE = 270
+  PINK = 330
+
+  hues = rgb_to_hues(rgb)
+  hues = hues[hues >= 200]  # Remove hues under 200
+  if len(hues) == 0:
+    return factor
+  avg = np.average(hues)
+  # pil_hue_histogram(hues).show()
+
+  pu = PURPLE - avg
+  pi = PINK - avg
+  pupi = pu + pi
+  # print("Av: %4d, Pu: %4d, Pi: %4d, PuPi: %4d" % (avg, pu, pi, pupi))
+  # Av:  250, Pu:   20, Pi:   80, PuPi:  100
+  # Av:  260, Pu:   10, Pi:   70, PuPi:   80
+  # Av:  270, Pu:    0, Pi:   60, PuPi:   60 ** PURPLE
+  # Av:  280, Pu:  -10, Pi:   50, PuPi:   40
+  # Av:  290, Pu:  -20, Pi:   40, PuPi:   20
+  # Av:  300, Pu:  -30, Pi:   30, PuPi:    0
+  # Av:  310, Pu:  -40, Pi:   20, PuPi:  -20
+  # Av:  320, Pu:  -50, Pi:   10, PuPi:  -40
+  # Av:  330, Pu:  -60, Pi:    0, PuPi:  -60 ** PINK
+  # Av:  340, Pu:  -70, Pi:  -10, PuPi:  -80
+  # Av:  350, Pu:  -80, Pi:  -20, PuPi: -100
+
+  if pupi > 30:
+    factor *= 1.2
+  if pupi < -30:
+    factor *= .8
+  if pupi > 0:
+    factor *= 1.2
+  if pupi > 50:
+    factor *= 1.2
+  if pupi < -60:
+    factor *= .8
+  return factor
 
 
 class TileSummary:
@@ -991,8 +1052,12 @@ class TileSummary:
     sorted_list = sorted(self.tiles, key=lambda t: t.tissue_percentage, reverse=True)
     return sorted_list
 
+  def tiles_by_score(self):
+    sorted_list = sorted(self.tiles, key=lambda t: t.score, reverse=True)
+    return sorted_list
+
   def top_tiles(self):
-    sorted_tiles = self.tiles_by_tissue_percentage()
+    sorted_tiles = self.tiles_by_score()
     top_tiles = sorted_tiles[:50]
     return top_tiles
 
@@ -1014,8 +1079,11 @@ class TileInfo:
   o_c_s = None
   o_c_e = None
   tissue_percentage = None
+  color_factor = None
+  score = None
 
-  def __init__(self, slide_num, tile_num, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p):
+  def __init__(self, slide_num, tile_num, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p, color_factor,
+               score):
     self.slide_num = slide_num
     self.tile_num = tile_num
     self.r = r
@@ -1029,6 +1097,8 @@ class TileInfo:
     self.o_c_s = o_c_s
     self.o_c_e = o_c_e
     self.tissue_percentage = t_p
+    self.color_factor = color_factor
+    self.score = score
 
   def __str__(self):
     return "[Tile #%d, Row #%d, Column #%d, Tissue %4.2f%%]" % (self.tile_num, self.r, self.c, self.tissue_percentage)
@@ -1059,35 +1129,32 @@ class TissueQuantity(Enum):
   HIGH = 3
 
 
-# summary_and_tiles(5, save=True)
+# summary_and_tiles(1, save=True)
+# x = np.arange(10)
+# print(str(x))
+# y = x[x>=5]
+# print(str(y))
 # singleprocess_filtered_images_to_tiles(image_num_list=[1,10,14], display=True, save=False)
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
-# multiprocess_filtered_images_to_tiles()
+multiprocess_filtered_images_to_tiles()
 
 # tile_sum = compute_tile_summary(4)
 # top = tile_sum.top_tiles()
 # for t in top:
 #   t.display_tile()
 
-# def hematoxylin_vs_eosin(np_img_rgb):
-#   print("RGB IMAGE: " + str(np_img_rgb))
-# np_img_hsv = sk_color.rgb2hsv(np_img_rgb)
-# print("HSV IMAGE: " + np_img_hsv)
+
 
 
 # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
 # img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
-img_path = "../data/tiles_png/002/TUPAC-TR-002-tile-r17-c35-x34817-y16387-w1024-h1024.png"
-img = slide.open_image(img_path)
-rgb = filter.pil_to_np_rgb(img)
+# img_path = "../data/tiles_png/002/TUPAC-TR-002-tile-r17-c35-x34817-y16387-w1024-h1024.png"
+# img = slide.open_image(img_path)
+# rgb = filter.pil_to_np_rgb(img)
 # display_tile_with_hue_histogram(rgb)
-h = rgb_to_hues(rgb)
-pil_hue_histogram(h).show()
-
-# https://en.wikipedia.org/wiki/HSL_and_HSV
-# Purple is around H=270
-# Pink is around H=330
-# Magenta is around H=300
+# purple_vs_pink_factor(rgb)
+# for i in [250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350]:
+#   purple_boost(i)
