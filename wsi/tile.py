@@ -19,7 +19,13 @@
 #
 # -------------------------------------------------------------
 
+# To get around renderer issue on OSX going from Matplotlib image to NumPy image.
+import matplotlib
+
+matplotlib.use('Agg')
+
 import math
+import matplotlib.pyplot as plt
 import multiprocessing
 import numpy as np
 import os
@@ -858,6 +864,27 @@ def generate_tiled_html_result(slide_nums, data_link):
       text_file.close()
 
 
+def pil_hue_histogram(h):
+  """
+  Create Matplotlib histogram of hue values for an HSV image and return the histogram as a PIL image.
+
+  Args:
+    h: Hue values as a 1-dimensional int NumPy array (scaled 0 to 360)
+
+  Returns:
+    Matplotlib histogram of hue values converted to a PIL image.
+  """
+  figure = plt.figure()
+  canvas = figure.canvas
+  plt.hist(h, bins=360)
+  canvas.draw()
+  w, h = canvas.get_width_height()
+  np_hist = np.fromstring(canvas.get_renderer().tostring_rgb(), dtype=np.uint8).reshape(h, w, 3)
+  filter.np_info(np_hist)
+  pil_hist = filter.np_to_pil(np_hist)
+  return pil_hist
+
+
 class TileSummary:
   """
   Class for tile summary information.
@@ -987,8 +1014,8 @@ class TissueQuantity(Enum):
 # singleprocess_filtered_images_to_tiles(image_num_list=[1,10,14], display=True, save=False)
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
-multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
-                                      display=False, html=True)
+# multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
+#                                       display=False, html=True)
 # multiprocess_images_to_tile_summaries(save=False, display=False, html=True)
 # multiprocess_filtered_images_to_tiles()
 # summary(2, display=True, save=False)
@@ -1003,3 +1030,26 @@ multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True,
 #   # print(str(tile))
 #   t.display_tile()
 # print("%-20s | Time: %-14s" % ("Save Tiles", str(t1.elapsed())))
+
+# def hematoxylin_vs_eosin(np_img_rgb):
+#   print("RGB IMAGE: " + str(np_img_rgb))
+# np_img_hsv = sk_color.rgb2hsv(np_img_rgb)
+# print("HSV IMAGE: " + np_img_hsv)
+
+
+# img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
+img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
+img = slide.open_image(img_path)
+rgb = filter.pil_to_np_rgb(img)
+hsv = filter.filter_rgb_to_hsv(rgb)
+h = filter.filter_hsv_to_h(hsv)
+
+# https://en.wikipedia.org/wiki/HSL_and_HSV
+# Purple is around H=270
+# Pink is around H=330
+# Magenta is around H=300
+
+
+
+
+pil_hue_histogram(h).show()
