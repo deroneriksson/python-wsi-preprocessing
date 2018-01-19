@@ -521,6 +521,36 @@ def filter_hsv_to_h(hsv, output_type="int", display_np_info=True):
   return h
 
 
+def filter_hsv_to_s(hsv):
+  """
+  Experimental HSV to S (saturation).
+
+  Args:
+    hsv:  HSV image as a NumPy array.
+
+  Returns:
+    Saturation values as a 1-dimensional NumPy array.
+  """
+  s = hsv[:, :, 1]
+  s = s.flatten()
+  return s
+
+
+def filter_hsv_to_v(hsv):
+  """
+  Experimental HSV to V (value).
+
+  Args:
+    hsv:  HSV image as a NumPy array.
+
+  Returns:
+    Value values as a 1-dimensional NumPy array.
+  """
+  v = hsv[:, :, 2]
+  v = v.flatten()
+  return v
+
+
 def filter_hed_to_hematoxylin(np_img, output_type="uint8"):
   """
   Obtain Hematoxylin channel from HED NumPy array and rescale it (for example, to 0 to 255 for uint8) for increased
