@@ -995,6 +995,11 @@ def purple_vs_pink_factor(rgb, tissue_percentage):
     factor *= 1.2
   if pupi < -60:
     factor *= .8
+
+  # don't allow high tissue tiles to be scored lower than tiles with less tissue
+  if factor * tissue_percentage < TISSUE_THRESHOLD_PERCENT:
+    factor = 1
+
   return factor
 
 
@@ -1129,7 +1134,7 @@ class TissueQuantity(Enum):
   HIGH = 3
 
 
-# summary_and_tiles(1, save=True)
+# summary_and_tiles(15, save=True)
 # x = np.arange(10)
 # print(str(x))
 # y = x[x>=5]
@@ -1156,5 +1161,3 @@ multiprocess_filtered_images_to_tiles()
 # rgb = filter.pil_to_np_rgb(img)
 # display_tile_with_hue_histogram(rgb)
 # purple_vs_pink_factor(rgb)
-# for i in [250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350]:
-#   purple_boost(i)
