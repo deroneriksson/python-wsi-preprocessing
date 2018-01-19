@@ -922,6 +922,21 @@ def display_tile_with_hue_histogram(np_rgb):
   pil_combo.show()
 
 
+def rgb_to_hues(rgb):
+  """
+  Convert RGB NumPy array to 1-dimensional array of hue values (HSV H values in degrees).
+
+  Args:
+    rgb: RGB image as a NumPy array
+
+  Returns:
+    1-dimensional array of hue values in degrees
+  """
+  hsv = filter.filter_rgb_to_hsv(rgb)
+  h = filter.filter_hsv_to_h(hsv)
+  return h
+
+
 class TileSummary:
   """
   Class for tile summary information.
@@ -1045,28 +1060,17 @@ class TissueQuantity(Enum):
 
 
 # summary_and_tiles(5, save=True)
-# summary(26, save=True)
-# image_list_to_tile_summaries([1, 2, 3, 4], display=True)
-# image_range_to_tile_summaries(1, 50)
 # singleprocess_filtered_images_to_tiles(image_num_list=[1,10,14], display=True, save=False)
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
-# multiprocess_images_to_tile_summaries(save=False, display=False, html=True)
 # multiprocess_filtered_images_to_tiles()
-# summary(2, display=True, save=False)
-# generate_tiled_html_result(slide_nums=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
-# generate_tiled_html_result(slide_nums=[10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
+
 # tile_sum = compute_tile_summary(4)
 # top = tile_sum.top_tiles()
-# t1 = Time()
 # for t in top:
-#   # t.save_tile()
-#   # tile = t.get_tile()
-#   # print(str(tile))
 #   t.display_tile()
-# print("%-20s | Time: %-14s" % ("Save Tiles", str(t1.elapsed())))
 
 # def hematoxylin_vs_eosin(np_img_rgb):
 #   print("RGB IMAGE: " + str(np_img_rgb))
@@ -1075,16 +1079,15 @@ class TissueQuantity(Enum):
 
 
 # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
-img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
+# img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
+img_path = "../data/tiles_png/002/TUPAC-TR-002-tile-r17-c35-x34817-y16387-w1024-h1024.png"
 img = slide.open_image(img_path)
 rgb = filter.pil_to_np_rgb(img)
-# hsv = filter.filter_rgb_to_hsv(rgb)
-# h = filter.filter_hsv_to_h(hsv)
-# pil_hue_histogram(h).show()
+# display_tile_with_hue_histogram(rgb)
+h = rgb_to_hues(rgb)
+pil_hue_histogram(h).show()
 
 # https://en.wikipedia.org/wiki/HSL_and_HSV
 # Purple is around H=270
 # Pink is around H=330
 # Magenta is around H=300
-
-display_tile_with_hue_histogram(rgb)
