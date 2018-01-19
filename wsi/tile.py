@@ -864,6 +864,26 @@ def generate_tiled_html_result(slide_nums, data_link):
       text_file.close()
 
 
+def np_hue_histogram(h):
+  """
+  Create Matplotlib histogram of hue values for an HSV image and return the histogram as a NumPy array image.
+
+  Args:
+    h: Hue values as a 1-dimensional int NumPy array (scaled 0 to 360)
+
+  Returns:
+    Matplotlib histogram of hue values converted to a NumPy array image.
+  """
+  figure = plt.figure()
+  canvas = figure.canvas
+  plt.hist(h, bins=360)
+  canvas.draw()
+  w, h = canvas.get_width_height()
+  np_hist = np.fromstring(canvas.get_renderer().tostring_rgb(), dtype=np.uint8).reshape(h, w, 3)
+  filter.np_info(np_hist)
+  return np_hist
+
+
 def pil_hue_histogram(h):
   """
   Create Matplotlib histogram of hue values for an HSV image and return the histogram as a PIL image.
@@ -874,13 +894,7 @@ def pil_hue_histogram(h):
   Returns:
     Matplotlib histogram of hue values converted to a PIL image.
   """
-  figure = plt.figure()
-  canvas = figure.canvas
-  plt.hist(h, bins=360)
-  canvas.draw()
-  w, h = canvas.get_width_height()
-  np_hist = np.fromstring(canvas.get_renderer().tostring_rgb(), dtype=np.uint8).reshape(h, w, 3)
-  filter.np_info(np_hist)
+  np_hist = np_hue_histogram(h)
   pil_hist = filter.np_to_pil(np_hist)
   return pil_hist
 
@@ -1037,8 +1051,8 @@ class TissueQuantity(Enum):
 # print("HSV IMAGE: " + np_img_hsv)
 
 
-# img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
-img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
+img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
+# img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
 img = slide.open_image(img_path)
 rgb = filter.pil_to_np_rgb(img)
 hsv = filter.filter_rgb_to_hsv(rgb)
@@ -1048,8 +1062,5 @@ h = filter.filter_hsv_to_h(hsv)
 # Purple is around H=270
 # Pink is around H=330
 # Magenta is around H=300
-
-
-
 
 pil_hue_histogram(h).show()
