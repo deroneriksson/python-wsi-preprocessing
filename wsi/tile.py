@@ -899,6 +899,29 @@ def pil_hue_histogram(h):
   return pil_hist
 
 
+def display_tile_with_hue_histogram(np_rgb):
+  """
+  Display a tile with its corresponding hue histogram.
+
+  Args:
+    np_rgb: RGB image tile as a NumPy array
+  """
+  hsv = filter.filter_rgb_to_hsv(np_rgb)
+  h = filter.filter_hsv_to_h(hsv)
+  np_hist = np_hue_histogram(h)
+
+  img_r, img_c, img_ch = np_rgb.shape
+  hist_r, hist_c, _ = np_hist.shape
+
+  r = max(img_r, hist_r)
+  c = img_c + hist_c
+  combo = np.zeros([r, c, img_ch], dtype=np.uint8)
+  combo[0:img_r, 0:img_c] = np_rgb
+  combo[0:hist_r, img_c:c] = np_hist
+  pil_combo = filter.np_to_pil(combo)
+  pil_combo.show()
+
+
 class TileSummary:
   """
   Class for tile summary information.
@@ -1051,16 +1074,17 @@ class TissueQuantity(Enum):
 # print("HSV IMAGE: " + np_img_hsv)
 
 
-img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
-# img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
+# img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
+img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
 img = slide.open_image(img_path)
 rgb = filter.pil_to_np_rgb(img)
-hsv = filter.filter_rgb_to_hsv(rgb)
-h = filter.filter_hsv_to_h(hsv)
+# hsv = filter.filter_rgb_to_hsv(rgb)
+# h = filter.filter_hsv_to_h(hsv)
+# pil_hue_histogram(h).show()
 
 # https://en.wikipedia.org/wiki/HSL_and_HSV
 # Purple is around H=270
 # Pink is around H=330
 # Magenta is around H=300
 
-pil_hue_histogram(h).show()
+display_tile_with_hue_histogram(rgb)
