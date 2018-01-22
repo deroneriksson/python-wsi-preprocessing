@@ -822,6 +822,18 @@ def image_row(slide_num, tile_summary, data_link):
           "        </a>\n" + \
           "      </td>\n"
 
+  top_tiles = tile_summary.top_tiles()
+  html += "      <td style=\"vertical-align: top\"><div>S%03d Top Tiles:</div><div style=\"font-size: smaller; width: %dpx;\">\n" % (
+    slide_num, slide.THUMBNAIL_SIZE)
+  tile_num = 1
+  for t in top_tiles:
+    label = "#%d R%d C%d: %4.2f<br/>" % (tile_num, t.r, t.c, t.score)
+    html += label
+    tile_num += 1
+
+  html += "</div>\n"
+  html += "      </td>\n"
+
   html += "    </tr>\n"
   return html
 
@@ -1170,8 +1182,8 @@ class TissueQuantity(Enum):
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
-multiprocess_filtered_images_to_tiles()
-# multiprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
+# multiprocess_filtered_images_to_tiles()
+multiprocess_filtered_images_to_tiles(image_num_list=[6])
 # tile_sum = compute_tile_summary(4)
 # top = tile_sum.top_tiles()
 # for t in top:
