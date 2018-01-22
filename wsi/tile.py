@@ -827,8 +827,9 @@ def image_row(slide_num, tile_summary, data_link):
     slide_num, slide.THUMBNAIL_SIZE)
   tile_num = 1
   for t in top_tiles:
-    label = "#%d R%d C%d: %4.2f<br/>" % (tile_num, t.r, t.c, t.score)
-    html += label
+    label = "#%d R%d C%d: %4.2f" % (tile_num, t.r, t.c, t.score)
+    tile_img_path = slide.get_tile_image_path(t)
+    html += "        <a target=\"_blank\" href=\"%s\">%s</a><br/>\n" % (tile_img_path, label)
     tile_num += 1
 
   html += "</div>\n"
