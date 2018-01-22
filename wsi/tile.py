@@ -804,6 +804,12 @@ def image_row(slide_num, tile_summary, data_link):
           "        </a>\n" + \
           "      </td>\n"
 
+  summary_text = str(tile_summary)
+  summary_text = summary_text.replace("\n", "<br/>")
+  html += "      <td style=\"vertical-align: top\"><div style=\"font-size: smaller; width: %dpx;\">\n" % slide.THUMBNAIL_SIZE + \
+          "        " + summary_text + "</div>\n" + \
+          "      </td>\n"
+
   html += "      <td>\n" + \
           "        <a target=\"_blank\" href=\"%s\">S%03d Top Tiles<br/>\n" % (top_img, slide_num) + \
           "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), top_thumb) + \
@@ -814,14 +820,6 @@ def image_row(slide_num, tile_summary, data_link):
           "        <a target=\"_blank\" href=\"%s\">S%03d Original Top Tiles<br/>\n" % (otop_img, slide_num) + \
           "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), otop_thumb) + \
           "        </a>\n" + \
-          "      </td>\n"
-
-  summary_text = str(tile_summary)
-  summary_text = summary_text.replace("\n", "<br/>")
-
-  html += "      <td style=\"vertical-align: top\"><div style=\"font-size: smaller; width: " + str(
-    slide.THUMBNAIL_SIZE) + "px;\">\n" + \
-          "        " + summary_text + "</div>\n" + \
           "      </td>\n"
 
   html += "    </tr>\n"
