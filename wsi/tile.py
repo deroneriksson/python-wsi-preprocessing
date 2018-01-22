@@ -424,6 +424,7 @@ def summary_and_tiles(slide_num, display=True, save=False, save_data=True, save_
   if save_top_tiles:
     for tile in tile_sum.top_tiles():
       tile.save_tile()
+  return tile_sum
 
 
 def save_tile_data(tile_summary):
@@ -616,9 +617,11 @@ def image_list_to_tiles(image_num_list, display=False, save=True, save_data=True
     save_data: If True, save tile data to csv file.
     save_top_tiles: If True, save top tiles to files.
   """
+  tile_summaries_dict = dict()
   for slide_num in image_num_list:
-    summary_and_tiles(slide_num, display, save, save_data, save_top_tiles)
-  return image_num_list
+    tile_summary = summary_and_tiles(slide_num, display, save, save_data, save_top_tiles)
+    tile_summaries_dict[slide_num] = tile_summary
+  return image_num_list, tile_summaries_dict
 
 
 def image_range_to_tiles(start_ind, end_ind, display=False, save=True, save_data=True, save_top_tiles=True):
@@ -634,10 +637,12 @@ def image_range_to_tiles(start_ind, end_ind, display=False, save=True, save_data
     save_top_tiles: If True, save top tiles to files.
   """
   image_num_list = list()
+  tile_summaries_dict = dict()
   for slide_num in range(start_ind, end_ind + 1):
-    summary_and_tiles(slide_num, display, save, save_data, save_top_tiles)
+    tile_summary = summary_and_tiles(slide_num, display, save, save_data, save_top_tiles)
     image_num_list.append(slide_num)
-  return image_num_list
+    tile_summaries_dict[slide_num] = tile_summary
+  return image_num_list, tile_summaries_dict
 
 
 def singleprocess_filtered_images_to_tiles(display=False, save=True, save_data=True, save_top_tiles=True, html=True,
@@ -657,15 +662,16 @@ def singleprocess_filtered_images_to_tiles(display=False, save=True, save_data=T
   print("Generating tile summaries\n")
 
   if image_num_list is not None:
-    image_list_to_tiles(image_num_list, display, save, save_data, save_top_tiles)
+    image_num_list, tile_summaries_dict = image_list_to_tiles(image_num_list, display, save, save_data, save_top_tiles)
   else:
     num_training_slides = slide.get_num_training_slides()
-    image_num_list = image_range_to_tiles(1, num_training_slides, display, save, save_data, save_top_tiles)
+    image_num_list, tile_summaries_dict = image_range_to_tiles(1, num_training_slides, display, save, save_data,
+                                                               save_top_tiles)
 
   print("Time to generate tile summaries: %s\n" % str(t.elapsed()))
 
   if html:
-    generate_tiled_html_result(image_num_list, save_data)
+    generate_tiled_html_result(image_num_list, tile_summaries_dict, save_data)
 
 
 def multiprocess_filtered_images_to_tiles(display=False, save=True, save_data=True, save_top_tiles=True, html=True,
@@ -728,23 +734,26 @@ def multiprocess_filtered_images_to_tiles(display=False, save=True, save_data=Tr
       results.append(pool.apply_async(image_range_to_tiles, t))
 
   slide_nums = list()
+  tile_summaries_dict = dict()
   for result in results:
-    image_nums = result.get()
+    image_nums, tile_summaries = result.get()
     slide_nums.extend(image_nums)
+    tile_summaries_dict.update(tile_summaries)
     print("Done tiling slides: %s" % image_nums)
 
   if html:
-    generate_tiled_html_result(slide_nums, save_data)
+    generate_tiled_html_result(slide_nums, tile_summaries_dict, save_data)
 
   print("Time to generate tile previews (multiprocess): %s\n" % str(timer.elapsed()))
 
 
-def image_row(slide_num, data_link):
+def image_row(slide_num, tile_summary, data_link):
   """
   Generate HTML for viewing a tiled image.
 
   Args:
     slide_num: The slide number.
+    tile_summary: TileSummary object.
     data_link: If True, add link to tile data csv file.
 
   Returns:
@@ -807,16 +816,25 @@ def image_row(slide_num, data_link):
           "        </a>\n" + \
           "      </td>\n"
 
+  summary_text = str(tile_summary)
+  summary_text = summary_text.replace("\n", "<br/>")
+
+  html += "      <td style=\"vertical-align: top\"><div style=\"font-size: smaller; width: " + str(
+    slide.THUMBNAIL_SIZE) + "px;\">\n" + \
+          "        " + summary_text + "</div>\n" + \
+          "      </td>\n"
+
   html += "    </tr>\n"
   return html
 
 
-def generate_tiled_html_result(slide_nums, data_link):
+def generate_tiled_html_result(slide_nums, tile_summaries_dict, data_link):
   """
   Generate HTML to view the tiled images.
 
   Args:
     slide_nums: List of slide numbers.
+    tile_summaries_dict: Dictionary of TileSummary objects keyed by slide number.
     data_link: If True, add link to tile data csv file.
   """
   slide_nums = sorted(slide_nums)
@@ -858,7 +876,8 @@ def generate_tiled_html_result(slide_nums, data_link):
 
       html += "  <table>\n"
       for slide_num in page_slide_nums:
-        html += image_row(slide_num, data_link)
+        tile_summary = tile_summaries_dict[slide_num]
+        html += image_row(slide_num, tile_summary, data_link)
       html += "  </table>\n"
 
       html += filter.html_footer()
@@ -1148,13 +1167,13 @@ class TissueQuantity(Enum):
 # print(str(x))
 # y = x[x>=5]
 # print(str(y))
-# singleprocess_filtered_images_to_tiles(image_num_list=[1,10,14], display=True, save=False)
+# singleprocess_filtered_images_to_tiles(image_num_list=[7, 8, 9])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
-# multiprocess_filtered_images_to_tiles()
-
+multiprocess_filtered_images_to_tiles()
+# multiprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # tile_sum = compute_tile_summary(4)
 # top = tile_sum.top_tiles()
 # for t in top:
@@ -1163,11 +1182,10 @@ class TissueQuantity(Enum):
 
 
 
-img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
+# img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
 # img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
 # img_path = "../data/tiles_png/002/TUPAC-TR-002-tile-r17-c35-x34817-y16387-w1024-h1024.png"
 # img_path = "../data/tiles_png/006/TUPAC-TR-006-tile-r58-c3-x2048-y58369-w1024-h1024.png"
-img = slide.open_image(img_path)
-rgb = filter.pil_to_np_rgb(img)
-display_tile_with_hue_histogram(rgb)
-# purple_vs_pink_factor(rgb)
+# img = slide.open_image(img_path)
+# rgb = filter.pil_to_np_rgb(img)
+# display_tile_with_hue_histogram(rgb)
