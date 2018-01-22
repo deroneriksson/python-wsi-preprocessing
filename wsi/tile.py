@@ -823,14 +823,28 @@ def image_row(slide_num, tile_summary, data_link):
           "      </td>\n"
 
   top_tiles = tile_summary.top_tiles()
-  html += "      <td style=\"vertical-align: top\"><div>S%03d Top Tiles:</div><div style=\"font-size: smaller; width: %dpx;\">\n" % (
-    slide_num, slide.THUMBNAIL_SIZE)
-  tile_num = 1
-  for t in top_tiles:
-    label = "#%d R%d C%d: %4.2f" % (tile_num, t.r, t.c, t.score)
-    tile_img_path = slide.get_tile_image_path(t)
-    html += "        <a target=\"_blank\" href=\"%s\">%s</a><br/>\n" % (tile_img_path, label)
-    tile_num += 1
+  html += "      <td style=\"vertical-align: top\"><div>S%03d Top Tiles:</div><div style=\"font-size: smaller; white-space: nowrap;\">\n" % slide_num
+
+  html += "<table>"
+  MAX_TILES_PER_ROW = 15
+  num_tiles = len(top_tiles)
+  num_cols = math.ceil(num_tiles / MAX_TILES_PER_ROW)
+  num_rows = num_tiles if num_tiles < MAX_TILES_PER_ROW else MAX_TILES_PER_ROW
+  for row in range(num_rows):
+    html += "<tr>"
+    for col in range(num_cols):
+      html += "<td style=\"border: none;\">"
+      tile_num = row + (col * num_rows) + 1
+      if tile_num <= num_tiles:
+        t = top_tiles[tile_num - 1]
+        label = "#%d R%d C%d: %4.2f" % (tile_num, t.r, t.c, t.score)
+        tile_img_path = slide.get_tile_image_path(t)
+        html += "<a target=\"_blank\" href=\"%s\">%s</a><br/>\n" % (tile_img_path, label)
+      else:
+        html += "&nbsp;"
+      html += "</td>"
+    html += "</tr>\n"
+  html += "</table>\n"
 
   html += "</div>\n"
   html += "      </td>\n"
@@ -1183,15 +1197,12 @@ class TissueQuantity(Enum):
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
-# multiprocess_filtered_images_to_tiles()
-multiprocess_filtered_images_to_tiles(image_num_list=[6])
+multiprocess_filtered_images_to_tiles()
+# multiprocess_filtered_images_to_tiles(image_num_list=[6])
 # tile_sum = compute_tile_summary(4)
 # top = tile_sum.top_tiles()
 # for t in top:
 #   t.display_tile()
-
-
-
 
 # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
 # img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
