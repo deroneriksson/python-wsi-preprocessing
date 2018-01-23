@@ -42,6 +42,7 @@ TISSUE_LOW_THRESHOLD_PERCENT = 10
 
 ROW_TILE_SIZE = 1024
 COL_TILE_SIZE = 1024
+NUM_TOP_TILES = 50
 
 # Currently only works well for tile sizes >= 4096
 # 2048 works decently by 2x image scaling except for displaying very large images such as S001
@@ -1125,7 +1126,7 @@ class TileSummary:
 
   def top_tiles(self):
     sorted_tiles = self.tiles_by_score()
-    top_tiles = sorted_tiles[:50]
+    top_tiles = sorted_tiles[:NUM_TOP_TILES]
     return top_tiles
 
 
@@ -1206,7 +1207,7 @@ class TissueQuantity(Enum):
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
-# multiprocess_filtered_images_to_tiles()
+multiprocess_filtered_images_to_tiles()
 # multiprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # tile_sum = compute_tile_summary(4)
 # top = tile_sum.top_tiles()
@@ -1217,7 +1218,7 @@ class TissueQuantity(Enum):
 # img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
 # img_path = "../data/tiles_png/002/TUPAC-TR-002-tile-r17-c35-x34817-y16387-w1024-h1024.png"
 # img_path = "../data/tiles_png/006/TUPAC-TR-006-tile-r58-c3-x2048-y58369-w1024-h1024.png"
-img_path = slide.get_tile_image_path_by_row_col(2, 31, 12)
-img = slide.open_image(img_path)
-rgb = filter.pil_to_np_rgb(img)
-display_tile_with_hue_histogram(rgb)
+# img_path = slide.get_tile_image_path_by_row_col(2, 31, 12)
+# img = slide.open_image(img_path)
+# rgb = filter.pil_to_np_rgb(img)
+# display_tile_with_hue_histogram(rgb)
