@@ -170,7 +170,7 @@ def generate_tile_summary_images(tile_sum, slide_num, np_img, display=True, save
     tile_border(draw, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color)
     tile_border(draw_orig, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color)
 
-  summary_txt = summary_text(tile_sum)
+  summary_txt = summary_title(tile_sum) + "\n" + summary_stats(tile_sum)
 
   summary_font = ImageFont.truetype("/Library/Fonts/Courier New Bold.ttf", size=24)
   draw.text((5, 5), summary_txt, (0, 0, 0), font=summary_font)
@@ -242,7 +242,7 @@ def generate_top_tile_images(tile_sum, slide_num, np_img, display=True, save=Fal
     tile_border(draw, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color)
     tile_border(draw_orig, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color)
 
-  summary_txt = summary_text(tile_sum)
+  summary_txt = summary_title(tile_sum) + "\n" + summary_stats(tile_sum)
 
   summary_font = ImageFont.truetype("/Library/Fonts/Courier New Bold.ttf", size=24)
   draw.text((5, 5), summary_txt, (0, 0, 0), font=summary_font)
@@ -287,9 +287,30 @@ def tile_border_color(tissue_percentage):
   return border_color
 
 
-def summary_text(tile_summary):
-  return "Slide #%03d Tissue Segmentation Summary:\n" % tile_summary.slide_num + \
-         "Original Dimensions: %dx%d\n" % (tile_summary.orig_w, tile_summary.orig_h) + \
+def summary_title(tile_summary):
+  """
+  Obtain tile summary title.
+
+  Args:
+    tile_summary: TileSummary object.
+
+  Returns:
+     The tile summary title.
+  """
+  return "Slide %03d Tile Summary:" % tile_summary.slide_num
+
+
+def summary_stats(tile_summary):
+  """
+  Obtain various stats about the slide tiles.
+
+  Args:
+    tile_summary: TileSummary object.
+
+  Returns:
+     Various stats about the slide tiles as a string.
+  """
+  return "Original Dimensions: %dx%d\n" % (tile_summary.orig_w, tile_summary.orig_h) + \
          "Original Tile Size: %dx%d\n" % (tile_summary.orig_tile_w, tile_summary.orig_tile_h) + \
          "Scale Factor: 1/%dx\n" % tile_summary.scale_factor + \
          "Scaled Dimensions: %dx%d\n" % (tile_summary.scaled_w, tile_summary.scaled_h) + \
@@ -438,7 +459,7 @@ def save_tile_data(tile_summary):
 
   time = Time()
 
-  csv = summary_text(tile_summary)
+  csv = summary_title(tile_summary) + "\n" + summary_stats(tile_summary)
 
   csv += "\n\n\nTile Num,Row,Column,Tissue %,Tissue Quantity,Col Start,Row Start,Col End,Row End,Col Size,Row Size," + \
          "Original Col Start,Original Row Start,Original Col End,Original Row End,Original Col Size,Original Row Size," + \
@@ -805,11 +826,14 @@ def image_row(slide_num, tile_summary, data_link):
           "        </a>\n" + \
           "      </td>\n"
 
-  summary_text = str(tile_summary)
+  html += "      <td style=\"vertical-align: top\">\n" + \
+          "        <div style=\"white-space: nowrap;\">%s</div>\n" % summary_title(tile_summary) + \
+          "        <div style=\"font-size: smaller; white-space: nowrap;\">\n"
+  summary_text = summary_stats(tile_summary)
   summary_text = summary_text.replace("\n", "<br/>")
-  html += "      <td style=\"vertical-align: top\"><div style=\"font-size: smaller; width: %dpx;\">\n" % slide.THUMBNAIL_SIZE + \
-          "        " + summary_text + "</div>\n" + \
-          "      </td>\n"
+  html += summary_text
+  html += "        </div>\n"
+  html += "      </td>\n"
 
   html += "      <td>\n" + \
           "        <a target=\"_blank\" href=\"%s\">S%03d Top Tiles<br/>\n" % (top_img, slide_num) + \
@@ -833,7 +857,7 @@ def image_row(slide_num, tile_summary, data_link):
   top_tiles = sorted(top_tiles, key=lambda t: (t.r, t.c), reverse=False)
 
   html += "      <td style=\"vertical-align: top\">\n" + \
-          "        <div>S%03d Top %d Tile Scores:</div>\n" % (slide_num, num_tiles) + \
+          "        <div style=\"white-space: nowrap;\">S%03d Top %d Tile Scores:</div>\n" % (slide_num, num_tiles) + \
           "        <div style=\"font-size: smaller; white-space: nowrap;\">\n"
 
   html += "<table>"
@@ -1108,7 +1132,7 @@ class TileSummary:
     self.tiles = []
 
   def __str__(self):
-    return summary_text(self)
+    return summary_title(self) + "\n" + summary_stats(self)
 
   def mask_percentage(self):
     return 100 - self.tissue_percentage
