@@ -131,6 +131,16 @@ def get_training_slide_path(slide_number):
 
 
 def get_tile_image_path(tile_info):
+  """
+  Obtain tile image path based on tile information such as row, column, row pixel position, column pixel position,
+  pixel width, and pixel height.
+
+  Args:
+    tile_info: TileInfo object.
+
+  Returns:
+    Path to image tile.
+  """
   t = tile_info
   padded_sl_num = str(t.slide_num).zfill(3)
   tile_path = TILE_DIR + os.sep + padded_sl_num + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + TILE_SUFFIX + "-r%d-c%d-x%d-y%d-w%d-h%d" % (
@@ -139,6 +149,17 @@ def get_tile_image_path(tile_info):
 
 
 def get_tile_image_path_by_row_col(slide_number, row, col):
+  """
+  Obtain tile image path using wildcard lookup with slide number, row, and column.
+
+  Args:
+    slide_number: The slide number.
+    row: The row.
+    col: The column.
+
+  Returns:
+    Path to image tile.
+  """
   padded_sl_num = str(slide_number).zfill(3)
   wilcard_path = TILE_DIR + os.sep + padded_sl_num + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + TILE_SUFFIX + "-r%d-c%d-*." % (
     row, col) + DEST_TRAIN_EXT
