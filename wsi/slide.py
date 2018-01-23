@@ -138,6 +138,14 @@ def get_tile_image_path(tile_info):
   return tile_path
 
 
+def get_tile_image_path_by_row_col(slide_number, row, col):
+  padded_sl_num = str(slide_number).zfill(3)
+  wilcard_path = TILE_DIR + os.sep + padded_sl_num + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + TILE_SUFFIX + "-r%d-c%d-*." % (
+    row, col) + DEST_TRAIN_EXT
+  img_path = glob.glob(wilcard_path)[0]
+  return img_path
+
+
 def get_training_image_path(slide_number, large_w=None, large_h=None, small_w=None, small_h=None):
   """
   Convert slide number and optional dimensions to a training image path. If no dimensions are supplied,
