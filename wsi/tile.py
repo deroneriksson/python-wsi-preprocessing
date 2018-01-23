@@ -823,11 +823,20 @@ def image_row(slide_num, tile_summary, data_link):
           "      </td>\n"
 
   top_tiles = tile_summary.top_tiles()
-  html += "      <td style=\"vertical-align: top\"><div>S%03d Top Tiles:</div><div style=\"font-size: smaller; white-space: nowrap;\">\n" % slide_num
+  num_tiles = len(top_tiles)
+  score_num = 0
+  for t in top_tiles:
+    score_num += 1
+    t.tile_num = score_num
+  # sort top tiles by rows and columns to make them easier to locate on HTML page
+  top_tiles = sorted(top_tiles, key=lambda t: (t.r, t.c), reverse=False)
+
+  html += "      <td style=\"vertical-align: top\">\n" + \
+          "        <div>S%03d Top %d Tile Scores:</div>\n" % (slide_num, num_tiles) + \
+          "        <div style=\"font-size: smaller; white-space: nowrap;\">\n"
 
   html += "<table>"
   MAX_TILES_PER_ROW = 15
-  num_tiles = len(top_tiles)
   num_cols = math.ceil(num_tiles / MAX_TILES_PER_ROW)
   num_rows = num_tiles if num_tiles < MAX_TILES_PER_ROW else MAX_TILES_PER_ROW
   for row in range(num_rows):
@@ -837,7 +846,7 @@ def image_row(slide_num, tile_summary, data_link):
       tile_num = row + (col * num_rows) + 1
       if tile_num <= num_tiles:
         t = top_tiles[tile_num - 1]
-        label = "#%d R%d C%d: %4.2f" % (tile_num, t.r, t.c, t.score)
+        label = "R%03d C%03d %05.1f (#%02d)" % (t.r, t.c, t.score, t.tile_num)
         tile_img_path = slide.get_tile_image_path(t)
         html += "<a target=\"_blank\" href=\"%s\">%s</a><br/>\n" % (tile_img_path, label)
       else:
@@ -1198,7 +1207,7 @@ class TissueQuantity(Enum):
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
 multiprocess_filtered_images_to_tiles()
-# multiprocess_filtered_images_to_tiles(image_num_list=[6])
+# multiprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # tile_sum = compute_tile_summary(4)
 # top = tile_sum.top_tiles()
 # for t in top:
