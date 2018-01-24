@@ -42,7 +42,7 @@ TISSUE_LOW_THRESHOLD_PERCENT = 10
 
 ROW_TILE_SIZE = 1024
 COL_TILE_SIZE = 1024
-NUM_TOP_TILES = 50
+NUM_TOP_TILES = 10
 
 # Currently only works well for tile sizes >= 4096
 # 2048 works decently by 2x image scaling except for displaying very large images such as S001
@@ -525,7 +525,7 @@ def save_display_tile(tile_info, save=True, display=False):
     tile_pil_img.show()
 
 
-def compute_tile_summary(slide_num, np_img=None):
+def compute_tile_summary(slide_num, np_img=None, dimensions=None):
   """
   Generate a tile summary consisting of summary statistics and also information about each tile such as tissue
   percentage and coordinates.
@@ -533,12 +533,17 @@ def compute_tile_summary(slide_num, np_img=None):
   Args:
     slide_num: The slide number.
     np_img: Image as a NumPy array.
+    dimensions: Optional tuple consisting of (original width, original height, new width, new height). Used for dynamic
+      tile retrieval.
 
   Returns:
     TileSummary object which includes a list of TileInfo objects containing information about each tile.
   """
-  img_path = slide.get_filter_image_result(slide_num)
-  o_w, o_h, w, h = slide.parse_dimensions_from_image_filename(img_path)
+  if dimensions is None:
+    img_path = slide.get_filter_image_result(slide_num)
+    o_w, o_h, w, h = slide.parse_dimensions_from_image_filename(img_path)
+  else:
+    o_w, o_h, w, h = dimensions
 
   if np_img is None:
     img = slide.open_image(img_path)
@@ -1266,10 +1271,10 @@ class TissueQuantity(Enum):
 
 
 def dynamic_tiles(slide_num):
-  pil_img = slide.slide_to_scaled_pil_image(slide_num)[0]
+  pil_img, large_w, large_h, small_w, small_h = slide.slide_to_scaled_pil_image(slide_num)
   np_img = filter.pil_to_np_rgb(pil_img)
   filt_np_img = filter.apply_image_filters(np_img)
-  tile_summary = compute_tile_summary(slide_num, filt_np_img)
+  tile_summary = compute_tile_summary(slide_num, filt_np_img, (large_w, large_h, small_w, small_h))
   return tile_summary
 
 
@@ -1317,8 +1322,16 @@ def dynamic_tiles(slide_num):
 # pil_val_hist = filter.np_to_pil(np_val_hist)
 # pil_val_hist.show()
 
-tile_summary = dynamic_tiles(2)
+timer = Time()
+tile_summary = dynamic_tiles(5)
 top = tile_summary.top_tiles()
 for t in top:
   pil_tile = t.get_tile()
   print("tile:" + str(pil_tile))
+  pil_tile.show()
+print(str(tile_summary))
+print("Time to retrieve all top tiles: %s" % str(timer.elapsed()))
+
+# slide.multiprocess_training_slides_to_images()
+# filter.multiprocess_apply_filters_to_images()
+# multiprocess_filtered_images_to_tiles()
