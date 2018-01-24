@@ -42,7 +42,7 @@ TISSUE_LOW_THRESHOLD_PERCENT = 10
 
 ROW_TILE_SIZE = 1024
 COL_TILE_SIZE = 1024
-NUM_TOP_TILES = 10
+NUM_TOP_TILES = 50
 
 # Currently only works well for tile sizes >= 4096
 # 2048 works decently by 2x image scaling except for displaying very large images such as S001
@@ -1271,6 +1271,17 @@ class TissueQuantity(Enum):
 
 
 def dynamic_tiles(slide_num):
+  """
+  Generate tile summary with top tiles using original WSI training slide without intermediate image files saved to
+  file system.
+
+  Args:
+    slide_num: The slide number.
+
+  Returns:
+     TileSummary object with list of top TileInfo objects. The actual PIL tile image is not retrieved until the
+     TileInfo's get_tile() method is called.
+  """
   pil_img, large_w, large_h, small_w, small_h = slide.slide_to_scaled_pil_image(slide_num)
   np_img = filter.pil_to_np_rgb(pil_img)
   filt_np_img = filter.apply_image_filters(np_img)
