@@ -976,6 +976,50 @@ def np_hue_histogram(h):
   return np_hist
 
 
+def np_saturation_histogram(s):
+  """
+  Create Matplotlib histogram of saturation values for an HSV image and return the histogram as a NumPy array image.
+
+  Args:
+    s: Saturation values as a 1-dimensional float NumPy array
+
+  Returns:
+    Matplotlib histogram of saturation values converted to a NumPy array image.
+  """
+  figure = plt.figure()
+  canvas = figure.canvas
+  plt.hist(s, bins="auto")
+  plt.title("HSV Saturation Histogram")
+
+  canvas.draw()
+  w, h = canvas.get_width_height()
+  np_hist = np.fromstring(canvas.get_renderer().tostring_rgb(), dtype=np.uint8).reshape(h, w, 3)
+  filter.np_info(np_hist)
+  return np_hist
+
+
+def np_value_histogram(v):
+  """
+  Create Matplotlib histogram of value values for an HSV image and return the histogram as a NumPy array image.
+
+  Args:
+    v: Value values as a 1-dimensional float NumPy array
+
+  Returns:
+    Matplotlib histogram of saturation values converted to a NumPy array image.
+  """
+  figure = plt.figure()
+  canvas = figure.canvas
+  plt.hist(v, bins="auto")
+  plt.title("HSV Value Histogram")
+
+  canvas.draw()
+  w, h = canvas.get_width_height()
+  np_hist = np.fromstring(canvas.get_renderer().tostring_rgb(), dtype=np.uint8).reshape(h, w, 3)
+  filter.np_info(np_hist)
+  return np_hist
+
+
 def pil_hue_histogram(h):
   """
   Create Matplotlib histogram of hue values for an HSV image and return the histogram as a PIL image.
@@ -1231,7 +1275,7 @@ class TissueQuantity(Enum):
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
-multiprocess_filtered_images_to_tiles()
+# multiprocess_filtered_images_to_tiles()
 # multiprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # tile_sum = compute_tile_summary(4)
 # top = tile_sum.top_tiles()
@@ -1240,9 +1284,27 @@ multiprocess_filtered_images_to_tiles()
 
 # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
 # img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
-# img_path = "../data/tiles_png/002/TUPAC-TR-002-tile-r17-c35-x34817-y16387-w1024-h1024.png"
+img_path = "../data/tiles_png/002/TUPAC-TR-002-tile-r17-c35-x34817-y16387-w1024-h1024.png"
 # img_path = "../data/tiles_png/006/TUPAC-TR-006-tile-r58-c3-x2048-y58369-w1024-h1024.png"
 # img_path = slide.get_tile_image_path_by_row_col(2, 31, 12)
-# img = slide.open_image(img_path)
-# rgb = filter.pil_to_np_rgb(img)
-# display_tile_with_hue_histogram(rgb)
+img = slide.open_image(img_path)
+# img = slide.open_image("robot.png")
+# img = img.convert("RGB")
+rgb = filter.pil_to_np_rgb(img)
+
+display_tile_with_hue_histogram(rgb)
+hsv = filter.filter_rgb_to_hsv(rgb)
+hue = filter.filter_hsv_to_h(hsv)
+np_hue_hist = np_hue_histogram(hue)
+pil_hue_hist = filter.np_to_pil(np_hue_hist)
+pil_hue_hist.show()
+
+sat = filter.filter_hsv_to_s(hsv)
+np_sat_hist = np_saturation_histogram(sat)
+pil_sat_hist = filter.np_to_pil(np_sat_hist)
+pil_sat_hist.show()
+
+val = filter.filter_hsv_to_v(hsv)
+np_val_hist = np_value_histogram(val)
+pil_val_hist = filter.np_to_pil(np_val_hist)
+pil_val_hist.show()
