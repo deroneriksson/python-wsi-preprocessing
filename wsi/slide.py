@@ -633,29 +633,14 @@ def small_to_large_mapping(small_pixel, large_dimensions):
 
 def training_slide_to_image(slide_number):
   """
-  Convert a WSI training slide to an image in a format such as jpg or png.
+  Convert a WSI training slide to a saved scaled-down image in a format such as jpg or png.
 
   Args:
     slide_number: The slide number.
   """
-  slide_filepath = get_training_slide_path(slide_number)
-  print("Opening Slide #%d: %s" % (slide_number, slide_filepath))
-  slide = open_slide(slide_filepath)
-  # print("SLIDE DIMENSIONS: " + str(slide.dimensions))
-  # print("LEVEL COUNT: " + str(slide.level_count))
-  # print("LEVEL DIMENSIONS: " + str(slide.level_dimensions))
-  # print("LEVEL DOWNSAMPLES: " + str(slide.level_downsamples))
 
-  large_w, large_h = slide.dimensions
-  new_w = math.floor(large_w / SCALE_FACTOR)
-  new_h = math.floor(large_h / SCALE_FACTOR)
-  level = slide.get_best_level_for_downsample(SCALE_FACTOR)
-  whole_slide_image = slide.read_region((0, 0), level, slide.level_dimensions[level])
-  whole_slide_image = whole_slide_image.convert("RGB")
-  img = whole_slide_image.resize((new_w, new_h), PIL.Image.BILINEAR)
-  # print("BEST LEVEL: " + str(level))
-  # print("WSI LEVEL SIZE: " + str(whole_slide_image.size))
-  # print("IMG SIZE: " + str(img.size))
+  img, large_w, large_h, new_w, new_h = slide_to_scaled_pil_image(slide_number)
+
   img_path = get_training_image_path(slide_number, large_w, large_h, new_w, new_h)
   print("Saving image to: " + img_path)
   if not os.path.exists(DEST_TRAIN_DIR):
@@ -664,6 +649,30 @@ def training_slide_to_image(slide_number):
 
   thumbnail_path = get_training_thumbnail_path(slide_number, large_w, large_h, new_w, new_h)
   save_thumbnail(img, THUMBNAIL_SIZE, thumbnail_path)
+
+
+def slide_to_scaled_pil_image(slide_number):
+  """
+  Convert a WSI training slide to a scaled-down PIL image.
+
+  Args:
+    slide_number: The slide number.
+
+  Returns:
+    Tuple consisting of scaled-down PIL image, original width, original height, new width, and new height.
+  """
+  slide_filepath = get_training_slide_path(slide_number)
+  print("Opening Slide #%d: %s" % (slide_number, slide_filepath))
+  slide = open_slide(slide_filepath)
+
+  large_w, large_h = slide.dimensions
+  new_w = math.floor(large_w / SCALE_FACTOR)
+  new_h = math.floor(large_h / SCALE_FACTOR)
+  level = slide.get_best_level_for_downsample(SCALE_FACTOR)
+  whole_slide_image = slide.read_region((0, 0), level, slide.level_dimensions[level])
+  whole_slide_image = whole_slide_image.convert("RGB")
+  img = whole_slide_image.resize((new_w, new_h), PIL.Image.BILINEAR)
+  return img, large_w, large_h, new_w, new_h
 
 
 def save_thumbnail(pil_img, size, path, display_path=False):
@@ -979,6 +988,7 @@ class Time:
     time_elapsed = self.end - self.start
     return time_elapsed
 
+
 # singleprocess_training_slides_to_images()
 # multiprocess_training_slides_to_images()
 # slide_stats()
@@ -987,3 +997,4 @@ class Time:
 # training_slide_to_image(2)
 # training_slide_to_image(3)
 # training_slide_to_image(4)
+# slide_to_scaled_pil_image(5)[0].show()
