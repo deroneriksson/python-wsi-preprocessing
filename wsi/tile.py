@@ -1265,6 +1265,14 @@ class TissueQuantity(Enum):
   HIGH = 3
 
 
+def dynamic_tiles(slide_num):
+  pil_img = slide.slide_to_scaled_pil_image(slide_num)[0]
+  np_img = filter.pil_to_np_rgb(pil_img)
+  filt_np_img = filter.apply_image_filters(np_img)
+  tile_summary = compute_tile_summary(slide_num, filt_np_img)
+  return tile_summary
+
+
 # summary_and_tiles(15, save=True)
 # x = np.arange(10)
 # print(str(x))
@@ -1282,29 +1290,35 @@ class TissueQuantity(Enum):
 # for t in top:
 #   t.display_tile()
 
-# img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
-# img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
-img_path = "../data/tiles_png/002/TUPAC-TR-002-tile-r17-c35-x34817-y16387-w1024-h1024.png"
-# img_path = "../data/tiles_png/006/TUPAC-TR-006-tile-r58-c3-x2048-y58369-w1024-h1024.png"
-# img_path = slide.get_tile_image_path_by_row_col(2, 31, 12)
-img = slide.open_image(img_path)
-# img = slide.open_image("robot.png")
-# img = img.convert("RGB")
-rgb = filter.pil_to_np_rgb(img)
+# # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
+# # img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
+# img_path = "../data/tiles_png/002/TUPAC-TR-002-tile-r17-c35-x34817-y16387-w1024-h1024.png"
+# # img_path = "../data/tiles_png/006/TUPAC-TR-006-tile-r58-c3-x2048-y58369-w1024-h1024.png"
+# # img_path = slide.get_tile_image_path_by_row_col(2, 31, 12)
+# img = slide.open_image(img_path)
+# # img = slide.open_image("robot.png")
+# # img = img.convert("RGB")
+# rgb = filter.pil_to_np_rgb(img)
+#
+# display_tile_with_hue_histogram(rgb)
+# hsv = filter.filter_rgb_to_hsv(rgb)
+# hue = filter.filter_hsv_to_h(hsv)
+# np_hue_hist = np_hue_histogram(hue)
+# pil_hue_hist = filter.np_to_pil(np_hue_hist)
+# pil_hue_hist.show()
+#
+# sat = filter.filter_hsv_to_s(hsv)
+# np_sat_hist = np_saturation_histogram(sat)
+# pil_sat_hist = filter.np_to_pil(np_sat_hist)
+# pil_sat_hist.show()
+#
+# val = filter.filter_hsv_to_v(hsv)
+# np_val_hist = np_value_histogram(val)
+# pil_val_hist = filter.np_to_pil(np_val_hist)
+# pil_val_hist.show()
 
-display_tile_with_hue_histogram(rgb)
-hsv = filter.filter_rgb_to_hsv(rgb)
-hue = filter.filter_hsv_to_h(hsv)
-np_hue_hist = np_hue_histogram(hue)
-pil_hue_hist = filter.np_to_pil(np_hue_hist)
-pil_hue_hist.show()
-
-sat = filter.filter_hsv_to_s(hsv)
-np_sat_hist = np_saturation_histogram(sat)
-pil_sat_hist = filter.np_to_pil(np_sat_hist)
-pil_sat_hist.show()
-
-val = filter.filter_hsv_to_v(hsv)
-np_val_hist = np_value_histogram(val)
-pil_val_hist = filter.np_to_pil(np_val_hist)
-pil_val_hist.show()
+tile_summary = dynamic_tiles(2)
+top = tile_summary.top_tiles()
+for t in top:
+  pil_tile = t.get_tile()
+  print("tile:" + str(pil_tile))
