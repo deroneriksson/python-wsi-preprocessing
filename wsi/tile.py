@@ -132,13 +132,13 @@ def create_summary_pil_img(np_img, title_area_height, row_tile_size, col_tile_si
   return summary
 
 
-def generate_tile_summary_images(tile_sum, slide_num, np_img, display=True, save=False, text_color=(255, 255, 255),
+def generate_tile_summary_images(tile_sum, np_img, display=True, save=False, text_color=(255, 255, 255),
                                  text_size=16, font_path="/Library/Fonts/Arial Bold.ttf"):
   """
   Generate summary images/thumbnails showing a 'heatmap' representation of the tissue segmentation of all tiles.
 
   Args:
-    slide_num: The slide number.
+    tile_sum: TileSummary object.
     np_img: Image as a NumPy array.
     tile_indices: List of tuples consisting of starting row, ending row, starting column, ending column, row number,
                   column number.
@@ -151,6 +151,7 @@ def generate_tile_summary_images(tile_sum, slide_num, np_img, display=True, save
     font_path: Path to the font to use.
   """
   z = 300  # height of area at top of summary slide
+  slide_num = tile_sum.slide_num
   rows = tile_sum.scaled_h
   cols = tile_sum.scaled_w
   row_tile_size = tile_sum.scaled_tile_h
@@ -441,7 +442,7 @@ def summary_and_tiles(slide_num, display=True, save=False, save_data=True, save_
   tile_sum = compute_tile_summary(slide_num, np_img)
   if save_data:
     save_tile_data(tile_sum)
-  generate_tile_summary_images(tile_sum, slide_num, np_img, display=display, save=save)
+  generate_tile_summary_images(tile_sum, np_img, display=display, save=save)
   generate_top_tile_images(tile_sum, slide_num, np_img, display=display, save=save)
   if save_top_tiles:
     for tile in tile_sum.top_tiles():
@@ -1339,7 +1340,7 @@ top = tile_summary.top_tiles()
 for t in top:
   pil_tile = t.get_tile()
   print("tile:" + str(pil_tile))
-  pil_tile.show()
+  # pil_tile.show()
 print(str(tile_summary))
 print("Time to retrieve all top tiles: %s" % str(timer.elapsed()))
 
