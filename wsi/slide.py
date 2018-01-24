@@ -187,8 +187,8 @@ def get_training_image_path(slide_number, large_w=None, large_h=None, small_w=No
   """
   padded_sl_num = str(slide_number).zfill(3)
   if large_w is None and large_h is None and small_w is None and small_h is None:
-    wilcard_path = DEST_TRAIN_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "*." + DEST_TRAIN_EXT
-    img_path = glob.glob(wilcard_path)[0]
+    wildcard_path = DEST_TRAIN_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "*." + DEST_TRAIN_EXT
+    img_path = glob.glob(wildcard_path)[0]
   else:
     img_path = DEST_TRAIN_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
       SCALE_FACTOR) + "x-" + DEST_TRAIN_SUFFIX + str(

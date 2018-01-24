@@ -1136,30 +1136,21 @@ def display_img(np_img, text=None, font_path="/Library/Fonts/Arial Bold.ttf", si
   result.show()
 
 
-def apply_filters_to_image(slide_num, save=True, display=False):
+def apply_image_filters(np_img, slide_num=None, info=None, save=False, display=False):
   """
-  Apply a set of filters to an image and optionally save and/or display filtered images.
+  Apply filters to image as NumPy array and optionally save and/or display filtered images.
 
   Args:
-    slide_num: The slide number.
-    save: If True, save filtered images.
-    display: If True, display filtered images to screen.
+    np_img: Image as NumPy array.
+    slide_num: The slide number (used for saving/displaying).
+    info: Dictionary of slide information (used for HTML display).
+    save: If True, save image.
+    display: If True, display image.
 
   Returns:
-    Tuple consisting of 1) the resulting filtered image as a NumPy array, and 2) dictionary of image information
-    (used for HTML page generation).
+    Resulting filtered image as a NumPy array.
   """
-  t = Time()
-  print("Processing slide #%d" % slide_num)
-
-  info = dict()
-
-  if save and not os.path.exists(slide.FILTER_DIR):
-    os.makedirs(slide.FILTER_DIR)
-  img_path = slide.get_training_image_path(slide_num)
-  img = slide.open_image(img_path)
-
-  rgb = pil_to_np_rgb(img)
+  rgb = np_img
   save_display(save, display, info, rgb, slide_num, 1, "Original", "rgb")
 
   mask_not_green = filter_green_channel(rgb)
@@ -1194,11 +1185,38 @@ def apply_filters_to_image(slide_num, save=True, display=False):
                "rgb-not-green-not-gray-no-pens-remove-small")
 
   img = rgb_remove_small
+  return img
+
+
+def apply_filters_to_image(slide_num, save=True, display=False):
+  """
+  Apply a set of filters to an image and optionally save and/or display filtered images.
+
+  Args:
+    slide_num: The slide number.
+    save: If True, save filtered images.
+    display: If True, display filtered images to screen.
+
+  Returns:
+    Tuple consisting of 1) the resulting filtered image as a NumPy array, and 2) dictionary of image information
+    (used for HTML page generation).
+  """
+  t = Time()
+  print("Processing slide #%d" % slide_num)
+
+  info = dict()
+
+  if save and not os.path.exists(slide.FILTER_DIR):
+    os.makedirs(slide.FILTER_DIR)
+  img_path = slide.get_training_image_path(slide_num)
+  pil_orig = slide.open_image(img_path)
+  np_orig = pil_to_np_rgb(pil_orig)
+  filtered_np_img = apply_image_filters(np_orig, slide_num, info, save=save, display=display)
 
   if save:
     t1 = Time()
     result_path = slide.get_filter_image_result(slide_num)
-    pil_img = np_to_pil(img)
+    pil_img = np_to_pil(filtered_np_img)
     pil_img.save(result_path)
     print("%-20s | Time: %-14s  Name: %s" % ("Save Image", str(t1.elapsed()), result_path))
 
@@ -1209,7 +1227,7 @@ def apply_filters_to_image(slide_num, save=True, display=False):
 
   print("Slide #%03d processing time: %s\n" % (slide_num, str(t.elapsed())))
 
-  return img, info
+  return filtered_np_img, info
 
 
 def save_display(save, display, info, np_img, slide_num, filter_num, display_text, file_text):
@@ -1234,13 +1252,16 @@ def save_display(save, display, info, np_img, slide_num, filter_num, display_tex
     pass
   elif filter_num is None:
     display_text = "S%03d " % slide_num + display_text
+  elif slide_num is None:
+    display_text = "F%03d " % filter_num + display_text
   else:
     display_text = "S%03d-F%03d " % (slide_num, filter_num) + display_text
   if display:
     display_img(np_img, display_text)
   if save:
     save_filtered_image(np_img, slide_num, filter_num, file_text)
-  info[slide_num * 1000 + filter_num] = (slide_num, filter_num, display_text, file_text, mask_percentage)
+  if info is not None:
+    info[slide_num * 1000 + filter_num] = (slide_num, filter_num, display_text, file_text, mask_percentage)
 
 
 def mask_percentage_text(mask_percentage):
@@ -1567,8 +1588,9 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 
   print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
 
-# apply_filters_to_image(1)
-# rgb, _ = apply_filters_to_image(337, display=False, save=False)
+
+# apply_filters_to_image(2)
+# rgb, _ = apply_filters_to_image(6, display=False, save=False)
 # display_img(rgb, "RGB")
 # not_greenish = filter_green(rgb, red_upper_thresh=125, green_lower_thresh=30, blue_lower_thresh=30,
 #                             display_np_info=True)
@@ -1580,7 +1602,7 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 # result = np.concatenate((row1, row2), axis=0)
 # display_img(result)
 
-# singleprocess_apply_filters_to_images(image_num_list=[1,2,3,4])
+# singleprocess_apply_filters_to_images(image_num_list=[3,4])
 
 # multiprocess_apply_filters_to_images(save=False, display=False, html=True)
 # multiprocess_apply_filters_to_images()
@@ -1651,3 +1673,10 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 #   mask_entropy = filter_entropy(gray_no_red_pen, neighborhood=5, threshold=4, output_type="bool")
 #   rgb_entropy = mask_rgb(rgb, mask_entropy)
 #   save_display(save, display, info, rgb_entropy, slide_num, 5, "Entropy", "rgb-entropy")
+
+# pil_img = slide.slide_to_scaled_pil_image(15)[0]
+# pil_img.show()
+# np_img = pil_to_np_rgb(pil_img)
+# filt_np_img = apply_image_filters(np_img)
+# filt_pil_img = np_to_pil(filt_np_img)
+# filt_pil_img.show()
