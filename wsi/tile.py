@@ -800,19 +800,19 @@ def image_row(slide_num, tile_summary, data_link):
   otop_img = slide.get_top_tiles_on_original_image_path(slide_num)
   otop_thumb = slide.get_top_tiles_on_original_thumbnail_path(slide_num)
   html = "    <tr>\n" + \
-         "      <td>\n" + \
+         "      <td style=\"vertical-align: top\">\n" + \
          "        <a target=\"_blank\" href=\"%s\">S%03d Original<br/>\n" % (orig_img, slide_num) + \
          "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), orig_thumb) + \
          "        </a>\n" + \
          "      </td>\n" + \
-         "      <td>\n" + \
+         "      <td style=\"vertical-align: top\">\n" + \
          "        <a target=\"_blank\" href=\"%s\">S%03d Filtered<br/>\n" % (filt_img, slide_num) + \
          "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), filt_thumb) + \
          "        </a>\n" + \
          "      </td>\n"
   if data_link:
     data_file = slide.get_tile_data_path(slide_num)
-    html += "      <td>\n" + \
+    html += "      <td style=\"vertical-align: top\">\n" + \
             "        <a target=\"_blank\" href=\"%s\">S%03d Tiled</a> " % (sum_img, slide_num) + \
             "        (<a target=\"_blank\" href=\"%s\">Data</a>)<br/>\n" % data_file + \
             "        <a target=\"_blank\" href=\"%s\">" % sum_img + \
@@ -820,20 +820,20 @@ def image_row(slide_num, tile_summary, data_link):
             "        </a>\n" + \
             "      </td>\n"
   else:
-    html += "      <td>\n" + \
+    html += "      <td style=\"vertical-align: top\">\n" + \
             "        <a target=\"_blank\" href=\"%s\">S%03d Tiled<br/>\n" % (sum_img, slide_num) + \
             "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), sum_thumb) + \
             "        </a>\n" + \
             "      </td>\n"
 
-  html += "      <td>\n" + \
+  html += "      <td style=\"vertical-align: top\">\n" + \
           "        <a target=\"_blank\" href=\"%s\">S%03d Original Tiled<br/>\n" % (osum_img, slide_num) + \
           "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), osum_thumb) + \
           "        </a>\n" + \
           "      </td>\n"
 
   html += "      <td style=\"vertical-align: top\">\n" + \
-          "        <div style=\"white-space: nowrap;\">%s</div>\n" % summary_title(tile_summary) + \
+          "        <div style=\"white-space: nowrap;\">S%03d Tile Summary</div>\n" % slide_num + \
           "        <div style=\"font-size: smaller; white-space: nowrap;\">\n"
   summary_text = summary_stats(tile_summary)
   summary_text = summary_text.replace("\n", "<br/>")
@@ -841,13 +841,13 @@ def image_row(slide_num, tile_summary, data_link):
   html += "        </div>\n"
   html += "      </td>\n"
 
-  html += "      <td>\n" + \
+  html += "      <td style=\"vertical-align: top\">\n" + \
           "        <a target=\"_blank\" href=\"%s\">S%03d Top Tiles<br/>\n" % (top_img, slide_num) + \
           "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), top_thumb) + \
           "        </a>\n" + \
           "      </td>\n"
 
-  html += "      <td>\n" + \
+  html += "      <td style=\"vertical-align: top\">\n" + \
           "        <a target=\"_blank\" href=\"%s\">S%03d Original Top Tiles<br/>\n" % (otop_img, slide_num) + \
           "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), otop_thumb) + \
           "        </a>\n" + \
@@ -863,7 +863,7 @@ def image_row(slide_num, tile_summary, data_link):
   top_tiles = sorted(top_tiles, key=lambda t: (t.r, t.c), reverse=False)
 
   html += "      <td style=\"vertical-align: top\">\n" + \
-          "        <div style=\"white-space: nowrap;\">S%03d Top %d Tile Scores:</div>\n" % (slide_num, num_tiles) + \
+          "        <div style=\"white-space: nowrap;\">S%03d Top %d Tile Scores</div>\n" % (slide_num, num_tiles) + \
           "        <div style=\"font-size: smaller; white-space: nowrap;\">\n"
 
   html += "<table>"
@@ -1301,7 +1301,7 @@ def dynamic_tiles(slide_num):
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
 # multiprocess_filtered_images_to_tiles()
-# multiprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8, 9])
+multiprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8, 9])
 # tile_sum = compute_tile_summary(4)
 # top = tile_sum.top_tiles()
 # for t in top:
@@ -1311,12 +1311,12 @@ def dynamic_tiles(slide_num):
 # # img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
 # img_path = "../data/tiles_png/002/TUPAC-TR-002-tile-r17-c35-x34817-y16387-w1024-h1024.png"
 # # img_path = "../data/tiles_png/006/TUPAC-TR-006-tile-r58-c3-x2048-y58369-w1024-h1024.png"
-# # img_path = slide.get_tile_image_path_by_row_col(2, 31, 12)
+# img_path = slide.get_tile_image_path_by_row_col(2, 31, 12)
 # img = slide.open_image(img_path)
 # # img = slide.open_image("robot.png")
-# # img = img.convert("RGB")
+# img = img.convert("RGB")
 # rgb = filter.pil_to_np_rgb(img)
-#
+
 # display_tile_with_hue_histogram(rgb)
 # hsv = filter.filter_rgb_to_hsv(rgb)
 # hue = filter.filter_hsv_to_h(hsv)
@@ -1334,15 +1334,15 @@ def dynamic_tiles(slide_num):
 # pil_val_hist = filter.np_to_pil(np_val_hist)
 # pil_val_hist.show()
 
-timer = Time()
-tile_summary = dynamic_tiles(6)
-top = tile_summary.top_tiles()
-for t in top:
-  pil_tile = t.get_tile()
-  print("tile:" + str(pil_tile))
-  # pil_tile.show()
-print(str(tile_summary))
-print("Time to retrieve all top tiles: %s" % str(timer.elapsed()))
+# timer = Time()
+# tile_summary = dynamic_tiles(6)
+# top = tile_summary.top_tiles()
+# for t in top:
+#   pil_tile = t.get_tile()
+#   print("tile:" + str(pil_tile))
+#   # pil_tile.show()
+# print(str(tile_summary))
+# print("Time to retrieve all top tiles: %s" % str(timer.elapsed()))
 
 # slide.multiprocess_training_slides_to_images()
 # filter.multiprocess_apply_filters_to_images()
