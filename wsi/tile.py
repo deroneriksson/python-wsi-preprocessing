@@ -1028,6 +1028,74 @@ def np_hsv_value_histogram(v):
   return np_hist
 
 
+def np_rgb_channel_histogram(rgb, ch_num, ch_name):
+  """
+  Create Matplotlib histogram of an RGB channel for an RGB image and return the histogram as a NumPy array image.
+
+  Args:
+    rgb: Image as RGB NumPy array.
+    ch_num: Which channel (0=red, 1=green, 2=blue)
+    ch_name: Channel name ("R", "G", "B")
+
+  Returns:
+    Matplotlib histogram of RGB channel converted to a NumPy array image.
+  """
+  ch = rgb[:, :, ch_num]
+  ch = ch.flatten()
+  figure = plt.figure()
+  canvas = figure.canvas
+  plt.hist(ch, bins=256)
+  plt.title("RGB %s Histogram, mean=%.2f, std=%.2f" % (ch_name, np.mean(ch), np.std(ch)))
+
+  canvas.draw()
+  w, h = canvas.get_width_height()
+  np_hist = np.fromstring(canvas.get_renderer().tostring_rgb(), dtype=np.uint8).reshape(h, w, 3)
+  filter.np_info(np_hist)
+  return np_hist
+
+
+def np_rgb_r_histogram(rgb):
+  """
+  Obtain RGB R channel histogram as a NumPy array image.
+
+  Args:
+    rgb: Image as RGB NumPy array.
+
+  Returns:
+     Histogram of RGB R channel as a NumPy array image.
+  """
+  hist = np_rgb_channel_histogram(rgb, 0, "R")
+  return hist
+
+
+def np_rgb_g_histogram(rgb):
+  """
+  Obtain RGB G channel histogram as a NumPy array image.
+
+  Args:
+    rgb: Image as RGB NumPy array.
+
+  Returns:
+     Histogram of RGB G channel as a NumPy array image.
+  """
+  hist = np_rgb_channel_histogram(rgb, 1, "G")
+  return hist
+
+
+def np_rgb_b_histogram(rgb):
+  """
+  Obtain RGB B channel histogram as a NumPy array image.
+
+  Args:
+    rgb: Image as RGB NumPy array.
+
+  Returns:
+     Histogram of RGB B channel as a NumPy array image.
+  """
+  hist = np_rgb_channel_histogram(rgb, 2, "B")
+  return hist
+
+
 def pil_hue_histogram(h):
   """
   Create Matplotlib histogram of hue values for an HSV image and return the histogram as a PIL image.
@@ -1377,8 +1445,10 @@ img_path = slide.get_tile_image_path_by_row_col(7, 21, 84)
 img = slide.open_image(img_path)
 rgb = filter.pil_to_np_rgb(img)
 # display_tile_with_hsv_hue_histogram(rgb)
-display_tile_with_hsv_histograms(rgb)
-
+# display_tile_with_hsv_histograms(rgb)
+filter.np_to_pil(np_rgb_r_histogram(rgb)).show()
+filter.np_to_pil(np_rgb_g_histogram(rgb)).show()
+filter.np_to_pil(np_rgb_b_histogram(rgb)).show()
 # timer = Time()
 # tile_summary = dynamic_tiles(6)
 # top = tile_summary.top_tiles()
