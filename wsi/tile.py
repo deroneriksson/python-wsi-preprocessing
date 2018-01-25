@@ -464,12 +464,13 @@ def save_tile_data(tile_summary):
 
   csv += "\n\n\nTile Num,Row,Column,Tissue %,Tissue Quantity,Col Start,Row Start,Col End,Row End,Col Size,Row Size," + \
          "Original Col Start,Original Row Start,Original Col End,Original Row End,Original Col Size,Original Row Size," + \
-         "Color Factor,Score\n"
+         "Color Factor,S and V Factor,Score\n"
 
   for t in tile_summary.tiles:
-    line = "%d,%d,%d,%4.2f,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%4.2f,%4.2f\n" % (
+    line = "%d,%d,%d,%4.2f,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%4.2f,%4.2f,%4.2f\n" % (
       t.tile_num, t.r, t.c, t.tissue_percentage, t.tissue_quantity().name, t.c_s, t.r_s, t.c_e, t.r_e, t.c_e - t.c_s,
-      t.r_e - t.r_s, t.o_c_s, t.o_r_s, t.o_c_e, t.o_r_e, t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s, t.color_factor, t.score)
+      t.r_e - t.r_s, t.o_c_s, t.o_r_s, t.o_c_e, t.o_r_e, t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s, t.color_factor,
+      t.s_and_v_factor, t.score)
     csv += line
 
   data_path = slide.get_tile_data_path(tile_summary.slide_num)
@@ -589,10 +590,11 @@ def compute_tile_summary(slide_num, np_img=None, dimensions=None):
       o_r_e -= 1
 
     color_factor = purple_vs_pink_factor(np_tile, t_p)
-    score = t_p * color_factor
+    s_and_v_factor = saturation_and_value_factor(np_tile)
+    score = t_p * color_factor * s_and_v_factor
 
     tile_info = TileInfo(slide_num, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p, color_factor,
-                         score)
+                         s_and_v_factor, score)
     tile_sum.tiles.append(tile_info)
 
     amount = tissue_quantity(t_p)
@@ -1112,6 +1114,36 @@ def rgb_to_hues(rgb):
   return h
 
 
+def saturation_and_value_factor(rgb):
+  """
+  Function to reduce scores of tiles with narrow HSV saturations and values since saturation and value standard
+  deviations should be relatively broad if the tile contains significant tissue.
+
+  Example of a blurred tile that should not be ranked as a top tile:
+    ../data/tiles_png/006/TUPAC-TR-006-tile-r58-c3-x2048-y58369-w1024-h1024.png
+
+  Args:
+    rgb: RGB image as a NumPy array
+
+  Returns:
+    Saturation and value factor, where 1 is no effect and less than 1 means the standard deviations of saturation and
+    value are relatively small.
+  """
+  hsv = filter.filter_rgb_to_hsv(rgb, display_np_info=False)
+  s = filter.filter_hsv_to_s(hsv)
+  v = filter.filter_hsv_to_v(hsv)
+  s_std = np.std(s)
+  v_std = np.std(v)
+  if s_std < 0.05 and v_std < 0.05:
+    return 0.4
+  elif s_std < 0.05:
+    return 0.7
+  elif v_std < 0.05:
+    return 0.7
+  else:
+    return 1
+
+
 def purple_vs_pink_factor(rgb, tissue_percentage):
   """
   Function to favor purple (hematoxylin) over pink (eosin) staining.
@@ -1255,10 +1287,11 @@ class TileInfo:
   o_c_e = None
   tissue_percentage = None
   color_factor = None
+  s_and_v_factor = None
   score = None
 
   def __init__(self, slide_num, tile_num, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p, color_factor,
-               score):
+               s_and_v_factor, score):
     self.slide_num = slide_num
     self.tile_num = tile_num
     self.r = r
@@ -1273,6 +1306,7 @@ class TileInfo:
     self.o_c_e = o_c_e
     self.tissue_percentage = t_p
     self.color_factor = color_factor
+    self.s_and_v_factor = s_and_v_factor
     self.score = score
 
   def __str__(self):
@@ -1329,21 +1363,21 @@ def dynamic_tiles(slide_num):
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
 # multiprocess_filtered_images_to_tiles()
-# multiprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8, 9])
+multiprocess_filtered_images_to_tiles(image_num_list=[6])
 
 # # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
 # # img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
 # img_path = "../data/tiles_png/002/TUPAC-TR-002-tile-r17-c35-x34817-y16387-w1024-h1024.png"
 # img_path = "../data/tiles_png/006/TUPAC-TR-006-tile-r58-c3-x2048-y58369-w1024-h1024.png"
 # img_path = slide.get_tile_image_path_by_row_col(2, 31, 12)
-img_path = slide.get_tile_image_path_by_row_col(6, 58, 3)
+# img_path = slide.get_tile_image_path_by_row_col(6, 58, 3)
 # img_path = slide.get_tile_image_path_by_row_col(7, 21, 84)
 # img_path = slide.get_tile_image_path_by_row_col(8, 54, 43)
 # img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
-img = slide.open_image(img_path)
-rgb = filter.pil_to_np_rgb(img)
+# img = slide.open_image(img_path)
+# rgb = filter.pil_to_np_rgb(img)
 # display_tile_with_hue_histogram(rgb)
-display_tile_with_hsv_histograms(rgb)
+# display_tile_with_hsv_histograms(rgb)
 
 # timer = Time()
 # tile_summary = dynamic_tiles(6)
