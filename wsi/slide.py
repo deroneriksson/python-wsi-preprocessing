@@ -32,6 +32,7 @@ import PIL
 from PIL import Image
 import re
 import sys
+from wsi import filter
 
 BASE_DIR = ".." + os.sep + "data"
 # BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
@@ -110,6 +111,21 @@ def open_image(filename):
   """
   image = Image.open(filename)
   return image
+
+
+def open_image_np(filename):
+  """
+  Open an image (*.jpg, *.png, etc) as an RGB NumPy array.
+
+  Args:
+    filename: Name of the image file.
+
+  returns:
+    A NumPy representing an RGB image.
+  """
+  pil_img = open_image(filename)
+  np_img = filter.pil_to_np_rgb(pil_img)
+  return np_img
 
 
 def get_training_slide_path(slide_number):
@@ -988,7 +1004,6 @@ class Time:
     time_elapsed = self.end - self.start
     return time_elapsed
 
-
 # singleprocess_training_slides_to_images()
 # multiprocess_training_slides_to_images()
 # slide_stats()
@@ -998,3 +1013,7 @@ class Time:
 # training_slide_to_image(3)
 # training_slide_to_image(4)
 # slide_to_scaled_pil_image(5)[0].show()
+
+# if __name__ == "__main__":
+#   np_img = open_image_np("robot.png")
+#   filter.np_to_pil(np_img).show()

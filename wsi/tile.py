@@ -1472,7 +1472,7 @@ def dynamic_tiles(slide_num):
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
 # multiprocess_filtered_images_to_tiles()
-multiprocess_filtered_images_to_tiles(image_num_list=[7, 8])
+multiprocess_filtered_images_to_tiles(image_num_list=[7, 8, 9])
 
 # # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
 # # img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
@@ -1483,11 +1483,11 @@ multiprocess_filtered_images_to_tiles(image_num_list=[7, 8])
 # img_path = slide.get_tile_image_path_by_row_col(7, 21, 84)
 # img_path = slide.get_tile_image_path_by_row_col(8, 54, 43)
 # img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
-# img = slide.open_image(img_path)
+# np_img = slide.open_image_np(img_path)
 # rgb = filter.pil_to_np_rgb(img)
 # display_tile_with_hsv_hue_histogram(rgb)
 # display_tile_with_hsv_histograms(rgb)
-# display_tile_with_rgb_and_hsv_histograms(rgb)
+# display_tile_with_rgb_and_hsv_histograms(np_img)
 # filter.np_to_pil(np_rgb_r_histogram(rgb)).show()
 # filter.np_to_pil(np_rgb_g_histogram(rgb)).show()
 # filter.np_to_pil(np_rgb_b_histogram(rgb)).show()
