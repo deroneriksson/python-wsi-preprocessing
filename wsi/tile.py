@@ -967,7 +967,7 @@ def np_hue_histogram(h):
   figure = plt.figure()
   canvas = figure.canvas
   _, _, patches = plt.hist(h, bins=360)
-  plt.title("HSV Hue Histogram")
+  plt.title("HSV Hue Histogram, mean=%3.1f, std=%3.1f" % (np.mean(h), np.std(h)))
 
   bin_num = 0
   for patch in patches:
@@ -995,7 +995,7 @@ def np_saturation_histogram(s):
   figure = plt.figure()
   canvas = figure.canvas
   plt.hist(s, bins="auto")
-  plt.title("HSV Saturation Histogram")
+  plt.title("HSV Saturation Histogram, mean=%.2f, std=%.2f" % (np.mean(s), np.std(s)))
 
   canvas.draw()
   w, h = canvas.get_width_height()
@@ -1017,7 +1017,7 @@ def np_value_histogram(v):
   figure = plt.figure()
   canvas = figure.canvas
   plt.hist(v, bins="auto")
-  plt.title("HSV Value Histogram")
+  plt.title("HSV Value Histogram, mean=%.2f, std=%.2f" % (np.mean(v), np.std(v)))
 
   canvas.draw()
   w, h = canvas.get_width_height()
@@ -1323,11 +1323,6 @@ def dynamic_tiles(slide_num):
   return tile_summary
 
 
-# summary_and_tiles(15, save=True)
-# x = np.arange(10)
-# print(str(x))
-# y = x[x>=5]
-# print(str(y))
 # singleprocess_filtered_images_to_tiles(image_num_list=[7, 8, 9])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
@@ -1335,42 +1330,20 @@ def dynamic_tiles(slide_num):
 #                                       display=False, html=True)
 # multiprocess_filtered_images_to_tiles()
 # multiprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8, 9])
-# tile_sum = compute_tile_summary(4)
-# top = tile_sum.top_tiles()
-# for t in top:
-#   t.display_tile()
 
 # # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
 # # img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
 # img_path = "../data/tiles_png/002/TUPAC-TR-002-tile-r17-c35-x34817-y16387-w1024-h1024.png"
 # img_path = "../data/tiles_png/006/TUPAC-TR-006-tile-r58-c3-x2048-y58369-w1024-h1024.png"
 # img_path = slide.get_tile_image_path_by_row_col(2, 31, 12)
-# img_path = slide.get_tile_image_path_by_row_col(6, 58, 3)
+img_path = slide.get_tile_image_path_by_row_col(6, 58, 3)
 # img_path = slide.get_tile_image_path_by_row_col(7, 21, 84)
 # img_path = slide.get_tile_image_path_by_row_col(8, 54, 43)
-img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
+# img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
 img = slide.open_image(img_path)
-# # img = slide.open_image("robot.png")
-# img = img.convert("RGB")
 rgb = filter.pil_to_np_rgb(img)
-
-display_tile_with_hue_histogram(rgb)
+# display_tile_with_hue_histogram(rgb)
 display_tile_with_hsv_histograms(rgb)
-# hsv = filter.filter_rgb_to_hsv(rgb)
-# hue = filter.filter_hsv_to_h(hsv)
-# np_hue_hist = np_hue_histogram(hue)
-# pil_hue_hist = filter.np_to_pil(np_hue_hist)
-# pil_hue_hist.show()
-#
-# sat = filter.filter_hsv_to_s(hsv)
-# np_sat_hist = np_saturation_histogram(sat)
-# pil_sat_hist = filter.np_to_pil(np_sat_hist)
-# pil_sat_hist.show()
-#
-# val = filter.filter_hsv_to_v(hsv)
-# np_val_hist = np_value_histogram(val)
-# pil_val_hist = filter.np_to_pil(np_val_hist)
-# pil_val_hist.show()
 
 # timer = Time()
 # tile_summary = dynamic_tiles(6)
