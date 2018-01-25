@@ -812,21 +812,12 @@ def image_row(slide_num, tile_summary, data_link):
          "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), filt_thumb) + \
          "        </a>\n" + \
          "      </td>\n"
-  if data_link:
-    data_file = slide.get_tile_data_path(slide_num)
-    html += "      <td style=\"vertical-align: top\">\n" + \
-            "        <a target=\"_blank\" href=\"%s\">S%03d Tiled</a> " % (sum_img, slide_num) + \
-            "        (<a target=\"_blank\" href=\"%s\">Data</a>)<br/>\n" % data_file + \
-            "        <a target=\"_blank\" href=\"%s\">" % sum_img + \
-            "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), sum_thumb) + \
-            "        </a>\n" + \
-            "      </td>\n"
-  else:
-    html += "      <td style=\"vertical-align: top\">\n" + \
-            "        <a target=\"_blank\" href=\"%s\">S%03d Tiled<br/>\n" % (sum_img, slide_num) + \
-            "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), sum_thumb) + \
-            "        </a>\n" + \
-            "      </td>\n"
+
+  html += "      <td style=\"vertical-align: top\">\n" + \
+          "        <a target=\"_blank\" href=\"%s\">S%03d Tiled<br/>\n" % (sum_img, slide_num) + \
+          "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), sum_thumb) + \
+          "        </a>\n" + \
+          "      </td>\n"
 
   html += "      <td style=\"vertical-align: top\">\n" + \
           "        <a target=\"_blank\" href=\"%s\">S%03d Original Tiled<br/>\n" % (osum_img, slide_num) + \
@@ -834,9 +825,14 @@ def image_row(slide_num, tile_summary, data_link):
           "        </a>\n" + \
           "      </td>\n"
 
-  html += "      <td style=\"vertical-align: top\">\n" + \
-          "        <div style=\"white-space: nowrap;\">S%03d Tile Summary</div>\n" % slide_num + \
-          "        <div style=\"font-size: smaller; white-space: nowrap;\">\n" + \
+  html += "      <td style=\"vertical-align: top\">\n"
+  if data_link:
+    html += "        <div style=\"white-space: nowrap;\">S%03d Tile Summary\n" % slide_num + \
+            "        (<a target=\"_blank\" href=\"%s\">Data</a>)</div>\n" % slide.get_tile_data_path(slide_num)
+  else:
+    html += "        <div style=\"white-space: nowrap;\">S%03d Tile Summary</div>\n" % slide_num
+
+  html += "        <div style=\"font-size: smaller; white-space: nowrap;\">\n" + \
           "          %s\n" % summary_stats(tile_summary).replace("\n", "<br/>\n          ") + \
           "        </div>\n" + \
           "      </td>\n"
