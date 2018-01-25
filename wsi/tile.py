@@ -836,12 +836,10 @@ def image_row(slide_num, tile_summary, data_link):
 
   html += "      <td style=\"vertical-align: top\">\n" + \
           "        <div style=\"white-space: nowrap;\">S%03d Tile Summary</div>\n" % slide_num + \
-          "        <div style=\"font-size: smaller; white-space: nowrap;\">\n"
-  summary_text = summary_stats(tile_summary)
-  summary_text = summary_text.replace("\n", "<br/>")
-  html += summary_text
-  html += "        </div>\n"
-  html += "      </td>\n"
+          "        <div style=\"font-size: smaller; white-space: nowrap;\">\n" + \
+          "          %s\n" % summary_stats(tile_summary).replace("\n", "<br/>\n          ") + \
+          "        </div>\n" + \
+          "      </td>\n"
 
   html += "      <td style=\"vertical-align: top\">\n" + \
           "        <a target=\"_blank\" href=\"%s\">S%03d Top Tiles<br/>\n" % (top_img, slide_num) + \
@@ -868,27 +866,27 @@ def image_row(slide_num, tile_summary, data_link):
           "        <div style=\"white-space: nowrap;\">S%03d Top %d Tile Scores</div>\n" % (slide_num, num_tiles) + \
           "        <div style=\"font-size: smaller; white-space: nowrap;\">\n"
 
-  html += "<table>"
+  html += "        <table>\n"
   MAX_TILES_PER_ROW = 15
   num_cols = math.ceil(num_tiles / MAX_TILES_PER_ROW)
   num_rows = num_tiles if num_tiles < MAX_TILES_PER_ROW else MAX_TILES_PER_ROW
   for row in range(num_rows):
-    html += "<tr>"
+    html += "          <tr>\n"
     for col in range(num_cols):
-      html += "<td style=\"border: none;\">"
+      html += "            <td style=\"border: none;\">"
       tile_num = row + (col * num_rows) + 1
       if tile_num <= num_tiles:
         t = top_tiles[tile_num - 1]
         label = "R%03d C%03d %05.1f (#%02d)" % (t.r, t.c, t.score, t.tile_num)
         tile_img_path = slide.get_tile_image_path(t)
-        html += "<a target=\"_blank\" href=\"%s\">%s</a><br/>\n" % (tile_img_path, label)
+        html += "<a target=\"_blank\" href=\"%s\">%s</a>" % (tile_img_path, label)
       else:
         html += "&nbsp;"
-      html += "</td>"
-    html += "</tr>\n"
-  html += "</table>\n"
+      html += "</td>\n"
+    html += "          </tr>\n"
+  html += "        </table>\n"
 
-  html += "</div>\n"
+  html += "        </div>\n"
   html += "      </td>\n"
 
   html += "    </tr>\n"
@@ -1478,7 +1476,7 @@ def dynamic_tiles(slide_num):
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
 # multiprocess_filtered_images_to_tiles()
-# multiprocess_filtered_images_to_tiles(image_num_list=[6])
+multiprocess_filtered_images_to_tiles(image_num_list=[7, 8])
 
 # # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
 # # img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
@@ -1486,14 +1484,14 @@ def dynamic_tiles(slide_num):
 # img_path = "../data/tiles_png/006/TUPAC-TR-006-tile-r58-c3-x2048-y58369-w1024-h1024.png"
 # img_path = slide.get_tile_image_path_by_row_col(2, 31, 12)
 # img_path = slide.get_tile_image_path_by_row_col(6, 58, 3)
-img_path = slide.get_tile_image_path_by_row_col(7, 21, 84)
+# img_path = slide.get_tile_image_path_by_row_col(7, 21, 84)
 # img_path = slide.get_tile_image_path_by_row_col(8, 54, 43)
 # img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
-img = slide.open_image(img_path)
-rgb = filter.pil_to_np_rgb(img)
+# img = slide.open_image(img_path)
+# rgb = filter.pil_to_np_rgb(img)
 # display_tile_with_hsv_hue_histogram(rgb)
 # display_tile_with_hsv_histograms(rgb)
-display_tile_with_rgb_and_hsv_histograms(rgb)
+# display_tile_with_rgb_and_hsv_histograms(rgb)
 # filter.np_to_pil(np_rgb_r_histogram(rgb)).show()
 # filter.np_to_pil(np_rgb_g_histogram(rgb)).show()
 # filter.np_to_pil(np_rgb_b_histogram(rgb)).show()
