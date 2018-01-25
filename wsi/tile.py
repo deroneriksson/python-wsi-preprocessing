@@ -1044,7 +1044,6 @@ def pil_hue_histogram(h):
 def display_tile_with_hue_histogram(np_rgb):
   """
   Display a tile with its corresponding hue histogram.
-
   Args:
     np_rgb: RGB image tile as a NumPy array
   """
@@ -1060,6 +1059,40 @@ def display_tile_with_hue_histogram(np_rgb):
   combo = np.zeros([r, c, img_ch], dtype=np.uint8)
   combo[0:img_r, 0:img_c] = np_rgb
   combo[0:hist_r, img_c:c] = np_hist
+  pil_combo = filter.np_to_pil(combo)
+  pil_combo.show()
+
+
+def display_tile_with_hsv_histograms(np_rgb):
+  """
+  Display a tile with its corresponding HSV hue, saturation, and value histograms.
+
+  Args:
+    np_rgb: RGB image tile as a NumPy array
+  """
+  hsv = filter.filter_rgb_to_hsv(np_rgb)
+  np_h = np_hue_histogram(filter.filter_hsv_to_h(hsv))
+  np_s = np_saturation_histogram(filter.filter_hsv_to_s(hsv))
+  np_v = np_value_histogram(filter.filter_hsv_to_v(hsv))
+
+  img_r, img_c, img_ch = np_rgb.shape
+  h_r, h_c, _ = np_h.shape
+  s_r, s_c, _ = np_s.shape
+  v_r, v_c, _ = np_v.shape
+
+  hists_c = max(h_c, s_c, v_c)
+  hists_r = h_r + s_r + v_r
+  hists = np.zeros([hists_r, hists_c, img_ch], dtype=np.uint8)
+
+  hists[0:h_r, 0:h_c] = np_h
+  hists[h_r:h_r + s_r, 0:s_c] = np_s
+  hists[h_r + s_r:h_r + s_r + v_r, 0:v_c] = np_v
+
+  r = max(img_r, hists_r)
+  c = img_c + hists_c
+  combo = np.zeros([r, c, img_ch], dtype=np.uint8)
+  combo[0:img_r, 0:img_c] = np_rgb
+  combo[0:hists_r, img_c:c] = hists
   pil_combo = filter.np_to_pil(combo)
   pil_combo.show()
 
@@ -1301,7 +1334,7 @@ def dynamic_tiles(slide_num):
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
 # multiprocess_filtered_images_to_tiles()
-multiprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8, 9])
+# multiprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8, 9])
 # tile_sum = compute_tile_summary(4)
 # top = tile_sum.top_tiles()
 # for t in top:
@@ -1310,14 +1343,19 @@ multiprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8, 9])
 # # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
 # # img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
 # img_path = "../data/tiles_png/002/TUPAC-TR-002-tile-r17-c35-x34817-y16387-w1024-h1024.png"
-# # img_path = "../data/tiles_png/006/TUPAC-TR-006-tile-r58-c3-x2048-y58369-w1024-h1024.png"
+# img_path = "../data/tiles_png/006/TUPAC-TR-006-tile-r58-c3-x2048-y58369-w1024-h1024.png"
 # img_path = slide.get_tile_image_path_by_row_col(2, 31, 12)
-# img = slide.open_image(img_path)
+# img_path = slide.get_tile_image_path_by_row_col(6, 58, 3)
+# img_path = slide.get_tile_image_path_by_row_col(7, 21, 84)
+# img_path = slide.get_tile_image_path_by_row_col(8, 54, 43)
+img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
+img = slide.open_image(img_path)
 # # img = slide.open_image("robot.png")
 # img = img.convert("RGB")
-# rgb = filter.pil_to_np_rgb(img)
+rgb = filter.pil_to_np_rgb(img)
 
-# display_tile_with_hue_histogram(rgb)
+display_tile_with_hue_histogram(rgb)
+display_tile_with_hsv_histograms(rgb)
 # hsv = filter.filter_rgb_to_hsv(rgb)
 # hue = filter.filter_hsv_to_h(hsv)
 # np_hue_hist = np_hue_histogram(hue)
