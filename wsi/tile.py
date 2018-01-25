@@ -590,7 +590,7 @@ def compute_tile_summary(slide_num, np_img=None, dimensions=None):
       o_r_e -= 1
 
     color_factor = purple_vs_pink_factor(np_tile, t_p)
-    s_and_v_factor = saturation_and_value_factor(np_tile)
+    s_and_v_factor = hsv_saturation_and_value_factor(np_tile)
     score = t_p * color_factor * s_and_v_factor
 
     tile_info = TileInfo(slide_num, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p, color_factor,
@@ -956,7 +956,7 @@ def generate_tiled_html_result(slide_nums, tile_summaries_dict, data_link):
       text_file.close()
 
 
-def np_hue_histogram(h):
+def np_hsv_hue_histogram(h):
   """
   Create Matplotlib histogram of hue values for an HSV image and return the histogram as a NumPy array image.
 
@@ -984,7 +984,7 @@ def np_hue_histogram(h):
   return np_hist
 
 
-def np_saturation_histogram(s):
+def np_hsv_saturation_histogram(s):
   """
   Create Matplotlib histogram of saturation values for an HSV image and return the histogram as a NumPy array image.
 
@@ -1006,7 +1006,7 @@ def np_saturation_histogram(s):
   return np_hist
 
 
-def np_value_histogram(v):
+def np_hsv_value_histogram(v):
   """
   Create Matplotlib histogram of value values for an HSV image and return the histogram as a NumPy array image.
 
@@ -1038,12 +1038,12 @@ def pil_hue_histogram(h):
   Returns:
     Matplotlib histogram of hue values converted to a PIL image.
   """
-  np_hist = np_hue_histogram(h)
+  np_hist = np_hsv_hue_histogram(h)
   pil_hist = filter.np_to_pil(np_hist)
   return pil_hist
 
 
-def display_tile_with_hue_histogram(np_rgb):
+def display_tile_with_hsv_hue_histogram(np_rgb):
   """
   Display a tile with its corresponding hue histogram.
   Args:
@@ -1051,7 +1051,7 @@ def display_tile_with_hue_histogram(np_rgb):
   """
   hsv = filter.filter_rgb_to_hsv(np_rgb)
   h = filter.filter_hsv_to_h(hsv)
-  np_hist = np_hue_histogram(h)
+  np_hist = np_hsv_hue_histogram(h)
 
   img_r, img_c, img_ch = np_rgb.shape
   hist_r, hist_c, _ = np_hist.shape
@@ -1073,9 +1073,9 @@ def display_tile_with_hsv_histograms(np_rgb):
     np_rgb: RGB image tile as a NumPy array
   """
   hsv = filter.filter_rgb_to_hsv(np_rgb)
-  np_h = np_hue_histogram(filter.filter_hsv_to_h(hsv))
-  np_s = np_saturation_histogram(filter.filter_hsv_to_s(hsv))
-  np_v = np_value_histogram(filter.filter_hsv_to_v(hsv))
+  np_h = np_hsv_hue_histogram(filter.filter_hsv_to_h(hsv))
+  np_s = np_hsv_saturation_histogram(filter.filter_hsv_to_s(hsv))
+  np_v = np_hsv_value_histogram(filter.filter_hsv_to_v(hsv))
 
   img_r, img_c, img_ch = np_rgb.shape
   h_r, h_c, _ = np_h.shape
@@ -1114,7 +1114,7 @@ def rgb_to_hues(rgb):
   return h
 
 
-def saturation_and_value_factor(rgb):
+def hsv_saturation_and_value_factor(rgb):
   """
   Function to reduce scores of tiles with narrow HSV saturations and values since saturation and value standard
   deviations should be relatively broad if the tile contains significant tissue.
@@ -1363,7 +1363,7 @@ def dynamic_tiles(slide_num):
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
 # multiprocess_filtered_images_to_tiles()
-multiprocess_filtered_images_to_tiles(image_num_list=[6])
+# multiprocess_filtered_images_to_tiles(image_num_list=[6])
 
 # # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
 # # img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
@@ -1371,13 +1371,13 @@ multiprocess_filtered_images_to_tiles(image_num_list=[6])
 # img_path = "../data/tiles_png/006/TUPAC-TR-006-tile-r58-c3-x2048-y58369-w1024-h1024.png"
 # img_path = slide.get_tile_image_path_by_row_col(2, 31, 12)
 # img_path = slide.get_tile_image_path_by_row_col(6, 58, 3)
-# img_path = slide.get_tile_image_path_by_row_col(7, 21, 84)
+img_path = slide.get_tile_image_path_by_row_col(7, 21, 84)
 # img_path = slide.get_tile_image_path_by_row_col(8, 54, 43)
 # img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
-# img = slide.open_image(img_path)
-# rgb = filter.pil_to_np_rgb(img)
-# display_tile_with_hue_histogram(rgb)
-# display_tile_with_hsv_histograms(rgb)
+img = slide.open_image(img_path)
+rgb = filter.pil_to_np_rgb(img)
+# display_tile_with_hsv_hue_histogram(rgb)
+display_tile_with_hsv_histograms(rgb)
 
 # timer = Time()
 # tile_summary = dynamic_tiles(6)
