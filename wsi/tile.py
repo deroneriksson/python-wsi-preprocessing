@@ -206,14 +206,13 @@ def generate_tile_summary_images(tile_sum, np_img, display=True, save=False, tex
     save_tile_summary_on_original_image(summary_orig, slide_num)
 
 
-def generate_top_tile_images(tile_sum, slide_num, np_img, display=True, save=False, text_color=(255, 255, 255),
+def generate_top_tile_images(tile_sum, np_img, display=True, save=False, text_color=(255, 255, 255),
                              text_size=10, font_path="/Library/Fonts/Arial Bold.ttf"):
   """
   Generate summary images/thumbnails showing the top tissue segmentation tiles.
 
   Args:
     tile_sum: TileSummary object.
-    slide_num: The slide number.
     np_img: Image as a NumPy array.
     display: If True, display top tiles to screen.
     save: If True, save top tiles images.
@@ -222,6 +221,7 @@ def generate_top_tile_images(tile_sum, slide_num, np_img, display=True, save=Fal
     font_path: Path to the font to use.
   """
   z = 300  # height of area at top of summary slide
+  slide_num = tile_sum.slide_num
   rows = tile_sum.scaled_h
   cols = tile_sum.scaled_w
   row_tile_size = tile_sum.scaled_tile_h
@@ -443,7 +443,7 @@ def summary_and_tiles(slide_num, display=True, save=False, save_data=True, save_
   if save_data:
     save_tile_data(tile_sum)
   generate_tile_summary_images(tile_sum, np_img, display=display, save=save)
-  generate_top_tile_images(tile_sum, slide_num, np_img, display=display, save=save)
+  generate_top_tile_images(tile_sum, np_img, display=display, save=save)
   if save_top_tiles:
     for tile in tile_sum.top_tiles():
       tile.save_tile()
@@ -1301,7 +1301,7 @@ def dynamic_tiles(slide_num):
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
 # multiprocess_filtered_images_to_tiles()
-# multiprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
+# multiprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8, 9])
 # tile_sum = compute_tile_summary(4)
 # top = tile_sum.top_tiles()
 # for t in top:
@@ -1335,7 +1335,7 @@ def dynamic_tiles(slide_num):
 # pil_val_hist.show()
 
 timer = Time()
-tile_summary = dynamic_tiles(5)
+tile_summary = dynamic_tiles(6)
 top = tile_summary.top_tiles()
 for t in top:
   pil_tile = t.get_tile()
