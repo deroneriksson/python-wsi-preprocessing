@@ -985,6 +985,7 @@ def np_hsv_hue_histogram(h):
   canvas.draw()
   w, h = canvas.get_width_height()
   np_hist = np.fromstring(canvas.get_renderer().tostring_rgb(), dtype=np.uint8).reshape(h, w, 3)
+  plt.close(figure)
   filter.np_info(np_hist)
   return np_hist
 
@@ -1007,6 +1008,7 @@ def np_hsv_saturation_histogram(s):
   canvas.draw()
   w, h = canvas.get_width_height()
   np_hist = np.fromstring(canvas.get_renderer().tostring_rgb(), dtype=np.uint8).reshape(h, w, 3)
+  plt.close(figure)
   filter.np_info(np_hist)
   return np_hist
 
@@ -1029,6 +1031,7 @@ def np_hsv_value_histogram(v):
   canvas.draw()
   w, h = canvas.get_width_height()
   np_hist = np.fromstring(canvas.get_renderer().tostring_rgb(), dtype=np.uint8).reshape(h, w, 3)
+  plt.close(figure)
   filter.np_info(np_hist)
   return np_hist
 
@@ -1055,6 +1058,7 @@ def np_rgb_channel_histogram(rgb, ch_num, ch_name):
   canvas.draw()
   w, h = canvas.get_width_height()
   np_hist = np.fromstring(canvas.get_renderer().tostring_rgb(), dtype=np.uint8).reshape(h, w, 3)
+  plt.close(figure)
   filter.np_info(np_hist)
   return np_hist
 
@@ -1478,6 +1482,7 @@ def dynamic_tiles(slide_num):
   tile_summary = compute_tile_summary(slide_num, filt_np_img, (large_w, large_h, small_w, small_h))
   return tile_summary
 
+
 # singleprocess_filtered_images_to_tiles(image_num_list=[7, 8, 9])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
@@ -1504,17 +1509,14 @@ def dynamic_tiles(slide_num):
 # filter.np_to_pil(np_rgb_g_histogram(rgb)).show()
 # filter.np_to_pil(np_rgb_b_histogram(rgb)).show()
 # timer = Time()
-# tile_summary = dynamic_tiles(2)
-# top = tile_summary.top_tiles()[:10]
-# for t in top:
-# pil_tile = t.get_pil_tile()
-# print("tile:" + str(pil_tile))
-# pil_tile.show()
-# np_tile = t.get_np_tile()
-# print("tile:" + str(np_tile))
-# filter.np_to_pil(np_tile).show()
-
-
+tile_summary = dynamic_tiles(10)
+top = tile_summary.top_tiles()[:10]
+for t in top:
+  # pil_tile = t.get_pil_tile()
+  # print("tile:" + str(pil_tile))
+  # pil_tile.show()
+  np_tile = t.get_np_tile()
+  display_tile_with_rgb_and_hsv_histograms(np_tile)
 # print(str(tile_summary))
 # print("Time to retrieve all top tiles: %s" % str(timer.elapsed()))
 
