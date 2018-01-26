@@ -604,8 +604,8 @@ def compute_tile_summary(slide_num, np_img=None, dimensions=None):
     s_and_v_factor = hsv_saturation_and_value_factor(np_tile)
     score = t_p * color_factor * s_and_v_factor
 
-    tile_info = TileInfo(slide_num, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p, color_factor,
-                         s_and_v_factor, score)
+    tile_info = TileInfo(tile_sum, slide_num, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p,
+                         color_factor, s_and_v_factor, score)
     tile_sum.tiles.append(tile_info)
 
     amount = tissue_quantity(t_p)
@@ -1258,7 +1258,8 @@ def display_tile_with_rgb_and_hsv_histograms(tile):
   """
   np_tile = tile.get_np_tile()
   text = "S%03d R%03d C%03d\n" % (tile.slide_num, tile.r, tile.c)
-  text += "Score: %5.2f, Tissue: %5.2f%%" % (tile.score, tile.tissue_percentage)
+  text += "Score: %5.2f, Tissue: %5.2f%%, Rank: #%d of %d" % (
+    tile.score, tile.tissue_percentage, tile.rank, tile.tile_summary.num_tiles())
   display_image_with_rgb_and_hsv_histograms(np_tile, text)
 
 
@@ -1542,6 +1543,7 @@ class TileInfo:
   """
   Class for information about a tile.
   """
+  tile_summary = None
   slide_num = None
   tile_num = None
   r = None
@@ -1560,8 +1562,9 @@ class TileInfo:
   score = None
   rank = None
 
-  def __init__(self, slide_num, tile_num, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p, color_factor,
-               s_and_v_factor, score):
+  def __init__(self, tile_summary, slide_num, tile_num, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p,
+               color_factor, s_and_v_factor, score):
+    self.tile_summary = tile_summary
     self.slide_num = slide_num
     self.tile_num = tile_num
     self.r = r
@@ -1672,11 +1675,12 @@ def dynamic_tile(slide_num, row, col):
 # display_tile_with_hsv_histograms(np_img, "Testing")
 # display_image_with_rgb_and_hsv_histograms(np_img, "Testing")
 tile_summary = dynamic_tiles(4)
-tile = tile_summary.get_tile(39, 79)
-print(str(tile.rank))
+# tile = tile_summary.get_tile(39, 79)
+# print(str(tile.rank))
 # top = tile_summary.top_tiles()[:10]
 # for t in top:
-#   print("RANK:" + str(t.rank))
+#   t.display_with_histograms()
+tile_summary.get_tile(14, 72).display_with_histograms()
 # display_tile_with_rgb_and_hsv_histograms(t)
 # tile = tile_summary.get_tile(7, 48)
 # tile.display_with_histograms()
