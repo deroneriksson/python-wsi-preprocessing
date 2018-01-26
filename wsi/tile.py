@@ -1176,6 +1176,15 @@ def display_tile_with_hsv_histograms(np_rgb):
 
 
 def pil_text(text):
+  """
+  Obtain a PIL image representation of text.
+
+  Args:
+    text: The text to convert to an image.
+
+  Returns:
+    PIL image representing the text.
+  """
   w_border = 5
   h_border = 4
   font_path = "/Library/Fonts/Arial Bold.ttf"
@@ -1193,12 +1202,27 @@ def pil_text(text):
 
 
 def np_text(text):
+  """
+  Obtain a NumPy array image representation of text.
+
+  Args:
+    text: The text to convert to an image.
+
+  Returns:
+    NumPy array representing the text.
+  """
   pil_img = pil_text(text)
   np_img = filter.pil_to_np_rgb(pil_img)
   return np_img
 
 
 def display_tile_with_rgb_and_hsv_histograms(tile):
+  """
+  Display a tile with its corresponding RGB and HSV histograms.
+
+  Args:
+    tile: The TileInfo object.
+  """
   np_tile = tile.get_np_tile()
   text = "S%03d R%03d C%03d\n" % (tile.slide_num, tile.r, tile.c)
   text += "Score: %5.2f, Tissue: %5.2f%%" % (tile.score, tile.tissue_percentage)
@@ -1416,25 +1440,65 @@ class TileSummary:
     return summary_title(self) + "\n" + summary_stats(self)
 
   def mask_percentage(self):
+    """
+    Obtain the percentage of the slide that is masked.
+
+    Returns:
+       The amount of the slide that is masked as a percentage.
+    """
     return 100 - self.tissue_percentage
 
   def num_tiles(self):
+    """
+    Retrieve the total number of tiles.
+
+    Returns:
+      The total number of tiles (number of rows * number of columns).
+    """
     return self.num_row_tiles * self.num_col_tiles
 
   def tiles_by_tissue_percentage(self):
+    """
+    Retrieve the tiles ranked by tissue percentage.
+
+    Returns:
+       List of the tiles ranked by tissue percentage.
+    """
     sorted_list = sorted(self.tiles, key=lambda t: t.tissue_percentage, reverse=True)
     return sorted_list
 
   def tiles_by_score(self):
+    """
+    Retrieve the tiles ranked by score.
+
+    Returns:
+       List of the tiles ranked by score.
+    """
     sorted_list = sorted(self.tiles, key=lambda t: t.score, reverse=True)
     return sorted_list
 
   def top_tiles(self):
+    """
+    Retrieve the top-scoring tiles.
+
+    Returns:
+       List of the top-scoring tiles.
+    """
     sorted_tiles = self.tiles_by_score()
     top_tiles = sorted_tiles[:NUM_TOP_TILES]
     return top_tiles
 
   def get_tile(self, row, col):
+    """
+    Retrieve tile by row and column.
+
+    Args:
+      row: The row
+      col: The column
+
+    Returns:
+      Corresponding TileInfo object.
+    """
     tile_index = (row - 1) * self.num_col_tiles + (col - 1)
     tile = self.tiles[tile_index]
     return tile
