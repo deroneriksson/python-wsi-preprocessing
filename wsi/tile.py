@@ -1179,7 +1179,7 @@ def pil_text(text):
   w_border = 5
   h_border = 4
   font_path = "/Library/Fonts/Arial Bold.ttf"
-  font_size = 24
+  font_size = 36
   background = (255, 255, 255)
   font_color = (0, 0, 0)
   font = ImageFont.truetype(font_path, font_size)
@@ -1198,13 +1198,26 @@ def np_text(text):
   return np_img
 
 
-def display_tile_with_rgb_and_hsv_histograms(np_rgb, title=None):
+def display_tile_with_rgb_and_hsv_histograms(np_rgb, text=None):
   """
   Display a tile with its corresponding RGB and HSV histograms.
 
   Args:
     np_rgb: RGB image tile as a NumPy array
   """
+  img_r, img_c, img_ch = np_rgb.shape
+  if text is not None:
+    np_t = np_text(text)
+    t_r, t_c, _ = np_t.shape
+    t_i_c = max(t_c, img_c)
+    t_i_r = t_r + img_r
+    t_i_hists = np.zeros([t_i_r, t_i_c, img_ch], dtype=np.uint8)
+    t_i_hists.fill(255)
+    t_i_hists[0:t_r, 0:t_c] = np_t
+    t_i_hists[t_r:t_r + img_r, 0:img_c] = np_rgb
+    np_rgb = t_i_hists  # for simplicity assign title+image to image
+    img_r, img_c, img_ch = np_rgb.shape
+
   hsv = filter.filter_rgb_to_hsv(np_rgb)
   np_r = np_rgb_r_histogram(np_rgb)
   np_g = np_rgb_g_histogram(np_rgb)
@@ -1213,7 +1226,6 @@ def display_tile_with_rgb_and_hsv_histograms(np_rgb, title=None):
   np_s = np_hsv_saturation_histogram(filter.filter_hsv_to_s(hsv))
   np_v = np_hsv_value_histogram(filter.filter_hsv_to_v(hsv))
 
-  img_r, img_c, img_ch = np_rgb.shape
   r_r, r_c, _ = np_r.shape
   g_r, g_c, _ = np_g.shape
   b_r, b_c, _ = np_b.shape
@@ -1235,12 +1247,10 @@ def display_tile_with_rgb_and_hsv_histograms(np_rgb, title=None):
   hsv_hists[h_r:h_r + s_r, 0:s_c] = np_s
   hsv_hists[h_r + s_r:h_r + s_r + v_r, 0:v_c] = np_v
 
-  # if title is not None:
-
-
   r = max(img_r, rgb_hists_r, hsv_hists_r)
   c = img_c + rgb_hists_c + hsv_hists_c
   combo = np.zeros([r, c, img_ch], dtype=np.uint8)
+  combo.fill(255)
   combo[0:img_r, 0:img_c] = np_rgb
   combo[0:rgb_hists_r, img_c:img_c + rgb_hists_c] = rgb_hists
   combo[0:hsv_hists_r, img_c + rgb_hists_c:c] = hsv_hists
@@ -1524,12 +1534,12 @@ def dynamic_tiles(slide_num):
 # img_path = slide.get_tile_image_path_by_row_col(6, 58, 3)
 # img_path = slide.get_tile_image_path_by_row_col(7, 21, 84)
 # img_path = slide.get_tile_image_path_by_row_col(8, 54, 43)
-# img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
-# np_img = slide.open_image_np(img_path)
+img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
+np_img = slide.open_image_np(img_path)
 # rgb = filter.pil_to_np_rgb(img)
 # display_tile_with_hsv_hue_histogram(rgb)
 # display_tile_with_hsv_histograms(rgb)
-# display_tile_with_rgb_and_hsv_histograms(np_img)
+display_tile_with_rgb_and_hsv_histograms(np_img, "Testing")
 # timer = Time()
 # tile_summary = dynamic_tiles(4)
 # top = tile_summary.top_tiles()[:5]
@@ -1545,5 +1555,5 @@ def dynamic_tiles(slide_num):
 # filter.multiprocess_apply_filters_to_images()
 # multiprocess_filtered_images_to_tiles()
 
-pil_text("Testing...").show()
-filter.np_info(np_text("Testing..."))
+# pil_text("Testing...").show()
+# filter.np_info(np_text("Testing..."))
