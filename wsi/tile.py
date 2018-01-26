@@ -161,8 +161,7 @@ def generate_tile_summary_images(tile_sum, np_img, display=True, save=False, tex
   draw = ImageDraw.Draw(summary)
 
   original_img_path = slide.get_training_image_path(slide_num)
-  orig_img = slide.open_image(original_img_path)
-  np_orig = filter.pil_to_np_rgb(orig_img)
+  np_orig = slide.open_image_np(original_img_path)
   summary_orig = create_summary_pil_img(np_orig, z, row_tile_size, col_tile_size, num_row_tiles, num_col_tiles)
   draw_orig = ImageDraw.Draw(summary_orig)
 
@@ -231,8 +230,7 @@ def generate_top_tile_images(tile_sum, np_img, display=True, save=False, text_co
   draw = ImageDraw.Draw(summary)
 
   original_img_path = slide.get_training_image_path(slide_num)
-  orig_img = slide.open_image(original_img_path)
-  np_orig = filter.pil_to_np_rgb(orig_img)
+  np_orig = slide.open_image_np(original_img_path)
   summary_orig = create_summary_pil_img(np_orig, z, row_tile_size, col_tile_size, num_row_tiles, num_col_tiles)
   draw_orig = ImageDraw.Draw(summary_orig)
 
@@ -436,8 +434,7 @@ def summary_and_tiles(slide_num, display=True, save=False, save_data=True, save_
 
   """
   img_path = slide.get_filter_image_result(slide_num)
-  img = slide.open_image(img_path)
-  np_img = filter.pil_to_np_rgb(img)
+  np_img = slide.open_image_np(img_path)
 
   tile_sum = compute_tile_summary(slide_num, np_img)
   if save_data:
@@ -548,8 +545,7 @@ def compute_tile_summary(slide_num, np_img=None, dimensions=None):
     o_w, o_h, w, h = dimensions
 
   if np_img is None:
-    img = slide.open_image(img_path)
-    np_img = filter.pil_to_np_rgb(img)
+    np_img = slide.open_image_np(img_path)
 
   row_tile_size = round(ROW_TILE_SIZE / slide.SCALE_FACTOR)  # use round?
   col_tile_size = round(COL_TILE_SIZE / slide.SCALE_FACTOR)  # use round?
@@ -1472,7 +1468,7 @@ def dynamic_tiles(slide_num):
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
 # multiprocess_filtered_images_to_tiles()
-multiprocess_filtered_images_to_tiles(image_num_list=[7, 8, 9])
+# multiprocess_filtered_images_to_tiles(image_num_list=[7, 8, 9])
 
 # # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
 # # img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"

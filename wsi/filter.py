@@ -1209,8 +1209,7 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   if save and not os.path.exists(slide.FILTER_DIR):
     os.makedirs(slide.FILTER_DIR)
   img_path = slide.get_training_image_path(slide_num)
-  pil_orig = slide.open_image(img_path)
-  np_orig = pil_to_np_rgb(pil_orig)
+  np_orig = slide.open_image_np(img_path)
   filtered_np_img = apply_image_filters(np_orig, slide_num, info, save=save, display=display)
 
   if save:
