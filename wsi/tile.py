@@ -1198,7 +1198,14 @@ def np_text(text):
   return np_img
 
 
-def display_tile_with_rgb_and_hsv_histograms(np_rgb, text=None):
+def display_tile_with_rgb_and_hsv_histograms(tile):
+  np_tile = tile.get_np_tile()
+  text = "S%03d R%03d C%03d\n" % (tile.slide_num, tile.r, tile.c)
+  text += "Score: %5.2f, Tissue: %5.2f%%" % (tile.score, tile.tissue_percentage)
+  display_image_with_rgb_and_hsv_histograms(np_tile, text)
+
+
+def display_image_with_rgb_and_hsv_histograms(np_rgb, text=None):
   """
   Display a tile with its corresponding RGB and HSV histograms.
 
@@ -1534,22 +1541,15 @@ def dynamic_tiles(slide_num):
 # img_path = slide.get_tile_image_path_by_row_col(6, 58, 3)
 # img_path = slide.get_tile_image_path_by_row_col(7, 21, 84)
 # img_path = slide.get_tile_image_path_by_row_col(8, 54, 43)
-img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
-np_img = slide.open_image_np(img_path)
-# rgb = filter.pil_to_np_rgb(img)
-# display_tile_with_hsv_hue_histogram(rgb)
-# display_tile_with_hsv_histograms(rgb)
-display_tile_with_rgb_and_hsv_histograms(np_img, "Testing")
-# timer = Time()
-# tile_summary = dynamic_tiles(4)
-# top = tile_summary.top_tiles()[:5]
-# for t in top:
-#   # pil_tile = t.get_pil_tile()
-#   # print("tile:" + str(pil_tile))
-#   # pil_tile.show()
-#   np_tile = t.get_np_tile()
-#   display_tile_with_rgb_and_hsv_histograms(np_tile)
-# print("Time to retrieve all top tiles: %s" % str(timer.elapsed()))
+# img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
+# np_img = slide.open_image_np(img_path)
+# display_tile_with_hsv_hue_histogram(np_img)
+# display_tile_with_hsv_histograms(np_img)
+# display_image_with_rgb_and_hsv_histograms(np_img, "Testing")
+tile_summary = dynamic_tiles(4)
+top = tile_summary.top_tiles()[:10]
+for t in top:
+  display_tile_with_rgb_and_hsv_histograms(t)
 
 # slide.multiprocess_training_slides_to_images()
 # filter.multiprocess_apply_filters_to_images()
