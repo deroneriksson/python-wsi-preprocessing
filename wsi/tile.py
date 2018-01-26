@@ -624,6 +624,12 @@ def compute_tile_summary(slide_num, np_img=None, dimensions=None):
   tile_sum.low = low
   tile_sum.none = none
 
+  tiles_by_score = tile_sum.tiles_by_score()
+  rank = 0
+  for t in tiles_by_score:
+    rank += 1
+    t.rank = rank
+
   return tile_sum
 
 
@@ -1552,6 +1558,7 @@ class TileInfo:
   color_factor = None
   s_and_v_factor = None
   score = None
+  rank = None
 
   def __init__(self, slide_num, tile_num, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p, color_factor,
                s_and_v_factor, score):
@@ -1659,14 +1666,17 @@ def dynamic_tile(slide_num, row, col):
 # img_path = slide.get_tile_image_path_by_row_col(6, 58, 3)
 # img_path = slide.get_tile_image_path_by_row_col(7, 21, 84)
 # img_path = slide.get_tile_image_path_by_row_col(8, 54, 43)
-img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
-np_img = slide.open_image_np(img_path)
+# img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
+# np_img = slide.open_image_np(img_path)
 # display_tile_with_hsv_hue_histogram(np_img, "Testing")
-display_tile_with_hsv_histograms(np_img, "Testing")
+# display_tile_with_hsv_histograms(np_img, "Testing")
 # display_image_with_rgb_and_hsv_histograms(np_img, "Testing")
-# tile_summary = dynamic_tiles(4)
+tile_summary = dynamic_tiles(4)
+tile = tile_summary.get_tile(39, 79)
+print(str(tile.rank))
 # top = tile_summary.top_tiles()[:10]
 # for t in top:
+#   print("RANK:" + str(t.rank))
 # display_tile_with_rgb_and_hsv_histograms(t)
 # tile = tile_summary.get_tile(7, 48)
 # tile.display_with_histograms()
