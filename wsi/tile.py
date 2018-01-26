@@ -1119,17 +1119,31 @@ def pil_hue_histogram(h):
   return pil_hist
 
 
-def display_tile_with_hsv_hue_histogram(np_rgb):
+def display_tile_with_hsv_hue_histogram(np_rgb, text=None):
   """
   Display a tile with its corresponding hue histogram.
+
   Args:
     np_rgb: RGB image tile as a NumPy array
+    text: Optional text to display above image
   """
+  img_r, img_c, img_ch = np_rgb.shape
+  if text is not None:
+    np_t = np_text(text)
+    t_r, t_c, _ = np_t.shape
+    t_i_c = max(t_c, img_c)
+    t_i_r = t_r + img_r
+    t_i = np.zeros([t_i_r, t_i_c, img_ch], dtype=np.uint8)
+    t_i.fill(255)
+    t_i[0:t_r, 0:t_c] = np_t
+    t_i[t_r:t_r + img_r, 0:img_c] = np_rgb
+    np_rgb = t_i  # for simplicity assign title+image to image
+    img_r, img_c, img_ch = np_rgb.shape
+
   hsv = filter.filter_rgb_to_hsv(np_rgb)
   h = filter.filter_hsv_to_h(hsv)
   np_hist = np_hsv_hue_histogram(h)
 
-  img_r, img_c, img_ch = np_rgb.shape
   hist_r, hist_c, _ = np_hist.shape
 
   r = max(img_r, hist_r)
@@ -1141,19 +1155,32 @@ def display_tile_with_hsv_hue_histogram(np_rgb):
   pil_combo.show()
 
 
-def display_tile_with_hsv_histograms(np_rgb):
+def display_tile_with_hsv_histograms(np_rgb, text=None):
   """
   Display a tile with its corresponding HSV hue, saturation, and value histograms.
 
   Args:
     np_rgb: RGB image tile as a NumPy array
+    text: Optional text to display above image
   """
+  img_r, img_c, img_ch = np_rgb.shape
+  if text is not None:
+    np_t = np_text(text)
+    t_r, t_c, _ = np_t.shape
+    t_i_c = max(t_c, img_c)
+    t_i_r = t_r + img_r
+    t_i = np.zeros([t_i_r, t_i_c, img_ch], dtype=np.uint8)
+    t_i.fill(255)
+    t_i[0:t_r, 0:t_c] = np_t
+    t_i[t_r:t_r + img_r, 0:img_c] = np_rgb
+    np_rgb = t_i  # for simplicity assign title+image to image
+    img_r, img_c, img_ch = np_rgb.shape
+
   hsv = filter.filter_rgb_to_hsv(np_rgb)
   np_h = np_hsv_hue_histogram(filter.filter_hsv_to_h(hsv))
   np_s = np_hsv_saturation_histogram(filter.filter_hsv_to_s(hsv))
   np_v = np_hsv_value_histogram(filter.filter_hsv_to_v(hsv))
 
-  img_r, img_c, img_ch = np_rgb.shape
   h_r, h_c, _ = np_h.shape
   s_r, s_c, _ = np_s.shape
   v_r, v_c, _ = np_v.shape
@@ -1235,6 +1262,7 @@ def display_image_with_rgb_and_hsv_histograms(np_rgb, text=None):
 
   Args:
     np_rgb: RGB image tile as a NumPy array
+    text: Optional text to display above image
   """
   img_r, img_c, img_ch = np_rgb.shape
   if text is not None:
@@ -1242,11 +1270,11 @@ def display_image_with_rgb_and_hsv_histograms(np_rgb, text=None):
     t_r, t_c, _ = np_t.shape
     t_i_c = max(t_c, img_c)
     t_i_r = t_r + img_r
-    t_i_hists = np.zeros([t_i_r, t_i_c, img_ch], dtype=np.uint8)
-    t_i_hists.fill(255)
-    t_i_hists[0:t_r, 0:t_c] = np_t
-    t_i_hists[t_r:t_r + img_r, 0:img_c] = np_rgb
-    np_rgb = t_i_hists  # for simplicity assign title+image to image
+    t_i = np.zeros([t_i_r, t_i_c, img_ch], dtype=np.uint8)
+    t_i.fill(255)
+    t_i[0:t_r, 0:t_c] = np_t
+    t_i[t_r:t_r + img_r, 0:img_c] = np_rgb
+    np_rgb = t_i  # for simplicity assign title+image to image
     img_r, img_c, img_ch = np_rgb.shape
 
   hsv = filter.filter_rgb_to_hsv(np_rgb)
@@ -1631,10 +1659,10 @@ def dynamic_tile(slide_num, row, col):
 # img_path = slide.get_tile_image_path_by_row_col(6, 58, 3)
 # img_path = slide.get_tile_image_path_by_row_col(7, 21, 84)
 # img_path = slide.get_tile_image_path_by_row_col(8, 54, 43)
-# img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
-# np_img = slide.open_image_np(img_path)
-# display_tile_with_hsv_hue_histogram(np_img)
-# display_tile_with_hsv_histograms(np_img)
+img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
+np_img = slide.open_image_np(img_path)
+# display_tile_with_hsv_hue_histogram(np_img, "Testing")
+display_tile_with_hsv_histograms(np_img, "Testing")
 # display_image_with_rgb_and_hsv_histograms(np_img, "Testing")
 # tile_summary = dynamic_tiles(4)
 # top = tile_summary.top_tiles()[:10]
@@ -1643,7 +1671,7 @@ def dynamic_tile(slide_num, row, col):
 # tile = tile_summary.get_tile(7, 48)
 # tile.display_with_histograms()
 
-dynamic_tile(10, 50, 50).display_with_histograms()
+# dynamic_tile(10, 50, 50).display_with_histograms()
 
 # for t in tile_summary.tiles:
 #   print(str(t))
