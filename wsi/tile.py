@@ -990,6 +990,31 @@ def np_hsv_hue_histogram(h):
   return np_hist
 
 
+def np_histogram(data, title, bins="auto"):
+  """
+  Create Matplotlib histogram and return it as a NumPy array image.
+
+  Args:
+    data: Data to plot in the histogram.
+    title: Title of the histogram.
+    bins: Number of histogram bins, "auto" by default.
+
+  Returns:
+    Matplotlib histogram as a NumPy array image.
+  """
+  figure = plt.figure()
+  canvas = figure.canvas
+  plt.hist(data, bins=bins)
+  plt.title(title)
+
+  canvas.draw()
+  w, h = canvas.get_width_height()
+  np_hist = np.fromstring(canvas.get_renderer().tostring_rgb(), dtype=np.uint8).reshape(h, w, 3)
+  plt.close(figure)
+  filter.np_info(np_hist)
+  return np_hist
+
+
 def np_hsv_saturation_histogram(s):
   """
   Create Matplotlib histogram of saturation values for an HSV image and return the histogram as a NumPy array image.
@@ -1000,17 +1025,8 @@ def np_hsv_saturation_histogram(s):
   Returns:
     Matplotlib histogram of saturation values converted to a NumPy array image.
   """
-  figure = plt.figure()
-  canvas = figure.canvas
-  plt.hist(s, bins="auto")
-  plt.title("HSV Saturation Histogram, mean=%.2f, std=%.2f" % (np.mean(s), np.std(s)))
-
-  canvas.draw()
-  w, h = canvas.get_width_height()
-  np_hist = np.fromstring(canvas.get_renderer().tostring_rgb(), dtype=np.uint8).reshape(h, w, 3)
-  plt.close(figure)
-  filter.np_info(np_hist)
-  return np_hist
+  title = "HSV Saturation Histogram, mean=%.2f, std=%.2f" % (np.mean(s), np.std(s))
+  return np_histogram(s, title)
 
 
 def np_hsv_value_histogram(v):
@@ -1023,17 +1039,8 @@ def np_hsv_value_histogram(v):
   Returns:
     Matplotlib histogram of saturation values converted to a NumPy array image.
   """
-  figure = plt.figure()
-  canvas = figure.canvas
-  plt.hist(v, bins="auto")
-  plt.title("HSV Value Histogram, mean=%.2f, std=%.2f" % (np.mean(v), np.std(v)))
-
-  canvas.draw()
-  w, h = canvas.get_width_height()
-  np_hist = np.fromstring(canvas.get_renderer().tostring_rgb(), dtype=np.uint8).reshape(h, w, 3)
-  plt.close(figure)
-  filter.np_info(np_hist)
-  return np_hist
+  title = "HSV Value Histogram, mean=%.2f, std=%.2f" % (np.mean(v), np.std(v))
+  return np_histogram(v, title)
 
 
 def np_rgb_channel_histogram(rgb, ch_num, ch_name):
@@ -1048,19 +1055,11 @@ def np_rgb_channel_histogram(rgb, ch_num, ch_name):
   Returns:
     Matplotlib histogram of RGB channel converted to a NumPy array image.
   """
+
   ch = rgb[:, :, ch_num]
   ch = ch.flatten()
-  figure = plt.figure()
-  canvas = figure.canvas
-  plt.hist(ch, bins=256)
-  plt.title("RGB %s Histogram, mean=%.2f, std=%.2f" % (ch_name, np.mean(ch), np.std(ch)))
-
-  canvas.draw()
-  w, h = canvas.get_width_height()
-  np_hist = np.fromstring(canvas.get_renderer().tostring_rgb(), dtype=np.uint8).reshape(h, w, 3)
-  plt.close(figure)
-  filter.np_info(np_hist)
-  return np_hist
+  title = "RGB %s Histogram, mean=%.2f, std=%.2f" % (ch_name, np.mean(ch), np.std(ch))
+  return np_histogram(ch, title, bins=256)
 
 
 def np_rgb_r_histogram(rgb):
