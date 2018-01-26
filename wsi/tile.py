@@ -1434,6 +1434,11 @@ class TileSummary:
     top_tiles = sorted_tiles[:NUM_TOP_TILES]
     return top_tiles
 
+  def get_tile(self, row, col):
+    tile_index = (row - 1) * self.num_col_tiles + (col - 1)
+    tile = self.tiles[tile_index]
+    return tile
+
 
 class TileInfo:
   """
@@ -1499,6 +1504,9 @@ class TileInfo:
   def display_tile(self):
     save_display_tile(self, save=False, display=True)
 
+  def display_tile_with_histograms(self):
+    display_tile_with_rgb_and_hsv_histograms(self)
+
 
 class TissueQuantity(Enum):
   NONE = 0
@@ -1547,9 +1555,16 @@ def dynamic_tiles(slide_num):
 # display_tile_with_hsv_histograms(np_img)
 # display_image_with_rgb_and_hsv_histograms(np_img, "Testing")
 tile_summary = dynamic_tiles(4)
-top = tile_summary.top_tiles()[:10]
-for t in top:
-  display_tile_with_rgb_and_hsv_histograms(t)
+# top = tile_summary.top_tiles()[:10]
+# for t in top:
+#   display_tile_with_rgb_and_hsv_histograms(t)
+
+tile = tile_summary.get_tile(14, 71)
+# display_tile_with_rgb_and_hsv_histograms(tile)
+tile.display_tile_with_histograms()
+
+# for t in tile_summary.tiles:
+#   print(str(t))
 
 # slide.multiprocess_training_slides_to_images()
 # filter.multiprocess_apply_filters_to_images()
