@@ -1157,6 +1157,7 @@ def display_image_with_hsv_hue_histogram(np_rgb, text=None):
   r = max(img_r, hist_r)
   c = img_c + hist_c
   combo = np.zeros([r, c, img_ch], dtype=np.uint8)
+  combo.fill(255)
   combo[0:img_r, 0:img_c] = np_rgb
   combo[0:hist_r, img_c:c] = np_hist
   pil_combo = filter.np_to_pil(combo)
@@ -1204,6 +1205,7 @@ def display_image_with_hsv_histograms(np_rgb, text=None):
   r = max(img_r, hists_r)
   c = img_c + hists_c
   combo = np.zeros([r, c, img_ch], dtype=np.uint8)
+  combo.fill(255)
   combo[0:img_r, 0:img_c] = np_rgb
   combo[0:hists_r, img_c:c] = hists
   pil_combo = filter.np_to_pil(combo)
@@ -1656,7 +1658,7 @@ def dynamic_tile(slide_num, row, col):
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
-multiprocess_filtered_images_to_tiles()
+# multiprocess_filtered_images_to_tiles()
 # multiprocess_filtered_images_to_tiles(image_num_list=[7, 8, 9])
 
 # # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
@@ -1667,11 +1669,11 @@ multiprocess_filtered_images_to_tiles()
 # img_path = slide.get_tile_image_path_by_row_col(6, 58, 3)
 # img_path = slide.get_tile_image_path_by_row_col(7, 21, 84)
 # img_path = slide.get_tile_image_path_by_row_col(8, 54, 43)
-# img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
-# np_img = slide.open_image_np(img_path)
-# display_image_with_hsv_hue_histogram(np_img, "Testing")
-# display_tile_with_hsv_histograms(np_img, "Testing")
-# display_image_with_rgb_and_hsv_histograms(np_img, "Testing")
+img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
+np_img = slide.open_image_np(img_path)
+display_image_with_hsv_hue_histogram(np_img, "Testing")
+display_image_with_hsv_histograms(np_img, "Testing")
+display_image_with_rgb_and_hsv_histograms(np_img, "Testing")
 # tile_summary = dynamic_tiles(4)
 # tile = tile_summary.get_tile(39, 79)
 # print(str(tile.rank))
