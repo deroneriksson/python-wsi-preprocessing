@@ -591,6 +591,15 @@ def compute_tile_summary(slide_num, np_img=None, dimensions=None):
     r_s, r_e, c_s, c_e, r, c = t
     np_tile = np_img[r_s:r_e, c_s:c_e]
     t_p = filter.tissue_percent(np_tile)
+    amount = tissue_quantity(t_p)
+    if amount == TissueQuantity.HIGH:
+      high += 1
+    elif amount == TissueQuantity.MEDIUM:
+      medium += 1
+    elif amount == TissueQuantity.LOW:
+      low += 1
+    elif amount == TissueQuantity.NONE:
+      none += 1
     o_c_s, o_r_s = slide.small_to_large_mapping((c_s, r_s), (o_w, o_h))
     o_c_e, o_r_e = slide.small_to_large_mapping((c_e, r_e), (o_w, o_h))
 
@@ -603,20 +612,13 @@ def compute_tile_summary(slide_num, np_img=None, dimensions=None):
     color_factor = purple_vs_pink_factor(np_tile, t_p)
     s_and_v_factor = hsv_saturation_and_value_factor(np_tile)
     score = t_p * color_factor * s_and_v_factor
+    # don't allow high tissue tiles to be scored lower than tiles with less tissue
+    if amount == TissueQuantity.HIGH and score < TISSUE_THRESHOLD_PERCENT:
+      score = TISSUE_THRESHOLD_PERCENT
 
     tile_info = TileInfo(tile_sum, slide_num, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p,
                          color_factor, s_and_v_factor, score)
     tile_sum.tiles.append(tile_info)
-
-    amount = tissue_quantity(t_p)
-    if amount == TissueQuantity.HIGH:
-      high += 1
-    elif amount == TissueQuantity.MEDIUM:
-      medium += 1
-    elif amount == TissueQuantity.LOW:
-      low += 1
-    elif amount == TissueQuantity.NONE:
-      none += 1
 
   tile_sum.count = count
   tile_sum.high = high
@@ -1423,10 +1425,6 @@ def purple_vs_pink_factor(rgb, tissue_percentage):
   if pupi < -60:
     factor *= .8
 
-  # don't allow high tissue tiles to be scored lower than tiles with less tissue
-  if factor * tissue_percentage < TISSUE_THRESHOLD_PERCENT:
-    factor = 1
-
   return factor
 
 
@@ -1658,7 +1656,7 @@ def dynamic_tile(slide_num, row, col):
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
-# multiprocess_filtered_images_to_tiles()
+multiprocess_filtered_images_to_tiles()
 # multiprocess_filtered_images_to_tiles(image_num_list=[7, 8, 9])
 
 # # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
@@ -1669,9 +1667,9 @@ def dynamic_tile(slide_num, row, col):
 # img_path = slide.get_tile_image_path_by_row_col(6, 58, 3)
 # img_path = slide.get_tile_image_path_by_row_col(7, 21, 84)
 # img_path = slide.get_tile_image_path_by_row_col(8, 54, 43)
-img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
-np_img = slide.open_image_np(img_path)
-display_image_with_hsv_hue_histogram(np_img, "Testing")
+# img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
+# np_img = slide.open_image_np(img_path)
+# display_image_with_hsv_hue_histogram(np_img, "Testing")
 # display_tile_with_hsv_histograms(np_img, "Testing")
 # display_image_with_rgb_and_hsv_histograms(np_img, "Testing")
 # tile_summary = dynamic_tiles(4)
