@@ -1504,7 +1504,7 @@ class TileInfo:
   def display_tile(self):
     save_display_tile(self, save=False, display=True)
 
-  def display_tile_with_histograms(self):
+  def display_with_histograms(self):
     display_tile_with_rgb_and_hsv_histograms(self)
 
 
@@ -1533,6 +1533,24 @@ def dynamic_tiles(slide_num):
   return tile_summary
 
 
+def dynamic_tile(slide_num, row, col):
+  """
+  Generate a single tile dynamically based on slide number, row, and column. If more than one tile needs to be
+  retrieved dynamically, dynamic_tiles() should be used.
+
+  Args:
+    slide_num: The slide number.
+    row: The row.
+    col: The column.
+
+  Returns:
+    TileInfo tile object.
+  """
+  tile_summary = dynamic_tiles(slide_num)
+  tile = tile_summary.get_tile(row, col)
+  return tile
+
+
 # singleprocess_filtered_images_to_tiles(image_num_list=[7, 8, 9])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
@@ -1554,14 +1572,14 @@ def dynamic_tiles(slide_num):
 # display_tile_with_hsv_hue_histogram(np_img)
 # display_tile_with_hsv_histograms(np_img)
 # display_image_with_rgb_and_hsv_histograms(np_img, "Testing")
-tile_summary = dynamic_tiles(4)
+# tile_summary = dynamic_tiles(4)
 # top = tile_summary.top_tiles()[:10]
 # for t in top:
-#   display_tile_with_rgb_and_hsv_histograms(t)
+# display_tile_with_rgb_and_hsv_histograms(t)
+# tile = tile_summary.get_tile(7, 48)
+# tile.display_with_histograms()
 
-tile = tile_summary.get_tile(14, 71)
-# display_tile_with_rgb_and_hsv_histograms(tile)
-tile.display_tile_with_histograms()
+dynamic_tile(10, 50, 50).display_with_histograms()
 
 # for t in tile_summary.tiles:
 #   print(str(t))
