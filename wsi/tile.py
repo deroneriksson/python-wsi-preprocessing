@@ -478,7 +478,7 @@ def save_tile_data(tile_summary):
   print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Data", str(time.elapsed()), data_path))
 
 
-def tile_info_to_tile(tile_info):
+def tile_info_to_pil_tile(tile_info):
   """
   Convert tile information into the corresponding tile as a PIL image read from the whole-slide image file.
 
@@ -500,6 +500,21 @@ def tile_info_to_tile(tile_info):
   return pil_img
 
 
+def tile_info_to_np_tile(tile_info):
+  """
+  Convert tile information into the corresponding tile as a NumPy image read from the whole-slide image file.
+
+  Args:
+    tile_info: TileInfo object.
+
+  Return:
+    Tile as a NumPy image.
+  """
+  pil_img = tile_info_to_pil_tile(tile_info)
+  np_img = filter.pil_to_np_rgb(pil_img)
+  return np_img
+
+
 def save_display_tile(tile_info, save=True, display=False):
   """
   Save and/or display a tile image.
@@ -509,7 +524,7 @@ def save_display_tile(tile_info, save=True, display=False):
     save: If True, save tile image.
     display: If True, dispaly tile image.
   """
-  tile_pil_img = tile_info_to_tile(tile_info)
+  tile_pil_img = tile_info_to_pil_tile(tile_info)
 
   if save:
     t = Time()
@@ -1426,8 +1441,11 @@ class TileInfo:
   def tissue_quantity(self):
     return tissue_quantity(self.tissue_percentage)
 
-  def get_tile(self):
-    return tile_info_to_tile(self)
+  def get_pil_tile(self):
+    return tile_info_to_pil_tile(self)
+
+  def get_np_tile(self):
+    return tile_info_to_np_tile(self)
 
   def save_tile(self):
     save_display_tile(self, save=True, display=False)
@@ -1460,7 +1478,6 @@ def dynamic_tiles(slide_num):
   tile_summary = compute_tile_summary(slide_num, filt_np_img, (large_w, large_h, small_w, small_h))
   return tile_summary
 
-
 # singleprocess_filtered_images_to_tiles(image_num_list=[7, 8, 9])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
@@ -1487,12 +1504,17 @@ def dynamic_tiles(slide_num):
 # filter.np_to_pil(np_rgb_g_histogram(rgb)).show()
 # filter.np_to_pil(np_rgb_b_histogram(rgb)).show()
 # timer = Time()
-# tile_summary = dynamic_tiles(4)
+# tile_summary = dynamic_tiles(2)
 # top = tile_summary.top_tiles()[:10]
 # for t in top:
-#   pil_tile = t.get_tile()
-#   print("tile:" + str(pil_tile))
-#   pil_tile.show()
+# pil_tile = t.get_pil_tile()
+# print("tile:" + str(pil_tile))
+# pil_tile.show()
+# np_tile = t.get_np_tile()
+# print("tile:" + str(np_tile))
+# filter.np_to_pil(np_tile).show()
+
+
 # print(str(tile_summary))
 # print("Time to retrieve all top tiles: %s" % str(timer.elapsed()))
 
