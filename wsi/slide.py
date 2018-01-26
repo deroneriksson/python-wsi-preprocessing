@@ -691,6 +691,21 @@ def slide_to_scaled_pil_image(slide_number):
   return img, large_w, large_h, new_w, new_h
 
 
+def slide_to_scaled_np_image(slide_number):
+  """
+  Convert a WSI training slide to a scaled-down NumPy image.
+
+  Args:
+    slide_number: The slide number.
+
+  Returns:
+    Tuple consisting of scaled-down NumPy image, original width, original height, new width, and new height.
+  """
+  pil_img, large_w, large_h, new_w, new_h = slide_to_scaled_pil_image(slide_number)
+  np_img = filter.pil_to_np_rgb(pil_img)
+  return np_img, large_w, large_h, new_w, new_h
+
+
 def save_thumbnail(pil_img, size, path, display_path=False):
   """
   Save a thumbnail of a PIL image, specifying the maximum width or height of the thumbnail.

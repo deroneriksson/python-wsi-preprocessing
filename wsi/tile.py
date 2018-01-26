@@ -1452,11 +1452,10 @@ def dynamic_tiles(slide_num):
     slide_num: The slide number.
 
   Returns:
-     TileSummary object with list of top TileInfo objects. The actual PIL tile image is not retrieved until the
-     TileInfo's get_tile() method is called.
+     TileSummary object with list of top TileInfo objects. The actual tile images are not retrieved until the
+     TileInfo get_tile() methods are called.
   """
-  pil_img, large_w, large_h, small_w, small_h = slide.slide_to_scaled_pil_image(slide_num)
-  np_img = filter.pil_to_np_rgb(pil_img)
+  np_img, large_w, large_h, small_w, small_h = slide.slide_to_scaled_np_image(slide_num)
   filt_np_img = filter.apply_image_filters(np_img)
   tile_summary = compute_tile_summary(slide_num, filt_np_img, (large_w, large_h, small_w, small_h))
   return tile_summary
@@ -1488,12 +1487,12 @@ def dynamic_tiles(slide_num):
 # filter.np_to_pil(np_rgb_g_histogram(rgb)).show()
 # filter.np_to_pil(np_rgb_b_histogram(rgb)).show()
 # timer = Time()
-# tile_summary = dynamic_tiles(6)
-# top = tile_summary.top_tiles()
+# tile_summary = dynamic_tiles(4)
+# top = tile_summary.top_tiles()[:10]
 # for t in top:
 #   pil_tile = t.get_tile()
 #   print("tile:" + str(pil_tile))
-#   # pil_tile.show()
+#   pil_tile.show()
 # print(str(tile_summary))
 # print("Time to retrieve all top tiles: %s" % str(timer.elapsed()))
 
