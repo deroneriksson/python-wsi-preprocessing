@@ -1125,9 +1125,9 @@ def pil_hue_histogram(h):
   return pil_hist
 
 
-def display_tile_with_hsv_hue_histogram(np_rgb, text=None):
+def display_image_with_hsv_hue_histogram(np_rgb, text=None):
   """
-  Display a tile with its corresponding hue histogram.
+  Display an image with its corresponding hue histogram.
 
   Args:
     np_rgb: RGB image tile as a NumPy array
@@ -1161,9 +1161,9 @@ def display_tile_with_hsv_hue_histogram(np_rgb, text=None):
   pil_combo.show()
 
 
-def display_tile_with_hsv_histograms(np_rgb, text=None):
+def display_image_with_hsv_histograms(np_rgb, text=None):
   """
-  Display a tile with its corresponding HSV hue, saturation, and value histograms.
+  Display an image with its corresponding HSV hue, saturation, and value histograms.
 
   Args:
     np_rgb: RGB image tile as a NumPy array
@@ -1669,18 +1669,18 @@ def dynamic_tile(slide_num, row, col):
 # img_path = slide.get_tile_image_path_by_row_col(6, 58, 3)
 # img_path = slide.get_tile_image_path_by_row_col(7, 21, 84)
 # img_path = slide.get_tile_image_path_by_row_col(8, 54, 43)
-# img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
-# np_img = slide.open_image_np(img_path)
-# display_tile_with_hsv_hue_histogram(np_img, "Testing")
+img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
+np_img = slide.open_image_np(img_path)
+display_image_with_hsv_hue_histogram(np_img, "Testing")
 # display_tile_with_hsv_histograms(np_img, "Testing")
 # display_image_with_rgb_and_hsv_histograms(np_img, "Testing")
-tile_summary = dynamic_tiles(4)
+# tile_summary = dynamic_tiles(4)
 # tile = tile_summary.get_tile(39, 79)
 # print(str(tile.rank))
 # top = tile_summary.top_tiles()[:10]
 # for t in top:
 #   t.display_with_histograms()
-tile_summary.get_tile(14, 72).display_with_histograms()
+# tile_summary.get_tile(14, 72).display_with_histograms()
 # display_tile_with_rgb_and_hsv_histograms(t)
 # tile = tile_summary.get_tile(7, 48)
 # tile.display_with_histograms()
