@@ -57,6 +57,17 @@ BELOW_THRESH_COLOR = (255, 255, 0)
 BELOW_LOWER_THRESH_COLOR = (255, 165, 0)
 NO_TISSUE_COLOR = (255, 0, 0)
 
+FONT_PATH = "/Library/Fonts/Arial Bold.ttf"
+SUMMARY_TITLE_FONT_PATH = "/Library/Fonts/Courier New Bold.ttf"
+SUMMARY_TITLE_TEXT_COLOR = (0, 0, 0)
+SUMMARY_TITLE_TEXT_SIZE = 24
+SUMMARY_TILE_TEXT_COLOR = (255, 255, 255)
+TILE_TEXT_COLOR = (0, 0, 0)
+TILE_TEXT_SIZE = 36
+TILE_TEXT_BACKGROUND_COLOR = (255, 255, 255)
+TILE_TEXT_W_BORDER = 5
+TILE_TEXT_H_BORDER = 4
+
 
 def get_num_tiles(rows, cols, row_tile_size, col_tile_size):
   """
@@ -132,8 +143,7 @@ def create_summary_pil_img(np_img, title_area_height, row_tile_size, col_tile_si
   return summary
 
 
-def generate_tile_summary_images(tile_sum, np_img, display=True, save=False, text_color=(255, 255, 255),
-                                 text_size=16, font_path="/Library/Fonts/Arial Bold.ttf"):
+def generate_tile_summary_images(tile_sum, np_img, display=True, save=False, text_size=16):
   """
   Generate summary images/thumbnails showing a 'heatmap' representation of the tissue segmentation of all tiles.
 
@@ -146,9 +156,7 @@ def generate_tile_summary_images(tile_sum, np_img, display=True, save=False, tex
     col_tile_size: Number of pixels in a tile column.
     display: If True, display tile summary to screen.
     save: If True, save tile summary image.
-    text_color: Font color (default white).
     text_size: Font size.
-    font_path: Path to the font to use.
   """
   z = 300  # height of area at top of summary slide
   slide_num = tile_sum.slide_num
@@ -172,9 +180,9 @@ def generate_tile_summary_images(tile_sum, np_img, display=True, save=False, tex
 
   summary_txt = summary_title(tile_sum) + "\n" + summary_stats(tile_sum)
 
-  summary_font = ImageFont.truetype("/Library/Fonts/Courier New Bold.ttf", size=24)
-  draw.text((5, 5), summary_txt, (0, 0, 0), font=summary_font)
-  draw_orig.text((5, 5), summary_txt, (0, 0, 0), font=summary_font)
+  summary_font = ImageFont.truetype(SUMMARY_TITLE_FONT_PATH, size=SUMMARY_TITLE_TEXT_SIZE)
+  draw.text((5, 5), summary_txt, SUMMARY_TITLE_TEXT_COLOR, font=summary_font)
+  draw_orig.text((5, 5), summary_txt, SUMMARY_TITLE_TEXT_COLOR, font=summary_font)
 
   if DISPLAY_TILE_LABELS:
     # resize image if 2048 for text display on tiles
@@ -192,10 +200,10 @@ def generate_tile_summary_images(tile_sum, np_img, display=True, save=False, tex
       count += 1
       label = "#%d\nR%d C%d\n%4.2f%%\n[%d,%d] x\n[%d,%d]\n%dx%d" % (
         count, t.r, t.c, t.tissue_percentage, t.c_s, t.r_s, t.c_e, t.r_e, t.c_e - t.c_s, t.r_e - t.r_s)
-      font = ImageFont.truetype(font_path, size=text_size)
+      font = ImageFont.truetype(FONT_PATH, size=text_size)
       draw.text(((t.c_s + 4) * f, (t.r_s + 4 + z) * f), label, (0, 0, 0), font=font)
       draw.text(((t.c_s + 3) * f, (t.r_s + 3 + z) * f), label, (0, 0, 0), font=font)
-      draw.text(((t.c_s + 2) * f, (t.r_s + 2 + z) * f), label, text_color, font=font)
+      draw.text(((t.c_s + 2) * f, (t.r_s + 2 + z) * f), label, SUMMARY_TILE_TEXT_COLOR, font=font)
 
   if display:
     summary.show()
@@ -205,8 +213,7 @@ def generate_tile_summary_images(tile_sum, np_img, display=True, save=False, tex
     save_tile_summary_on_original_image(summary_orig, slide_num)
 
 
-def generate_top_tile_images(tile_sum, np_img, display=True, save=False, text_color=(255, 255, 255),
-                             text_size=10, font_path="/Library/Fonts/Arial Bold.ttf"):
+def generate_top_tile_images(tile_sum, np_img, display=True, save=False, text_size=10):
   """
   Generate summary images/thumbnails showing the top tissue segmentation tiles.
 
@@ -215,9 +222,7 @@ def generate_top_tile_images(tile_sum, np_img, display=True, save=False, text_co
     np_img: Image as a NumPy array.
     display: If True, display top tiles to screen.
     save: If True, save top tiles images.
-    text_color: Font color (default white).
     text_size: Font size.
-    font_path: Path to the font to use.
   """
   z = 300  # height of area at top of summary slide
   slide_num = tile_sum.slide_num
@@ -243,19 +248,19 @@ def generate_top_tile_images(tile_sum, np_img, display=True, save=False, text_co
 
   summary_txt = summary_title(tile_sum) + "\n" + summary_stats(tile_sum)
 
-  summary_font = ImageFont.truetype("/Library/Fonts/Courier New Bold.ttf", size=24)
-  draw.text((5, 5), summary_txt, (0, 0, 0), font=summary_font)
-  draw_orig.text((5, 5), summary_txt, (0, 0, 0), font=summary_font)
+  summary_font = ImageFont.truetype(SUMMARY_TITLE_FONT_PATH, size=SUMMARY_TITLE_TEXT_SIZE)
+  draw.text((5, 5), summary_txt, SUMMARY_TITLE_TEXT_COLOR, font=summary_font)
+  draw_orig.text((5, 5), summary_txt, SUMMARY_TITLE_TEXT_COLOR, font=summary_font)
 
   for t in top_tiles:
     label = "R%d\nC%d" % (t.r, t.c)
-    font = ImageFont.truetype(font_path, size=text_size)
+    font = ImageFont.truetype(FONT_PATH, size=text_size)
     # drop shadow behind text
     draw.text(((t.c_s + 3), (t.r_s + 3 + z)), label, (0, 0, 0), font=font)
     draw_orig.text(((t.c_s + 3), (t.r_s + 3 + z)), label, (0, 0, 0), font=font)
 
-    draw.text(((t.c_s + 2), (t.r_s + 2 + z)), label, text_color, font=font)
-    draw_orig.text(((t.c_s + 2), (t.r_s + 2 + z)), label, text_color, font=font)
+    draw.text(((t.c_s + 2), (t.r_s + 2 + z)), label, SUMMARY_TILE_TEXT_COLOR, font=font)
+    draw_orig.text(((t.c_s + 2), (t.r_s + 2 + z)), label, SUMMARY_TILE_TEXT_COLOR, font=font)
 
   if display:
     summary.show()
@@ -1212,7 +1217,8 @@ def display_image_with_hsv_histograms(np_rgb, text=None):
   pil_combo.show()
 
 
-def pil_text(text):
+def pil_text(text, w_border=TILE_TEXT_W_BORDER, h_border=TILE_TEXT_H_BORDER, font_path=FONT_PATH,
+             font_size=TILE_TEXT_SIZE, text_color=TILE_TEXT_COLOR, background=TILE_TEXT_BACKGROUND_COLOR):
   """
   Obtain a PIL image representation of text.
 
@@ -1222,23 +1228,17 @@ def pil_text(text):
   Returns:
     PIL image representing the text.
   """
-  w_border = 5
-  h_border = 4
-  font_path = "/Library/Fonts/Arial Bold.ttf"
-  font_size = 36
-  background = (255, 255, 255)
-  font_color = (0, 0, 0)
+
   font = ImageFont.truetype(font_path, font_size)
-
   x, y = ImageDraw.Draw(Image.new("RGB", (1, 1), background)).textsize(text, font)
-
   image = Image.new("RGB", (x + 2 * w_border, y + 2 * h_border), background)
   draw = ImageDraw.Draw(image)
-  draw.text((w_border, h_border), text, font_color, font=font)
+  draw.text((w_border, h_border), text, text_color, font=font)
   return image
 
 
-def np_text(text):
+def np_text(text, w_border=TILE_TEXT_W_BORDER, h_border=TILE_TEXT_H_BORDER, font_path=FONT_PATH,
+            font_size=TILE_TEXT_SIZE, text_color=TILE_TEXT_COLOR, background=TILE_TEXT_BACKGROUND_COLOR):
   """
   Obtain a NumPy array image representation of text.
 
@@ -1248,7 +1248,8 @@ def np_text(text):
   Returns:
     NumPy array representing the text.
   """
-  pil_img = pil_text(text)
+  pil_img = pil_text(text, w_border, h_border, font_path, font_size,
+                     text_color, background)
   np_img = filter.pil_to_np_rgb(pil_img)
   return np_img
 
@@ -1669,14 +1670,12 @@ def dynamic_tile(slide_num, row, col):
 # img_path = slide.get_tile_image_path_by_row_col(6, 58, 3)
 # img_path = slide.get_tile_image_path_by_row_col(7, 21, 84)
 # img_path = slide.get_tile_image_path_by_row_col(8, 54, 43)
-img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
-np_img = slide.open_image_np(img_path)
-display_image_with_hsv_hue_histogram(np_img, "Testing")
-display_image_with_hsv_histograms(np_img, "Testing")
-display_image_with_rgb_and_hsv_histograms(np_img, "Testing")
+# img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
+# np_img = slide.open_image_np(img_path)
+# display_image_with_hsv_hue_histogram(np_img, "Testing")
+# display_image_with_hsv_histograms(np_img, "Testing")
+# display_image_with_rgb_and_hsv_histograms(np_img, "Testing")
 # tile_summary = dynamic_tiles(4)
-# tile = tile_summary.get_tile(39, 79)
-# print(str(tile.rank))
 # top = tile_summary.top_tiles()[:10]
 # for t in top:
 #   t.display_with_histograms()
