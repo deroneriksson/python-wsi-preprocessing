@@ -1273,6 +1273,12 @@ def display_tile_with_rgb_and_hsv_histograms(tile):
   text = "S%03d R%03d C%03d\n" % (tile.slide_num, tile.r, tile.c)
   text += "Score: %5.2f, Tissue: %5.2f%%, Rank: #%d of %d" % (
     tile.score, tile.tissue_percentage, tile.rank, tile.tile_summary.num_tiles())
+
+  hues = rgb_to_hues(np_tile)
+  purple_dev = hsv_purple_deviation(hues)
+  pink_dev = hsv_pink_deviation(hues)
+  text += "\nPurple Deviation: %5.2f, Pink Deviation: %5.2f" % (purple_dev, pink_dev)
+
   display_image_with_rgb_and_hsv_histograms(np_tile, text)
 
 
@@ -1392,7 +1398,7 @@ def hsv_purple_deviation(hsv_hues):
   Returns:
     The HSV purple deviation.
   """
-  purple_deviation = np.sqrt(np.mean(np.abs(HSV_PURPLE - hsv_hues.mean()) ** 2))
+  purple_deviation = np.sqrt(np.mean(np.abs(hsv_hues - HSV_PURPLE) ** 2))
   return purple_deviation
 
 
@@ -1406,7 +1412,7 @@ def hsv_pink_deviation(hsv_hues):
   Returns:
     The HSV pink deviation.
   """
-  pink_deviation = np.sqrt(np.mean(np.abs(HSV_PINK - hsv_hues.mean()) ** 2))
+  pink_deviation = np.sqrt(np.mean(np.abs(hsv_hues - HSV_PINK) ** 2))
   return pink_deviation
 
 
@@ -1708,10 +1714,11 @@ def dynamic_tile(slide_num, row, col):
 # display_image_with_hsv_hue_histogram(np_img, "Testing")
 # display_image_with_hsv_histograms(np_img, "Testing")
 # display_image_with_rgb_and_hsv_histograms(np_img, "Testing")
-# tile_summary = dynamic_tiles(4)
-# top = tile_summary.top_tiles()[:10]
-# for t in top:
-#   t.display_with_histograms()
+tile_summary = dynamic_tiles(4)
+# top = tile_summary.tiles_by_tissue_percentage()[:10]  # top_tiles()[:10]
+top = tile_summary.top_tiles()[:10]
+for t in top:
+  t.display_with_histograms()
 # tile_summary.get_tile(14, 72).display_with_histograms()
 # display_tile_with_rgb_and_hsv_histograms(t)
 # tile = tile_summary.get_tile(7, 48)
@@ -1719,13 +1726,13 @@ def dynamic_tile(slide_num, row, col):
 
 # dynamic_tile(10, 50, 50).display_with_histograms()
 # dynamic_tile(7, 10, 64).display_with_histograms()
-tile = dynamic_tile(7, 5, 80)
-tile.display_with_histograms()
-hues = rgb_to_hues(tile.get_np_tile())
-purple_deviation = hsv_purple_deviation(hues)
-pink_deviation = hsv_pink_deviation(hues)
-print("Purple deviation:" + str(purple_deviation))
-print("Pink deviation:" + str(pink_deviation))
+# tile = dynamic_tile(7, 5, 80)
+# tile.display_with_histograms()
+# hues = rgb_to_hues(tile.get_np_tile())
+# purple_deviation = hsv_purple_deviation(hues)
+# pink_deviation = hsv_pink_deviation(hues)
+# print("Purple deviation:" + str(purple_deviation))
+# print("Pink deviation:" + str(pink_deviation))
 # tile_summary = dynamic_tiles(7)
 
 # for t in tile_summary.tiles:
