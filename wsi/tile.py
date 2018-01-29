@@ -68,6 +68,9 @@ TILE_TEXT_BACKGROUND_COLOR = (255, 255, 255)
 TILE_TEXT_W_BORDER = 5
 TILE_TEXT_H_BORDER = 4
 
+HSV_PURPLE = 270
+HSV_PINK = 330
+
 
 def get_num_tiles(rows, cols, row_tile_size, col_tile_size):
   """
@@ -1379,6 +1382,34 @@ def hsv_saturation_and_value_factor(rgb):
     return 1
 
 
+def hsv_purple_deviation(hsv_hues):
+  """
+  Obtain the deviation from the HSV hue for purple.
+
+  Args:
+    hsv_hues: NumPy array of HSV hue values.
+
+  Returns:
+    The HSV purple deviation.
+  """
+  purple_deviation = np.sqrt(np.mean(np.abs(HSV_PURPLE - hsv_hues.mean()) ** 2))
+  return purple_deviation
+
+
+def hsv_pink_deviation(hsv_hues):
+  """
+  Obtain the deviation from the HSV hue for pink.
+
+  Args:
+    hsv_hues: NumPy array of HSV hue values.
+
+  Returns:
+    The HSV pink deviation.
+  """
+  pink_deviation = np.sqrt(np.mean(np.abs(HSV_PINK - hsv_hues.mean()) ** 2))
+  return pink_deviation
+
+
 def purple_vs_pink_factor(rgb, tissue_percentage):
   """
   Function to favor purple (hematoxylin) over pink (eosin) staining.
@@ -1396,9 +1427,6 @@ def purple_vs_pink_factor(rgb, tissue_percentage):
   if tissue_percentage < TISSUE_THRESHOLD_PERCENT:
     return factor
 
-  PURPLE = 270
-  PINK = 330
-
   hues = rgb_to_hues(rgb)
   hues = hues[hues >= 200]  # Remove hues under 200
   if len(hues) == 0:
@@ -1406,8 +1434,8 @@ def purple_vs_pink_factor(rgb, tissue_percentage):
   avg = np.average(hues)
   # pil_hue_histogram(hues).show()
 
-  pu = PURPLE - avg
-  pi = PINK - avg
+  pu = HSV_PURPLE - avg
+  pi = HSV_PINK - avg
   pupi = pu + pi
   # print("Av: %4d, Pu: %4d, Pi: %4d, PuPi: %4d" % (avg, pu, pi, pupi))
   # Av:  250, Pu:   20, Pi:   80, PuPi:  100
@@ -1664,7 +1692,7 @@ def dynamic_tile(slide_num, row, col):
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
-multiprocess_filtered_images_to_tiles()
+# multiprocess_filtered_images_to_tiles()
 # multiprocess_filtered_images_to_tiles(image_num_list=[7, 8, 9])
 
 # # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
@@ -1691,8 +1719,13 @@ multiprocess_filtered_images_to_tiles()
 
 # dynamic_tile(10, 50, 50).display_with_histograms()
 # dynamic_tile(7, 10, 64).display_with_histograms()
-# dynamic_tile(7, 5, 80).display_with_histograms()
-
+tile = dynamic_tile(7, 5, 80)
+tile.display_with_histograms()
+hues = rgb_to_hues(tile.get_np_tile())
+purple_deviation = hsv_purple_deviation(hues)
+pink_deviation = hsv_pink_deviation(hues)
+print("Purple deviation:" + str(purple_deviation))
+print("Pink deviation:" + str(pink_deviation))
 # tile_summary = dynamic_tiles(7)
 
 # for t in tile_summary.tiles:
