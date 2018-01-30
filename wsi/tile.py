@@ -666,21 +666,21 @@ def compute_tile_summary(slide_num, np_img=None, dimensions=None):
     if amount == TissueQuantity.HIGH:
       quantity_factor = 1.0
     elif amount == TissueQuantity.MEDIUM:
-      quantity_factor = 0.4
+      quantity_factor = 0.2
     elif amount == TissueQuantity.LOW:
       quantity_factor = 0.1
     else:
       quantity_factor = 0.0
     factor = color_factor * s_and_v_factor * quantity_factor
-    score = (t_p ** 2) * factor
+    score = (t_p ** 2) * np.log(1 + factor)
 
     # if (slide_num == 1) and ((r == 181 and c == 70) or (r == 177 and c == 66)):
     # if (slide_num == 3):
     #   if (r == 17 and (c == 6 or c == 7 or c == 8)) or (r == 11 and (c == 22 or c == 23 or c == 24)):
-    if (slide_num == 1):
-      if (r == 181 and (c == 71 or c == 72 or c == 73)):
-        tup = (slide_num, r, c, t_p, color_factor, s_and_v_factor, quantity_factor, factor, score)
-        print("S%03d R%03d C%03d TP:%4.2f CF:%4.2f SVF:%4.2f QF:%4.2f F:%4.2f S:%4.2f" % tup)
+    # if (slide_num == 1):
+    #   if (r == 181 and (c == 71 or c == 72 or c == 73)):
+    #     tup = (slide_num, r, c, t_p, color_factor, s_and_v_factor, quantity_factor, factor, score)
+    #     print("S%03d R%03d C%03d TP:%4.2f CF:%4.2f SVF:%4.2f QF:%4.2f F:%4.2f S:%4.2f" % tup)
 
     tile_info = TileInfo(tile_sum, slide_num, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p,
                          color_factor, s_and_v_factor, score)
@@ -1488,7 +1488,8 @@ def hsv_purple_pink_factor(rgb, tissue_percentage, slide_num, row, col):
   factor = 1
 
   hues = rgb_to_hues(rgb)
-  hues = hues[hues >= 240]  # exclude hues under 240
+  hues = hues[hues >= 260]  # exclude hues under 260
+  hues = hues[hues <= 340]  # exclude hues over 340
   if len(hues) == 0:
     return factor
   pu_dev = hsv_purple_deviation(hues)
@@ -1785,8 +1786,8 @@ def dynamic_tile(slide_num, row, col):
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
-# multiprocess_filtered_images_to_tiles()
-multiprocess_filtered_images_to_tiles(image_num_list=[7, 8])
+multiprocess_filtered_images_to_tiles()
+# multiprocess_filtered_images_to_tiles(image_num_list=[7, 8])
 
 # # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
 # # img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
@@ -1839,5 +1840,7 @@ multiprocess_filtered_images_to_tiles(image_num_list=[7, 8])
 # dynamic_tile(1, 181, 70).display_with_histograms()
 # dynamic_tile(1, 177, 66).display_with_histograms()
 
-# tile_summary = dynamic_tiles(1)
-# tile_summary.get_tile()
+# tile_summary = dynamic_tiles(7)
+# tile_summary.get_tile(42, 59).display_with_histograms()
+# tile_summary.get_tile(42, 60).display_with_histograms()
+# tile_summary.get_tile(42, 61).display_with_histograms()
