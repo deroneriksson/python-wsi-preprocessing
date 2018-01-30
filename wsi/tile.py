@@ -618,6 +618,7 @@ def compute_tile_summary(slide_num, np_img=None, dimensions=None):
       o_r_e -= 1
 
     color_factor = purple_vs_pink_factor(np_tile, t_p)
+    # color_factor = hsv_purple_pink_factor(np_tile, t_p, slide_num, r, c)
     s_and_v_factor = hsv_saturation_and_value_factor(np_tile)
     factor = color_factor * s_and_v_factor
     if amount == TissueQuantity.HIGH:
@@ -1277,7 +1278,8 @@ def display_tile_with_rgb_and_hsv_histograms(tile):
   hues = rgb_to_hues(np_tile)
   purple_dev = hsv_purple_deviation(hues)
   pink_dev = hsv_pink_deviation(hues)
-  text += "\nPurple Deviation: %5.2f, Pink Deviation: %5.2f" % (purple_dev, pink_dev)
+  pi_to_pu = pink_dev / purple_dev
+  text += "\nPurple Dev: %5.2f, Pink Dev: %5.2f, PiDev/PuDev: %5.2f" % (purple_dev, pink_dev, pi_to_pu)
 
   display_image_with_rgb_and_hsv_histograms(np_tile, text)
 
@@ -1414,6 +1416,37 @@ def hsv_pink_deviation(hsv_hues):
   """
   pink_deviation = np.sqrt(np.mean(np.abs(hsv_hues - HSV_PINK) ** 2))
   return pink_deviation
+
+
+def hsv_purple_pink_factor(rgb, tissue_percentage, slide_num, row, col):
+  """
+  Experimental function to compute scoring factor based on purple and pink HSV hue deviations.
+
+  Args:
+    rgb: Image an NumPy array.
+    tissue_percentage: The tissue percentage for this tile.
+    slide_num: The slide number.
+    row: The row.
+    col: The column.
+
+  Returns:
+    Factor that favors purple (hematoxylin stained) tissue over pink (eosin stained) tissue.
+  """
+  factor = 1
+
+  hues = rgb_to_hues(rgb)
+  hues = hues[hues >= 240]  # exclude hues under 240
+  if len(hues) == 0:
+    return factor
+  pu_dev = hsv_purple_deviation(hues)
+  pi_dev = hsv_pink_deviation(hues)
+
+  factor = pi_dev / pu_dev
+
+  # print("S: %d, R: %d, C: %d, PiDev: %4.2f, PuDev: %4.2f, PiDev/PuDev: %4.2" % (
+  #   slide_num, row, col, pu_dev, pi_dev, factor))
+
+  return factor
 
 
 def purple_vs_pink_factor(rgb, tissue_percentage):
@@ -1698,7 +1731,7 @@ def dynamic_tile(slide_num, row, col):
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
-# multiprocess_filtered_images_to_tiles()
+multiprocess_filtered_images_to_tiles()
 # multiprocess_filtered_images_to_tiles(image_num_list=[7, 8, 9])
 
 # # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
@@ -1714,11 +1747,6 @@ def dynamic_tile(slide_num, row, col):
 # display_image_with_hsv_hue_histogram(np_img, "Testing")
 # display_image_with_hsv_histograms(np_img, "Testing")
 # display_image_with_rgb_and_hsv_histograms(np_img, "Testing")
-tile_summary = dynamic_tiles(4)
-# top = tile_summary.tiles_by_tissue_percentage()[:10]  # top_tiles()[:10]
-top = tile_summary.top_tiles()[:10]
-for t in top:
-  t.display_with_histograms()
 # tile_summary.get_tile(14, 72).display_with_histograms()
 # display_tile_with_rgb_and_hsv_histograms(t)
 # tile = tile_summary.get_tile(7, 48)
@@ -1744,3 +1772,11 @@ for t in top:
 
 # pil_text("Testing...").show()
 # filter.np_info(np_text("Testing..."))
+
+# tile_summary = dynamic_tiles(4)
+# top = tile_summary.top_tiles()[:5]
+# for t in top:
+#   t.display_with_histograms()
+# tiles = tile_summary.tiles_by_tissue_percentage()[:5]
+# for t in tiles:
+#   t.display_with_histograms()
