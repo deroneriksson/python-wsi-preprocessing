@@ -617,18 +617,27 @@ def compute_tile_summary(slide_num, np_img=None, dimensions=None):
     if (o_r_e - o_r_s) > ROW_TILE_SIZE:
       o_r_e -= 1
 
-    color_factor = purple_vs_pink_factor(np_tile, t_p)
-    # color_factor = hsv_purple_pink_factor(np_tile, t_p, slide_num, r, c)
+    # color_factor = purple_vs_pink_factor(np_tile, t_p)
+    color_factor = hsv_purple_pink_factor(np_tile, t_p, slide_num, r, c)
     s_and_v_factor = hsv_saturation_and_value_factor(np_tile)
-    factor = color_factor * s_and_v_factor
     if amount == TissueQuantity.HIGH:
-      factor = (100 - TISSUE_THRESHOLD_PERCENT) * factor + TISSUE_THRESHOLD_PERCENT
+      quantity_factor = 1.0
     elif amount == TissueQuantity.MEDIUM:
-      factor = (TISSUE_THRESHOLD_PERCENT - TISSUE_LOW_THRESHOLD_PERCENT) * factor + TISSUE_LOW_THRESHOLD_PERCENT
+      quantity_factor = 0.4
     elif amount == TissueQuantity.LOW:
-      factor = TISSUE_LOW_THRESHOLD_PERCENT * factor
-    factor = factor / 100.0
-    score = t_p * factor
+      quantity_factor = 0.1
+    else:
+      quantity_factor = 0.0
+    factor = color_factor * s_and_v_factor * quantity_factor
+    score = (t_p ** 2) * factor
+
+    # if (slide_num == 1) and ((r == 181 and c == 70) or (r == 177 and c == 66)):
+    # if (slide_num == 3):
+    #   if (r == 17 and (c == 6 or c == 7 or c == 8)) or (r == 11 and (c == 22 or c == 23 or c == 24)):
+    if (slide_num == 1):
+      if (r == 181 and (c == 71 or c == 72 or c == 73)):
+        tup = (slide_num, r, c, t_p, color_factor, s_and_v_factor, quantity_factor, factor, score)
+        print("S%03d R%03d C%03d TP:%4.2f CF:%4.2f SVF:%4.2f QF:%4.2f F:%4.2f S:%4.2f" % tup)
 
     tile_info = TileInfo(tile_sum, slide_num, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p,
                          color_factor, s_and_v_factor, score)
@@ -1278,8 +1287,9 @@ def display_tile_with_rgb_and_hsv_histograms(tile):
   hues = rgb_to_hues(np_tile)
   purple_dev = hsv_purple_deviation(hues)
   pink_dev = hsv_pink_deviation(hues)
-  pi_to_pu = pink_dev / purple_dev
-  text += "\nPurple Dev: %5.2f, Pink Dev: %5.2f, PiDev/PuDev: %5.2f" % (purple_dev, pink_dev, pi_to_pu)
+  # pi_to_pu = pink_dev / purple_dev
+  purple_pink_factor = hsv_purple_pink_factor(np_tile, tile.tissue_percentage, tile.slide_num, tile.r, tile.c)
+  text += "\nPurple Dev: %5.2f, Pink Dev: %5.2f, purple_pink_factor: %5.2f" % (purple_dev, pink_dev, purple_pink_factor)
 
   display_image_with_rgb_and_hsv_histograms(np_tile, text)
 
@@ -1441,6 +1451,7 @@ def hsv_purple_pink_factor(rgb, tissue_percentage, slide_num, row, col):
   pu_dev = hsv_purple_deviation(hues)
   pi_dev = hsv_pink_deviation(hues)
 
+  # factor = (tissue_percentage / 100) * pi_dev / pu_dev
   factor = pi_dev / pu_dev
 
   # print("S: %d, R: %d, C: %d, PiDev: %4.2f, PuDev: %4.2f, PiDev/PuDev: %4.2" % (
@@ -1731,7 +1742,7 @@ def dynamic_tile(slide_num, row, col):
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
-multiprocess_filtered_images_to_tiles()
+# multiprocess_filtered_images_to_tiles()
 # multiprocess_filtered_images_to_tiles(image_num_list=[7, 8, 9])
 
 # # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
@@ -1780,3 +1791,8 @@ multiprocess_filtered_images_to_tiles()
 # tiles = tile_summary.tiles_by_tissue_percentage()[:5]
 # for t in tiles:
 #   t.display_with_histograms()
+# dynamic_tile(1, 181, 70).display_with_histograms()
+# dynamic_tile(1, 177, 66).display_with_histograms()
+
+tile_summary = dynamic_tiles(1)
+# tile_summary.get_tile()
