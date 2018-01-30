@@ -216,7 +216,7 @@ def generate_tile_summary_images(tile_sum, np_img, display=True, save=False, tex
     save_tile_summary_on_original_image(summary_orig, slide_num)
 
 
-def generate_top_tile_images(tile_sum, np_img, display=True, save=False, text_size=10, display_top_stats=True):
+def generate_top_tile_images(tile_sum, np_img, display=True, save=False, text_size=10, show_top_stats=True):
   """
   Generate summary images/thumbnails showing the top tissue segmentation tiles.
 
@@ -226,6 +226,7 @@ def generate_top_tile_images(tile_sum, np_img, display=True, save=False, text_si
     display: If True, display top tiles to screen.
     save: If True, save top tiles images.
     text_size: Font size.
+    show_top_stats: If True, append top tile score stats to image.
   """
   z = 300  # height of area at top of summary slide
   slide_num = tile_sum.slide_num
@@ -265,18 +266,9 @@ def generate_top_tile_images(tile_sum, np_img, display=True, save=False, text_si
     draw.text(((t.c_s + 2), (t.r_s + 2 + z)), label, SUMMARY_TILE_TEXT_COLOR, font=font)
     draw_orig.text(((t.c_s + 2), (t.r_s + 2 + z)), label, SUMMARY_TILE_TEXT_COLOR, font=font)
 
-  if display_top_stats:
-    np_sum = filter.pil_to_np_rgb(summary_orig)
-    sum_r, sum_c, sum_ch = np_sum.shape
-    np_stats = np_tile_stat_img(top_tiles)
-    st_r, st_c, _ = np_stats.shape
-    combo_c = sum_c + st_c
-    combo_r = max(sum_r, st_r + z)
-    combo = np.zeros([combo_r, combo_c, sum_ch], dtype=np.uint8)
-    combo.fill(255)
-    combo[0:sum_r, 0:sum_c] = np_sum
-    combo[z:st_r + z, sum_c:sum_c + st_c] = np_stats
-    summary_orig = filter.np_to_pil(combo)
+  if show_top_stats:
+    summary = add_tile_stats_to_top_tile_summary(summary, top_tiles, z)
+    summary_orig = add_tile_stats_to_top_tile_summary(summary_orig, top_tiles, z)
 
   if display:
     summary.show()
@@ -284,6 +276,21 @@ def generate_top_tile_images(tile_sum, np_img, display=True, save=False, text_si
   if save:
     save_top_tiles_image(summary, slide_num)
     save_top_tiles_on_original_image(summary_orig, slide_num)
+
+
+def add_tile_stats_to_top_tile_summary(pil_img, tiles, z):
+  np_sum = filter.pil_to_np_rgb(pil_img)
+  sum_r, sum_c, sum_ch = np_sum.shape
+  np_stats = np_tile_stat_img(tiles)
+  st_r, st_c, _ = np_stats.shape
+  combo_c = sum_c + st_c
+  combo_r = max(sum_r, st_r + z)
+  combo = np.zeros([combo_r, combo_c, sum_ch], dtype=np.uint8)
+  combo.fill(255)
+  combo[0:sum_r, 0:sum_c] = np_sum
+  combo[z:st_r + z, sum_c:sum_c + st_c] = np_stats
+  result = filter.np_to_pil(combo)
+  return result
 
 
 def np_tile_stat_img(tiles):
@@ -1779,7 +1786,7 @@ def dynamic_tile(slide_num, row, col):
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
 # multiprocess_filtered_images_to_tiles()
-multiprocess_filtered_images_to_tiles(image_num_list=[7])
+multiprocess_filtered_images_to_tiles(image_num_list=[7, 8])
 
 # # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
 # # img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
