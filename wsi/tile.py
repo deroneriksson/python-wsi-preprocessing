@@ -672,19 +672,17 @@ def compute_tile_summary(slide_num, np_img=None, dimensions=None):
     else:
       quantity_factor = 0.0
     factor = color_factor * s_and_v_factor * quantity_factor
-    score = (t_p ** 2) * np.log(1 + factor)
-
-    # if (slide_num == 1) and ((r == 181 and c == 70) or (r == 177 and c == 66)):
-    # if (slide_num == 3):
-    #   if (r == 17 and (c == 6 or c == 7 or c == 8)) or (r == 11 and (c == 22 or c == 23 or c == 24)):
-    # if (slide_num == 1):
-    #   if (r == 181 and (c == 71 or c == 72 or c == 73)):
-    #     tup = (slide_num, r, c, t_p, color_factor, s_and_v_factor, quantity_factor, factor, score)
-    #     print("S%03d R%03d C%03d TP:%4.2f CF:%4.2f SVF:%4.2f QF:%4.2f F:%4.2f S:%4.2f" % tup)
+    score = (t_p ** 2) * np.log(1 + factor) / 1000.0
 
     tile_info = TileInfo(tile_sum, slide_num, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p,
                          color_factor, s_and_v_factor, score)
     tile_sum.tiles.append(tile_info)
+
+    # if (slide_num == 15):
+    #   if (r == 5 and (c == 44)) or (r == 59 and (c == 33)):
+    #     tup = (slide_num, r, c, t_p, color_factor, s_and_v_factor, quantity_factor, factor, score)
+    #     print("S%03d R%03d C%03d TP:%4.2f CF:%4.2f SVF:%4.2f QF:%4.2f F:%4.2f S:%4.2f" % tup)
+    #     display_image_with_rgb_and_hsv_histograms(np_tile)
 
   tile_sum.count = count
   tile_sum.high = high
@@ -1494,13 +1492,10 @@ def hsv_purple_pink_factor(rgb, tissue_percentage, slide_num, row, col):
     return factor
   pu_dev = hsv_purple_deviation(hues)
   pi_dev = hsv_pink_deviation(hues)
-
-  # factor = (tissue_percentage / 100) * pi_dev / pu_dev
-  factor = pi_dev / pu_dev
-
+  avg_factor = (340 - np.average(hues)) ** 2
+  factor = pi_dev / pu_dev * avg_factor
   # print("S: %d, R: %d, C: %d, PiDev: %4.2f, PuDev: %4.2f, PiDev/PuDev: %4.2" % (
   #   slide_num, row, col, pu_dev, pi_dev, factor))
-
   return factor
 
 
@@ -1844,3 +1839,7 @@ multiprocess_filtered_images_to_tiles()
 # tile_summary.get_tile(42, 59).display_with_histograms()
 # tile_summary.get_tile(42, 60).display_with_histograms()
 # tile_summary.get_tile(42, 61).display_with_histograms()
+
+# tile_summary = dynamic_tiles(15)
+# tile_summary.get_tile(5, 44).display_with_histograms()  # pink but coming up
+# tile_summary.get_tile(59, 33).display_with_histograms()
