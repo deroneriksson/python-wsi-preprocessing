@@ -596,7 +596,7 @@ def score_tiles(slide_num, np_img=None, dimensions=None):
 
   Args:
     slide_num: The slide number.
-    np_img: Image as a NumPy array.
+    np_img: Optional image as a NumPy array.
     dimensions: Optional tuple consisting of (original width, original height, new width, new height). Used for dynamic
       tile retrieval.
 
@@ -1418,13 +1418,16 @@ def hsv_saturation_and_value_factor(rgb):
   s_std = np.std(s)
   v_std = np.std(v)
   if s_std < 0.05 and v_std < 0.05:
-    return 0.4
+    factor = 0.4
   elif s_std < 0.05:
-    return 0.7
+    factor = 0.7
   elif v_std < 0.05:
-    return 0.7
+    factor = 0.7
   else:
-    return 1
+    factor = 1
+
+  factor = factor ** 2
+  return factor
 
 
 def hsv_purple_deviation(hsv_hues):
