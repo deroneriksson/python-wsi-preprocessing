@@ -311,8 +311,8 @@ def np_tile_stat_img(tiles):
     if count > 0:
       tile_stats += "\n"
     count += 1
-    tup = (t.r, t.c, t.rank, t.tissue_percentage, t.color_factor, t.s_and_v_factor, t.score)
-    tile_stats += "R%03d C%03d #%003d TP:%6.2f%% CF:%4.0f SVF:%4.2f S:%0.4f" % tup
+    tup = (t.r, t.c, t.rank, t.tissue_percentage, t.color_factor, t.s_and_v_factor, t.quantity_factor, t.score)
+    tile_stats += "R%03d C%03d #%003d TP:%6.2f%% CF:%4.0f SVF:%4.2f QF:%4.2f S:%0.4f" % tup
   np_stats = np_text(tile_stats, font_path=SUMMARY_TITLE_FONT_PATH, font_size=14)
   return np_stats
 
@@ -513,13 +513,13 @@ def save_tile_data(tile_summary):
 
   csv += "\n\n\nTile Num,Row,Column,Tissue %,Tissue Quantity,Col Start,Row Start,Col End,Row End,Col Size,Row Size," + \
          "Original Col Start,Original Row Start,Original Col End,Original Row End,Original Col Size,Original Row Size," + \
-         "Color Factor,S and V Factor,Score\n"
+         "Color Factor,S and V Factor,Quantity Factor,Score\n"
 
   for t in tile_summary.tiles:
-    line = "%d,%d,%d,%4.2f,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%4.2f,%4.2f,%4.2f\n" % (
+    line = "%d,%d,%d,%4.2f,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%4.0f,%4.2f,%4.2f,%0.4f\n" % (
       t.tile_num, t.r, t.c, t.tissue_percentage, t.tissue_quantity().name, t.c_s, t.r_s, t.c_e, t.r_e, t.c_e - t.c_s,
       t.r_e - t.r_s, t.o_c_s, t.o_r_s, t.o_c_e, t.o_r_e, t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s, t.color_factor,
-      t.s_and_v_factor, t.score)
+      t.s_and_v_factor, t.quantity_factor, t.score)
     csv += line
 
   data_path = slide.get_tile_data_path(tile_summary.slide_num)
@@ -663,7 +663,7 @@ def score_tiles(slide_num, np_img=None, dimensions=None):
     score, color_factor, s_and_v_factor, quantity_factor = score_tile(np_tile, t_p, slide_num, r, c)
 
     tile_info = TileInfo(tile_sum, slide_num, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p,
-                         color_factor, s_and_v_factor, score)
+                         color_factor, s_and_v_factor, quantity_factor, score)
     tile_sum.tiles.append(tile_info)
 
   tile_sum.count = count
@@ -1711,7 +1711,7 @@ class TileInfo:
   rank = None
 
   def __init__(self, tile_summary, slide_num, tile_num, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p,
-               color_factor, s_and_v_factor, score):
+               color_factor, s_and_v_factor, quantity_factor, score):
     self.tile_summary = tile_summary
     self.slide_num = slide_num
     self.tile_num = tile_num
@@ -1728,10 +1728,12 @@ class TileInfo:
     self.tissue_percentage = t_p
     self.color_factor = color_factor
     self.s_and_v_factor = s_and_v_factor
+    self.quantity_factor = quantity_factor
     self.score = score
 
   def __str__(self):
-    return "[Tile #%d, Row #%d, Column #%d, Tissue %4.2f%%]" % (self.tile_num, self.r, self.c, self.tissue_percentage)
+    return "[Tile #%d, Row #%d, Column #%d, Tissue %4.2f%%, Score %0.4f]" % (
+      self.tile_num, self.r, self.c, self.tissue_percentage, self.score)
 
   def __repr__(self):
     return "\n" + self.__str__()
