@@ -678,10 +678,10 @@ def compute_tile_summary(slide_num, np_img=None, dimensions=None):
                          color_factor, s_and_v_factor, score)
     tile_sum.tiles.append(tile_info)
 
-    # if (slide_num == 15):
-    #   if (r == 5 and (c == 44)) or (r == 59 and (c == 33)):
-    #     tup = (slide_num, r, c, t_p, color_factor, s_and_v_factor, quantity_factor, factor, score)
-    #     print("S%03d R%03d C%03d TP:%4.2f CF:%4.2f SVF:%4.2f QF:%4.2f F:%4.2f S:%4.2f" % tup)
+    # if (slide_num == 5):
+    #   if (r == 97 and (c == 16)):
+    #     #     tup = (slide_num, r, c, t_p, color_factor, s_and_v_factor, quantity_factor, factor, score)
+    #     #     print("S%03d R%03d C%03d TP:%4.2f CF:%4.2f SVF:%4.2f QF:%4.2f F:%4.2f S:%4.2f" % tup)
     #     display_image_with_rgb_and_hsv_histograms(np_tile)
 
   tile_sum.count = count
@@ -1493,7 +1493,17 @@ def hsv_purple_pink_factor(rgb, tissue_percentage, slide_num, row, col):
   pu_dev = hsv_purple_deviation(hues)
   pi_dev = hsv_pink_deviation(hues)
   avg_factor = (340 - np.average(hues)) ** 2
+
+  if pu_dev == 0:  # avoid divide by zero if tile has no tissue
+    return 0
+
   factor = pi_dev / pu_dev * avg_factor
+
+  # if (slide_num == 5):
+  #   if (row == 97 and (col == 16)):
+  #     print("S%d R%d C%d PiDev: %4.2f PuDev: %4.2f AF:%4.2f F:%4.2f" % (
+  #       slide_num, row, col, pi_dev, pu_dev, avg_factor, factor))
+
   # print("S: %d, R: %d, C: %d, PiDev: %4.2f, PuDev: %4.2f, PiDev/PuDev: %4.2" % (
   #   slide_num, row, col, pu_dev, pi_dev, factor))
   return factor
@@ -1843,3 +1853,7 @@ multiprocess_filtered_images_to_tiles()
 # tile_summary = dynamic_tiles(15)
 # tile_summary.get_tile(5, 44).display_with_histograms()  # pink but coming up
 # tile_summary.get_tile(59, 33).display_with_histograms()
+
+# tile_summary = dynamic_tiles(5)
+# tile_summary.get_tile(97, 16).display_with_histograms()  # orange box!
+# tile_summary.get_tile(99, 16).display_with_histograms()
