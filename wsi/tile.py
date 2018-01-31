@@ -305,14 +305,14 @@ def np_tile_stat_img(tiles):
     Tile scoring statistics converted into an NumPy array image.
   """
   tt = sorted(tiles, key=lambda t: (t.r, t.c), reverse=False)
-  tile_stats = ""
+  tile_stats = "Tile Score Statistics:\n"
   count = 0
   for t in tt:
     if count > 0:
       tile_stats += "\n"
     count += 1
     tup = (t.r, t.c, t.rank, t.tissue_percentage, t.color_factor, t.s_and_v_factor, t.score)
-    tile_stats += "R%03d C%03d #%003d TP:%6.2f%% CF:%4.2f SVF:%4.2f S:%4.2f" % tup
+    tile_stats += "R%03d C%03d #%003d TP:%6.2f%% CF:%4.0f SVF:%4.2f S:%0.4f" % tup
   np_stats = np_text(tile_stats, font_path=SUMMARY_TITLE_FONT_PATH, font_size=14)
   return np_stats
 
@@ -700,6 +700,8 @@ def score_tile(np_tile, tissue_percent, slide_num, row, col):
   quantity_factor = tissue_quantity_factor(amount)
   combined_factor = color_factor * s_and_v_factor * quantity_factor
   score = (tissue_percent ** 2) * np.log(1 + combined_factor) / 1000.0
+  # scale score to between 0 and 1
+  score = 1.0 - (10.0 / (10.0 + score))
   return score, color_factor, s_and_v_factor, quantity_factor
 
 
@@ -981,7 +983,7 @@ def image_row(slide_num, tile_summary, data_link):
       tile_num = row + (col * num_rows) + 1
       if tile_num <= num_tiles:
         t = top_tiles[tile_num - 1]
-        label = "R%03d C%03d %05.1f (#%02d)" % (t.r, t.c, t.score, t.tile_num)
+        label = "R%03d C%03d %0.4f (#%02d)" % (t.r, t.c, t.score, t.tile_num)
         tile_img_path = slide.get_tile_image_path(t)
         html += "<a target=\"_blank\" href=\"%s\">%s</a>" % (tile_img_path, label)
       else:
