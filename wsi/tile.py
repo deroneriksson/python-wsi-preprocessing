@@ -660,17 +660,9 @@ def score_tiles(slide_num, np_img=None, dimensions=None):
     if (o_r_e - o_r_s) > ROW_TILE_SIZE:
       o_r_e -= 1
 
-    # color_factor = purple_vs_pink_factor(np_tile, t_p)
     color_factor = hsv_purple_pink_factor(np_tile, t_p, slide_num, r, c)
     s_and_v_factor = hsv_saturation_and_value_factor(np_tile)
-    if amount == TissueQuantity.HIGH:
-      quantity_factor = 1.0
-    elif amount == TissueQuantity.MEDIUM:
-      quantity_factor = 0.2
-    elif amount == TissueQuantity.LOW:
-      quantity_factor = 0.1
-    else:
-      quantity_factor = 0.0
+    quantity_factor = tissue_quantity_factor(amount)
     factor = color_factor * s_and_v_factor * quantity_factor
     score = (t_p ** 2) * np.log(1 + factor) / 1000.0
 
@@ -691,6 +683,27 @@ def score_tiles(slide_num, np_img=None, dimensions=None):
     t.rank = rank
 
   return tile_sum
+
+
+def tissue_quantity_factor(amount):
+  """
+  Obtain a scoring factor based on the quantity of tissue in a tile.
+
+  Args:
+    amount: Tissue amount as a TissueQuantity enum value.
+
+  Returns:
+    Scoring factor based on the tile tissue quantity.
+  """
+  if amount == TissueQuantity.HIGH:
+    quantity_factor = 1.0
+  elif amount == TissueQuantity.MEDIUM:
+    quantity_factor = 0.2
+  elif amount == TissueQuantity.LOW:
+    quantity_factor = 0.1
+  else:
+    quantity_factor = 0.0
+  return quantity_factor
 
 
 def tissue_quantity(tissue_percentage):
@@ -1461,7 +1474,8 @@ def hsv_pink_deviation(hsv_hues):
 
 def hsv_purple_pink_factor(rgb, tissue_percentage, slide_num, row, col):
   """
-  Experimental function to compute scoring factor based on purple and pink HSV hue deviations.
+  Compute scoring factor based on purple and pink HSV hue deviations and degree to which a narrowed hue color range
+  average is purple versus pink.
 
   Args:
     rgb: Image an NumPy array.
@@ -1477,7 +1491,7 @@ def hsv_purple_pink_factor(rgb, tissue_percentage, slide_num, row, col):
   hues = hues[hues >= 260]  # exclude hues under 260
   hues = hues[hues <= 340]  # exclude hues over 340
   if len(hues) == 0:
-    return 1
+    return 0  # if no hues between 260 and 340, then not purple or pink
   pu_dev = hsv_purple_deviation(hues)
   pi_dev = hsv_pink_deviation(hues)
   avg_factor = (340 - np.average(hues)) ** 2
@@ -1489,9 +1503,10 @@ def hsv_purple_pink_factor(rgb, tissue_percentage, slide_num, row, col):
   return factor
 
 
-def purple_vs_pink_factor(rgb, tissue_percentage):
+def hsv_purple_vs_pink_average_factor(rgb, tissue_percentage):
   """
-  Function to favor purple (hematoxylin) over pink (eosin) staining.
+  Function to favor purple (hematoxylin) over pink (eosin) staining based on the distance of the HSV hue average
+  from purple and pink.
 
   Args:
     rgb: Image as RGB NumPy array
