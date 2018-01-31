@@ -660,11 +660,7 @@ def score_tiles(slide_num, np_img=None, dimensions=None):
     if (o_r_e - o_r_s) > ROW_TILE_SIZE:
       o_r_e -= 1
 
-    color_factor = hsv_purple_pink_factor(np_tile, t_p, slide_num, r, c)
-    s_and_v_factor = hsv_saturation_and_value_factor(np_tile)
-    quantity_factor = tissue_quantity_factor(amount)
-    factor = color_factor * s_and_v_factor * quantity_factor
-    score = (t_p ** 2) * np.log(1 + factor) / 1000.0
+    score, color_factor, s_and_v_factor, quantity_factor = score_tile(np_tile, t_p, slide_num, r, c)
 
     tile_info = TileInfo(tile_sum, slide_num, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p,
                          color_factor, s_and_v_factor, score)
@@ -683,6 +679,28 @@ def score_tiles(slide_num, np_img=None, dimensions=None):
     t.rank = rank
 
   return tile_sum
+
+
+def score_tile(np_tile, tissue_percent, slide_num, row, col):
+  """
+  Score tile based on tissue percentage, color factor, saturation/value factor, and tissue quantity factor.
+
+  Args:
+    np_tile: Tile as NumPy array.
+    tissue_percent: The percentage of the tile judged to be tissue.
+    slide_num: Slide number.
+    row: Tile row.
+    col: Tile column.
+
+  Returns tuple consisting of score, color factor, saturation/value factor, and tissue quantity factor.
+  """
+  color_factor = hsv_purple_pink_factor(np_tile, tissue_percent, slide_num, row, col)
+  s_and_v_factor = hsv_saturation_and_value_factor(np_tile)
+  amount = tissue_quantity(tissue_percent)
+  quantity_factor = tissue_quantity_factor(amount)
+  combined_factor = color_factor * s_and_v_factor * quantity_factor
+  score = (tissue_percent ** 2) * np.log(1 + combined_factor) / 1000.0
+  return score, color_factor, s_and_v_factor, quantity_factor
 
 
 def tissue_quantity_factor(amount):
