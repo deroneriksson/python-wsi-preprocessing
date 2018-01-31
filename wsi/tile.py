@@ -295,7 +295,7 @@ def add_tile_stats_to_top_tile_summary(pil_img, tiles, z):
 
 def np_tile_stat_img(tiles):
   """
-  Generate tile scoring statistics for a list of tiles and return the result as a NumPy array.
+  Generate tile scoring statistics for a list of tiles and return the result as a NumPy array image.
 
   Args:
     tiles: List of tiles (such as top tiles)
@@ -487,7 +487,7 @@ def summary_and_tiles(slide_num, display=True, save=False, save_data=True, save_
   img_path = slide.get_filter_image_result(slide_num)
   np_img = slide.open_image_np(img_path)
 
-  tile_sum = compute_tile_summary(slide_num, np_img)
+  tile_sum = score_tiles(slide_num, np_img)
   if save_data:
     save_tile_data(tile_sum)
   generate_tile_summary_images(tile_sum, np_img, display=display, save=save)
@@ -590,10 +590,9 @@ def save_display_tile(tile_info, save=True, display=False):
     tile_pil_img.show()
 
 
-def compute_tile_summary(slide_num, np_img=None, dimensions=None):
+def score_tiles(slide_num, np_img=None, dimensions=None):
   """
-  Generate a tile summary consisting of summary statistics and also information about each tile such as tissue
-  percentage and coordinates.
+  Score all tiles for a slide and return the results in a TileSummary object.
 
   Args:
     slide_num: The slide number.
@@ -677,12 +676,6 @@ def compute_tile_summary(slide_num, np_img=None, dimensions=None):
     tile_info = TileInfo(tile_sum, slide_num, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p,
                          color_factor, s_and_v_factor, score)
     tile_sum.tiles.append(tile_info)
-
-    # if (slide_num == 5):
-    #   if (r == 97 and (c == 16)):
-    #     #     tup = (slide_num, r, c, t_p, color_factor, s_and_v_factor, quantity_factor, factor, score)
-    #     #     print("S%03d R%03d C%03d TP:%4.2f CF:%4.2f SVF:%4.2f QF:%4.2f F:%4.2f S:%4.2f" % tup)
-    #     display_image_with_rgb_and_hsv_histograms(np_tile)
 
   tile_sum.count = count
   tile_sum.high = high
@@ -1325,13 +1318,6 @@ def display_tile_with_rgb_and_hsv_histograms(tile):
   text += "Score: %5.2f, Tissue: %5.2f%%, Rank: #%d of %d" % (
     tile.score, tile.tissue_percentage, tile.rank, tile.tile_summary.num_tiles())
 
-  hues = rgb_to_hues(np_tile)
-  purple_dev = hsv_purple_deviation(hues)
-  pink_dev = hsv_pink_deviation(hues)
-  # pi_to_pu = pink_dev / purple_dev
-  purple_pink_factor = hsv_purple_pink_factor(np_tile, tile.tissue_percentage, tile.slide_num, tile.r, tile.c)
-  text += "\nPurple Dev: %5.2f, Pink Dev: %5.2f, purple_pink_factor: %5.2f" % (purple_dev, pink_dev, purple_pink_factor)
-
   display_image_with_rgb_and_hsv_histograms(np_tile, text)
 
 
@@ -1483,13 +1469,11 @@ def hsv_purple_pink_factor(rgb, tissue_percentage, slide_num, row, col):
   Returns:
     Factor that favors purple (hematoxylin stained) tissue over pink (eosin stained) tissue.
   """
-  factor = 1
-
   hues = rgb_to_hues(rgb)
   hues = hues[hues >= 260]  # exclude hues under 260
   hues = hues[hues <= 340]  # exclude hues over 340
   if len(hues) == 0:
-    return factor
+    return 1
   pu_dev = hsv_purple_deviation(hues)
   pi_dev = hsv_pink_deviation(hues)
   avg_factor = (340 - np.average(hues)) ** 2
@@ -1498,14 +1482,6 @@ def hsv_purple_pink_factor(rgb, tissue_percentage, slide_num, row, col):
     return 0
 
   factor = pi_dev / pu_dev * avg_factor
-
-  # if (slide_num == 5):
-  #   if (row == 97 and (col == 16)):
-  #     print("S%d R%d C%d PiDev: %4.2f PuDev: %4.2f AF:%4.2f F:%4.2f" % (
-  #       slide_num, row, col, pi_dev, pu_dev, avg_factor, factor))
-
-  # print("S: %d, R: %d, C: %d, PiDev: %4.2f, PuDev: %4.2f, PiDev/PuDev: %4.2" % (
-  #   slide_num, row, col, pu_dev, pi_dev, factor))
   return factor
 
 
@@ -1764,7 +1740,7 @@ def dynamic_tiles(slide_num):
   """
   np_img, large_w, large_h, small_w, small_h = slide.slide_to_scaled_np_image(slide_num)
   filt_np_img = filter.apply_image_filters(np_img)
-  tile_summary = compute_tile_summary(slide_num, filt_np_img, (large_w, large_h, small_w, small_h))
+  tile_summary = score_tiles(slide_num, filt_np_img, (large_w, large_h, small_w, small_h))
   return tile_summary
 
 
@@ -1853,7 +1829,3 @@ multiprocess_filtered_images_to_tiles()
 # tile_summary = dynamic_tiles(15)
 # tile_summary.get_tile(5, 44).display_with_histograms()  # pink but coming up
 # tile_summary.get_tile(59, 33).display_with_histograms()
-
-# tile_summary = dynamic_tiles(5)
-# tile_summary.get_tile(97, 16).display_with_histograms()  # orange box!
-# tile_summary.get_tile(99, 16).display_with_histograms()
