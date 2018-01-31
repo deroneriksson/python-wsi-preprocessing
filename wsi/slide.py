@@ -68,11 +68,11 @@ TILE_SUMMARY_HTML_DIR = BASE_DIR
 TILE_DATA_DIR = BASE_DIR + os.sep + "tile_data"
 TILE_DATA_SUFFIX = "tile_data"
 
-TOP_TILES_SUFFIX = "top_tiles"
-TOP_TILES_DIR = BASE_DIR + os.sep + "top_tiles_" + DEST_TRAIN_EXT
-TOP_TILES_THUMBNAIL_DIR = BASE_DIR + os.sep + "top_tiles_thumbnail_" + THUMBNAIL_EXT
-TOP_TILES_ON_ORIGINAL_DIR = BASE_DIR + os.sep + "top_tiles_on_original_" + DEST_TRAIN_EXT
-TOP_TILES_ON_ORIGINAL_THUMBNAIL_DIR = BASE_DIR + os.sep + "top_tiles_on_original_thumbnail_" + THUMBNAIL_EXT
+TOP_TILES_SUFFIX = "top_tile_summary"
+TOP_TILES_DIR = BASE_DIR + os.sep + TOP_TILES_SUFFIX + "_" + DEST_TRAIN_EXT
+TOP_TILES_THUMBNAIL_DIR = BASE_DIR + os.sep + TOP_TILES_SUFFIX + "_thumbnail_" + THUMBNAIL_EXT
+TOP_TILES_ON_ORIGINAL_DIR = BASE_DIR + os.sep + TOP_TILES_SUFFIX + "_on_original_" + DEST_TRAIN_EXT
+TOP_TILES_ON_ORIGINAL_THUMBNAIL_DIR = BASE_DIR + os.sep + TOP_TILES_SUFFIX + "_on_original_thumbnail_" + THUMBNAIL_EXT
 
 TILE_DIR = BASE_DIR + os.sep + "tiles_" + DEST_TRAIN_EXT
 TILE_SUFFIX = "tile"
@@ -164,7 +164,7 @@ def get_tile_image_path(tile_info):
   return tile_path
 
 
-def get_tile_image_path_by_row_col(slide_number, row, col):
+def get_tile_image_path_by_slide_row_col(slide_number, row, col):
   """
   Obtain tile image path using wildcard lookup with slide number, row, and column.
 

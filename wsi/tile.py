@@ -146,7 +146,7 @@ def create_summary_pil_img(np_img, title_area_height, row_tile_size, col_tile_si
   return summary
 
 
-def generate_tile_summary_images(tile_sum, np_img, display=True, save=False, text_size=16):
+def generate_tile_summaries(tile_sum, np_img, display=True, save=False, text_size=16):
   """
   Generate summary images/thumbnails showing a 'heatmap' representation of the tissue segmentation of all tiles.
 
@@ -216,7 +216,7 @@ def generate_tile_summary_images(tile_sum, np_img, display=True, save=False, tex
     save_tile_summary_on_original_image(summary_orig, slide_num)
 
 
-def generate_top_tile_images(tile_sum, np_img, display=True, save=False, text_size=10, show_top_stats=True):
+def generate_top_tile_summaries(tile_sum, np_img, display=True, save=False, text_size=10, show_top_stats=True):
   """
   Generate summary images/thumbnails showing the top tissue segmentation tiles.
 
@@ -490,8 +490,8 @@ def summary_and_tiles(slide_num, display=True, save=False, save_data=True, save_
   tile_sum = score_tiles(slide_num, np_img)
   if save_data:
     save_tile_data(tile_sum)
-  generate_tile_summary_images(tile_sum, np_img, display=display, save=save)
-  generate_top_tile_images(tile_sum, np_img, display=display, save=save)
+  generate_tile_summaries(tile_sum, np_img, display=display, save=save)
+  generate_top_tile_summaries(tile_sum, np_img, display=display, save=save)
   if save_top_tiles:
     for tile in tile_sum.top_tiles():
       tile.save_tile()
@@ -1761,71 +1761,10 @@ def dynamic_tile(slide_num, row, col):
   tile = tile_summary.get_tile(row, col)
   return tile
 
-
 # singleprocess_filtered_images_to_tiles(image_num_list=[7, 8, 9])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,
 #                                       display=False, html=True)
-multiprocess_filtered_images_to_tiles()
-# multiprocess_filtered_images_to_tiles(image_num_list=[7, 8])
-
-# # img_path = "../data/tiles_png/004/TUPAC-TR-004-tile-r34-c24-x23554-y33792-w1024-h1024.png"
-# # img_path = "../data/tiles_png/003/TUPAC-TR-003-tile-r12-c21-x20480-y11264-w1024-h1024.png"
-# img_path = "../data/tiles_png/002/TUPAC-TR-002-tile-r17-c35-x34817-y16387-w1024-h1024.png"
-# img_path = "../data/tiles_png/006/TUPAC-TR-006-tile-r58-c3-x2048-y58369-w1024-h1024.png"
-# img_path = slide.get_tile_image_path_by_row_col(2, 31, 12)
-# img_path = slide.get_tile_image_path_by_row_col(6, 58, 3)
-# img_path = slide.get_tile_image_path_by_row_col(7, 21, 84)
-# img_path = slide.get_tile_image_path_by_row_col(8, 54, 43)
-# img_path = slide.get_tile_image_path_by_row_col(9, 72, 62)
-# np_img = slide.open_image_np(img_path)
-# display_image_with_hsv_hue_histogram(np_img, "Testing")
-# display_image_with_hsv_histograms(np_img, "Testing")
-# display_image_with_rgb_and_hsv_histograms(np_img, "Testing")
-# tile_summary.get_tile(14, 72).display_with_histograms()
-# display_tile_with_rgb_and_hsv_histograms(t)
-# tile = tile_summary.get_tile(7, 48)
-# tile.display_with_histograms()
-
-# dynamic_tile(10, 50, 50).display_with_histograms()
-# dynamic_tile(7, 10, 64).display_with_histograms()
-# tile = dynamic_tile(7, 5, 80)
-# tile.display_with_histograms()
-# hues = rgb_to_hues(tile.get_np_tile())
-# purple_deviation = hsv_purple_deviation(hues)
-# pink_deviation = hsv_pink_deviation(hues)
-# print("Purple deviation:" + str(purple_deviation))
-# print("Pink deviation:" + str(pink_deviation))
-# tile_summary = dynamic_tiles(7)
-
-# for t in tile_summary.tiles:
-#   print(str(t))
-
-# slide.multiprocess_training_slides_to_images()
-# filter.multiprocess_apply_filters_to_images()
 # multiprocess_filtered_images_to_tiles()
-
-# pil_text("Testing...").show()
-# filter.np_info(np_text("Testing..."))
-# txt = np_text("OK", text_color=(255, 0, 0))
-# filter.np_to_pil(txt).show()
-
-# tile_summary = dynamic_tiles(4)
-# top = tile_summary.top_tiles()[:5]
-# for t in top:
-#   t.display_with_histograms()
-# tiles = tile_summary.tiles_by_tissue_percentage()[:5]
-# for t in tiles:
-#   t.display_with_histograms()
-# dynamic_tile(1, 181, 70).display_with_histograms()
-# dynamic_tile(1, 177, 66).display_with_histograms()
-
-# tile_summary = dynamic_tiles(7)
-# tile_summary.get_tile(42, 59).display_with_histograms()
-# tile_summary.get_tile(42, 60).display_with_histograms()
-# tile_summary.get_tile(42, 61).display_with_histograms()
-
-# tile_summary = dynamic_tiles(15)
-# tile_summary.get_tile(5, 44).display_with_histograms()  # pink but coming up
-# tile_summary.get_tile(59, 33).display_with_histograms()
+# multiprocess_filtered_images_to_tiles(image_num_list=[7, 8])
