@@ -218,7 +218,7 @@ def generate_tile_summaries(tile_sum, np_img, display=True, save=False, text_siz
 
 def generate_top_tile_summaries(tile_sum, np_img, display=True, save=False, text_size=10, show_top_stats=True):
   """
-  Generate summary images/thumbnails showing the top tissue segmentation tiles.
+  Generate summary images/thumbnails showing the top tiles ranked by score.
 
   Args:
     tile_sum: TileSummary object.
@@ -250,7 +250,8 @@ def generate_top_tile_summaries(tile_sum, np_img, display=True, save=False, text
     tile_border(draw, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color)
     tile_border(draw_orig, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color)
 
-  summary_txt = summary_title(tile_sum) + "\n" + summary_stats(tile_sum)
+  summary_title = "Slide %03d Top Tile Summary:" % slide_num
+  summary_txt = summary_title + "\n" + summary_stats(tile_sum)
 
   summary_font = ImageFont.truetype(SUMMARY_TITLE_FONT_PATH, size=SUMMARY_TITLE_TEXT_SIZE)
   draw.text((5, 5), summary_txt, SUMMARY_TITLE_TEXT_COLOR, font=summary_font)
@@ -890,13 +891,13 @@ def image_row(slide_num, tile_summary, data_link):
          "      </td>\n"
 
   html += "      <td style=\"vertical-align: top\">\n" + \
-          "        <a target=\"_blank\" href=\"%s\">S%03d Tiled<br/>\n" % (sum_img, slide_num) + \
+          "        <a target=\"_blank\" href=\"%s\">S%03d Tiles<br/>\n" % (sum_img, slide_num) + \
           "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), sum_thumb) + \
           "        </a>\n" + \
           "      </td>\n"
 
   html += "      <td style=\"vertical-align: top\">\n" + \
-          "        <a target=\"_blank\" href=\"%s\">S%03d Original Tiled<br/>\n" % (osum_img, slide_num) + \
+          "        <a target=\"_blank\" href=\"%s\">S%03d Tiles<br/>\n" % (osum_img, slide_num) + \
           "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), osum_thumb) + \
           "        </a>\n" + \
           "      </td>\n"
@@ -920,7 +921,7 @@ def image_row(slide_num, tile_summary, data_link):
           "      </td>\n"
 
   html += "      <td style=\"vertical-align: top\">\n" + \
-          "        <a target=\"_blank\" href=\"%s\">S%03d Original Top Tiles<br/>\n" % (otop_img, slide_num) + \
+          "        <a target=\"_blank\" href=\"%s\">S%03d Top Tiles<br/>\n" % (otop_img, slide_num) + \
           "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), otop_thumb) + \
           "        </a>\n" + \
           "      </td>\n"
@@ -977,7 +978,7 @@ def generate_tiled_html_result(slide_nums, tile_summaries_dict, data_link):
   slide_nums = sorted(slide_nums)
   if not slide.TILE_SUMMARY_PAGINATE:
     html = ""
-    html += filter.html_header("Tiled Images")
+    html += filter.html_header("Tiles")
 
     html += "  <table>\n"
     for slide_num in slide_nums:
@@ -998,7 +999,7 @@ def generate_tiled_html_result(slide_nums, tile_summaries_dict, data_link):
       page_slide_nums = slide_nums[start_index:end_index]
 
       html = ""
-      html += filter.html_header("Tiled Images, Page %d" % page_num)
+      html += filter.html_header("Tiles, Page %d" % page_num)
 
       html += "  <div style=\"font-size: 20px\">"
       if page_num > 1:
