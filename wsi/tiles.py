@@ -654,7 +654,7 @@ def score_tiles(slide_num, np_img=None, dimensions=None, small_tile_in_tile=Fals
 
     np_scaled_tile = np_tile if small_tile_in_tile else None
     tile = Tile(tile_sum, slide_num, np_scaled_tile, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s,
-                     o_c_e, t_p, color_factor, s_and_v_factor, quantity_factor, score)
+                o_c_e, t_p, color_factor, s_and_v_factor, quantity_factor, score)
     tile_sum.tiles.append(tile)
 
   tile_sum.count = count
@@ -1693,25 +1693,6 @@ class Tile:
   """
   Class for information about a tile.
   """
-  tile_summary = None
-  slide_num = None
-  np_scaled_tile = None
-  tile_num = None
-  r = None
-  c = None
-  r_s = None
-  r_e = None
-  c_s = None
-  c_e = None
-  o_r_s = None
-  o_r_e = None
-  o_c_s = None
-  o_c_e = None
-  tissue_percentage = None
-  color_factor = None
-  s_and_v_factor = None
-  score = None
-  rank = None
 
   def __init__(self, tile_summary, slide_num, np_scaled_tile, tile_num, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s,
                o_c_e, t_p, color_factor, s_and_v_factor, quantity_factor, score):
