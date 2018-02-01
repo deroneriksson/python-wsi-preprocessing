@@ -45,6 +45,7 @@ COL_TILE_SIZE = 1024
 NUM_TOP_TILES = 50
 
 DISPLAY_TILE_SUMMARY_LABELS = False
+TILE_LABEL_TEXT_SIZE = 10
 
 TILE_BORDER_SIZE = 2  # The size of the colored rectangular border around summary tiles.
 
@@ -142,7 +143,7 @@ def create_summary_pil_img(np_img, title_area_height, row_tile_size, col_tile_si
   return summary
 
 
-def generate_tile_summaries(tile_sum, np_img, display=True, save=False, text_size=10):
+def generate_tile_summaries(tile_sum, np_img, display=True, save=False):
   """
   Generate summary images/thumbnails showing a 'heatmap' representation of the tissue segmentation of all tiles.
 
@@ -188,9 +189,13 @@ def generate_tile_summaries(tile_sum, np_img, display=True, save=False, text_siz
     for t in tile_sum.tiles:
       count += 1
       label = "R%d\nC%d" % (t.r, t.c)
-      font = ImageFont.truetype(FONT_PATH, size=text_size)
+      font = ImageFont.truetype(FONT_PATH, size=TILE_LABEL_TEXT_SIZE)
+      # drop shadow behind text
       draw.text(((t.c_s + 3), (t.r_s + 3 + z)), label, (0, 0, 0), font=font)
+      draw_orig.text(((t.c_s + 3), (t.r_s + 3 + z)), label, (0, 0, 0), font=font)
+
       draw.text(((t.c_s + 2), (t.r_s + 2 + z)), label, SUMMARY_TILE_TEXT_COLOR, font=font)
+      draw_orig.text(((t.c_s + 2), (t.r_s + 2 + z)), label, SUMMARY_TILE_TEXT_COLOR, font=font)
 
   if display:
     summary.show()
@@ -200,7 +205,7 @@ def generate_tile_summaries(tile_sum, np_img, display=True, save=False, text_siz
     save_tile_summary_on_original_image(summary_orig, slide_num)
 
 
-def generate_top_tile_summaries(tile_sum, np_img, display=True, save=False, text_size=10, show_top_stats=True):
+def generate_top_tile_summaries(tile_sum, np_img, display=True, save=False, show_top_stats=True):
   """
   Generate summary images/thumbnails showing the top tiles ranked by score.
 
@@ -243,7 +248,7 @@ def generate_top_tile_summaries(tile_sum, np_img, display=True, save=False, text
 
   for t in top_tiles:
     label = "R%d\nC%d" % (t.r, t.c)
-    font = ImageFont.truetype(FONT_PATH, size=text_size)
+    font = ImageFont.truetype(FONT_PATH, size=TILE_LABEL_TEXT_SIZE)
     # drop shadow behind text
     draw.text(((t.c_s + 3), (t.r_s + 3 + z)), label, (0, 0, 0), font=font)
     draw_orig.text(((t.c_s + 3), (t.r_s + 3 + z)), label, (0, 0, 0), font=font)
