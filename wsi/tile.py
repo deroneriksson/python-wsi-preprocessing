@@ -1344,18 +1344,19 @@ def display_tile_with_rgb_and_hsv_histograms(tile):
 
   np_scaled_tile = tile.get_np_scaled_tile()
   if np_scaled_tile is not None:
-    display_image_with_rgb_and_hsv_histograms(np_scaled_tile, text)
+    display_image_with_rgb_and_hsv_histograms(np_scaled_tile, text, scale_up=True)
 
   display_image_with_rgb_and_hsv_histograms(np_tile, text)
 
 
-def display_image_with_rgb_and_hsv_histograms(np_rgb, text=None):
+def display_image_with_rgb_and_hsv_histograms(np_rgb, text=None, scale_up=False):
   """
   Display a tile with its corresponding RGB and HSV histograms.
 
   Args:
     np_rgb: RGB image tile as a NumPy array
     text: Optional text to display above image
+    scale_up: If True, scale up image to display by slide.SCALE_FACTOR
   """
   hsv = filter.filter_rgb_to_hsv(np_rgb)
   np_r = np_rgb_r_histogram(np_rgb)
@@ -1371,6 +1372,10 @@ def display_image_with_rgb_and_hsv_histograms(np_rgb, text=None):
   h_r, h_c, _ = np_h.shape
   s_r, s_c, _ = np_s.shape
   v_r, v_c, _ = np_v.shape
+
+  if scale_up:
+    np_rgb = np.repeat(np_rgb, slide.SCALE_FACTOR, axis=1)
+    np_rgb = np.repeat(np_rgb, slide.SCALE_FACTOR, axis=0)
 
   img_r, img_c, img_ch = np_rgb.shape
   if text is not None:
