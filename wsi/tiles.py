@@ -44,7 +44,7 @@ ROW_TILE_SIZE = 1024
 COL_TILE_SIZE = 1024
 NUM_TOP_TILES = 50
 
-DISPLAY_TILE_SUMMARY_LABELS = False
+DISPLAY_TILE_SUMMARY_LABELS = True
 TILE_LABEL_TEXT_SIZE = 10
 
 TILE_BORDER_SIZE = 2  # The size of the colored rectangular border around summary tiles.
@@ -519,17 +519,17 @@ def save_tile_data(tile_summary):
   print("%-20s | Time: %-14s  Name: %s" % ("Save Tile Data", str(time.elapsed()), data_path))
 
 
-def tile_info_to_pil_tile(tile_info):
+def tile_to_pil_tile(tile):
   """
   Convert tile information into the corresponding tile as a PIL image read from the whole-slide image file.
 
   Args:
-    tile_info: TileInfo object.
+    tile: Tile object.
 
   Return:
     Tile as a PIL image.
   """
-  t = tile_info
+  t = tile
   slide_filepath = slide.get_training_slide_path(t.slide_num)
   s = slide.open_slide(slide_filepath)
 
@@ -541,35 +541,35 @@ def tile_info_to_pil_tile(tile_info):
   return pil_img
 
 
-def tile_info_to_np_tile(tile_info):
+def tile_to_np_tile(tile):
   """
   Convert tile information into the corresponding tile as a NumPy image read from the whole-slide image file.
 
   Args:
-    tile_info: TileInfo object.
+    tile: Tile object.
 
   Return:
     Tile as a NumPy image.
   """
-  pil_img = tile_info_to_pil_tile(tile_info)
+  pil_img = tile_to_pil_tile(tile)
   np_img = filter.pil_to_np_rgb(pil_img)
   return np_img
 
 
-def save_display_tile(tile_info, save=True, display=False):
+def save_display_tile(tile, save=True, display=False):
   """
   Save and/or display a tile image.
 
   Args:
-    tile_info: TileInfo object.
+    tile: Tile object.
     save: If True, save tile image.
     display: If True, dispaly tile image.
   """
-  tile_pil_img = tile_info_to_pil_tile(tile_info)
+  tile_pil_img = tile_to_pil_tile(tile)
 
   if save:
     t = Time()
-    img_path = slide.get_tile_image_path(tile_info)
+    img_path = slide.get_tile_image_path(tile)
     dir = os.path.dirname(img_path)
     if not os.path.exists(dir):
       os.makedirs(dir)
@@ -580,7 +580,7 @@ def save_display_tile(tile_info, save=True, display=False):
     tile_pil_img.show()
 
 
-def score_tiles(slide_num, np_img=None, dimensions=None, small_tile_in_tileinfo=False):
+def score_tiles(slide_num, np_img=None, dimensions=None, small_tile_in_tile=False):
   """
   Score all tiles for a slide and return the results in a TileSummary object.
 
@@ -589,10 +589,10 @@ def score_tiles(slide_num, np_img=None, dimensions=None, small_tile_in_tileinfo=
     np_img: Optional image as a NumPy array.
     dimensions: Optional tuple consisting of (original width, original height, new width, new height). Used for dynamic
       tile retrieval.
-    small_tile_in_tileinfo: If True, include the small NumPy image in the TileInfo objects.
+    small_tile_in_tile: If True, include the small NumPy image in the Tile objects.
 
   Returns:
-    TileSummary object which includes a list of TileInfo objects containing information about each tile.
+    TileSummary object which includes a list of Tile objects containing information about each tile.
   """
   if dimensions is None:
     img_path = slide.get_filter_image_result(slide_num)
@@ -652,10 +652,10 @@ def score_tiles(slide_num, np_img=None, dimensions=None, small_tile_in_tileinfo=
 
     score, color_factor, s_and_v_factor, quantity_factor = score_tile(np_tile, t_p, slide_num, r, c)
 
-    np_scaled_tile = np_tile if small_tile_in_tileinfo else None
-    tile_info = TileInfo(tile_sum, slide_num, np_scaled_tile, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s,
-                         o_c_e, t_p, color_factor, s_and_v_factor, quantity_factor, score)
-    tile_sum.tiles.append(tile_info)
+    np_scaled_tile = np_tile if small_tile_in_tile else None
+    tile = Tile(tile_sum, slide_num, np_scaled_tile, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s,
+                     o_c_e, t_p, color_factor, s_and_v_factor, quantity_factor, score)
+    tile_sum.tiles.append(tile)
 
   tile_sum.count = count
   tile_sum.high = high
@@ -1334,7 +1334,7 @@ def display_tile_with_rgb_and_hsv_histograms(tile):
   Display a tile with its corresponding RGB and HSV histograms.
 
   Args:
-    tile: The TileInfo object.
+    tile: The Tile object.
   """
 
   text = "S%03d R%03d C%03d\n" % (tile.slide_num, tile.r, tile.c)
@@ -1682,14 +1682,14 @@ class TileSummary:
       col: The column
 
     Returns:
-      Corresponding TileInfo object.
+      Corresponding Tile object.
     """
     tile_index = (row - 1) * self.num_col_tiles + (col - 1)
     tile = self.tiles[tile_index]
     return tile
 
 
-class TileInfo:
+class Tile:
   """
   Class for information about a tile.
   """
@@ -1749,10 +1749,10 @@ class TileInfo:
     return tissue_quantity(self.tissue_percentage)
 
   def get_pil_tile(self):
-    return tile_info_to_pil_tile(self)
+    return tile_to_pil_tile(self)
 
   def get_np_tile(self):
-    return tile_info_to_np_tile(self)
+    return tile_to_np_tile(self)
 
   def save_tile(self):
     save_display_tile(self, save=True, display=False)
@@ -1774,26 +1774,26 @@ class TissueQuantity(Enum):
   HIGH = 3
 
 
-def dynamic_tiles(slide_num, small_tile_in_tileinfo=False):
+def dynamic_tiles(slide_num, small_tile_in_tile=False):
   """
   Generate tile summary with top tiles using original WSI training slide without intermediate image files saved to
   file system.
 
   Args:
     slide_num: The slide number.
-    small_tile_in_tileinfo: If True, include the small NumPy image in the TileInfo objects.
+    small_tile_in_tile: If True, include the small NumPy image in the Tile objects.
 
   Returns:
-     TileSummary object with list of top TileInfo objects. The actual tile images are not retrieved until the
-     TileInfo get_tile() methods are called.
+     TileSummary object with list of top Tile objects. The actual tile images are not retrieved until the
+     Tile get_tile() methods are called.
   """
   np_img, large_w, large_h, small_w, small_h = slide.slide_to_scaled_np_image(slide_num)
   filt_np_img = filter.apply_image_filters(np_img)
-  tile_summary = score_tiles(slide_num, filt_np_img, (large_w, large_h, small_w, small_h), small_tile_in_tileinfo)
+  tile_summary = score_tiles(slide_num, filt_np_img, (large_w, large_h, small_w, small_h), small_tile_in_tile)
   return tile_summary
 
 
-def dynamic_tile(slide_num, row, col, small_tile_in_tileinfo=False):
+def dynamic_tile(slide_num, row, col, small_tile_in_tile=False):
   """
   Generate a single tile dynamically based on slide number, row, and column. If more than one tile needs to be
   retrieved dynamically, dynamic_tiles() should be used.
@@ -1802,12 +1802,12 @@ def dynamic_tile(slide_num, row, col, small_tile_in_tileinfo=False):
     slide_num: The slide number.
     row: The row.
     col: The column.
-    small_tile_in_tileinfo: If True, include the small NumPy image in the TileInfo objects.
+    small_tile_in_tile: If True, include the small NumPy image in the Tile objects.
 
   Returns:
-    TileInfo tile object.
+    Tile tile object.
   """
-  tile_summary = dynamic_tiles(slide_num, small_tile_in_tileinfo)
+  tile_summary = dynamic_tiles(slide_num, small_tile_in_tile)
   tile = tile_summary.get_tile(row, col)
   return tile
 

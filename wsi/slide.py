@@ -146,18 +146,18 @@ def get_training_slide_path(slide_number):
   return slide_filepath
 
 
-def get_tile_image_path(tile_info):
+def get_tile_image_path(tile):
   """
   Obtain tile image path based on tile information such as row, column, row pixel position, column pixel position,
   pixel width, and pixel height.
 
   Args:
-    tile_info: TileInfo object.
+    tile: Tile object.
 
   Returns:
     Path to image tile.
   """
-  t = tile_info
+  t = tile
   padded_sl_num = str(t.slide_num).zfill(3)
   tile_path = TILE_DIR + os.sep + padded_sl_num + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + TILE_SUFFIX + "-r%d-c%d-x%d-y%d-w%d-h%d" % (
     t.r, t.c, t.o_c_s, t.o_r_s, t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s) + "." + DEST_TRAIN_EXT
