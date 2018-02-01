@@ -1336,15 +1336,19 @@ def display_tile_with_rgb_and_hsv_histograms(tile):
   Args:
     tile: The TileInfo object.
   """
-  np_tile = tile.get_np_tile()
+
   text = "S%03d R%03d C%03d\n" % (tile.slide_num, tile.r, tile.c)
-  text += "Score: %5.2f, Tissue: %5.2f%%, Rank: #%d of %d" % (
-    tile.score, tile.tissue_percentage, tile.rank, tile.tile_summary.num_tiles())
+  text += "Score:%4.2f Tissue:%5.2f%% CF:%2.0f SVF:%4.2f QF:%4.2f\n" % (
+    tile.score, tile.tissue_percentage, tile.color_factor, tile.s_and_v_factor, tile.quantity_factor)
+  text += "Rank #%d of %d" % (tile.rank, tile.tile_summary.num_tiles())
 
   np_scaled_tile = tile.get_np_scaled_tile()
   if np_scaled_tile is not None:
-    display_image_with_rgb_and_hsv_histograms(np_scaled_tile, text, scale_up=True)
+    small_text = text + "\n \nSmall Tile (%d x %d)" % (np_scaled_tile.shape[1], np_scaled_tile.shape[0])
+    display_image_with_rgb_and_hsv_histograms(np_scaled_tile, small_text, scale_up=True)
 
+  np_tile = tile.get_np_tile()
+  text += " based on small tile\n \nLarge Tile (%d x %d)" % (np_tile.shape[1], np_tile.shape[0])
   display_image_with_rgb_and_hsv_histograms(np_tile, text)
 
 
