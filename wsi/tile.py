@@ -44,11 +44,7 @@ ROW_TILE_SIZE = 1024
 COL_TILE_SIZE = 1024
 NUM_TOP_TILES = 50
 
-# Currently only works well for tile sizes >= 4096
-# 2048 works decently by 2x image scaling except for displaying very large images such as S001
-# One possibility would be to break the image into multiple images and use an image map on the thumbnail to navigate
-# to the different sections of the image
-DISPLAY_TILE_LABELS = False
+DISPLAY_TILE_SUMMARY_LABELS = False
 
 TILE_BORDER_SIZE = 2  # The size of the colored rectangular border around summary tiles.
 
@@ -146,7 +142,7 @@ def create_summary_pil_img(np_img, title_area_height, row_tile_size, col_tile_si
   return summary
 
 
-def generate_tile_summaries(tile_sum, np_img, display=True, save=False, text_size=16):
+def generate_tile_summaries(tile_sum, np_img, display=True, save=False, text_size=10):
   """
   Generate summary images/thumbnails showing a 'heatmap' representation of the tissue segmentation of all tiles.
 
@@ -187,26 +183,14 @@ def generate_tile_summaries(tile_sum, np_img, display=True, save=False, text_siz
   draw.text((5, 5), summary_txt, SUMMARY_TITLE_TEXT_COLOR, font=summary_font)
   draw_orig.text((5, 5), summary_txt, SUMMARY_TITLE_TEXT_COLOR, font=summary_font)
 
-  if DISPLAY_TILE_LABELS:
-    # resize image if 2048 for text display on tiles
-    if COL_TILE_SIZE == 2048:
-      f = 2
-      w, h = summary.size
-      w = w * f
-      h = h * f
-      summary = summary.resize((w, h), PIL.Image.BILINEAR)
-      draw = ImageDraw.Draw(summary)
-    else:
-      f = 1
+  if DISPLAY_TILE_SUMMARY_LABELS:
     count = 0
     for t in tile_sum.tiles:
       count += 1
-      label = "#%d\nR%d C%d\n%4.2f%%\n[%d,%d] x\n[%d,%d]\n%dx%d" % (
-        count, t.r, t.c, t.tissue_percentage, t.c_s, t.r_s, t.c_e, t.r_e, t.c_e - t.c_s, t.r_e - t.r_s)
+      label = "R%d\nC%d" % (t.r, t.c)
       font = ImageFont.truetype(FONT_PATH, size=text_size)
-      draw.text(((t.c_s + 4) * f, (t.r_s + 4 + z) * f), label, (0, 0, 0), font=font)
-      draw.text(((t.c_s + 3) * f, (t.r_s + 3 + z) * f), label, (0, 0, 0), font=font)
-      draw.text(((t.c_s + 2) * f, (t.r_s + 2 + z) * f), label, SUMMARY_TILE_TEXT_COLOR, font=font)
+      draw.text(((t.c_s + 3), (t.r_s + 3 + z)), label, (0, 0, 0), font=font)
+      draw.text(((t.c_s + 2), (t.r_s + 2 + z)), label, SUMMARY_TILE_TEXT_COLOR, font=font)
 
   if display:
     summary.show()
