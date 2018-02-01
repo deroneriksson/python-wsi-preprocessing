@@ -1215,6 +1215,11 @@ def display_image_with_hsv_hue_histogram(np_rgb, text=None):
     np_rgb: RGB image tile as a NumPy array
     text: Optional text to display above image
   """
+  hsv = filter.filter_rgb_to_hsv(np_rgb)
+  h = filter.filter_hsv_to_h(hsv)
+  np_hist = np_hsv_hue_histogram(h)
+  hist_r, hist_c, _ = np_hist.shape
+
   img_r, img_c, img_ch = np_rgb.shape
   if text is not None:
     np_t = np_text(text)
@@ -1227,12 +1232,6 @@ def display_image_with_hsv_hue_histogram(np_rgb, text=None):
     t_i[t_r:t_r + img_r, 0:img_c] = np_rgb
     np_rgb = t_i  # for simplicity assign title+image to image
     img_r, img_c, img_ch = np_rgb.shape
-
-  hsv = filter.filter_rgb_to_hsv(np_rgb)
-  h = filter.filter_hsv_to_h(hsv)
-  np_hist = np_hsv_hue_histogram(h)
-
-  hist_r, hist_c, _ = np_hist.shape
 
   r = max(img_r, hist_r)
   c = img_c + hist_c
@@ -1252,6 +1251,14 @@ def display_image_with_hsv_histograms(np_rgb, text=None):
     np_rgb: RGB image tile as a NumPy array
     text: Optional text to display above image
   """
+  hsv = filter.filter_rgb_to_hsv(np_rgb)
+  np_h = np_hsv_hue_histogram(filter.filter_hsv_to_h(hsv))
+  np_s = np_hsv_saturation_histogram(filter.filter_hsv_to_s(hsv))
+  np_v = np_hsv_value_histogram(filter.filter_hsv_to_v(hsv))
+  h_r, h_c, _ = np_h.shape
+  s_r, s_c, _ = np_s.shape
+  v_r, v_c, _ = np_v.shape
+
   img_r, img_c, img_ch = np_rgb.shape
   if text is not None:
     np_t = np_text(text)
@@ -1264,15 +1271,6 @@ def display_image_with_hsv_histograms(np_rgb, text=None):
     t_i[t_r:t_r + img_r, 0:img_c] = np_rgb
     np_rgb = t_i  # for simplicity assign title+image to image
     img_r, img_c, img_ch = np_rgb.shape
-
-  hsv = filter.filter_rgb_to_hsv(np_rgb)
-  np_h = np_hsv_hue_histogram(filter.filter_hsv_to_h(hsv))
-  np_s = np_hsv_saturation_histogram(filter.filter_hsv_to_s(hsv))
-  np_v = np_hsv_value_histogram(filter.filter_hsv_to_v(hsv))
-
-  h_r, h_c, _ = np_h.shape
-  s_r, s_c, _ = np_s.shape
-  v_r, v_c, _ = np_v.shape
 
   hists_c = max(h_c, s_c, v_c)
   hists_r = h_r + s_r + v_r
@@ -1352,19 +1350,6 @@ def display_image_with_rgb_and_hsv_histograms(np_rgb, text=None):
     np_rgb: RGB image tile as a NumPy array
     text: Optional text to display above image
   """
-  img_r, img_c, img_ch = np_rgb.shape
-  if text is not None:
-    np_t = np_text(text)
-    t_r, t_c, _ = np_t.shape
-    t_i_c = max(t_c, img_c)
-    t_i_r = t_r + img_r
-    t_i = np.zeros([t_i_r, t_i_c, img_ch], dtype=np.uint8)
-    t_i.fill(255)
-    t_i[0:t_r, 0:t_c] = np_t
-    t_i[t_r:t_r + img_r, 0:img_c] = np_rgb
-    np_rgb = t_i  # for simplicity assign title+image to image
-    img_r, img_c, img_ch = np_rgb.shape
-
   hsv = filter.filter_rgb_to_hsv(np_rgb)
   np_r = np_rgb_r_histogram(np_rgb)
   np_g = np_rgb_g_histogram(np_rgb)
@@ -1379,6 +1364,19 @@ def display_image_with_rgb_and_hsv_histograms(np_rgb, text=None):
   h_r, h_c, _ = np_h.shape
   s_r, s_c, _ = np_s.shape
   v_r, v_c, _ = np_v.shape
+
+  img_r, img_c, img_ch = np_rgb.shape
+  if text is not None:
+    np_t = np_text(text)
+    t_r, t_c, _ = np_t.shape
+    t_i_c = max(t_c, img_c)
+    t_i_r = t_r + img_r
+    t_i = np.zeros([t_i_r, t_i_c, img_ch], dtype=np.uint8)
+    t_i.fill(255)
+    t_i[0:t_r, 0:t_c] = np_t
+    t_i[t_r:t_r + img_r, 0:img_c] = np_rgb
+    np_rgb = t_i  # for simplicity assign title+image to image
+    img_r, img_c, img_ch = np_rgb.shape
 
   rgb_hists_c = max(r_c, g_c, b_c)
   rgb_hists_r = r_r + g_r + b_r
