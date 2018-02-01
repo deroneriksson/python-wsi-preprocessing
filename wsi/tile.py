@@ -68,6 +68,8 @@ TILE_TEXT_H_BORDER = 4
 HSV_PURPLE = 270
 HSV_PINK = 330
 
+INCLUDE_SCALED_TILE_IN_TILE_INFO = True
+
 
 def get_num_tiles(rows, cols, row_tile_size, col_tile_size):
   """
@@ -651,8 +653,9 @@ def score_tiles(slide_num, np_img=None, dimensions=None):
 
     score, color_factor, s_and_v_factor, quantity_factor = score_tile(np_tile, t_p, slide_num, r, c)
 
-    tile_info = TileInfo(tile_sum, slide_num, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p,
-                         color_factor, s_and_v_factor, quantity_factor, score)
+    np_scaled_tile = np_tile if INCLUDE_SCALED_TILE_IN_TILE_INFO else None
+    tile_info = TileInfo(tile_sum, slide_num, np_scaled_tile, count, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s,
+                         o_c_e, t_p, color_factor, s_and_v_factor, quantity_factor, score)
     tile_sum.tiles.append(tile_info)
 
   tile_sum.count = count
@@ -1339,6 +1342,10 @@ def display_tile_with_rgb_and_hsv_histograms(tile):
   text += "Score: %5.2f, Tissue: %5.2f%%, Rank: #%d of %d" % (
     tile.score, tile.tissue_percentage, tile.rank, tile.tile_summary.num_tiles())
 
+  np_scaled_tile = tile.get_np_scaled_tile()
+  if np_scaled_tile is not None:
+    display_image_with_rgb_and_hsv_histograms(np_scaled_tile, text)
+
   display_image_with_rgb_and_hsv_histograms(np_tile, text)
 
 
@@ -1680,6 +1687,7 @@ class TileInfo:
   """
   tile_summary = None
   slide_num = None
+  np_scaled_tile = None
   tile_num = None
   r = None
   c = None
@@ -1697,10 +1705,11 @@ class TileInfo:
   score = None
   rank = None
 
-  def __init__(self, tile_summary, slide_num, tile_num, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s, o_c_e, t_p,
-               color_factor, s_and_v_factor, quantity_factor, score):
+  def __init__(self, tile_summary, slide_num, np_scaled_tile, tile_num, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s,
+               o_c_e, t_p, color_factor, s_and_v_factor, quantity_factor, score):
     self.tile_summary = tile_summary
     self.slide_num = slide_num
+    self.np_scaled_tile = np_scaled_tile
     self.tile_num = tile_num
     self.r = r
     self.c = c
@@ -1745,6 +1754,9 @@ class TileInfo:
 
   def display_with_histograms(self):
     display_tile_with_rgb_and_hsv_histograms(self)
+
+  def get_np_scaled_tile(self):
+    return self.np_scaled_tile
 
 
 class TissueQuantity(Enum):
