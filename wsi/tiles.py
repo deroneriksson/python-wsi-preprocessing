@@ -46,6 +46,7 @@ NUM_TOP_TILES = 50
 
 DISPLAY_TILE_SUMMARY_LABELS = True
 TILE_LABEL_TEXT_SIZE = 10
+LABEL_ALL_TILES_IN_TOP_TILE_SUMMARY = False
 
 TILE_BORDER_SIZE = 2  # The size of the colored rectangular border around summary tiles.
 
@@ -210,7 +211,8 @@ def generate_tile_summaries(tile_sum, np_img, display=True, save=False):
     save_tile_summary_on_original_image(summary_orig, slide_num)
 
 
-def generate_top_tile_summaries(tile_sum, np_img, display=True, save=False, show_top_stats=True):
+def generate_top_tile_summaries(tile_sum, np_img, display=True, save=False, show_top_stats=True,
+                                label_all_tiles=LABEL_ALL_TILES_IN_TOP_TILE_SUMMARY):
   """
   Generate summary images/thumbnails showing the top tiles ranked by score.
 
@@ -221,6 +223,7 @@ def generate_top_tile_summaries(tile_sum, np_img, display=True, save=False, show
     save: If True, save top tiles images.
     text_size: Font size.
     show_top_stats: If True, append top tile score stats to image.
+    label_all_tiles: If True, label all tiles. If False, label only top tiles.
   """
   z = 300  # height of area at top of summary slide
   slide_num = tile_sum.slide_num
@@ -251,7 +254,8 @@ def generate_top_tile_summaries(tile_sum, np_img, display=True, save=False, show
   draw.text((5, 5), summary_txt, SUMMARY_TITLE_TEXT_COLOR, font=summary_font)
   draw_orig.text((5, 5), summary_txt, SUMMARY_TITLE_TEXT_COLOR, font=summary_font)
 
-  for t in top_tiles:
+  tiles_to_label = tile_sum.tiles if label_all_tiles else top_tiles
+  for t in tiles_to_label:
     label = "R%d\nC%d" % (t.r, t.c)
     font = ImageFont.truetype(FONT_PATH, size=TILE_LABEL_TEXT_SIZE)
     # drop shadow behind text
