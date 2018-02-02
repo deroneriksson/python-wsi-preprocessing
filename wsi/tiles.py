@@ -1235,7 +1235,7 @@ def pil_hue_histogram(h):
   return pil_hist
 
 
-def display_image_with_hsv_hue_histogram(np_rgb, text=None):
+def display_image_with_hsv_hue_histogram(np_rgb, text=None, scale_up=False):
   """
   Display an image with its corresponding hue histogram.
 
@@ -1247,6 +1247,10 @@ def display_image_with_hsv_hue_histogram(np_rgb, text=None):
   h = filter.filter_hsv_to_h(hsv)
   np_hist = np_hsv_hue_histogram(h)
   hist_r, hist_c, _ = np_hist.shape
+
+  if scale_up:
+    np_rgb = np.repeat(np_rgb, slide.SCALE_FACTOR, axis=1)
+    np_rgb = np.repeat(np_rgb, slide.SCALE_FACTOR, axis=0)
 
   img_r, img_c, img_ch = np_rgb.shape
   if text is not None:
@@ -1271,7 +1275,7 @@ def display_image_with_hsv_hue_histogram(np_rgb, text=None):
   pil_combo.show()
 
 
-def display_image(np_rgb, text=None):
+def display_image(np_rgb, text=None, scale_up=False):
   """
   Display an image with optional text above image.
 
@@ -1279,6 +1283,9 @@ def display_image(np_rgb, text=None):
     np_rgb: RGB image tile as a NumPy array
     text: Optional text to display above image
   """
+  if scale_up:
+    np_rgb = np.repeat(np_rgb, slide.SCALE_FACTOR, axis=1)
+    np_rgb = np.repeat(np_rgb, slide.SCALE_FACTOR, axis=0)
 
   img_r, img_c, img_ch = np_rgb.shape
   if text is not None:
@@ -1291,13 +1298,12 @@ def display_image(np_rgb, text=None):
     t_i[0:t_r, 0:t_c] = np_t
     t_i[t_r:t_r + img_r, 0:img_c] = np_rgb
     np_rgb = t_i
-    img_r, img_c, img_ch = np_rgb.shape
 
   pil_img = filter.np_to_pil(np_rgb)
   pil_img.show()
 
 
-def display_image_with_hsv_histograms(np_rgb, text=None):
+def display_image_with_hsv_histograms(np_rgb, text=None, scale_up=False):
   """
   Display an image with its corresponding HSV hue, saturation, and value histograms.
 
@@ -1312,6 +1318,10 @@ def display_image_with_hsv_histograms(np_rgb, text=None):
   h_r, h_c, _ = np_h.shape
   s_r, s_c, _ = np_s.shape
   v_r, v_c, _ = np_v.shape
+
+  if scale_up:
+    np_rgb = np.repeat(np_rgb, slide.SCALE_FACTOR, axis=1)
+    np_rgb = np.repeat(np_rgb, slide.SCALE_FACTOR, axis=0)
 
   img_r, img_c, img_ch = np_rgb.shape
   if text is not None:
@@ -1344,7 +1354,7 @@ def display_image_with_hsv_histograms(np_rgb, text=None):
   pil_combo.show()
 
 
-def display_image_with_rgb_histograms(np_rgb, text=None):
+def display_image_with_rgb_histograms(np_rgb, text=None, scale_up=False):
   """
   Display an image with its corresponding RGB histograms.
 
@@ -1358,6 +1368,10 @@ def display_image_with_rgb_histograms(np_rgb, text=None):
   r_r, r_c, _ = np_r.shape
   g_r, g_c, _ = np_g.shape
   b_r, b_c, _ = np_b.shape
+
+  if scale_up:
+    np_rgb = np.repeat(np_rgb, slide.SCALE_FACTOR, axis=1)
+    np_rgb = np.repeat(np_rgb, slide.SCALE_FACTOR, axis=0)
 
   img_r, img_c, img_ch = np_rgb.shape
   if text is not None:
@@ -1443,7 +1457,14 @@ def display_tile(tile, rgb_histograms=True, hsv_histograms=True):
   np_scaled_tile = tile.get_np_scaled_tile()
   if np_scaled_tile is not None:
     small_text = text + "\n \nSmall Tile (%d x %d)" % (np_scaled_tile.shape[1], np_scaled_tile.shape[0])
-    display_image_with_rgb_and_hsv_histograms(np_scaled_tile, small_text, scale_up=True)
+    if rgb_histograms and hsv_histograms:
+      display_image_with_rgb_and_hsv_histograms(np_scaled_tile, small_text, scale_up=True)
+    elif rgb_histograms:
+      display_image_with_rgb_histograms(np_scaled_tile, small_text, scale_up=True)
+    elif hsv_histograms:
+      display_image_with_hsv_histograms(np_scaled_tile, small_text, scale_up=True)
+    else:
+      display_image(np_scaled_tile, small_text, scale_up=True)
 
   np_tile = tile.get_np_tile()
   text += " based on small tile\n \nLarge Tile (%d x %d)" % (np_tile.shape[1], np_tile.shape[0])
