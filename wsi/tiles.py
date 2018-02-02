@@ -47,6 +47,7 @@ NUM_TOP_TILES = 50
 DISPLAY_TILE_SUMMARY_LABELS = True
 TILE_LABEL_TEXT_SIZE = 10
 LABEL_ALL_TILES_IN_TOP_TILE_SUMMARY = False
+BORDER_ALL_TILES_IN_TOP_TILE_SUMMARY = False
 
 TILE_BORDER_SIZE = 2  # The size of the colored rectangular border around summary tiles.
 
@@ -212,7 +213,8 @@ def generate_tile_summaries(tile_sum, np_img, display=True, save=False):
 
 
 def generate_top_tile_summaries(tile_sum, np_img, display=True, save=False, show_top_stats=True,
-                                label_all_tiles=LABEL_ALL_TILES_IN_TOP_TILE_SUMMARY):
+                                label_all_tiles=LABEL_ALL_TILES_IN_TOP_TILE_SUMMARY,
+                                border_all_tiles=BORDER_ALL_TILES_IN_TOP_TILE_SUMMARY):
   """
   Generate summary images/thumbnails showing the top tiles ranked by score.
 
@@ -240,12 +242,21 @@ def generate_top_tile_summaries(tile_sum, np_img, display=True, save=False, show
   summary_orig = create_summary_pil_img(np_orig, z, row_tile_size, col_tile_size, num_row_tiles, num_col_tiles)
   draw_orig = ImageDraw.Draw(summary_orig)
 
-  top_tiles = tile_sum.top_tiles()
+  if border_all_tiles:
+    for t in tile_sum.tiles:
+      border_color = faded_tile_border_color(t.tissue_percentage)
+      tile_border(draw, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color, border_size=1)
+      tile_border(draw_orig, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color, border_size=1)
 
+  tbs = TILE_BORDER_SIZE
+  top_tiles = tile_sum.top_tiles()
   for t in top_tiles:
     border_color = tile_border_color(t.tissue_percentage)
     tile_border(draw, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color)
     tile_border(draw_orig, t.r_s + z, t.r_e + z, t.c_s, t.c_e, border_color)
+    if border_all_tiles:
+      tile_border(draw, t.r_s + z + tbs, t.r_e + z - tbs, t.c_s + tbs, t.c_e - tbs, (0, 0, 0))
+      tile_border(draw_orig, t.r_s + z + tbs, t.r_e + z - tbs, t.c_s + tbs, t.c_e - tbs, (0, 0, 0))
 
   summary_title = "Slide %03d Top Tile Summary:" % slide_num
   summary_txt = summary_title + "\n" + summary_stats(tile_sum)
@@ -255,15 +266,19 @@ def generate_top_tile_summaries(tile_sum, np_img, display=True, save=False, show
   draw_orig.text((5, 5), summary_txt, SUMMARY_TITLE_TEXT_COLOR, font=summary_font)
 
   tiles_to_label = tile_sum.tiles if label_all_tiles else top_tiles
+  h_offset = TILE_BORDER_SIZE + 2
+  v_offset = TILE_BORDER_SIZE
+  h_ds_offset = TILE_BORDER_SIZE + 3
+  v_ds_offset = TILE_BORDER_SIZE + 1
   for t in tiles_to_label:
     label = "R%d\nC%d" % (t.r, t.c)
     font = ImageFont.truetype(FONT_PATH, size=TILE_LABEL_TEXT_SIZE)
     # drop shadow behind text
-    draw.text(((t.c_s + 3), (t.r_s + 3 + z)), label, (0, 0, 0), font=font)
-    draw_orig.text(((t.c_s + 3), (t.r_s + 3 + z)), label, (0, 0, 0), font=font)
+    draw.text(((t.c_s + h_ds_offset), (t.r_s + v_ds_offset + z)), label, (0, 0, 0), font=font)
+    draw_orig.text(((t.c_s + h_ds_offset), (t.r_s + v_ds_offset + z)), label, (0, 0, 0), font=font)
 
-    draw.text(((t.c_s + 2), (t.r_s + 2 + z)), label, SUMMARY_TILE_TEXT_COLOR, font=font)
-    draw_orig.text(((t.c_s + 2), (t.r_s + 2 + z)), label, SUMMARY_TILE_TEXT_COLOR, font=font)
+    draw.text(((t.c_s + h_offset), (t.r_s + v_offset + z)), label, SUMMARY_TILE_TEXT_COLOR, font=font)
+    draw_orig.text(((t.c_s + h_offset), (t.r_s + v_offset + z)), label, SUMMARY_TILE_TEXT_COLOR, font=font)
 
   if show_top_stats:
     summary = add_tile_stats_to_top_tile_summary(summary, top_tiles, z)
@@ -398,7 +413,7 @@ def summary_stats(tile_summary):
          " %5d (%5.2f%%) tiles =0%% tissue" % (tile_summary.none, tile_summary.none / tile_summary.count * 100)
 
 
-def tile_border(draw, r_s, r_e, c_s, c_e, color):
+def tile_border(draw, r_s, r_e, c_s, c_e, color, border_size=TILE_BORDER_SIZE):
   """
   Draw a border around a tile with width TILE_BORDER_SIZE.
 
@@ -410,7 +425,7 @@ def tile_border(draw, r_s, r_e, c_s, c_e, color):
     c_e: Column ending pixel.
     color: Color of the border.
   """
-  for x in range(0, TILE_BORDER_SIZE):
+  for x in range(0, border_size):
     draw.rectangle([(c_s + x, r_s + x), (c_e - 1 - x, r_e - 1 - x)], outline=color)
 
 
