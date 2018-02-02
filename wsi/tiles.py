@@ -54,6 +54,11 @@ BELOW_THRESH_COLOR = (255, 255, 0)
 BELOW_LOWER_THRESH_COLOR = (255, 165, 0)
 NO_TISSUE_COLOR = (255, 0, 0)
 
+FADED_THRESH_COLOR = (128, 255, 128)
+FADED_BELOW_THRESH_COLOR = (255, 255, 128)
+FADED_BELOW_LOWER_THRESH_COLOR = (255, 210, 128)
+FADED_NO_TISSUE_COLOR = (255, 128, 128)
+
 FONT_PATH = "/Library/Fonts/Arial Bold.ttf"
 SUMMARY_TITLE_FONT_PATH = "/Library/Fonts/Courier New Bold.ttf"
 SUMMARY_TITLE_TEXT_COLOR = (0, 0, 0)
@@ -324,6 +329,27 @@ def tile_border_color(tissue_percentage):
     border_color = BELOW_LOWER_THRESH_COLOR
   else:
     border_color = NO_TISSUE_COLOR
+  return border_color
+
+
+def faded_tile_border_color(tissue_percentage):
+  """
+  Obtain the corresponding faded tile border color for a particular tile tissue percentage.
+
+  Args:
+    tissue_percentage: The tile tissue percentage
+
+  Returns:
+    The faded tile border color corresponding to the tile tissue percentage.
+  """
+  if tissue_percentage >= TISSUE_THRESHOLD_PERCENT:
+    border_color = FADED_THRESH_COLOR
+  elif (tissue_percentage >= TISSUE_LOW_THRESHOLD_PERCENT) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
+    border_color = FADED_BELOW_THRESH_COLOR
+  elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESHOLD_PERCENT):
+    border_color = FADED_BELOW_LOWER_THRESH_COLOR
+  else:
+    border_color = FADED_NO_TISSUE_COLOR
   return border_color
 
 
