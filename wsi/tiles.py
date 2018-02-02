@@ -1318,6 +1318,52 @@ def display_image_with_hsv_histograms(np_rgb, text=None):
   pil_combo.show()
 
 
+def display_image_with_rgb_histograms(np_rgb, text=None):
+  """
+  Display an image with its corresponding RGB histograms.
+
+  Args:
+    np_rgb: RGB image tile as a NumPy array
+    text: Optional text to display above image
+  """
+  np_r = np_rgb_r_histogram(np_rgb)
+  np_g = np_rgb_g_histogram(np_rgb)
+  np_b = np_rgb_b_histogram(np_rgb)
+  r_r, r_c, _ = np_r.shape
+  g_r, g_c, _ = np_g.shape
+  b_r, b_c, _ = np_b.shape
+
+  img_r, img_c, img_ch = np_rgb.shape
+  if text is not None:
+    np_t = np_text(text)
+    t_r, t_c, _ = np_t.shape
+    t_i_c = max(t_c, img_c)
+    t_i_r = t_r + img_r
+    t_i = np.zeros([t_i_r, t_i_c, img_ch], dtype=np.uint8)
+    t_i.fill(255)
+    t_i[0:t_r, 0:t_c] = np_t
+    t_i[t_r:t_r + img_r, 0:img_c] = np_rgb
+    np_rgb = t_i  # for simplicity assign title+image to image
+    img_r, img_c, img_ch = np_rgb.shape
+
+  hists_c = max(r_c, g_c, b_c)
+  hists_r = r_r + g_r + b_r
+  hists = np.zeros([hists_r, hists_c, img_ch], dtype=np.uint8)
+
+  hists[0:r_r, 0:r_c] = np_r
+  hists[r_r:r_r + g_r, 0:g_c] = np_g
+  hists[r_r + g_r:r_r + g_r + b_r, 0:b_c] = np_b
+
+  r = max(img_r, hists_r)
+  c = img_c + hists_c
+  combo = np.zeros([r, c, img_ch], dtype=np.uint8)
+  combo.fill(255)
+  combo[0:img_r, 0:img_c] = np_rgb
+  combo[0:hists_r, img_c:c] = hists
+  pil_combo = filter.np_to_pil(combo)
+  pil_combo.show()
+
+
 def pil_text(text, w_border=TILE_TEXT_W_BORDER, h_border=TILE_TEXT_H_BORDER, font_path=FONT_PATH,
              font_size=TILE_TEXT_SIZE, text_color=TILE_TEXT_COLOR, background=TILE_TEXT_BACKGROUND_COLOR):
   """
