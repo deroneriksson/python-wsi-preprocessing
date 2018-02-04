@@ -1294,7 +1294,7 @@ def image_cell(slide_num, filter_num, display_text, file_text):
   img_name = slide.get_filter_image_filename(slide_num, filter_num, file_text)
   return "      <td>\n" + \
          "        <a target=\"_blank\" href=\"%s\">%s<br/>\n" % (filt_img, display_text) + \
-         "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (b64_img(), filt_thumb) + \
+         "          <img src=\"%s\" />\n" % (filt_thumb) + \
          "        </a>\n" + \
          "      </td>\n"
 
