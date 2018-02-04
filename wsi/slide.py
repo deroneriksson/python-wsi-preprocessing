@@ -34,8 +34,8 @@ import re
 import sys
 from wsi import filter
 
-BASE_DIR = ".." + os.sep + "data"
-# BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
+# BASE_DIR = ".." + os.sep + "data"
+BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
 TRAIN_PREFIX = "TUPAC-TR-"
 SRC_TRAIN_DIR = BASE_DIR + os.sep + "training_slides"
 SRC_TRAIN_EXT = "svs"
@@ -721,7 +721,7 @@ def save_thumbnail(pil_img, size, path, display_path=False):
   if display_path:
     print("Saving thumbnail to: " + path)
   dir = os.path.dirname(path)
-  if not os.path.exists(dir):
+  if dir != '' and not os.path.exists(dir):
     os.makedirs(dir)
   img.save(path)
 
