@@ -44,7 +44,7 @@ ROW_TILE_SIZE = 1024
 COL_TILE_SIZE = 1024
 NUM_TOP_TILES = 50
 
-DISPLAY_TILE_SUMMARY_LABELS = True
+DISPLAY_TILE_SUMMARY_LABELS = False
 TILE_LABEL_TEXT_SIZE = 10
 LABEL_ALL_TILES_IN_TOP_TILE_SUMMARY = False
 BORDER_ALL_TILES_IN_TOP_TILE_SUMMARY = False
@@ -950,24 +950,24 @@ def image_row(slide_num, tile_summary, data_link):
   html = "    <tr>\n" + \
          "      <td style=\"vertical-align: top\">\n" + \
          "        <a target=\"_blank\" href=\"%s\">S%03d Original<br/>\n" % (orig_img, slide_num) + \
-         "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), orig_thumb) + \
+         "          <img src=\"%s\" />\n" % (orig_thumb) + \
          "        </a>\n" + \
          "      </td>\n" + \
          "      <td style=\"vertical-align: top\">\n" + \
          "        <a target=\"_blank\" href=\"%s\">S%03d Filtered<br/>\n" % (filt_img, slide_num) + \
-         "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), filt_thumb) + \
+         "          <img src=\"%s\" />\n" % (filt_thumb) + \
          "        </a>\n" + \
          "      </td>\n"
 
   html += "      <td style=\"vertical-align: top\">\n" + \
           "        <a target=\"_blank\" href=\"%s\">S%03d Tiles<br/>\n" % (sum_img, slide_num) + \
-          "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), sum_thumb) + \
+          "          <img src=\"%s\" />\n" % (sum_thumb) + \
           "        </a>\n" + \
           "      </td>\n"
 
   html += "      <td style=\"vertical-align: top\">\n" + \
           "        <a target=\"_blank\" href=\"%s\">S%03d Tiles<br/>\n" % (osum_img, slide_num) + \
-          "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), osum_thumb) + \
+          "          <img src=\"%s\" />\n" % (osum_thumb) + \
           "        </a>\n" + \
           "      </td>\n"
 
@@ -985,13 +985,13 @@ def image_row(slide_num, tile_summary, data_link):
 
   html += "      <td style=\"vertical-align: top\">\n" + \
           "        <a target=\"_blank\" href=\"%s\">S%03d Top Tiles<br/>\n" % (top_img, slide_num) + \
-          "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), top_thumb) + \
+          "          <img src=\"%s\" />\n" % (top_thumb) + \
           "        </a>\n" + \
           "      </td>\n"
 
   html += "      <td style=\"vertical-align: top\">\n" + \
           "        <a target=\"_blank\" href=\"%s\">S%03d Top Tiles<br/>\n" % (otop_img, slide_num) + \
-          "          <img class=\"lazyload\" src=\"%s\" data-src=\"%s\" />\n" % (filter.b64_img(), otop_thumb) + \
+          "          <img src=\"%s\" />\n" % (otop_thumb) + \
           "        </a>\n" + \
           "      </td>\n"
 
