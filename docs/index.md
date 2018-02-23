@@ -31,8 +31,8 @@ limitations under the License.
 
 The primary goal of the [Tumor Proliferation Assessment Challenge 2016 (TUPAC16)](http://tupac.tue-image.nl/) is to
 develop algorithms to automatically predict breast cancer tumor proliferation scores. In this challenge, the training
-set we looked at consisted of 500 whole-slide images which are scored (1, 2, or 3) by pathologists based on mitosis
-counts. A higher proliferation score indicates a worse prognosis since higher tumor proliferation speeds are
+set consists of 500 whole-slide images which are scored (1, 2, or 3) by pathologists based on mitosis
+counts. A higher proliferation score indicates a worse prognosis since higher tumor proliferation rates are
 correlated with worse outcomes. The tissue samples are stained with hematoxylin and eosin (H&E).
 
 One of our first approaches to this challenge was to apply deep learning to breast cancer whole-slide images,
@@ -50,10 +50,19 @@ identification of tissue regions in whole-slide images is done using Otsu thresh
 binary dilation.
 
 Tissue identification in whole-slide images can be a very important precursor to deep learning, since accurate tissue
-identification decreases the quantity of data and increases the quality of the data to be analyzed. This
+identification can decrease the quantity of data and increase the quality of the data to be analyzed. This
 can lead to faster, more accurate model training.
 In this tutorial, we will take a look at whole-slide image processing and will describe various filters
 that can be used to increase the accuracy of tissue identification.
+After determining a useful set of filters for tissue segmentation, we'll divide slides into tiles and determine sets
+of tiles that typically represent good tissue samples.
+
+In summary, we will scale down whole-slide images, apply filters to these scaled-down images for tissue segmentation,
+break the slides into tiles, score the tiles, and then retrieve the top tiles based on their scores.
+
+| **5 Steps** |
+| -------------------- |
+| ![5 Steps](images/5-steps.png "5 Steps") |
 
 
 ## Setup
