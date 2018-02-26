@@ -216,7 +216,8 @@ about the set of slides. It also generates a variety of charts for a visual repr
 The `training_slide_to_image()` function converts a single svs slide to a smaller image in a more common format such as
 jpg or png. The `singleprocess_training_slides_to_images()` function converts all svs slides to smaller images,
 and the `multiprocess_training_slides_to_images()` function uses multiple processes (1 process per core) to
-speed up the slide conversion process.
+speed up the slide conversion process. For the last three functions, when an image is saved, a thumbnail image is also
+saved. By default, the thumbnail has a maximum height or width of 300 pixels and is jpg format.
 
 One of the first actions we can take to become more familiar with the training dataset is to have a look at the metadata
 associated with each image, which we can do with the `slide_info()` function. Here we can see a sample of this
@@ -302,10 +303,10 @@ below.
 
 
 The `wsi/slide.py` file contains constants that can be used to control various image conversion settings. For example,
-the `DEST_TRAIN_SIZE` constant controls the maximum width or height value. For our purposes, its default value will
-be 2048. The `DEST_TRAIN_EXT` constant controls the output format. We will use `png` since it is lossless.
-Note that `jpg` conversion can also be specified, but `jpg` is lossy. For later deep learning purposes with TensorFlow,
-we have determined that a lossless format is preferable.
+the `SCALE_FACTOR` constant controls the factor by which the slides will be scaled down. Its default value is 32,
+meaning that the height and width will be scaled down by a factor of 32. This means that when we perform filtering,
+it will be performed on an image 1/1024th the size of the original high-resolution image.
+The `DEST_TRAIN_EXT` constant controls the output format. We will use `png`.
 
 Using OS X with an external hard drive containing the training set, the following conversion times using
 `singleprocess_training_slides_to_images()` and `multiprocess_training_slides_to_images()`
@@ -315,14 +316,14 @@ on the 500 image training set were obtained:
 
 | Format | Processes      | Time   |
 | ------ | -------------- | ------ |
-| jpg    | single process | 4m47s  |
-| jpg    | multi process  | 1n37s  |
-| png    | single process | 11m22s |
-| png    | multi process  | 3m08s  |
+| jpg    | single process | 26m09s  |
+| jpg    | multi process  | 10m21s  |
+| png    | single process | 42m59s |
+| png    | multi process  | 11m58s  |
 
 
 After calling `multiprocess_training_slides_to_images()` using the `png` format, we have 500 whole-slide
-images in lossless `png` format that we can now examine in much greater detail in relation to our filters.
+images in lossless `png` format that we will examine in greater detail in relation to our filters.
 
 
 ## Image Saving, Displaying, and Conversions
