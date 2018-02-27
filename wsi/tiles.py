@@ -30,12 +30,12 @@ import matplotlib.pyplot as plt
 import multiprocessing
 import numpy as np
 import os
-import wsi.filter as filter
-import wsi.slide as slide
-from wsi.slide import Time
-import PIL
 from PIL import Image, ImageDraw, ImageFont
 from enum import Enum
+from wsi import util
+from wsi import filter
+from wsi import slide
+from wsi.util import Time
 
 TISSUE_THRESHOLD_PERCENT = 80
 TISSUE_LOW_THRESHOLD_PERCENT = 10
@@ -146,7 +146,7 @@ def create_summary_pil_img(np_img, title_area_height, row_tile_size, col_tile_si
   # color title area white
   summary_img[0:title_area_height, 0:summary_img.shape[1]].fill(255)
   summary_img[title_area_height:np_img.shape[0] + title_area_height, 0:np_img.shape[1]] = np_img
-  summary = filter.np_to_pil(summary_img)
+  summary = util.np_to_pil(summary_img)
   return summary
 
 
@@ -293,7 +293,7 @@ def generate_top_tile_summaries(tile_sum, np_img, display=True, save=False, show
 
 
 def add_tile_stats_to_top_tile_summary(pil_img, tiles, z):
-  np_sum = filter.pil_to_np_rgb(pil_img)
+  np_sum = util.pil_to_np_rgb(pil_img)
   sum_r, sum_c, sum_ch = np_sum.shape
   np_stats = np_tile_stat_img(tiles)
   st_r, st_c, _ = np_stats.shape
@@ -303,7 +303,7 @@ def add_tile_stats_to_top_tile_summary(pil_img, tiles, z):
   combo.fill(255)
   combo[0:sum_r, 0:sum_c] = np_sum
   combo[z:st_r + z, sum_c:sum_c + st_c] = np_stats
-  result = filter.np_to_pil(combo)
+  result = util.np_to_pil(combo)
   return result
 
 
@@ -597,7 +597,7 @@ def tile_to_np_tile(tile):
     Tile as a NumPy image.
   """
   pil_img = tile_to_pil_tile(tile)
-  np_img = filter.pil_to_np_rgb(pil_img)
+  np_img = util.pil_to_np_rgb(pil_img)
   return np_img
 
 
@@ -1121,7 +1121,7 @@ def np_hsv_hue_histogram(h):
   w, h = canvas.get_width_height()
   np_hist = np.fromstring(canvas.get_renderer().tostring_rgb(), dtype=np.uint8).reshape(h, w, 3)
   plt.close(figure)
-  filter.np_info(np_hist)
+  util.np_info(np_hist)
   return np_hist
 
 
@@ -1146,7 +1146,7 @@ def np_histogram(data, title, bins="auto"):
   w, h = canvas.get_width_height()
   np_hist = np.fromstring(canvas.get_renderer().tostring_rgb(), dtype=np.uint8).reshape(h, w, 3)
   plt.close(figure)
-  filter.np_info(np_hist)
+  util.np_info(np_hist)
   return np_hist
 
 
@@ -1250,7 +1250,7 @@ def pil_hue_histogram(h):
     Matplotlib histogram of hue values converted to a PIL image.
   """
   np_hist = np_hsv_hue_histogram(h)
-  pil_hist = filter.np_to_pil(np_hist)
+  pil_hist = util.np_to_pil(np_hist)
   return pil_hist
 
 
@@ -1290,7 +1290,7 @@ def display_image_with_hsv_hue_histogram(np_rgb, text=None, scale_up=False):
   combo.fill(255)
   combo[0:img_r, 0:img_c] = np_rgb
   combo[0:hist_r, img_c:c] = np_hist
-  pil_combo = filter.np_to_pil(combo)
+  pil_combo = util.np_to_pil(combo)
   pil_combo.show()
 
 
@@ -1318,7 +1318,7 @@ def display_image(np_rgb, text=None, scale_up=False):
     t_i[t_r:t_r + img_r, 0:img_c] = np_rgb
     np_rgb = t_i
 
-  pil_img = filter.np_to_pil(np_rgb)
+  pil_img = util.np_to_pil(np_rgb)
   pil_img.show()
 
 
@@ -1369,7 +1369,7 @@ def display_image_with_hsv_histograms(np_rgb, text=None, scale_up=False):
   combo.fill(255)
   combo[0:img_r, 0:img_c] = np_rgb
   combo[0:hists_r, img_c:c] = hists
-  pil_combo = filter.np_to_pil(combo)
+  pil_combo = util.np_to_pil(combo)
   pil_combo.show()
 
 
@@ -1419,7 +1419,7 @@ def display_image_with_rgb_histograms(np_rgb, text=None, scale_up=False):
   combo.fill(255)
   combo[0:img_r, 0:img_c] = np_rgb
   combo[0:hists_r, img_c:c] = hists
-  pil_combo = filter.np_to_pil(combo)
+  pil_combo = util.np_to_pil(combo)
   pil_combo.show()
 
 
@@ -1456,7 +1456,7 @@ def np_text(text, w_border=TILE_TEXT_W_BORDER, h_border=TILE_TEXT_H_BORDER, font
   """
   pil_img = pil_text(text, w_border, h_border, font_path, font_size,
                      text_color, background)
-  np_img = filter.pil_to_np_rgb(pil_img)
+  np_img = util.pil_to_np_rgb(pil_img)
   return np_img
 
 
@@ -1559,7 +1559,7 @@ def display_image_with_rgb_and_hsv_histograms(np_rgb, text=None, scale_up=False)
   combo[0:img_r, 0:img_c] = np_rgb
   combo[0:rgb_hists_r, img_c:img_c + rgb_hists_c] = rgb_hists
   combo[0:hsv_hists_r, img_c + rgb_hists_c:c] = hsv_hists
-  pil_combo = filter.np_to_pil(combo)
+  pil_combo = util.np_to_pil(combo)
   pil_combo.show()
 
 
@@ -1937,7 +1937,8 @@ def dynamic_tile(slide_num, row, col, small_tile_in_tile=False):
   tile = tile_summary.get_tile(row, col)
   return tile
 
-# singleprocess_filtered_images_to_tiles(image_num_list=[7, 8, 9])
+# if __name__ == "__main__":
+#   singleprocess_filtered_images_to_tiles(image_num_list=[7, 8, 9])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5], save=True, save_data=True, save_top_tiles=True,

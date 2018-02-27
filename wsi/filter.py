@@ -1587,6 +1587,8 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 # filt_pil_img.show()
 
 # if __name__ == "__main__":
+  # multiprocess_apply_filters_to_images(image_num_list=[3, 4, 5, 6, 7, 8])
+  # singleprocess_apply_filters_to_images(image_num_list=[3, 4])
 #   img_path = slide.get_training_image_path(2)
 #   img = slide.open_image(img_path)
 #   rgb = util.pil_to_np_rgb(img)
