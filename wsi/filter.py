@@ -32,48 +32,11 @@ import skimage.future as sk_future
 import skimage.morphology as sk_morphology
 import skimage.segmentation as sk_segmentation
 
-import wsi.slide as slide
-from wsi.slide import Time
-from PIL import Image, ImageDraw, ImageFont
+from wsi import slide
+from wsi import util
+from wsi.util import Time
 
-# If True, display NumPy array stats for filters (min, max, mean, is_binary).
-DISPLAY_FILTER_STATS = False
 DISPLAY_MASK_PERCENTAGE = True
-
-
-def pil_to_np_rgb(pil_img):
-  """
-  Convert a PIL Image to a NumPy array.
-
-  Note that RGB PIL (w, h) -> NumPy (h, w, 3).
-
-  Args:
-    pil_img: The PIL Image.
-
-  Returns:
-    The PIL image converted to a NumPy array.
-  """
-  t = Time()
-  rgb = np.asarray(pil_img)
-  np_info(rgb, "RGB", t.elapsed())
-  return rgb
-
-
-def np_to_pil(np_img):
-  """
-  Convert a NumPy array to a PIL Image.
-
-  Args:
-    np_img: The image represented as a NumPy array.
-
-  Returns:
-     The NumPy array converted to a PIL Image.
-  """
-  if np_img.dtype == "bool":
-    np_img = np_img.astype("uint8") * 255
-  elif np_img.dtype == "float64":
-    np_img = (np_img * 255).astype("uint8")
-  return Image.fromarray(np_img)
 
 
 def filter_rgb_to_grayscale(np_img, output_type="uint8"):
@@ -94,7 +57,7 @@ def filter_rgb_to_grayscale(np_img, output_type="uint8"):
   grayscale = np.dot(np_img[..., :3], [0.2125, 0.7154, 0.0721])
   if output_type != "float":
     grayscale = grayscale.astype("uint8")
-  np_info(grayscale, "Gray", t.elapsed())
+  util.np_info(grayscale, "Gray", t.elapsed())
   return grayscale
 
 
@@ -114,35 +77,8 @@ def filter_complement(np_img, output_type="uint8"):
     complement = 1.0 - np_img
   else:
     complement = 255 - np_img
-  np_info(complement, "Complement", t.elapsed())
+  util.np_info(complement, "Complement", t.elapsed())
   return complement
-
-
-def np_info(np_arr, name=None, elapsed=None):
-  """
-  Display information (shape, type, max, min, etc) about a NumPy array.
-
-  Args:
-    np_arr: The NumPy array.
-    name: The (optional) name of the array.
-    elapsed: The (optional) time elapsed to perform a filtering operation.
-  """
-
-  if name is None:
-    name = "NumPy Array"
-  if elapsed is None:
-    elapsed = "---"
-
-  if DISPLAY_FILTER_STATS is False:
-    print("%-20s | Time: %-14s  Type: %-7s Shape: %s" % (name, str(elapsed), np_arr.dtype, np_arr.shape))
-  else:
-    # np_arr = np.asarray(np_arr)
-    max = np_arr.max()
-    min = np_arr.min()
-    mean = np_arr.mean()
-    is_binary = "T" if (np.unique(np_arr).size == 2) else "F"
-    print("%-20s | Time: %-14s Min: %6.2f  Max: %6.2f  Mean: %6.2f  Binary: %s  Type: %-7s Shape: %s" % (
-      name, str(elapsed), min, max, mean, is_binary, np_arr.dtype, np_arr.shape))
 
 
 def filter_hysteresis_threshold(np_img, low=50, high=100, output_type="uint8"):
@@ -166,7 +102,7 @@ def filter_hysteresis_threshold(np_img, low=50, high=100, output_type="uint8"):
     hyst = hyst.astype(float)
   else:
     hyst = (255 * hyst).astype("uint8")
-  np_info(hyst, "Hysteresis Threshold", t.elapsed())
+  util.np_info(hyst, "Hysteresis Threshold", t.elapsed())
   return hyst
 
 
@@ -190,7 +126,7 @@ def filter_otsu_threshold(np_img, output_type="uint8"):
     otsu = otsu.astype(float)
   else:
     otsu = otsu.astype("uint8") * 255
-  np_info(otsu, "Otsu Threshold", t.elapsed())
+  util.np_info(otsu, "Otsu Threshold", t.elapsed())
   return otsu
 
 
@@ -215,7 +151,7 @@ def filter_local_otsu_threshold(np_img, disk_size=3, output_type="uint8"):
     local_otsu = local_otsu.astype(float)
   else:
     local_otsu = local_otsu.astype("uint8") * 255
-  np_info(local_otsu, "Otsu Local Threshold", t.elapsed())
+  util.np_info(local_otsu, "Otsu Local Threshold", t.elapsed())
   return local_otsu
 
 
@@ -240,7 +176,7 @@ def filter_entropy(np_img, neighborhood=9, threshold=5, output_type="uint8"):
     entr = entr.astype(float)
   else:
     entr = entr.astype("uint8") * 255
-  np_info(entr, "Entropy", t.elapsed())
+  util.np_info(entr, "Entropy", t.elapsed())
   return entr
 
 
@@ -266,7 +202,7 @@ def filter_canny(np_img, sigma=1, low_threshold=0, high_threshold=25, output_typ
     can = can.astype(float)
   else:
     can = can.astype("uint8") * 255
-  np_info(can, "Canny Edges", t.elapsed())
+  util.np_info(can, "Canny Edges", t.elapsed())
   return can
 
 
@@ -336,7 +272,7 @@ def filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=True, over
   else:
     np_img = np_img.astype("uint8") * 255
 
-  np_info(np_img, "Remove Small Objs", t.elapsed())
+  util.np_info(np_img, "Remove Small Objs", t.elapsed())
   return np_img
 
 
@@ -363,7 +299,7 @@ def filter_remove_small_holes(np_img, min_size=3000, output_type="uint8"):
   else:
     rem_sm = rem_sm.astype("uint8") * 255
 
-  np_info(rem_sm, "Remove Small Holes", t.elapsed())
+  util.np_info(rem_sm, "Remove Small Holes", t.elapsed())
   return rem_sm
 
 
@@ -383,7 +319,7 @@ def filter_contrast_stretch(np_img, low=40, high=60):
   t = Time()
   low_p, high_p = np.percentile(np_img, (low * 100 / 255, high * 100 / 255))
   contrast_stretch = sk_exposure.rescale_intensity(np_img, in_range=(low_p, high_p))
-  np_info(contrast_stretch, "Contrast Stretch", t.elapsed())
+  util.np_info(contrast_stretch, "Contrast Stretch", t.elapsed())
   return contrast_stretch
 
 
@@ -408,7 +344,7 @@ def filter_histogram_equalization(np_img, nbins=256, output_type="uint8"):
     pass
   else:
     hist_equ = (hist_equ * 255).astype("uint8")
-  np_info(hist_equ, "Hist Equalization", t.elapsed())
+  util.np_info(hist_equ, "Hist Equalization", t.elapsed())
   return hist_equ
 
 
@@ -432,7 +368,7 @@ def filter_adaptive_equalization(np_img, nbins=256, clip_limit=0.01, output_type
     pass
   else:
     adapt_equ = (adapt_equ * 255).astype("uint8")
-  np_info(adapt_equ, "Adapt Equalization", t.elapsed())
+  util.np_info(adapt_equ, "Adapt Equalization", t.elapsed())
   return adapt_equ
 
 
@@ -449,7 +385,7 @@ def filter_local_equalization(np_img, disk_size=50):
   """
   t = Time()
   local_equ = sk_filters.rank.equalize(np_img, selem=sk_morphology.disk(disk_size))
-  np_info(local_equ, "Local Equalization", t.elapsed())
+  util.np_info(local_equ, "Local Equalization", t.elapsed())
   return local_equ
 
 
@@ -471,7 +407,7 @@ def filter_rgb_to_hed(np_img, output_type="uint8"):
   else:
     hed = (sk_exposure.rescale_intensity(hed, out_range=(0, 255))).astype("uint8")
 
-  np_info(hed, "RGB to HED", t.elapsed())
+  util.np_info(hed, "RGB to HED", t.elapsed())
   return hed
 
 
@@ -491,7 +427,7 @@ def filter_rgb_to_hsv(np_img, display_np_info=True):
     t = Time()
   hsv = sk_color.rgb2hsv(np_img)
   if display_np_info:
-    np_info(hsv, "RGB to HSV", t.elapsed())
+    util.np_info(hsv, "RGB to HSV", t.elapsed())
   return hsv
 
 
@@ -517,7 +453,7 @@ def filter_hsv_to_h(hsv, output_type="int", display_np_info=True):
     h *= 360
     h = h.astype("int")
   if display_np_info:
-    np_info(hsv, "HSV to H", t.elapsed())
+    util.np_info(hsv, "HSV to H", t.elapsed())
   return h
 
 
@@ -569,7 +505,7 @@ def filter_hed_to_hematoxylin(np_img, output_type="uint8"):
     hema = sk_exposure.rescale_intensity(hema, out_range=(0.0, 1.0))
   else:
     hema = (sk_exposure.rescale_intensity(hema, out_range=(0, 255))).astype("uint8")
-  np_info(hema, "HED to Hematoxylin", t.elapsed())
+  util.np_info(hema, "HED to Hematoxylin", t.elapsed())
   return hema
 
 
@@ -591,7 +527,7 @@ def filter_hed_to_eosin(np_img, output_type="uint8"):
     eosin = sk_exposure.rescale_intensity(eosin, out_range=(0.0, 1.0))
   else:
     eosin = (sk_exposure.rescale_intensity(eosin, out_range=(0, 255))).astype("uint8")
-  np_info(eosin, "HED to Eosin", t.elapsed())
+  util.np_info(eosin, "HED to Eosin", t.elapsed())
   return eosin
 
 
@@ -616,7 +552,7 @@ def filter_binary_fill_holes(np_img, output_type="bool"):
     result = result.astype(float)
   else:
     result = result.astype("uint8") * 255
-  np_info(result, "Binary Fill Holes", t.elapsed())
+  util.np_info(result, "Binary Fill Holes", t.elapsed())
   return result
 
 
@@ -643,7 +579,7 @@ def filter_binary_erosion(np_img, disk_size=5, iterations=1, output_type="uint8"
     result = result.astype(float)
   else:
     result = result.astype("uint8") * 255
-  np_info(result, "Binary Erosion", t.elapsed())
+  util.np_info(result, "Binary Erosion", t.elapsed())
   return result
 
 
@@ -670,7 +606,7 @@ def filter_binary_dilation(np_img, disk_size=5, iterations=1, output_type="uint8
     result = result.astype(float)
   else:
     result = result.astype("uint8") * 255
-  np_info(result, "Binary Dilation", t.elapsed())
+  util.np_info(result, "Binary Dilation", t.elapsed())
   return result
 
 
@@ -698,7 +634,7 @@ def filter_binary_opening(np_img, disk_size=3, iterations=1, output_type="uint8"
     result = result.astype(float)
   else:
     result = result.astype("uint8") * 255
-  np_info(result, "Binary Opening", t.elapsed())
+  util.np_info(result, "Binary Opening", t.elapsed())
   return result
 
 
@@ -726,7 +662,7 @@ def filter_binary_closing(np_img, disk_size=3, iterations=1, output_type="uint8"
     result = result.astype(float)
   else:
     result = result.astype("uint8") * 255
-  np_info(result, "Binary Closing", t.elapsed())
+  util.np_info(result, "Binary Closing", t.elapsed())
   return result
 
 
@@ -747,7 +683,7 @@ def filter_kmeans_segmentation(np_img, compactness=10, n_segments=800):
   t = Time()
   labels = sk_segmentation.slic(np_img, compactness=compactness, n_segments=n_segments)
   result = sk_color.label2rgb(labels, np_img, kind='avg')
-  np_info(result, "K-Means Segmentation", t.elapsed())
+  util.np_info(result, "K-Means Segmentation", t.elapsed())
   return result
 
 
@@ -771,7 +707,7 @@ def filter_rag_threshold(np_img, compactness=10, n_segments=800, threshold=9):
   g = sk_future.graph.rag_mean_color(np_img, labels)
   labels2 = sk_future.graph.cut_threshold(labels, g, threshold)
   result = sk_color.label2rgb(labels2, np_img, kind='avg')
-  np_info(result, "RAG Threshold", t.elapsed())
+  util.np_info(result, "RAG Threshold", t.elapsed())
   return result
 
 
@@ -796,7 +732,7 @@ def filter_threshold(np_img, threshold, output_type="bool"):
     result = result.astype(float)
   else:
     result = result.astype("uint8") * 255
-  np_info(result, "Threshold", t.elapsed())
+  util.np_info(result, "Threshold", t.elapsed())
   return result
 
 
@@ -835,7 +771,7 @@ def filter_green_channel(np_img, green_thresh=200, avoid_overmask=True, overmask
   else:
     np_img = np_img.astype("uint8") * 255
 
-  np_info(np_img, "Filter Green Channel", t.elapsed())
+  util.np_info(np_img, "Filter Green Channel", t.elapsed())
   return np_img
 
 
@@ -869,7 +805,7 @@ def filter_red(rgb, red_lower_thresh, green_upper_thresh, blue_upper_thresh, out
   else:
     result = result.astype("uint8") * 255
   if display_np_info:
-    np_info(result, "Filter Red", t.elapsed())
+    util.np_info(result, "Filter Red", t.elapsed())
   return result
 
 
@@ -900,7 +836,7 @@ def filter_red_pen(rgb, output_type="bool"):
     result = result.astype(float)
   else:
     result = result.astype("uint8") * 255
-  np_info(result, "Filter Red Pen", t.elapsed())
+  util.np_info(result, "Filter Red Pen", t.elapsed())
   return result
 
 
@@ -936,7 +872,7 @@ def filter_green(rgb, red_upper_thresh, green_lower_thresh, blue_lower_thresh, o
   else:
     result = result.astype("uint8") * 255
   if display_np_info:
-    np_info(result, "Filter Green", t.elapsed())
+    util.np_info(result, "Filter Green", t.elapsed())
   return result
 
 
@@ -973,7 +909,7 @@ def filter_green_pen(rgb, output_type="bool"):
     result = result.astype(float)
   else:
     result = result.astype("uint8") * 255
-  np_info(result, "Filter Green Pen", t.elapsed())
+  util.np_info(result, "Filter Green Pen", t.elapsed())
   return result
 
 
@@ -1007,7 +943,7 @@ def filter_blue(rgb, red_upper_thresh, green_upper_thresh, blue_lower_thresh, ou
   else:
     result = result.astype("uint8") * 255
   if display_np_info:
-    np_info(result, "Filter Blue", t.elapsed())
+    util.np_info(result, "Filter Blue", t.elapsed())
   return result
 
 
@@ -1041,7 +977,7 @@ def filter_blue_pen(rgb, output_type="bool"):
     result = result.astype(float)
   else:
     result = result.astype("uint8") * 255
-  np_info(result, "Filter Blue Pen", t.elapsed())
+  util.np_info(result, "Filter Blue Pen", t.elapsed())
   return result
 
 
@@ -1072,7 +1008,7 @@ def filter_grays(rgb, tolerance=15, output_type="bool"):
     result = result.astype(float)
   else:
     result = result.astype("uint8") * 255
-  np_info(result, "Filter Grays", t.elapsed())
+  util.np_info(result, "Filter Grays", t.elapsed())
   return result
 
 
@@ -1089,7 +1025,7 @@ def mask_rgb(rgb, mask):
   """
   t = Time()
   result = rgb * np.dstack([mask, mask, mask])
-  np_info(result, "Mask RGB", t.elapsed())
+  util.np_info(result, "Mask RGB", t.elapsed())
   return result
 
 
@@ -1105,35 +1041,6 @@ def uint8_to_bool(np_img):
   """
   result = (np_img / 255).astype(bool)
   return result
-
-
-def display_img(np_img, text=None, font_path="/Library/Fonts/Arial Bold.ttf", size=48, color=(255, 0, 0),
-                background=(255, 255, 255), border=(0, 0, 0), bg=False):
-  """
-  Convert a NumPy array to a PIL image, add text to the image, and display the image.
-
-  Args:
-    np_img: Image as a NumPy array.
-    text: The text to add to the image.
-    font_path: The path to the font to use.
-    size: The font size
-    color: The font color
-    background: The background color
-    border: The border color
-    bg: If True, add rectangle background behind text
-  """
-  result = np_to_pil(np_img)
-  # if gray, convert to RGB for display
-  if result.mode == 'L':
-    result = result.convert('RGB')
-  draw = ImageDraw.Draw(result)
-  if text is not None:
-    font = ImageFont.truetype(font_path, size)
-    if bg:
-      (x, y) = draw.textsize(text, font)
-      draw.rectangle([(0, 0), (x + 5, y + 4)], fill=background, outline=border)
-    draw.text((2, 0), text, color, font=font)
-  result.show()
 
 
 def apply_image_filters(np_img, slide_num=None, info=None, save=False, display=False):
@@ -1215,7 +1122,7 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   if save:
     t1 = Time()
     result_path = slide.get_filter_image_result(slide_num)
-    pil_img = np_to_pil(filtered_np_img)
+    pil_img = util.np_to_pil(filtered_np_img)
     pil_img.save(result_path)
     print("%-20s | Time: %-14s  Name: %s" % ("Save Image", str(t1.elapsed()), result_path))
 
@@ -1256,7 +1163,7 @@ def save_display(save, display, info, np_img, slide_num, filter_num, display_tex
   else:
     display_text = "S%03d-F%03d " % (slide_num, filter_num) + display_text
   if display:
-    display_img(np_img, display_text)
+    util.display_img(np_img, display_text)
   if save:
     save_filtered_image(np_img, slide_num, filter_num, file_text)
   if info is not None:
@@ -1356,7 +1263,7 @@ def save_filtered_image(np_img, slide_num, filter_num, filter_text):
   """
   t = Time()
   filepath = slide.get_filter_image_path(slide_num, filter_num, filter_text)
-  pil_img = np_to_pil(np_img)
+  pil_img = util.np_to_pil(np_img)
   pil_img.save(filepath)
   print("%-20s | Time: %-14s  Name: %s" % ("Save Image", str(t.elapsed()), filepath))
 
@@ -1587,7 +1494,6 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 
   print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
 
-
 # apply_filters_to_image(2)
 # rgb, _ = apply_filters_to_image(6, display=False, save=False)
 # display_img(rgb, "RGB")
@@ -1679,3 +1585,9 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 # filt_np_img = apply_image_filters(np_img)
 # filt_pil_img = np_to_pil(filt_np_img)
 # filt_pil_img.show()
+
+# if __name__ == "__main__":
+#   img_path = slide.get_training_image_path(2)
+#   img = slide.open_image(img_path)
+#   rgb = util.pil_to_np_rgb(img)
+#   util.display_img(rgb, "RGB")

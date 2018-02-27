@@ -19,7 +19,6 @@
 #
 # -------------------------------------------------------------
 
-import datetime
 import glob
 import math
 import matplotlib.pyplot as plt
@@ -32,7 +31,8 @@ import PIL
 from PIL import Image
 import re
 import sys
-from wsi import filter
+from wsi import util
+from wsi.util import Time
 
 BASE_DIR = ".." + os.sep + "data"
 # BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
@@ -124,7 +124,7 @@ def open_image_np(filename):
     A NumPy representing an RGB image.
   """
   pil_img = open_image(filename)
-  np_img = filter.pil_to_np_rgb(pil_img)
+  np_img = util.pil_to_np_rgb(pil_img)
   return np_img
 
 
@@ -702,7 +702,7 @@ def slide_to_scaled_np_image(slide_number):
     Tuple consisting of scaled-down NumPy image, original width, original height, new width, and new height.
   """
   pil_img, large_w, large_h, new_w, new_h = slide_to_scaled_pil_image(slide_number)
-  np_img = filter.pil_to_np_rgb(pil_img)
+  np_img = util.pil_to_np_rgb(pil_img)
   return np_img, large_w, large_h, new_w, new_h
 
 
@@ -1002,33 +1002,12 @@ def slide_info(display_all_properties=False):
   t.elapsed_display()
 
 
-class Time:
-  """
-  Class for displaying elapsed time.
-  """
-
-  def __init__(self):
-    self.start = datetime.datetime.now()
-
-  def elapsed_display(self):
-    time_elapsed = self.elapsed()
-    print("Time elapsed: " + str(time_elapsed))
-
-  def elapsed(self):
-    self.end = datetime.datetime.now()
-    time_elapsed = self.end - self.start
-    return time_elapsed
-
-# singleprocess_training_slides_to_images()
-# multiprocess_training_slides_to_images()
-# slide_stats()
-# slide_info(display_all_properties=True)
-# training_slide_to_image(1)
-# training_slide_to_image(2)
-# training_slide_to_image(3)
-# training_slide_to_image(4)
-# slide_to_scaled_pil_image(5)[0].show()
-
 # if __name__ == "__main__":
-#   np_img = open_image_np("robot.png")
-#   filter.np_to_pil(np_img).show()
+  # np_img = open_image_np("Deron.jpg")
+  # util.np_to_pil(np_img).show()
+  # training_slide_to_image(2)
+  # slide_info(display_all_properties=True)
+  # slide_stats()
+  # slide_to_scaled_pil_image(5)[0].show()
+  # singleprocess_training_slides_to_images()
+  # multiprocess_training_slides_to_images()
