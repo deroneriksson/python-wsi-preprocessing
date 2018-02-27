@@ -340,17 +340,17 @@ img = slide.open_image(img_path)
 ```
 
 
-To mathematically manipulate the images, we use NumPy arrays. The `wsi/filter.py` file contains a
+To mathematically manipulate the images, we use NumPy arrays. The `wsi/util.py` file contains a
 `pil_to_np_rgb()` function that converts a PIL Image to a 3-dimensional NumPy array. The first dimension
 represents the number of rows, the second dimension represents the number of columns, and the third dimension
 represents the channel (red, green, and blue).
 
 ```
-rgb = pil_to_np_rgb(img)
+rgb = util.pil_to_np_rgb(img)
 ```
 
 
-The `wsi/filter.py` file contains an `np_to_pil()` function that converts a NumPy array to a PIL Image.
+The `wsi/util.py` file contains an `np_to_pil()` function that converts a NumPy array to a PIL Image.
 
 For convenience, the `display_img()` function can be used to display a NumPy array image. Text can be added to
 the displayed image, which can be very useful when visually comparing the results of multiple filters.
@@ -358,8 +358,8 @@ the displayed image, which can be very useful when visually comparing the result
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-display_img(rgb, "RGB")
+rgb = util.pil_to_np_rgb(img)
+util.display_img(rgb, "RGB")
 ```
 
 | **Display Image with Text** |
@@ -368,7 +368,7 @@ display_img(rgb, "RGB")
 
 
 When performing operations on NumPy arrays, functions in the `wsi/filter.py` file will often utilize the
-`np_info()` function to display information about the NumPy array and the amount of time required to perform the
+`util.np_info()` function to display information about the NumPy array and the amount of time required to perform the
 operation. For example, the above call to `pil_to_np_rgb()` internally calls `np_info()`:
 
 ```
@@ -384,12 +384,12 @@ This call to `np_info()` generates console output such as the following:
 RGB                  | Time: 0:00:00.162484  Type: uint8   Shape: (1385, 1810, 3)
 ```
 
-We see that the PIL-to-NumPy array conversion took 0.19s. The type of the NumPy array is `uint8`, which means
+We see that the PIL-to-NumPy array conversion took 0.16s. The type of the NumPy array is `uint8`, which means
 that each pixel is represented by a red, green, and blue value from 0 to 255. The image has a height of 1385 pixels
 and a width of 1810 pixels.
 
-We can obtain additional information about NumPy arrays by setting the `DISPLAY_FILTER_STATS` constant to `True`.
-If we rerun the above code with `DISPLAY_FILTER_STATS = True`, we see the following:
+We can obtain additional information about NumPy arrays by setting the `ADDITIONAL_NP_STATS` constant to `True`.
+If we rerun the above code with `ADDITIONAL_NP_STATS = True`, we see the following:
 
 ```
 RGB                  | Time: 0:00:00.157696 Min:   2.00  Max: 255.00  Mean: 182.62  Binary: F  Type: uint8   Shape: (1385, 1810, 3)
@@ -403,7 +403,7 @@ When interacting with NumPy image processing code, the information provided by `
 For example, some functions return boolean NumPy arrays, other functions return float NumPy arrays, and other
 functions may return `uint8` NumPy arrays. Before performing actions on a NumPy array, it's usually necessary to know
 the data type of the array and the nature of the data in that array. For performance reasons, normally
-`DISPLAY_FILTER_STATS` should be set to `False`.
+`ADDITIONAL_NP_STATS` should be set to `False`.
 
 
 ## Filters
