@@ -339,18 +339,14 @@ img_path = slide.get_training_image_path(4)
 img = slide.open_image(img_path)
 ```
 
-
 To mathematically manipulate the images, we use NumPy arrays. The `wsi/util.py` file contains a
-`pil_to_np_rgb()` function that converts a PIL Image to a 3-dimensional NumPy array. The first dimension
+`pil_to_np_rgb()` function that converts a PIL Image to a 3-dimensional NumPy array in RGB format. The first dimension
 represents the number of rows, the second dimension represents the number of columns, and the third dimension
 represents the channel (red, green, and blue).
 
 ```
 rgb = util.pil_to_np_rgb(img)
 ```
-
-
-The `wsi/util.py` file contains an `np_to_pil()` function that converts a NumPy array to a PIL Image.
 
 For convenience, the `display_img()` function can be used to display a NumPy array image. Text can be added to
 the displayed image, which can be very useful when visually comparing the results of multiple filters.
@@ -404,6 +400,15 @@ For example, some functions return boolean NumPy arrays, other functions return 
 functions may return `uint8` NumPy arrays. Before performing actions on a NumPy array, it's usually necessary to know
 the data type of the array and the nature of the data in that array. For performance reasons, normally
 `ADDITIONAL_NP_STATS` should be set to `False`.
+
+The `wsi/util.py` file contains an `np_to_pil()` function that converts a NumPy array to a PIL Image.
+
+If we have a PIL Image, saving the image to the file system can be accomplished by calling the Image's `save()`
+function.
+
+```
+img.save(path)
+```
 
 
 ## Filters
