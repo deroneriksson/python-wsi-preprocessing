@@ -1537,19 +1537,19 @@ Remove Small Objs    | Time: 0:00:00.044924  Type: uint8   Shape: (1385, 1810)
 
 The scikit-image `remove_small_holes()` function is similar to the `remove_small_objects()` function except it removes
 holes rather than objects from binary images. Here we demonstrate this using the `filter_remove_small_holes()`
-wrapper with sizes of 100 pixels and 10,000 pixels.
+function with sizes of 100 pixels and 10,000 pixels.
 
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-display_img(rgb, "Original")
-no_grays = filter_grays(rgb, output_type="bool")
-display_img(no_grays, "No Grays")
-remove_small_100 = filter_remove_small_holes(no_grays, min_size=100)
-display_img(remove_small_100, "Remove Small Holes (100)")
-remove_small_10000 = filter_remove_small_holes(no_grays, min_size=10000)
-display_img(remove_small_10000, "Remove Small Holes (10000)")
+rgb = util.pil_to_np_rgb(img)
+util.display_img(rgb, "Original", bg=True)
+no_grays = filter.filter_grays(rgb, output_type="bool")
+util.display_img(no_grays, "No Grays", bg=True)
+remove_small_100 = filter.filter_remove_small_holes(no_grays, min_size=100)
+util.display_img(remove_small_100, "Remove Small Holes (100)", bg=True)
+remove_small_10000 = filter.filter_remove_small_holes(no_grays, min_size=10000)
+util.display_img(remove_small_10000, "Remove Small Holes (10000)", bg=True)
 ```
 
 Notice that using a minimum size of 10,000 removes more holes than a size of 100, as we would expect.
@@ -1562,10 +1562,10 @@ Notice that using a minimum size of 10,000 removes more holes than a size of 100
 Console output:
 
 ```
-RGB                  | Time: 0:00:00.210587  Type: uint8   Shape: (1567, 2048, 3)
-Filter Grays         | Time: 0:00:00.105123  Type: bool    Shape: (1567, 2048)
-Remove Small Holes   | Time: 0:00:00.055991  Type: uint8   Shape: (1567, 2048)
-Remove Small Holes   | Time: 0:00:00.058003  Type: uint8   Shape: (1567, 2048)
+RGB                  | Time: 0:00:00.171669  Type: uint8   Shape: (1385, 1810, 3)
+Filter Grays         | Time: 0:00:00.081116  Type: bool    Shape: (1385, 1810)
+Remove Small Holes   | Time: 0:00:00.043491  Type: uint8   Shape: (1385, 1810)
+Remove Small Holes   | Time: 0:00:00.044550  Type: uint8   Shape: (1385, 1810)
 ```
 
 
