@@ -1026,18 +1026,18 @@ We'll start by creating a filter to filter out blue. The `filter_blue()` functio
 a blue channel lower threshold value. The generated mask is based on a pixel being below the red channel threshold
 value, below the green channel threshold value, and above the blue channel threshold value.
 
-Once again, we'll also apply the results of the blue filter and the inverse of the blue filter as masks to the original
+Once again, we'll apply the results of the blue filter and the inverse of the blue filter as masks to the original
 RGB image to help visualize the filter results.
 
 ```
 img_path = slide.get_training_image_path(241)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-display_img(rgb, "Original")
-not_blue = filter_blue(rgb, red_upper_thresh=130, green_upper_thresh=155, blue_lower_thresh=180, display_np_info=True)
-display_img(not_blue, "Blue Filter (130, 155, 180)")
-display_img(mask_rgb(rgb, not_blue), "Not Blue")
-display_img(mask_rgb(rgb, ~not_blue), "Blue")
+rgb = util.pil_to_np_rgb(img)
+util.display_img(rgb, "RGB")
+not_blue = filter.filter_blue(rgb, red_upper_thresh=130, green_upper_thresh=155, blue_lower_thresh=180, display_np_info=True)
+util.display_img(not_blue, "Blue Filter (130, 155, 180)")
+util.display_img(util.mask_rgb(rgb, not_blue), "Not Blue")
+util.display_img(util.mask_rgb(rgb, ~not_blue), "Blue")
 ```
 
 We see that a lot of the blue pen has been filtered out.
@@ -1055,10 +1055,10 @@ We see that a lot of the blue pen has been filtered out.
 Console output:
 
 ```
-RGB                  | Time: 0:00:00.142685  Type: uint8   Shape: (1301, 2048, 3)
-Filter Blue          | Time: 0:00:00.011197  Type: bool    Shape: (1301, 2048)
-Mask RGB             | Time: 0:00:00.010248  Type: uint8   Shape: (1301, 2048, 3)
-Mask RGB             | Time: 0:00:00.009995  Type: uint8   Shape: (1301, 2048, 3)
+RGB                  | Time: 0:00:00.432772  Type: uint8   Shape: (2058, 3240, 3)
+Filter Blue          | Time: 0:00:00.029066  Type: bool    Shape: (2058, 3240)
+Mask RGB             | Time: 0:00:00.038966  Type: uint8   Shape: (2058, 3240, 3)
+Mask RGB             | Time: 0:00:00.021153  Type: uint8   Shape: (2058, 3240, 3)
 ```
 
 
@@ -1082,7 +1082,7 @@ result = filter_blue(rgb, red_upper_thresh=60, green_upper_thresh=120, blue_lowe
          filter_blue(rgb, red_upper_thresh=110, green_upper_thresh=110, blue_lower_thresh=175)
 ```
 
-Once again, we'll apply the filter and its inverse to the original slide to help us visualize the results.
+We'll apply the filter and its inverse to the original slide to help us visualize the results.
 
 ```
 img_path = slide.get_training_image_path(241)
