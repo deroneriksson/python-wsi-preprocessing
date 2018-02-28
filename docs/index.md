@@ -625,7 +625,7 @@ Otsu Threshold       | Time: 0:00:00.014615  Type: uint8   Shape: (1385, 1810)
 
 ### Contrast
 
-For an image, suppose we have a histogram of the number of pixels (y-axis) plotted against the range
+For an image, suppose we have a histogram of the number of pixels (intensity on y-axis) plotted against the range
 of possible pixel values (x-axis, 0 to 255). Contrast is a measure of the difference in intensities. An image with
 low contrast is typically dull and details are not clearly seen visually. An image with high contrast is typically
 sharp and details can clearly be discerned. Increasing the contrast in an image can be used to bring out various details
@@ -645,11 +645,11 @@ the complement of the grayscale image.
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-grayscale = filter_rgb_to_grayscale(rgb)
-complement = filter_complement(grayscale)
-contrast_stretch = filter_contrast_stretch(complement, low=100, high=200)
-display_img(contrast_stretch, "Contrast Stretch")
+rgb = util.pil_to_np_rgb(img)
+grayscale = filter.filter_rgb_to_grayscale(rgb)
+complement = filter.filter_complement(grayscale)
+contrast_stretch = filter.filter_contrast_stretch(complement, low=100, high=200)
+util.display_img(contrast_stretch, "Contrast Stretch")
 ```
 
 This can be used to visually inspect details in the previous intensity range of 100 to 200, since the image filter has
@@ -664,10 +664,10 @@ spread out this range across the full spectrum.
 Here we see the console output from this set of filters.
 
 ```
-RGB                  | Time: 0:00:00.207501  Type: uint8   Shape: (1567, 2048, 3)
-Gray                 | Time: 0:00:00.146119  Type: uint8   Shape: (1567, 2048)
-Complement           | Time: 0:00:00.001615  Type: uint8   Shape: (1567, 2048)
-Contrast Stretch     | Time: 0:00:00.075437  Type: uint8   Shape: (1567, 2048)
+RGB                  | Time: 0:00:00.171582  Type: uint8   Shape: (1385, 1810, 3)
+Gray                 | Time: 0:00:00.110818  Type: uint8   Shape: (1385, 1810)
+Complement           | Time: 0:00:00.002410  Type: uint8   Shape: (1385, 1810)
+Contrast Stretch     | Time: 0:00:00.058357  Type: uint8   Shape: (1385, 1810)
 ```
 
 
@@ -684,11 +684,11 @@ equalization and display the resulting image.
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-grayscale = filter_rgb_to_grayscale(rgb)
-display_img(grayscale, "Grayscale")
-hist_equ = filter_histogram_equalization(grayscale)
-display_img(hist_equ, "Histogram Equalization")
+rgb = util.pil_to_np_rgb(img)
+grayscale = filter.filter_rgb_to_grayscale(rgb)
+util.display_img(grayscale, "Grayscale")
+hist_equ = filter.filter_histogram_equalization(grayscale)
+util.display_img(hist_equ, "Histogram Equalization")
 ```
 
 Comparing the grayscale image and the image after histogram equalization, we see that contrast in the image has been
@@ -702,9 +702,9 @@ increased.
 Console output following histogram equalization is shown here.
 
 ```
-RGB                  | Time: 0:00:00.201479  Type: uint8   Shape: (1567, 2048, 3)
-Gray                 | Time: 0:00:00.129065  Type: uint8   Shape: (1567, 2048)
-Hist Equalization    | Time: 0:00:00.152975  Type: uint8   Shape: (1567, 2048)
+RGB                  | Time: 0:00:00.175498  Type: uint8   Shape: (1385, 1810, 3)
+Gray                 | Time: 0:00:00.110181  Type: uint8   Shape: (1385, 1810)
+Hist Equalization    | Time: 0:00:00.116568  Type: uint8   Shape: (1385, 1810)
 ```
 
 
@@ -712,7 +712,7 @@ Hist Equalization    | Time: 0:00:00.152975  Type: uint8   Shape: (1567, 2048)
 
 Rather than applying a single transformation to all pixels in an image, adaptive histogram equalization applies
 transformations to local regions in an image. As a result, adaptive equalization allows contrast to be enhanced to
-different extents in different regions based on the regions' histograms. For more information about adaptive
+different extents in different regions based on the regions' intensity histograms. For more information about adaptive
 equalization, please see
 [https://en.wikipedia.org/wiki/Adaptive_histogram_equalization](https://en.wikipedia.org/wiki/Adaptive_histogram_equalization).
 
@@ -723,11 +723,11 @@ the grayscale image and the image after adaptive equalization for comparison.
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-grayscale = filter_rgb_to_grayscale(rgb)
-display_img(grayscale, "Grayscale")
-adaptive_equ = filter_adaptive_equalization(grayscale)
-display_img(adaptive_equ, "Adaptive Equalization")
+rgb = util.pil_to_np_rgb(img)
+grayscale = filter.filter_rgb_to_grayscale(rgb)
+util.display_img(grayscale, "Grayscale")
+adaptive_equ = filter.filter_adaptive_equalization(grayscale)
+util.display_img(adaptive_equ, "Adaptive Equalization")
 ```
 
 | **Grayscale Filter** | **Adaptive Equalization Filter** |
@@ -735,13 +735,13 @@ display_img(adaptive_equ, "Adaptive Equalization")
 | ![Grayscale Filter](images/grayscale.png "Grayscale Filter") | ![Adaptive Equalization Filter](images/adaptive-equalization.png "Adaptive Equalization Filter") |
 
 
-In the console output, we can see that adaptive equalization is fairly compute-intensive compared with other filters
-that we have looked at so far.
+In the console output, we can see that adaptive equalization is more compute-intensive than constrast stretching and
+histogram equalization.
 
 ```
-RGB                  | Time: 0:00:00.209276  Type: uint8   Shape: (1567, 2048, 3)
-Gray                 | Time: 0:00:00.140665  Type: uint8   Shape: (1567, 2048)
-Adapt Equalization   | Time: 0:00:00.278476  Type: uint8   Shape: (1567, 2048)
+RGB                  | Time: 0:00:00.167076  Type: uint8   Shape: (1385, 1810, 3)
+Gray                 | Time: 0:00:00.106797  Type: uint8   Shape: (1385, 1810)
+Adapt Equalization   | Time: 0:00:00.223172  Type: uint8   Shape: (1385, 1810)
 ```
 
 
