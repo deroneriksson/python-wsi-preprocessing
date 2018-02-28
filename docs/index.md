@@ -1497,17 +1497,17 @@ and we'll perform this on the "No Grays" binary image.
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-display_img(rgb, "Original")
-no_grays = filter_grays(rgb, output_type="bool")
-display_img(no_grays, "No Grays")
-remove_small_100 = filter_remove_small_objects(no_grays, min_size=100)
-display_img(remove_small_100, "Remove Small Objects (100)")
-remove_small_10000 = filter_remove_small_objects(no_grays, min_size=10000)
-display_img(remove_small_10000, "Remove Small Objects (10000)")
+rgb = util.pil_to_np_rgb(img)
+util.display_img(rgb, "Original", bg=True)
+no_grays = filter.filter_grays(rgb, output_type="bool")
+util.display_img(no_grays, "No Grays", bg=True)
+remove_small_100 = filter.filter_remove_small_objects(no_grays, min_size=100)
+util.display_img(remove_small_100, "Remove Small Objects (100)", bg=True)
+remove_small_10000 = filter.filter_remove_small_objects(no_grays, min_size=10000)
+util.display_img(remove_small_10000, "Remove Small Objects (10000)", bg=True)
 ```
 
-Notice in the "No Grays" mask that we see lots of scattered, small objects.
+Notice in the "No Grays" binary image that we see lots of scattered, small objects.
 
 | **Original Slide** | **No Grays** |
 | -------------------- | --------------------------------- |
@@ -1526,10 +1526,10 @@ removed from the binary image.
 The performance of the filters to remove small objects is quite fast.
 
 ```
-RGB                  | Time: 0:00:00.208705  Type: uint8   Shape: (1567, 2048, 3)
-Filter Grays         | Time: 0:00:00.100657  Type: bool    Shape: (1567, 2048)
-Remove Small Objs    | Time: 0:00:00.055258  Type: uint8   Shape: (1567, 2048)
-Remove Small Objs    | Time: 0:00:00.056445  Type: uint8   Shape: (1567, 2048)
+RGB                  | Time: 0:00:00.177367  Type: uint8   Shape: (1385, 1810, 3)
+Filter Grays         | Time: 0:00:00.081827  Type: bool    Shape: (1385, 1810)
+Remove Small Objs    | Time: 0:00:00.053734  Type: uint8   Shape: (1385, 1810)
+Remove Small Objs    | Time: 0:00:00.044924  Type: uint8   Shape: (1385, 1810)
 ```
 
 
