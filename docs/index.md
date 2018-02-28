@@ -1299,14 +1299,14 @@ Here, we perform k-means segmentation, build a RAG, and apply different RAG thre
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-display_img(rgb, "Original")
-rag_thresh = filter_rag_threshold(rgb)
-display_img(rag_thresh, "RAG Threshold (9)")
-rag_thresh = filter_rag_threshold(rgb, threshold=1)
-display_img(rag_thresh, "RAG Threshold (1)")
-rag_thresh = filter_rag_threshold(rgb, threshold=20)
-display_img(rag_thresh, "RAG Threshold (20)")
+rgb = util.pil_to_np_rgb(img)
+util.display_img(rgb, "Original", bg=True)
+rag_thresh = filter.filter_rag_threshold(rgb)
+util.display_img(rag_thresh, "RAG Threshold (9)", bg=True)
+rag_thresh = filter.filter_rag_threshold(rgb, threshold=1)
+util.display_img(rag_thresh, "RAG Threshold (1)", bg=True)
+rag_thresh = filter.filter_rag_threshold(rgb, threshold=20)
+util.display_img(rag_thresh, "RAG Threshold (20)", bg=True)
 ```
 
 | **Original Slide** | **RAG Threshold = 9** |
@@ -1323,10 +1323,10 @@ Even using the default 800 number of segments for the k-means segmentation, we s
 computationally expensive.
 
 ```
-RGB                  | Time: 0:00:00.202184  Type: uint8   Shape: (1567, 2048, 3)
-RAG Threshold        | Time: 0:00:30.311410  Type: uint8   Shape: (1567, 2048, 3)
-RAG Threshold        | Time: 0:00:32.604226  Type: uint8   Shape: (1567, 2048, 3)
-RAG Threshold        | Time: 0:00:28.637301  Type: uint8   Shape: (1567, 2048, 3)
+RGB                  | Time: 0:00:00.462239  Type: uint8   Shape: (1385, 1810, 3)
+RAG Threshold        | Time: 0:00:24.677776  Type: uint8   Shape: (1385, 1810, 3)
+RAG Threshold        | Time: 0:00:26.683581  Type: uint8   Shape: (1385, 1810, 3)
+RAG Threshold        | Time: 0:00:23.774296  Type: uint8   Shape: (1385, 1810, 3)
 ```
 
 
