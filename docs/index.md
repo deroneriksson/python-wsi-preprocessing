@@ -1087,12 +1087,12 @@ We'll apply the filter and its inverse to the original slide to help us visualiz
 ```
 img_path = slide.get_training_image_path(241)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-display_img(rgb, "Original")
-not_blue_pen = filter_blue_pen(rgb)
-display_img(not_blue_pen, "Blue Pen Filter")
-display_img(mask_rgb(rgb, not_blue_pen), "Not Blue Pen")
-display_img(mask_rgb(rgb, ~not_blue_pen), "Blue Pen")
+rgb = util.pil_to_np_rgb(img)
+util.display_img(rgb, "RGB")
+not_blue_pen = filter.filter_blue_pen(rgb)
+util.display_img(not_blue_pen, "Blue Pen Filter")
+util.display_img(util.mask_rgb(rgb, not_blue_pen), "Not Blue Pen")
+util.display_img(util.mask_rgb(rgb, ~not_blue_pen), "Blue Pen")
 ```
 
 For this slide, we see that `filter_blue_pen()` filters out more blue than the previous `filter_blue()` example.
@@ -1110,30 +1110,28 @@ For this slide, we see that `filter_blue_pen()` filters out more blue than the p
 We see from the console output that the blue pen filter is quite fast.
 
 ```
-RGB                  | Time: 0:00:00.146905  Type: uint8   Shape: (1301, 2048, 3)
-Filter Blue Pen      | Time: 0:00:00.134946  Type: bool    Shape: (1301, 2048)
-Mask RGB             | Time: 0:00:00.010695  Type: uint8   Shape: (1301, 2048, 3)
-Mask RGB             | Time: 0:00:00.005944  Type: uint8   Shape: (1301, 2048, 3)
+RGB                  | Time: 0:00:00.348514  Type: uint8   Shape: (2058, 3240, 3)
+Filter Blue Pen      | Time: 0:00:00.288286  Type: bool    Shape: (2058, 3240)
+Mask RGB             | Time: 0:00:00.033348  Type: uint8   Shape: (2058, 3240, 3)
+Mask RGB             | Time: 0:00:00.019622  Type: uint8   Shape: (2058, 3240, 3)
 ```
 
 As an aside, we can easily quantify the differences in filtering between the `filter_blue()` and `filter_blue_pen()`
 results.
 
 ```
-not_blue = filter_blue(rgb, red_upper_thresh=130, green_upper_thresh=155, blue_lower_thresh=180, display_np_info=True)
-not_blue_pen = filter_blue_pen(rgb)
-print("filter_blue:" + mask_percentage_text(mask_percent(not_blue)))
-print("filter_blue_pen:" + mask_percentage_text(mask_percent(not_blue_pen)))
+not_blue = filter.filter_blue(rgb, red_upper_thresh=130, green_upper_thresh=155, blue_lower_thresh=180, display_np_info=True)
+not_blue_pen = filter.filter_blue_pen(rgb)
+print("filter_blue: " + filter.mask_percentage_text(filter.mask_percent(not_blue)))
+print("filter_blue_pen: " + filter.mask_percentage_text(filter.mask_percent(not_blue_pen)))
 ```
 
 The `filter_blue()` example filtered out 0.45% of the slide pixels and the `filter_blue_pen()` example filtered out
-0.68% of the slide pixels.
+0.69% of the slide pixels.
 
 ```
-filter_blue:
-(0.45% masked)
-filter_blue_pen:
-(0.68% masked)
+filter_blue: 0.45%
+filter_blue_pen: 0.69%
 ```
 
 #### Green Filter

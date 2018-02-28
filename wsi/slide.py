@@ -34,8 +34,8 @@ import sys
 from wsi import util
 from wsi.util import Time
 
-BASE_DIR = ".." + os.sep + "data"
-# BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
+# BASE_DIR = ".." + os.sep + "data"
+BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
 TRAIN_PREFIX = "TUPAC-TR-"
 SRC_TRAIN_DIR = BASE_DIR + os.sep + "training_slides"
 SRC_TRAIN_EXT = "svs"

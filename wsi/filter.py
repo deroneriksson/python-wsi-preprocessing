@@ -1136,7 +1136,7 @@ def save_display(save, display, info, np_img, slide_num, filter_num, display_tex
   mask_percentage = None
   if DISPLAY_MASK_PERCENTAGE:
     mask_percentage = mask_percent(np_img)
-    display_text = display_text + mask_percentage_text(mask_percentage)
+    display_text = display_text + "\n(" + mask_percentage_text(mask_percentage) + " masked)"
   if slide_num is None and filter_num is None:
     pass
   elif filter_num is None:
@@ -1163,7 +1163,7 @@ def mask_percentage_text(mask_percentage):
   Returns:
     The mask percentage formatted as a string.
   """
-  return "\n(%3.2f%% masked)" % mask_percentage
+  return "%3.2f%%" % mask_percentage
 
 
 def image_cell(slide_num, filter_num, display_text, file_text):
