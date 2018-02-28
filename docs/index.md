@@ -1426,14 +1426,14 @@ As mentioned, opening is erosion followed by dilation. Opening can be used to re
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-display_img(rgb, "Original")
-no_grays = filter_grays(rgb, output_type="bool")
-display_img(no_grays, "No Grays")
-bin_opening_5 = filter_binary_opening(no_grays, disk_size=5)
-display_img(bin_opening_5, "Binary Opening (5)")
-bin_opening_20 = filter_binary_opening(no_grays, disk_size=20)
-display_img(bin_opening_20, "Binary Opening (20)")
+rgb = util.pil_to_np_rgb(img)
+util.display_img(rgb, "Original", bg=True)
+no_grays = filter.filter_grays(rgb, output_type="bool")
+util.display_img(no_grays, "No Grays", bg=True)
+bin_opening_5 = filter.filter_binary_opening(no_grays, disk_size=5)
+util.display_img(bin_opening_5, "Binary Opening (5)", bg=True)
+bin_opening_20 = filter.filter_binary_opening(no_grays, disk_size=20)
+util.display_img(bin_opening_20, "Binary Opening (20)", bg=True)
 ```
 
 | **Binary Opening (disk_size = 5)** | **Binary Opening (disk_size = 20)** |
@@ -1442,14 +1442,14 @@ display_img(bin_opening_20, "Binary Opening (20)")
 
 
 Opening is a fairly expensive operation, since it is an erosion followed by a dilation. The compute time increases
-with the size of the structuring element. The 5-pixel disk radius for the structuring element results in a 0.3s
-operation, whereas the 20-pixel disk radius results in a 3 second operation.
+with the size of the structuring element. The 5-pixel disk radius for the structuring element results in a 0.25s
+operation, whereas the 20-pixel disk radius results in a 2.45s operation.
 
 ```
-RGB                  | Time: 0:00:00.207179  Type: uint8   Shape: (1567, 2048, 3)
-Filter Grays         | Time: 0:00:00.099212  Type: bool    Shape: (1567, 2048)
-Binary Opening       | Time: 0:00:00.299361  Type: uint8   Shape: (1567, 2048)
-Binary Opening       | Time: 0:00:03.019376  Type: uint8   Shape: (1567, 2048)
+RGB                  | Time: 0:00:00.169241  Type: uint8   Shape: (1385, 1810, 3)
+Filter Grays         | Time: 0:00:00.085474  Type: bool    Shape: (1385, 1810)
+Binary Opening       | Time: 0:00:00.248629  Type: uint8   Shape: (1385, 1810)
+Binary Opening       | Time: 0:00:02.452089  Type: uint8   Shape: (1385, 1810)
 ```
 
 
