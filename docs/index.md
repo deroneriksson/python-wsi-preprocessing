@@ -1332,33 +1332,34 @@ RAG Threshold        | Time: 0:00:23.774296  Type: uint8   Shape: (1385, 1810, 3
 
 ### Morphology
 
-Information about the field of morphology applied to images can be found at
+Information about image morphology can be found at
 [https://en.wikipedia.org/wiki/Mathematical_morphology](https://en.wikipedia.org/wiki/Mathematical_morphology).
 The primary morphology operators are erosion, dilation, opening, and closing. With erosion, pixels along the edges
-of an object are removed. For dilation, pixels along the edges of an object are added. Opening is erosion followed
+of an object are removed. With dilation, pixels along the edges of an object are added. Opening is erosion followed
 by dilation. Closing is dilation followed by erosion. With morphology operators, a structuring element (such as
 a square, circle, cross, etc) is passed along the edges of the objects to perform the operations. Morphology operators
-can be performed on binary and grayscale images. In our examples, we will apply morphology operators to binary images
-(2-dimensional arrays of 2 values, such as True/False, 1.0/0.0, and 255/0).
+are typically performed on binary and grayscale images. In our examples, we will apply morphology operators to binary
+images (2-dimensional arrays of 2 values, such as True/False, 1.0/0.0, and 255/0).
 
 
 #### Erosion
 
-We create a binary image mask by calling the `filter_grays()` function on the original RGB image. The
-`filter_binary_erosion()` function uses a disk as the structuring element that will be used to erode the edges of the
+Let's have a look at an erosion example.
+We create a binary image by calling the `filter_grays()` function on the original RGB image. The
+`filter_binary_erosion()` function uses a disk as the structuring element that erodes the edges of the
 "No Grays" binary image. We demonstrate erosion with disk structuring elements of radius 5 and radius 20.
 
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-display_img(rgb, "Original")
-no_grays = filter_grays(rgb, output_type="bool")
-display_img(no_grays, "No Grays")
-bin_erosion_5 = filter_binary_erosion(no_grays, disk_size=5)
-display_img(bin_erosion_5, "Binary Erosion (5)")
-bin_erosion_20 = filter_binary_erosion(no_grays, disk_size=20)
-display_img(bin_erosion_20, "Binary Erosion (20)")
+rgb = util.pil_to_np_rgb(img)
+util.display_img(rgb, "Original", bg=True)
+no_grays = filter.filter_grays(rgb, output_type="bool")
+util.display_img(no_grays, "No Grays", bg=True)
+bin_erosion_5 = filter.filter_binary_erosion(no_grays, disk_size=5)
+util.display_img(bin_erosion_5, "Binary Erosion (5)", bg=True)
+bin_erosion_20 = filter.filter_binary_erosion(no_grays, disk_size=20)
+util.display_img(bin_erosion_20, "Binary Erosion (20)", bg=True)
 ```
 
 | **Original Slide** | **No Grays** |
@@ -1374,10 +1375,10 @@ display_img(bin_erosion_20, "Binary Erosion (20)")
 Notice that increasing the structuring element radius increases the compute time.
 
 ```
-RGB                  | Time: 0:00:00.208153  Type: uint8   Shape: (1567, 2048, 3)
-Filter Grays         | Time: 0:00:00.096831  Type: bool    Shape: (1567, 2048)
-Binary Erosion       | Time: 0:00:00.156416  Type: uint8   Shape: (1567, 2048)
-Binary Erosion       | Time: 0:00:00.900778  Type: uint8   Shape: (1567, 2048)
+RGB                  | Time: 0:00:00.171309  Type: uint8   Shape: (1385, 1810, 3)
+Filter Grays         | Time: 0:00:00.086484  Type: bool    Shape: (1385, 1810)
+Binary Erosion       | Time: 0:00:00.167290  Type: uint8   Shape: (1385, 1810)
+Binary Erosion       | Time: 0:00:00.765442  Type: uint8   Shape: (1385, 1810)
 ```
 
 
