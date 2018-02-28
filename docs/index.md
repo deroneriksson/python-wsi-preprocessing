@@ -1126,7 +1126,7 @@ print("filter_blue: " + filter.mask_percentage_text(filter.mask_percent(not_blue
 print("filter_blue_pen: " + filter.mask_percentage_text(filter.mask_percent(not_blue_pen)))
 ```
 
-The `filter_blue()` example filtered out 0.45% of the slide pixels and the `filter_blue_pen()` example filtered out
+The `filter_blue()` example filters out 0.45% of the slide pixels and the `filter_blue_pen()` example filters out
 0.69% of the slide pixels.
 
 ```
@@ -1145,12 +1145,12 @@ threshold value, a green channel lower threshold value, and a blue channel lower
 ```
 img_path = slide.get_training_image_path(51)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-display_img(rgb, "Original")
-not_green = filter_green(rgb, red_upper_thresh=150, green_lower_thresh=160, blue_lower_thresh=140, display_np_info=True)
-display_img(not_green, "Green Filter (150, 160, 140)")
-display_img(mask_rgb(rgb, not_green), "Not Green")
-display_img(mask_rgb(rgb, ~not_green), "Green")
+rgb = util.pil_to_np_rgb(img)
+util.display_img(rgb, "RGB")
+not_green = filter.filter_green(rgb, red_upper_thresh=150, green_lower_thresh=160, blue_lower_thresh=140, display_np_info=True)
+util.display_img(not_green, "Green Filter (150, 160, 140)")
+util.display_img(util.mask_rgb(rgb, not_green), "Not Green")
+util.display_img(util.mask_rgb(rgb, ~not_green), "Green")
 ```
 
 Using a red upper threshold of 150, a green lower threshold of 160, and a blue lower threshold of 140, we see that the
@@ -1170,10 +1170,10 @@ out.
 Console output:
 
 ```
-RGB                  | Time: 0:00:00.150075  Type: uint8   Shape: (1222, 2048, 3)
-Filter Green         | Time: 0:00:00.010120  Type: bool    Shape: (1222, 2048)
-Mask RGB             | Time: 0:00:00.009844  Type: uint8   Shape: (1222, 2048, 3)
-Mask RGB             | Time: 0:00:00.006240  Type: uint8   Shape: (1222, 2048, 3)
+RGB                  | Time: 0:00:00.611914  Type: uint8   Shape: (2291, 3839, 3)
+Filter Green         | Time: 0:00:00.077429  Type: bool    Shape: (2291, 3839)
+Mask RGB             | Time: 0:00:00.049026  Type: uint8   Shape: (2291, 3839, 3)
+Mask RGB             | Time: 0:00:00.027211  Type: uint8   Shape: (2291, 3839, 3)
 ```
 
 #### Green Pen Filter
