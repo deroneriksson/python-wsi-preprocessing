@@ -1204,12 +1204,12 @@ If we apply the green pen filter, we see that it includes most of the green shad
 ```
 img_path = slide.get_training_image_path(51)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-display_img(rgb, "Original")
-not_green_pen = filter_green_pen(rgb)
-display_img(not_green_pen, "Green Pen Filter")
-display_img(mask_rgb(rgb, not_green_pen), "Not Green Pen")
-display_img(mask_rgb(rgb, ~not_green_pen), "Green Pen")
+rgb = util.pil_to_np_rgb(img)
+util.display_img(rgb, "RGB")
+not_green_pen = filter.filter_green_pen(rgb)
+util.display_img(not_green_pen, "Green Pen Filter")
+util.display_img(util.mask_rgb(rgb, not_green_pen), "Not Green Pen")
+util.display_img(util.mask_rgb(rgb, ~not_green_pen), "Green Pen")
 ```
 
 | **Original Slide** | **Green Pen Filter** |
@@ -1225,10 +1225,10 @@ display_img(mask_rgb(rgb, ~not_green_pen), "Green Pen")
 Like the other pen filters, the green pen filter's performance is quite good.
 
 ```
-RGB                  | Time: 0:00:00.165038  Type: uint8   Shape: (1222, 2048, 3)
-Filter Green Pen     | Time: 0:00:00.118797  Type: bool    Shape: (1222, 2048)
-Mask RGB             | Time: 0:00:00.011132  Type: uint8   Shape: (1222, 2048, 3)
-Mask RGB             | Time: 0:00:00.005561  Type: uint8   Shape: (1222, 2048, 3)
+RGB                  | Time: 0:00:00.540223  Type: uint8   Shape: (2291, 3839, 3)
+Filter Green Pen     | Time: 0:00:00.487728  Type: bool    Shape: (2291, 3839)
+Mask RGB             | Time: 0:00:00.044024  Type: uint8   Shape: (2291, 3839, 3)
+Mask RGB             | Time: 0:00:00.022867  Type: uint8   Shape: (2291, 3839, 3)
 ```
 
 
