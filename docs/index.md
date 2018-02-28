@@ -436,9 +436,9 @@ NumPy array.
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-grayscale = filter_rgb_to_grayscale(rgb)
-display_img(grayscale, "Grayscale")
+rgb = util.pil_to_np_rgb(img)
+grayscale = filter.filter_rgb_to_grayscale(rgb)
+util.display_img(grayscale, "Grayscale")
 ```
 
 Here we see the displayed grayscale image.
@@ -449,13 +449,13 @@ Here we see the displayed grayscale image.
 
 
 In the console, we see that the grayscale image is a two-dimensional NumPy array, since the 3 color channels have
-been combined into a single grayscale channel. The data type is `uint8` and the pixel is represented by an integer
-value between 0 and 255.
+been combined into a single grayscale channel. The data type is `uint8` and pixels are represented by integer
+values between 0 and 255.
 
 
 ```
-RGB                  | Time: 0:00:00.220014  Type: uint8   Shape: (1567, 2048, 3)
-Gray                 | Time: 0:00:00.130243  Type: uint8   Shape: (1567, 2048)
+RGB                  | Time: 0:00:00.159974  Type: uint8   Shape: (1385, 1810, 3)
+Gray                 | Time: 0:00:00.101953  Type: uint8   Shape: (1385, 1810)
 ```
 
 
@@ -473,10 +473,10 @@ Below, we use the `filter_complement()` function to invert the previously obtain
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-grayscale = filter_rgb_to_grayscale(rgb)
-complement = filter_complement(grayscale)
-display_img(complement, "Complement")
+rgb = util.pil_to_np_rgb(img)
+grayscale = filter.filter_rgb_to_grayscale(rgb)
+complement = filter.filter_complement(grayscale)
+util.display_img(complement, "Complement")
 ```
 
 | **Complement Filter** |
@@ -487,9 +487,9 @@ display_img(complement, "Complement")
 In the console output, we see that computing the complement is a very fast operation.
 
 ```
-RGB                  | Time: 0:00:00.225361  Type: uint8   Shape: (1567, 2048, 3)
-Gray                 | Time: 0:00:00.136738  Type: uint8   Shape: (1567, 2048)
-Complement           | Time: 0:00:00.002159  Type: uint8   Shape: (1567, 2048)
+RGB                  | Time: 0:00:00.177398  Type: uint8   Shape: (1385, 1810, 3)
+Gray                 | Time: 0:00:00.105015  Type: uint8   Shape: (1385, 1810)
+Complement           | Time: 0:00:00.001439  Type: uint8   Shape: (1385, 1810)
 ```
 
 
@@ -498,7 +498,7 @@ Complement           | Time: 0:00:00.002159  Type: uint8   Shape: (1567, 2048)
 
 #### Basic Threshold
 
-With basic thresholding, a binary NumPy array is generated, where each value in the resulting NumPy array indicates
+With basic thresholding, a binary image is generated, where each value in the resulting NumPy array indicates
 whether the corresponding pixel in the original image is above a particular threshold value. So, a
 pixel with a value of 160 with a threshold of 150 would generate a True (or 255, or 1.0), and a pixel with a value
 of 140 with a threshold of 150 would generate a False (or 0, or 0.0).
@@ -508,11 +508,11 @@ Here, we apply a basic threshold with a threshold value of 100 to the grayscale 
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-grayscale = filter_rgb_to_grayscale(rgb)
-complement = filter_complement(grayscale)
-hyst = filter_threshold(complement, threshold=100)
-display_img(hyst, "Threshold")
+rgb = util.pil_to_np_rgb(img)
+grayscale = filter.filter_rgb_to_grayscale(rgb)
+complement = filter.filter_complement(grayscale)
+thresh = filter.filter_threshold(complement, threshold=100)
+util.display_img(thresh, "Threshold")
 ```
 
 The result is a binary image where pixel values that were above 100 are shown in white and pixel values that were 100 or
@@ -526,10 +526,10 @@ lower are shown in black.
 In the console output, we see that basic thresholding is a very fast operation.
 
 ```
-RGB                  | Time: 0:00:00.207232  Type: uint8   Shape: (1567, 2048, 3)
-Gray                 | Time: 0:00:00.132555  Type: uint8   Shape: (1567, 2048)
-Complement           | Time: 0:00:00.001420  Type: uint8   Shape: (1567, 2048)
-Threshold            | Time: 0:00:00.001329  Type: bool    Shape: (1567, 2048)
+RGB                  | Time: 0:00:00.164464  Type: uint8   Shape: (1385, 1810, 3)
+Gray                 | Time: 0:00:00.102431  Type: uint8   Shape: (1385, 1810)
+Complement           | Time: 0:00:00.001397  Type: uint8   Shape: (1385, 1810)
+Threshold            | Time: 0:00:00.001456  Type: bool    Shape: (1385, 1810)
 ```
 
 
@@ -551,14 +551,14 @@ Here, we perform a hysteresis threshold on the complement of the grayscale image
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-grayscale = filter_rgb_to_grayscale(rgb)
-complement = filter_complement(grayscale)
-hyst = filter_hysteresis_threshold(complement)
-display_img(hyst, "Hysteresis Threshold")
+rgb = util.pil_to_np_rgb(img)
+grayscale = filter.filter_rgb_to_grayscale(rgb)
+complement = filter.filter_complement(grayscale)
+hyst = filter.filter_hysteresis_threshold(complement)
+util.display_img(hyst, "Hysteresis Threshold")
 ```
 
-In the generated image, notice that the result is a binary image. All pixel values are either white (255) or black (0).
+In the displayed image, the result is a binary image. All pixel values are either white (255) or black (0).
 The red display text in the corner can be ignored since it is for informational purposes only and is not present when
 we save the images to the file system.
 
@@ -573,10 +573,10 @@ though conceptually it is background and should not be treated as tissue.
 Here we see the console output from our filter operations.
 
 ```
-RGB                  | Time: 0:00:00.213741  Type: uint8   Shape: (1567, 2048, 3)
-Gray                 | Time: 0:00:00.126530  Type: uint8   Shape: (1567, 2048)
-Complement           | Time: 0:00:00.001428  Type: uint8   Shape: (1567, 2048)
-Hysteresis Threshold | Time: 0:00:00.115570  Type: uint8   Shape: (1567, 2048)
+RGB                  | Time: 0:00:00.167947  Type: uint8   Shape: (1385, 1810, 3)
+Gray                 | Time: 0:00:00.109109  Type: uint8   Shape: (1385, 1810)
+Complement           | Time: 0:00:00.001453  Type: uint8   Shape: (1385, 1810)
+Hysteresis Threshold | Time: 0:00:00.079292  Type: uint8   Shape: (1385, 1810)
 ```
 
 
@@ -593,11 +593,11 @@ Let's try Otsu's method on the complement image as we did when demonstrating hys
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-grayscale = filter_rgb_to_grayscale(rgb)
-complement = filter_complement(grayscale)
-otsu = filter_otsu_threshold(complement)
-display_img(otsu, "Otsu Threshold")
+rgb = util.pil_to_np_rgb(img)
+grayscale = filter.filter_rgb_to_grayscale(rgb)
+complement = filter.filter_complement(grayscale)
+otsu = filter.filter_otsu_threshold(complement)
+util.display_img(otsu, "Otsu Threshold")
 ```
 
 
@@ -616,10 +616,10 @@ background.
 In terms of performance, thresholding using Otsu's method is very fast, as we see in the console output.
 
 ```
-RGB                  | Time: 0:00:00.206994  Type: uint8   Shape: (1567, 2048, 3)
-Gray                 | Time: 0:00:00.132579  Type: uint8   Shape: (1567, 2048)
-Complement           | Time: 0:00:00.001439  Type: uint8   Shape: (1567, 2048)
-Otsu Threshold       | Time: 0:00:00.018829  Type: uint8   Shape: (1567, 2048)
+RGB                  | Time: 0:00:00.166855  Type: uint8   Shape: (1385, 1810, 3)
+Gray                 | Time: 0:00:00.111960  Type: uint8   Shape: (1385, 1810)
+Complement           | Time: 0:00:00.001746  Type: uint8   Shape: (1385, 1810)
+Otsu Threshold       | Time: 0:00:00.014615  Type: uint8   Shape: (1385, 1810)
 ```
 
 
