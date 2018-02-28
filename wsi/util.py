@@ -118,6 +118,24 @@ def display_img(np_img, text=None, font_path="/Library/Fonts/Arial Bold.ttf", si
   result.show()
 
 
+def mask_rgb(rgb, mask):
+  """
+  Apply a binary (T/F, 1/0) mask to a 3-channel RGB image and output the result.
+
+  Args:
+    rgb: RGB image as a NumPy array.
+    mask: An image mask to determine which pixels in the original image should be displayed.
+
+  Returns:
+    NumPy array representing an RGB image with mask applied.
+  """
+  t = Time()
+  result = rgb * np.dstack([mask, mask, mask])
+  np_info(result, "Mask RGB", t.elapsed())
+  return result
+
+
+
 class Time:
   """
   Class for displaying elapsed time.

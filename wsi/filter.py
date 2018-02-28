@@ -1012,23 +1012,6 @@ def filter_grays(rgb, tolerance=15, output_type="bool"):
   return result
 
 
-def mask_rgb(rgb, mask):
-  """
-  Apply a binary (T/F, 1/0) mask to a 3-channel RGB image and output the result.
-
-  Args:
-    rgb: RGB image as a NumPy array.
-    mask: An image mask to determine which pixels in the original image should be displayed.
-
-  Returns:
-    NumPy array representing an RGB image with mask applied.
-  """
-  t = Time()
-  result = rgb * np.dstack([mask, mask, mask])
-  util.np_info(result, "Mask RGB", t.elapsed())
-  return result
-
-
 def uint8_to_bool(np_img):
   """
   Convert NumPy array of uint8 (255,0) values to bool (True,False) values
@@ -1061,32 +1044,32 @@ def apply_image_filters(np_img, slide_num=None, info=None, save=False, display=F
   save_display(save, display, info, rgb, slide_num, 1, "Original", "rgb")
 
   mask_not_green = filter_green_channel(rgb)
-  rgb_not_green = mask_rgb(rgb, mask_not_green)
+  rgb_not_green = util.mask_rgb(rgb, mask_not_green)
   save_display(save, display, info, rgb_not_green, slide_num, 2, "Not Green", "rgb-not-green")
 
   mask_not_gray = filter_grays(rgb)
-  rgb_not_gray = mask_rgb(rgb, mask_not_gray)
+  rgb_not_gray = util.mask_rgb(rgb, mask_not_gray)
   save_display(save, display, info, rgb_not_gray, slide_num, 3, "Not Gray", "rgb-not-gray")
 
   mask_no_red_pen = filter_red_pen(rgb)
-  rgb_no_red_pen = mask_rgb(rgb, mask_no_red_pen)
+  rgb_no_red_pen = util.mask_rgb(rgb, mask_no_red_pen)
   save_display(save, display, info, rgb_no_red_pen, slide_num, 4, "No Red Pen", "rgb-no-red-pen")
 
   mask_no_green_pen = filter_green_pen(rgb)
-  rgb_no_green_pen = mask_rgb(rgb, mask_no_green_pen)
+  rgb_no_green_pen = util.mask_rgb(rgb, mask_no_green_pen)
   save_display(save, display, info, rgb_no_green_pen, slide_num, 5, "No Green Pen", "rgb-no-green-pen")
 
   mask_no_blue_pen = filter_blue_pen(rgb)
-  rgb_no_blue_pen = mask_rgb(rgb, mask_no_blue_pen)
+  rgb_no_blue_pen = util.mask_rgb(rgb, mask_no_blue_pen)
   save_display(save, display, info, rgb_no_blue_pen, slide_num, 6, "No Blue Pen", "rgb-no-blue-pen")
 
   mask_gray_green_pens = mask_not_gray & mask_not_green & mask_no_red_pen & mask_no_green_pen & mask_no_blue_pen
-  rgb_gray_green_pens = mask_rgb(rgb, mask_gray_green_pens)
+  rgb_gray_green_pens = util.mask_rgb(rgb, mask_gray_green_pens)
   save_display(save, display, info, rgb_gray_green_pens, slide_num, 7, "Not Gray, Not Green, No Pens",
                "rgb-no-gray-no-green-no-pens")
 
   mask_remove_small = filter_remove_small_objects(mask_gray_green_pens, min_size=500, output_type="bool")
-  rgb_remove_small = mask_rgb(rgb, mask_remove_small)
+  rgb_remove_small = util.mask_rgb(rgb, mask_remove_small)
   save_display(save, display, info, rgb_remove_small, slide_num, 8,
                "Not Gray, Not Green, No Pens,\nRemove Small Objects",
                "rgb-not-green-not-gray-no-pens-remove-small")
@@ -1500,8 +1483,8 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 # not_greenish = filter_green(rgb, red_upper_thresh=125, green_lower_thresh=30, blue_lower_thresh=30,
 #                             display_np_info=True)
 # not_grayish = filter_grays(rgb, tolerance=30)
-# rgb_new = mask_rgb(rgb, not_greenish & not_grayish)
-# display_img(mask_rgb(rgb, not_greenish & not_grayish), "Not Greenish, Not Grayish")
+# rgb_new = util.mask_rgb(rgb, not_greenish & not_grayish)
+# display_img(util.mask_rgb(rgb, not_greenish & not_grayish), "Not Greenish, Not Grayish")
 # row1 = np.concatenate((rgb[800:1200, 100:500], rgb[750:1150, 1350:1750]), axis=1)
 # row2 = np.concatenate((rgb_new[800:1200, 100:500], rgb_new[750:1150, 1350:1750]), axis=1)
 # result = np.concatenate((row1, row2), axis=0)
@@ -1545,7 +1528,7 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 # display_img(b, "B Entropy")
 # rgb_entropy = r & g & b
 # display_img(rgb_entropy, "RGB Entropy")
-# display_img(mask_rgb(rgb, entropy), "Original with RGB Entropy Mask")
+# display_img(util.mask_rgb(rgb, entropy), "Original with RGB Entropy Mask")
 
 # display_img(grayscale, "Grayscale")
 # complement = filter_complement(grayscale)
@@ -1569,14 +1552,14 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 # np_info(np_img)
 # np_filt = filter_rgb_to_grayscale(np_img)
 # np_filt = filter_entropy(np_filt, neighborhood=5, threshold=4, output_type="bool")
-# np_img = mask_rgb(np_img, np_filt)
+# np_img = util.mask_rgb(np_img, np_filt)
 # display_img(np_img, "Entropy" + mask_percentage_text(mask_percent(np_img)))
 
 # red_pen_mask_percentage = mask_percent(mask_no_red_pen)
 # if red_pen_mask_percentage >= 1.0:
 #   gray_no_red_pen = filter_rgb_to_grayscale(rgb_no_red_pen)
 #   mask_entropy = filter_entropy(gray_no_red_pen, neighborhood=5, threshold=4, output_type="bool")
-#   rgb_entropy = mask_rgb(rgb, mask_entropy)
+#   rgb_entropy = util.mask_rgb(rgb, mask_entropy)
 #   save_display(save, display, info, rgb_entropy, slide_num, 5, "Entropy", "rgb-entropy")
 
 # pil_img = slide.slide_to_scaled_pil_image(15)[0]
@@ -1587,9 +1570,5 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 # filt_pil_img.show()
 
 # if __name__ == "__main__":
-  # multiprocess_apply_filters_to_images(image_num_list=[3, 4, 5, 6, 7, 8])
-  # singleprocess_apply_filters_to_images(image_num_list=[3, 4])
-#   img_path = slide.get_training_image_path(2)
-#   img = slide.open_image(img_path)
-#   rgb = util.pil_to_np_rgb(img)
-#   util.display_img(rgb, "RGB")
+# multiprocess_apply_filters_to_images(image_num_list=[3, 4, 5, 6, 7, 8])
+# singleprocess_apply_filters_to_images(image_num_list=[3, 4])
