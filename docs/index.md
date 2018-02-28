@@ -798,12 +798,12 @@ the resulting images.
 ```
 img_path = slide.get_training_image_path(4)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-hed = filter_rgb_to_hed(rgb)
-hema = filter_hed_to_hematoxylin(hed)
-display_img(hema, "Hematoxylin Channel")
-eosin = filter_hed_to_eosin(hed)
-display_img(eosin, "Eosin Channel")
+rgb = util.pil_to_np_rgb(img)
+hed = filter.filter_rgb_to_hed(rgb)
+hema = filter.filter_hed_to_hematoxylin(hed)
+util.display_img(hema, "Hematoxylin Channel")
+eosin = filter.filter_hed_to_eosin(hed)
+util.display_img(eosin, "Eosin Channel")
 ```
 
 Notice that the hematoxylin channel does fairly well at detecting the purple areas of the original slide,
@@ -821,18 +821,18 @@ pen is considered to be part of the eosin stain spectrum.
 Console output:
 
 ```
-RGB                  | Time: 0:00:00.185915  Type: uint8   Shape: (1804, 2048, 3)
-RGB to HED           | Time: 0:00:00.515751  Type: uint8   Shape: (1804, 2048, 3)
-HED to Hematoxylin   | Time: 0:00:00.063843  Type: uint8   Shape: (1804, 2048)
-HED to Eosin         | Time: 0:00:00.042430  Type: uint8   Shape: (1804, 2048)
+RGB                  | Time: 0:00:00.397570  Type: uint8   Shape: (2594, 2945, 3)
+RGB to HED           | Time: 0:00:01.322220  Type: uint8   Shape: (2594, 2945, 3)
+HED to Hematoxylin   | Time: 0:00:00.136750  Type: uint8   Shape: (2594, 2945)
+HED to Eosin         | Time: 0:00:00.086537  Type: uint8   Shape: (2594, 2945)
 ```
 
 
 #### Green Channel Filter
 
-If we look at a color wheel, we see that purple and pink are next to each other. On the other side of color wheel, we
-have yellow and green. Since green is one of our 3 NumPy array RGB color channels, filtering out pixels that have a high
-green channel value can be one way to potentially filter out parts of the slide that are not pink or purple. This
+If we look at an RGB color wheel, we see that purple and pink are next to each other. On the other side of color wheel,
+we have yellow and green. Since green is one of our 3 NumPy array RGB color channels, filtering out pixels that have a
+high green channel value can be one way to potentially filter out parts of the slide that are not pink or purple. This
 includes the white background, since white also has a high green channel value along with high red and blue channel
 values.
 
@@ -842,9 +842,10 @@ with green channel values of 200 or greater will be rejected.
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-not_green = filter_green_channel(rgb)
-display_img(not_green, "Green Channel Filter")
+rgb = util.pil_to_np_rgb(img)
+util.display_img(rgb, "RGB")
+not_green = filter.filter_green_channel(rgb)
+util.display_img(not_green, "Green Channel Filter")
 ```
 
 The green channel filter does a decent job of differentiating the tissue from the white background. However, notice
@@ -859,8 +860,8 @@ purposes. As a result, the default output type for the green channel filter is `
 output. If another output type is desired, this can be set with the function's `output_type` parameter.
 
 ```
-RGB                  | Time: 0:00:00.210066  Type: uint8   Shape: (1567, 2048, 3)
-Filter Green Channel | Time: 0:00:00.027842  Type: bool    Shape: (1567, 2048)
+RGB                  | Time: 0:00:00.169249  Type: uint8   Shape: (1385, 1810, 3)
+Filter Green Channel | Time: 0:00:00.005618  Type: bool    Shape: (1385, 1810)
 ```
 
 
@@ -877,9 +878,10 @@ Here, we run the grays filter on the original RGB image.
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-not_grays = filter_grays(rgb)
-display_img(not_grays, "Grays Filter")
+rgb = util.pil_to_np_rgb(img)
+util.display_img(rgb, "RGB")
+not_grays = filter.filter_grays(rgb)
+util.display_img(not_grays, "Grays Filter")
 ```
 
 Notice that in addition to filtering out the white background, the grays filter has indeed filtered out the shadow
@@ -894,15 +896,15 @@ be used in combination with other filters. Since the grays filter is fast, it of
 low-cost way to filter out shadows from the slides during preprocessing.
 
 ```
-RGB                  | Time: 0:00:00.219749  Type: uint8   Shape: (1567, 2048, 3)
-Filter Grays         | Time: 0:00:00.091341  Type: bool    Shape: (1567, 2048)
+RGB                  | Time: 0:00:00.169642  Type: uint8   Shape: (1385, 1810, 3)
+Filter Grays         | Time: 0:00:00.082075  Type: bool    Shape: (1385, 1810)
 ```
 
 
 #### Red Filter
 
-Next, let's turn our attention to filtering out shades of red, which can be used to filter out the red pen color.
-The red pen consists of a wide variety of closely related red shades. Certain shades are
+Next, let's turn our attention to filtering out shades of red, which can be used to filter out a significant amount of
+the red pen color. The red pen consists of a wide variety of closely related red shades. Certain shades are
 reddish, others are maroonish, and others are pinkish, for example. These color gradations are a result of a variety of
 factors, such as the amount of ink, lighting, shadowing, and tissue under the pen marks.
 
@@ -919,18 +921,19 @@ original RGB image as a mask, and we will also apply the inverse of the red filt
 ```
 img_path = slide.get_training_image_path(4)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-not_red = filter_red(rgb, red_lower_thresh=150, green_upper_thresh=80, blue_upper_thresh=90, display_np_info=True)
-display_img(not_red, "Red Filter (150, 80, 90)")
-display_img(mask_rgb(rgb, not_red), "Not Red")
-display_img(mask_rgb(rgb, ~not_red), "Red")
+rgb = util.pil_to_np_rgb(img)
+util.display_img(rgb, "RGB")
+not_red = filter.filter_red(rgb, red_lower_thresh=150, green_upper_thresh=80, blue_upper_thresh=90, display_np_info=True)
+util.display_img(not_red, "Red Filter (150, 80, 90)")
+util.display_img(util.mask_rgb(rgb, not_red), "Not Red")
+util.display_img(util.mask_rgb(rgb, ~not_red), "Red")
 ```
 
-In the generated image, we can see that much of the red pen has been filtered out.
+We see that the red filter filters out much of the red pen.
 
 | **Original Slide** | **Red Filter** |
 | -------------------- | --------------------------------- |
-| ![Original Slide](images/slide-pen.png "Original Slide") | ![Red Filter](images/red-filter.png "Red Filter") |
+| ![Original Slide](images/slide-4-rgb.png "Original Slide") | ![Red Filter](images/red-filter.png "Red Filter") |
 
 
 Applying the red filter and the inverse of the red filter as masks to the original image, we see that our threshold
@@ -941,13 +944,13 @@ values did quite well at filtering out a large amount of the red pen.
 | ![Not Red](images/not-red.png "Not Red") | ![Red](images/red.png "Red") |
 
 
-Console output from the above image generation:
+Here we see the console output from the above image filtering:
 
 ```
-RGB                  | Time: 0:00:00.182861  Type: uint8   Shape: (1804, 2048, 3)
-Filter Red           | Time: 0:00:00.013861  Type: bool    Shape: (1804, 2048)
-Mask RGB             | Time: 0:00:00.015051  Type: uint8   Shape: (1804, 2048, 3)
-Mask RGB             | Time: 0:00:00.018000  Type: uint8   Shape: (1804, 2048, 3)
+RGB                  | Time: 0:00:00.404069  Type: uint8   Shape: (2594, 2945, 3)
+Filter Red           | Time: 0:00:00.034864  Type: bool    Shape: (2594, 2945)
+Mask RGB             | Time: 0:00:00.053997  Type: uint8   Shape: (2594, 2945, 3)
+Mask RGB             | Time: 0:00:00.022750  Type: uint8   Shape: (2594, 2945, 3)
 ```
 
 
