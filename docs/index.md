@@ -983,16 +983,17 @@ Let's apply the red pen filter to slide #4.
 ```
 img_path = slide.get_training_image_path(4)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-not_red_pen = filter_red_pen(rgb)
-display_img(not_red_pen, "Red Pen Filter")
-display_img(mask_rgb(rgb, not_red_pen), "Not Red Pen")
-display_img(mask_rgb(rgb, ~not_red_pen), "Red Pen")
+rgb = util.pil_to_np_rgb(img)
+util.display_img(rgb, "RGB")
+not_red_pen = filter.filter_red_pen(rgb)
+util.display_img(not_red_pen, "Red Pen Filter")
+util.display_img(util.mask_rgb(rgb, not_red_pen), "Not Red Pen")
+util.display_img(util.mask_rgb(rgb, ~not_red_pen), "Red Pen")
 ```
 
 | **Original Slide** | **Red Pen Filter** |
 | -------------------- | --------------------------------- |
-| ![Original Slide](images/slide-pen.png "Original Slide") | ![Red Pen Filter](images/red-pen-filter.png "Red Pen Filter") |
+| ![Original Slide](images/slide-4-rgb.png "Original Slide") | ![Red Pen Filter](images/red-pen-filter.png "Red Pen Filter") |
 
 Compared with using a single set of red threshold values, we can see that the red pen filter is significantly
 more inclusive in terms of the shades of red that are accepted. As a result, more red pen is filtered. However, notice
@@ -1007,10 +1008,10 @@ that some of the pinkish-red from eosin-stained tissue is also included as a res
 Even though the red pen filter ANDs nine sets of red filter results together, we see that the performance is excellent.
 
 ```
-RGB                  | Time: 0:00:00.192713  Type: uint8   Shape: (1804, 2048, 3)
-Filter Red Pen       | Time: 0:00:00.113712  Type: bool    Shape: (1804, 2048)
-Mask RGB             | Time: 0:00:00.014232  Type: uint8   Shape: (1804, 2048, 3)
-Mask RGB             | Time: 0:00:00.019559  Type: uint8   Shape: (1804, 2048, 3)
+RGB                  | Time: 0:00:00.392082  Type: uint8   Shape: (2594, 2945, 3)
+Filter Red Pen       | Time: 0:00:00.251170  Type: bool    Shape: (2594, 2945)
+Mask RGB             | Time: 0:00:00.037256  Type: uint8   Shape: (2594, 2945, 3)
+Mask RGB             | Time: 0:00:00.026589  Type: uint8   Shape: (2594, 2945, 3)
 ```
 
 #### Blue Filter
