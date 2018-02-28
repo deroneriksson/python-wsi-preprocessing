@@ -1582,18 +1582,17 @@ with size values of 100 and 10,000.
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-display_img(rgb, "Original")
-no_grays = filter_grays(rgb, output_type="bool")
-display_img(no_grays, "No Grays")
-fill_holes = filter_binary_fill_holes(no_grays)
-display_img(fill_holes, "Fill Holes")
+rgb = util.pil_to_np_rgb(img)
+util.display_img(rgb, "Original", bg=True)
+no_grays = filter.filter_grays(rgb, output_type="bool")
+fill_holes = filter.filter_binary_fill_holes(no_grays)
+util.display_img(fill_holes, "Fill Holes", bg=True)
 
-remove_holes_100 = filter_remove_small_holes(no_grays, min_size=100, output_type="bool")
-display_img(fill_holes ^ remove_holes_100, "Differences between Fill Holes and Remove Small Holes (100)")
+remove_holes_100 = filter.filter_remove_small_holes(no_grays, min_size=100, output_type="bool")
+util.display_img(fill_holes ^ remove_holes_100, "Differences between Fill Holes and Remove Small Holes (100)", bg=True)
 
-remove_holes_10000 = filter_remove_small_holes(no_grays, min_size=10000, output_type="bool")
-display_img(fill_holes ^ remove_holes_10000, "Differences between Fill Holes and Remove Small Holes (10000)")
+remove_holes_10000 = filter.filter_remove_small_holes(no_grays, min_size=10000, output_type="bool")
+util.display_img(fill_holes ^ remove_holes_10000, "Differences between Fill Holes and Remove Small Holes (10000)", bg=True)
 
 ```
 
@@ -1613,11 +1612,11 @@ In this example, increasing the minimum small hole size results in less differen
 Console output:
 
 ```
-RGB                  | Time: 0:00:00.208171  Type: uint8   Shape: (1567, 2048, 3)
-Filter Grays         | Time: 0:00:00.108048  Type: bool    Shape: (1567, 2048)
-Binary Fill Holes    | Time: 0:00:00.088519  Type: bool    Shape: (1567, 2048)
-Remove Small Holes   | Time: 0:00:00.054506  Type: bool    Shape: (1567, 2048)
-Remove Small Holes   | Time: 0:00:00.056771  Type: bool    Shape: (1567, 2048)
+RGB                  | Time: 0:00:00.176696  Type: uint8   Shape: (1385, 1810, 3)
+Filter Grays         | Time: 0:00:00.082582  Type: bool    Shape: (1385, 1810)
+Binary Fill Holes    | Time: 0:00:00.069583  Type: bool    Shape: (1385, 1810)
+Remove Small Holes   | Time: 0:00:00.046232  Type: bool    Shape: (1385, 1810)
+Remove Small Holes   | Time: 0:00:00.044539  Type: bool    Shape: (1385, 1810)
 ```
 
 
