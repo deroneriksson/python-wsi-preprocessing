@@ -1248,14 +1248,14 @@ perform k-means segmentation on that image.
 ```
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-display_img(rgb, "Original")
-kmeans_seg = filter_kmeans_segmentation(rgb, n_segments=3000)
-display_img(kmeans_seg, "K-Means Segmentation", color=(0, 0, 0))
-otsu_mask = mask_rgb(rgb, filter_otsu_threshold(filter_complement(filter_rgb_to_grayscale(rgb)), output_type="bool"))
-display_img(otsu_mask, "Image after Otsu Mask", color=(255, 255, 255))
-kmeans_seg_otsu = filter_kmeans_segmentation(otsu_mask, n_segments=3000)
-display_img(kmeans_seg_otsu, "K-Means Segmentation after Otsu Mask", color=(255, 255, 255))
+rgb = util.pil_to_np_rgb(img)
+util.display_img(rgb, "Original", bg=True)
+kmeans_seg = filter.filter_kmeans_segmentation(rgb, n_segments=3000)
+util.display_img(kmeans_seg, "K-Means Segmentation", bg=True)
+otsu_mask = util.mask_rgb(rgb, filter.filter_otsu_threshold(filter.filter_complement(filter.filter_rgb_to_grayscale(rgb)), output_type="bool"))
+util.display_img(otsu_mask, "Image after Otsu Mask", bg=True)
+kmeans_seg_otsu = filter.filter_kmeans_segmentation(otsu_mask, n_segments=3000)
+util.display_img(kmeans_seg_otsu, "K-Means Segmentation after Otsu Mask", bg=True)
 ```
 
 
@@ -1273,18 +1273,18 @@ Note that there are a couple practical difficulties in terms of implementing aut
 segmentation. To begin with, due to the variation in tissue stain colors across the image dataset, it can be difficult
 to filter on "pinkish" and "purplish" colors across all the slides. In addition, the k-means segmentation technique
 is very computationally expensive, as we can see in the console output. The compute time increases with the number
-of segments. For 3000 segments, we have a filter time of 26 seconds, whereas all operations that we have seen up to
+of segments. For 3000 segments, we have a filter time of ~20 seconds, whereas all operations that we have seen up to
 this point are subsecond. If we use the default value of 800 segments, compute time for the k-means segmentation filter
-is 9 seconds.
+is ~7 seconds.
 
 ```
-RGB                  | Time: 0:00:00.206051  Type: uint8   Shape: (1567, 2048, 3)
-K-Means Segmentation | Time: 0:00:26.106364  Type: uint8   Shape: (1567, 2048, 3)
-Gray                 | Time: 0:00:00.109594  Type: uint8   Shape: (1567, 2048)
-Complement           | Time: 0:00:00.000841  Type: uint8   Shape: (1567, 2048)
-Otsu Threshold       | Time: 0:00:00.016523  Type: bool    Shape: (1567, 2048)
-Mask RGB             | Time: 0:00:00.009480  Type: uint8   Shape: (1567, 2048, 3)
-K-Means Segmentation | Time: 0:00:26.232028  Type: uint8   Shape: (1567, 2048, 3)
+RGB                  | Time: 0:00:00.172848  Type: uint8   Shape: (1385, 1810, 3)
+K-Means Segmentation | Time: 0:00:20.238886  Type: uint8   Shape: (1385, 1810, 3)
+Gray                 | Time: 0:00:00.076287  Type: uint8   Shape: (1385, 1810)
+Complement           | Time: 0:00:00.000374  Type: uint8   Shape: (1385, 1810)
+Otsu Threshold       | Time: 0:00:00.013864  Type: bool    Shape: (1385, 1810)
+Mask RGB             | Time: 0:00:00.008522  Type: uint8   Shape: (1385, 1810, 3)
+K-Means Segmentation | Time: 0:00:20.130044  Type: uint8   Shape: (1385, 1810, 3)
 ```
 
 ---
