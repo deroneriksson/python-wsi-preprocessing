@@ -2035,7 +2035,7 @@ to the subset of relevant training images without requiring reprocessing of the 
 
 ## Overmask Avoidance
 
-When developing filters and filter settings to perform tissue identification on the entire training
+When developing filters and filter settings to perform tissue segmentation on the entire training
 set, we have to deal with a great amount of variation in the slide samples. To begin with, some slides have a large
 amount of tissue on them, while other slides only have a minimal amount of tissue. There is a great deal of
 variation in tissue staining. We also need to deal with additional issues such as pen marks and shadows on some of
@@ -2075,15 +2075,14 @@ at risk for overmasking with our given combination of filters.
 | ![Slide with Small Tissue Sample and Faint Staining](images/424-rgb.png "Slide with Small Tissue Sample and Faint Staining") |
 
 
-
 Therefore, rather than having fixed settings, we can automatically have our filters tweak parameter values to avoid
 overmasking if desired. As examples, the `filter_green_channel()` and `filter_remove_small_objects()` functions have
-this ability. If this masking exceeds a certain overmasking threshold, a parameter value can be changed to lower
+this ability. If masking exceeds a certain overmasking threshold, a parameter value can be changed to lower
 the amount of masking until the masking is below the overmasking threshold.
 
 ```
-filter_green_channel(np_img, green_thresh=200, avoid_overmask=True, overmask_thresh=90, output_type="bool")
-filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=True, overmask_thresh=95, output_type="uint8")
+filter.filter_green_channel(np_img, green_thresh=200, avoid_overmask=True, overmask_thresh=90, output_type="bool")
+filter.filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=True, overmask_thresh=95, output_type="uint8")
 ```
 
 For the `filter_green_channel()` function, if a `green_thresh` value of 200 results in masking over 90%, the
@@ -2096,13 +2095,13 @@ reductions will continue until the masking level isn't over 95%.
 
 Examining our full set of images using `multiprocess_apply_filters_to_images()`, we can identify slides that are
 at risk for overmasking. We can create a list of these slide numbers and use `multiprocess_apply_filters_to_images()`
-with this list of slide numbers to generate our HTML filters page that allows us to visually inspect the filters
+with this list of slide numbers to generate the `filters.html` page that allows us to visually inspect the filters
 applied to this set of slides.
 
 ```
 overmasked_slides = [1, 21, 29, 37, 43, 88, 116, 126, 127, 142, 145, 173, 196, 220, 225, 234, 238, 284, 292, 294, 304,
                      316, 401, 403, 424, 448, 452, 472, 494]
-multiprocess_apply_filters_to_images(image_num_list=overmasked_slides)
+filter.multiprocess_apply_filters_to_images(image_num_list=overmasked_slides)
 ```
 
 Let's have a look at how we reduce overmasking on slide 21, which is a slide that has very faint staining.
@@ -2115,81 +2114,88 @@ Let's have a look at how we reduce overmasking on slide 21, which is a slide tha
 We'll run our filters on slide #21 by calling `singleprocess_apply_filters_to_images(image_num_list=[21])`.
 
 If we set the `filter_green_channel()` and `filter_remove_small_objects()` `avoid_overmask` parameters to False,
-97.15% of the original image is masked by the "green channel" filter and 99.84% of the original image is
+97.69% of the original image is masked by the "green channel" filter and 99.92% of the original image is
 masked by the subsequent "remove small objects" filter. This is significant overmasking.
 
-| **Overmasked by Green Channel Filter (97.15%)** | **Overmasked by Remove Small Objects Filter (99.84%)** |
+| **Overmasked by Green Channel Filter (97.69%)** | **Overmasked by Remove Small Objects Filter (99.92%)** |
 | -- | -- |
-| ![Overmasked by Green Channel Filter (97.15%)](images/21-overmask-green-ch.png "Overmasked by Green Channel Filter (97.15%)") | ![Overmasked by Remove Small Objects Filter (99.84%)](images/21-overmask-green-ch-overmask-rem-small-obj.png "Overmasked by Remove Small Objects Filter (99.84%)")
+| ![Overmasked by Green Channel Filter (97.69%)](images/21-overmask-green-ch.png "Overmasked by Green Channel Filter (97.69%)") | ![Overmasked by Remove Small Objects Filter (99.92%)](images/21-overmask-green-ch-overmask-rem-small-obj.png "Overmasked by Remove Small Objects Filter (99.92%)")
 
 If we set `avoid_overmask` to True for `filter_remove_small_objects()`, we see that the "remove small objects"
-filter does not perform any further masking since the 97.15% masking from the previous "green channel" filter
+filter does not perform any further masking since the 97.69% masking from the previous "green channel" filter
 already exceeds its overmasking threshold of 95%.
 
-| **Overmasked by Green Channel Filter (97.15%)** | **Avoid Overmask by Remove Small Objects Filter (97.15%)** |
+| **Overmasked by Green Channel Filter (97.69%)** | **Avoid Overmask by Remove Small Objects Filter (97.69%)** |
 | -- | -- |
-| ![Overmasked by Green Channel Filter (97.15%)](images/21-overmask-green-ch.png "Overmasked by Green Channel Filter (97.15%)") | ![Avoid Overmask by Remove Small Objects Filter (97.15%)](images/21-overmask-green-ch-avoid-overmask-rem-small-obj.png "Avoid Overmask by Remove Small Objects Filter (97.15%)")
+| ![Overmasked by Green Channel Filter (97.69%)](images/21-overmask-green-ch.png "Overmasked by Green Channel Filter (97.69%)") | ![Avoid Overmask by Remove Small Objects Filter (97.69%)](images/21-overmask-green-ch-avoid-overmask-rem-small-obj.png "Avoid Overmask by Remove Small Objects Filter (97.69%)")
 
 
 If we set `avoid_overmask` back to False for `filter_remove_small_objects()` and we set `avoid_overmask` to True for
-`filter_green_channel()`, we see that 88.46% of the original image is masked by the "green channel" filter (under
-the 90% overmasking threshold for the filter) and 97.81% of the image is masked by the subsequent
+`filter_green_channel()`, we see that 87.91% of the original image is masked by the "green channel" filter (under
+the 90% overmasking threshold for the filter) and 97.40% of the image is masked by the subsequent
 "remove small objects" filter.
 
-| **Avoid Overmask by Green Channel Filter (88.46%)** | **Overmask by Remove Small Objects Filter (97.81%)** |
+| **Avoid Overmask by Green Channel Filter (87.91%)** | **Overmask by Remove Small Objects Filter (97.40%)** |
 | -- | -- |
-| ![Avoid Overmask by Green Channel Filter (88.46%)](images/21-avoid-overmask-green-ch.png "Avoid Overmask by Green Channel Filter (88.46%)") | ![Overmask by Remove Small Objects Filter (97.81%)](images/21-avoid-overmask-green-ch-overmask-rem-small-obj.png "Overmask by Remove Small Objects Filter (97.81%)")
+| ![Avoid Overmask by Green Channel Filter (87.91%)](images/21-avoid-overmask-green-ch.png "Avoid Overmask by Green Channel Filter (87.91%)") | ![Overmask by Remove Small Objects Filter (97.40%)](images/21-avoid-overmask-green-ch-overmask-rem-small-obj.png "Overmask by Remove Small Objects Filter (97.40%)")
 
 
 If we set `avoid_overmask` to True for both `filter_green_channel()` and `filter_remove_small_objects()`, we see that
-the resulting masking after the "remove small objects" filter has been reduced to 93.96%, which is under its
+the resulting masking after the "remove small objects" filter has been reduced to 94.88%, which is under its
 overmasking threshold of 95%.
 
-| **Avoid Overmask by Green Channel Filter (88.46%)** | **Avoid Overmask by Remove Small Objects Filter (93.96%)** |
+| **Avoid Overmask by Green Channel Filter (87.91%)** | **Avoid Overmask by Remove Small Objects Filter (94.88%)** |
 | -- | -- |
-| ![Avoid Overmask by Green Channel Filter (88.46%)](images/21-avoid-overmask-green-ch-2.png "Avoid Overmask by Green Channel Filter (88.46%)") | ![Avoid Overmask by Remove Small Objects Filter (93.96%)](images/21-avoid-overmask-green-ch-avoid-overmask-rem-small-obj.png "Avoid Overmask by Remove Small Objects Filter (93.96%)")
+| ![Avoid Overmask by Green Channel Filter (87.91%)](images/21-avoid-overmask-green-ch-2.png "Avoid Overmask by Green Channel Filter (87.91%)") | ![Avoid Overmask by Remove Small Objects Filter (94.88%)](images/21-avoid-overmask-green-ch-avoid-overmask-rem-small-obj.png "Avoid Overmask by Remove Small Objects Filter (94.88%)")
 
 
-Thus, in this example we've reduced the masking from 99.84% to 93.96%.
+Thus, in this example we've reduced the masking from 99.92% to 94.88%.
 
 We can see the filter adjustments being made in the console output.
 
 ```
-Applying filters to images
-
 Processing slide #21
-RGB                  | Time: 0:00:00.168369  Type: uint8   Shape: (1944, 2048, 3)
-Save Image           | Time: 0:00:01.044200  Name: /Volumes/BigData/TUPAC/filter_2048_png/TUPAC-TR-021-001-2048-rgb.png
-Mask percentage 97.15% >= overmask threshold 90.00% for Remove Green Channel green_thresh=200, so try 227
-Filter Green Channel | Time: 0:00:00.009298  Type: bool    Shape: (1944, 2048)
-Filter Green Channel | Time: 0:00:00.021384  Type: bool    Shape: (1944, 2048)
-Mask RGB             | Time: 0:00:00.016247  Type: uint8   Shape: (1944, 2048, 3)
-Save Image           | Time: 0:00:00.537678  Name: /Volumes/BigData/TUPAC/filter_2048_png/TUPAC-TR-021-002-2048-rgb-not-green.png
-Filter Grays         | Time: 0:00:00.130681  Type: bool    Shape: (1944, 2048)
-Mask RGB             | Time: 0:00:00.015921  Type: uint8   Shape: (1944, 2048, 3)
-Save Image           | Time: 0:00:00.505956  Name: /Volumes/BigData/TUPAC/filter_2048_png/TUPAC-TR-021-003-2048-rgb-not-gray.png
-Filter Red Pen       | Time: 0:00:00.103038  Type: bool    Shape: (1944, 2048)
-Mask RGB             | Time: 0:00:00.014579  Type: uint8   Shape: (1944, 2048, 3)
-Save Image           | Time: 0:00:00.995982  Name: /Volumes/BigData/TUPAC/filter_2048_png/TUPAC-TR-021-004-2048-rgb-no-red-pen.png
-Filter Green Pen     | Time: 0:00:00.148576  Type: bool    Shape: (1944, 2048)
-Mask RGB             | Time: 0:00:00.013955  Type: uint8   Shape: (1944, 2048, 3)
-Save Image           | Time: 0:00:00.981354  Name: /Volumes/BigData/TUPAC/filter_2048_png/TUPAC-TR-021-005-2048-rgb-no-green-pen.png
-Filter Blue Pen      | Time: 0:00:00.133999  Type: bool    Shape: (1944, 2048)
-Mask RGB             | Time: 0:00:00.014755  Type: uint8   Shape: (1944, 2048, 3)
-Save Image           | Time: 0:00:01.020773  Name: /Volumes/BigData/TUPAC/filter_2048_png/TUPAC-TR-021-006-2048-rgb-no-blue-pen.png
-Mask RGB             | Time: 0:00:00.015858  Type: uint8   Shape: (1944, 2048, 3)
-Save Image           | Time: 0:00:00.541936  Name: /Volumes/BigData/TUPAC/filter_2048_png/TUPAC-TR-021-007-2048-rgb-no-gray-no-green-no-pens.png
-Mask percentage 97.81% >= overmask threshold 95.00% for Remove Small Objs size 500, so try 250
-Mask percentage 97.04% >= overmask threshold 95.00% for Remove Small Objs size 250, so try 125
-Mask percentage 96.06% >= overmask threshold 95.00% for Remove Small Objs size 125, so try 62
-Mask percentage 95.02% >= overmask threshold 95.00% for Remove Small Objs size 62, so try 31
-Remove Small Objs    | Time: 0:00:00.076443  Type: bool    Shape: (1944, 2048)
-Remove Small Objs    | Time: 0:00:00.160442  Type: bool    Shape: (1944, 2048)
-Remove Small Objs    | Time: 0:00:00.231779  Type: bool    Shape: (1944, 2048)
-Remove Small Objs    | Time: 0:00:00.300997  Type: bool    Shape: (1944, 2048)
-Remove Small Objs    | Time: 0:00:00.376790  Type: bool    Shape: (1944, 2048)
-Mask RGB             | Time: 0:00:00.016087  Type: uint8   Shape: (1944, 2048, 3)
-Save Image           | Time: 0:00:00.453725  Name: /Volumes/BigData/TUPAC/filter_2048_png/TUPAC-TR-021-008-2048-rgb-not-green-not-gray-no-pens-remove-small.png
-Slide #021 processing time: 0:00:07.492792
+RGB                  | Time: 0:00:00.107057  Type: uint8   Shape: (1496, 1576, 3)
+Save Image           | Time: 0:00:00.612523  Name: /Volumes/BigData/TUPAC/filter_png/TUPAC-TR-021-001-rgb.png
+Save Thumbnail       | Time: 0:00:00.018348  Name: /Volumes/BigData/TUPAC/filter_thumbnail_jpg/TUPAC-TR-021-001-rgb.jpg
+Mask percentage 97.69% >= overmask threshold 90.00% for Remove Green Channel green_thresh=200, so try 227
+Filter Green Channel | Time: 0:00:00.005076  Type: bool    Shape: (1496, 1576)
+Filter Green Channel | Time: 0:00:00.010362  Type: bool    Shape: (1496, 1576)
+Mask RGB             | Time: 0:00:00.008531  Type: uint8   Shape: (1496, 1576, 3)
+Save Image           | Time: 0:00:00.325600  Name: /Volumes/BigData/TUPAC/filter_png/TUPAC-TR-021-002-rgb-not-green.png
+Save Thumbnail       | Time: 0:00:00.018255  Name: /Volumes/BigData/TUPAC/filter_thumbnail_jpg/TUPAC-TR-021-002-rgb-not-green.jpg
+Filter Grays         | Time: 0:00:00.078234  Type: bool    Shape: (1496, 1576)
+Mask RGB             | Time: 0:00:00.009263  Type: uint8   Shape: (1496, 1576, 3)
+Save Image           | Time: 0:00:00.316081  Name: /Volumes/BigData/TUPAC/filter_png/TUPAC-TR-021-003-rgb-not-gray.png
+Save Thumbnail       | Time: 0:00:00.017545  Name: /Volumes/BigData/TUPAC/filter_thumbnail_jpg/TUPAC-TR-021-003-rgb-not-gray.jpg
+Filter Red Pen       | Time: 0:00:00.062633  Type: bool    Shape: (1496, 1576)
+Mask RGB             | Time: 0:00:00.009025  Type: uint8   Shape: (1496, 1576, 3)
+Save Image           | Time: 0:00:00.618641  Name: /Volumes/BigData/TUPAC/filter_png/TUPAC-TR-021-004-rgb-no-red-pen.png
+Save Thumbnail       | Time: 0:00:00.016450  Name: /Volumes/BigData/TUPAC/filter_thumbnail_jpg/TUPAC-TR-021-004-rgb-no-red-pen.jpg
+Filter Green Pen     | Time: 0:00:00.093654  Type: bool    Shape: (1496, 1576)
+Mask RGB             | Time: 0:00:00.008186  Type: uint8   Shape: (1496, 1576, 3)
+Save Image           | Time: 0:00:00.615919  Name: /Volumes/BigData/TUPAC/filter_png/TUPAC-TR-021-005-rgb-no-green-pen.png
+Save Thumbnail       | Time: 0:00:00.016976  Name: /Volumes/BigData/TUPAC/filter_thumbnail_jpg/TUPAC-TR-021-005-rgb-no-green-pen.jpg
+Filter Blue Pen      | Time: 0:00:00.069574  Type: bool    Shape: (1496, 1576)
+Mask RGB             | Time: 0:00:00.008654  Type: uint8   Shape: (1496, 1576, 3)
+Save Image           | Time: 0:00:00.620468  Name: /Volumes/BigData/TUPAC/filter_png/TUPAC-TR-021-006-rgb-no-blue-pen.png
+Save Thumbnail       | Time: 0:00:00.018341  Name: /Volumes/BigData/TUPAC/filter_thumbnail_jpg/TUPAC-TR-021-006-rgb-no-blue-pen.jpg
+Mask RGB             | Time: 0:00:00.009056  Type: uint8   Shape: (1496, 1576, 3)
+Save Image           | Time: 0:00:00.308774  Name: /Volumes/BigData/TUPAC/filter_png/TUPAC-TR-021-007-rgb-no-gray-no-green-no-pens.png
+Save Thumbnail       | Time: 0:00:00.019130  Name: /Volumes/BigData/TUPAC/filter_thumbnail_jpg/TUPAC-TR-021-007-rgb-no-gray-no-green-no-pens.jpg
+Mask percentage 97.40% >= overmask threshold 95.00% for Remove Small Objs size 500, so try 250
+Mask percentage 96.83% >= overmask threshold 95.00% for Remove Small Objs size 250, so try 125
+Mask percentage 95.87% >= overmask threshold 95.00% for Remove Small Objs size 125, so try 62
+Remove Small Objs    | Time: 0:00:00.034327  Type: bool    Shape: (1496, 1576)
+Remove Small Objs    | Time: 0:00:00.068586  Type: bool    Shape: (1496, 1576)
+Remove Small Objs    | Time: 0:00:00.104876  Type: bool    Shape: (1496, 1576)
+Remove Small Objs    | Time: 0:00:00.140102  Type: bool    Shape: (1496, 1576)
+Mask RGB             | Time: 0:00:00.007216  Type: uint8   Shape: (1496, 1576, 3)
+Save Image           | Time: 0:00:00.245963  Name: /Volumes/BigData/TUPAC/filter_png/TUPAC-TR-021-008-rgb-not-green-not-gray-no-pens-remove-small.png
+Save Thumbnail       | Time: 0:00:00.016763  Name: /Volumes/BigData/TUPAC/filter_thumbnail_jpg/TUPAC-TR-021-008-rgb-not-green-not-gray-no-pens-remove-small.jpg
+Save Image           | Time: 0:00:00.248853  Name: /Volumes/BigData/TUPAC/filter_png/TUPAC-TR-021-32x-50432x47872-1576x1496-filtered.png
+Save Thumbnail       | Time: 0:00:00.019088  Name: /Volumes/BigData/TUPAC/filter_thumbnail_jpg/TUPAC-TR-021-32x-50432x47872-1576x1496-filtered.jpg
+Slide #021 processing time: 0:00:04.787326
+
 ```
 
