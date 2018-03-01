@@ -1741,15 +1741,15 @@ mask and this mask applied to the original image, masking out the green and blue
 ```
 img_path = slide.get_training_image_path(74)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-display_img(rgb, "Original")
-no_green_pen = filter_green_pen(rgb)
-display_img(no_green_pen, "No Green Pen")
-no_blue_pen = filter_blue_pen(rgb)
-display_img(no_blue_pen, "No Blue Pen")
+rgb = util.pil_to_np_rgb(img)
+util.display_img(rgb, "Original")
+no_green_pen = filter.filter_green_pen(rgb)
+util.display_img(no_green_pen, "No Green Pen")
+no_blue_pen = filter.filter_blue_pen(rgb)
+util.display_img(no_blue_pen, "No Blue Pen")
 no_gp_bp = no_green_pen & no_blue_pen
-display_img(no_gp_bp, "No Green Pen, No Blue Pen")
-display_img(mask_rgb(rgb, no_gp_bp), "Original with No Green Pen, No Blue Pen")
+util.display_img(no_gp_bp, "No Green Pen, No Blue Pen")
+util.display_img(util.mask_rgb(rgb, no_gp_bp), "Original with No Green Pen, No Blue Pen")
 ```
 
 | **Original Slide** |
@@ -1768,16 +1768,16 @@ display_img(mask_rgb(rgb, no_gp_bp), "Original with No Green Pen, No Blue Pen")
 Console Output:
 
 ```
-RGB                  | Time: 0:00:00.174402  Type: uint8   Shape: (1513, 2048, 3)
-Filter Green Pen     | Time: 0:00:00.199907  Type: bool    Shape: (1513, 2048)
-Filter Blue Pen      | Time: 0:00:00.100322  Type: bool    Shape: (1513, 2048)
-Mask RGB             | Time: 0:00:00.011881  Type: uint8   Shape: (1513, 2048, 3)
+RGB                  | Time: 0:00:00.525283  Type: uint8   Shape: (2592, 3509, 3)
+Filter Green Pen     | Time: 0:00:00.562343  Type: bool    Shape: (2592, 3509)
+Filter Blue Pen      | Time: 0:00:00.414910  Type: bool    Shape: (2592, 3509)
+Mask RGB             | Time: 0:00:00.054763  Type: uint8   Shape: (2592, 3509, 3)
 ```
 
 
 ---
 
-Let's try another combination of filters that should give us a fairly good tissue extraction for this slide,
+Let's try another combination of filters that should give us a fairly good tissue segmentation for this slide,
 where the slide background and blue and green pen marks are removed. We can do this for this slide by ANDing
 together the "No Grays" filter, the "Green Channel" filter, the "No Green Pen" filter, and the "No Blue Pen" filter.
 In addition, we can use our "Remove Small Objects" filter to remove small islands from the mask. We display the
