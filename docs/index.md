@@ -1777,7 +1777,7 @@ Mask RGB             | Time: 0:00:00.054763  Type: uint8   Shape: (2592, 3509, 3
 
 ---
 
-Let's try another combination of filters that should give us a fairly good tissue segmentation for this slide,
+Let's try another combination of filters that should give us fairly good tissue segmentation for this slide,
 where the slide background and blue and green pen marks are removed. We can do this for this slide by ANDing
 together the "No Grays" filter, the "Green Channel" filter, the "No Green Pen" filter, and the "No Blue Pen" filter.
 In addition, we can use our "Remove Small Objects" filter to remove small islands from the mask. We display the
@@ -1787,14 +1787,13 @@ slide are passed through and which parts are masked out.
 ```
 img_path = slide.get_training_image_path(74)
 img = slide.open_image(img_path)
-rgb = pil_to_np_rgb(img)
-display_img(rgb, "Original")
-mask = filter_grays(rgb) & filter_green_channel(rgb) & filter_green_pen(rgb) & filter_blue_pen(rgb)
-mask = filter_remove_small_objects(mask, min_size=100, output_type="bool")
-display_img(mask, "No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects")
-display_img(mask_rgb(rgb, mask),
-                     "Original with No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects")
-display_img(mask_rgb(rgb, ~mask), "Original with Inverse Mask")
+rgb = util.pil_to_np_rgb(img)
+util.display_img(rgb, "Original")
+mask = filter.filter_grays(rgb) & filter.filter_green_channel(rgb) & filter.filter_green_pen(rgb) & filter.filter_blue_pen(rgb)
+mask = filter.filter_remove_small_objects(mask, min_size=100, output_type="bool")
+util.display_img(mask, "No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects")
+util.display_img(util.mask_rgb(rgb, mask), "Original with No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects")
+util.display_img(util.mask_rgb(rgb, ~mask), "Original with Inverse Mask")
 ```
 
 | **Original Slide** | **No Grays, Green Channel, No Green Pen, No Blue Pen, No Small Objects** |
@@ -1812,14 +1811,14 @@ We see that this combination does a good job at allowing us to filter the most r
 Console Output:
 
 ```
-RGB                  | Time: 0:00:00.167955  Type: uint8   Shape: (1513, 2048, 3)
-Filter Grays         | Time: 0:00:00.109165  Type: bool    Shape: (1513, 2048)
-Filter Green Channel | Time: 0:00:00.044170  Type: bool    Shape: (1513, 2048)
-Filter Green Pen     | Time: 0:00:00.194573  Type: bool    Shape: (1513, 2048)
-Filter Blue Pen      | Time: 0:00:00.118921  Type: bool    Shape: (1513, 2048)
-Remove Small Objs    | Time: 0:00:00.042549  Type: bool    Shape: (1513, 2048)
-Mask RGB             | Time: 0:00:00.011598  Type: uint8   Shape: (1513, 2048, 3)
-Mask RGB             | Time: 0:00:00.007193  Type: uint8   Shape: (1513, 2048, 3)
+RGB                  | Time: 0:00:00.496920  Type: uint8   Shape: (2592, 3509, 3)
+Filter Grays         | Time: 0:00:00.361576  Type: bool    Shape: (2592, 3509)
+Filter Green Channel | Time: 0:00:00.020190  Type: bool    Shape: (2592, 3509)
+Filter Green Pen     | Time: 0:00:00.488955  Type: bool    Shape: (2592, 3509)
+Filter Blue Pen      | Time: 0:00:00.369501  Type: bool    Shape: (2592, 3509)
+Remove Small Objs    | Time: 0:00:00.178179  Type: bool    Shape: (2592, 3509)
+Mask RGB             | Time: 0:00:00.047400  Type: uint8   Shape: (2592, 3509, 3)
+Mask RGB             | Time: 0:00:00.048710  Type: uint8   Shape: (2592, 3509, 3)
 ```
 
 
