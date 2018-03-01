@@ -37,8 +37,8 @@ from wsi import filter
 from wsi import slide
 from wsi.util import Time
 
-TISSUE_THRESHOLD_PERCENT = 80
-TISSUE_LOW_THRESHOLD_PERCENT = 10
+TISSUE_HIGH_THRESH = 80
+TISSUE_LOW_THRESH = 10
 
 ROW_TILE_SIZE = 1024
 COL_TILE_SIZE = 1024
@@ -340,11 +340,11 @@ def tile_border_color(tissue_percentage):
   Returns:
     The tile border color corresponding to the tile tissue percentage.
   """
-  if tissue_percentage >= TISSUE_THRESHOLD_PERCENT:
+  if tissue_percentage >= TISSUE_HIGH_THRESH:
     border_color = THRESH_COLOR
-  elif (tissue_percentage >= TISSUE_LOW_THRESHOLD_PERCENT) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
+  elif (tissue_percentage >= TISSUE_LOW_THRESH) and (tissue_percentage < TISSUE_HIGH_THRESH):
     border_color = BELOW_THRESH_COLOR
-  elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESHOLD_PERCENT):
+  elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESH):
     border_color = BELOW_LOWER_THRESH_COLOR
   else:
     border_color = NO_TISSUE_COLOR
@@ -361,11 +361,11 @@ def faded_tile_border_color(tissue_percentage):
   Returns:
     The faded tile border color corresponding to the tile tissue percentage.
   """
-  if tissue_percentage >= TISSUE_THRESHOLD_PERCENT:
+  if tissue_percentage >= TISSUE_HIGH_THRESH:
     border_color = FADED_THRESH_COLOR
-  elif (tissue_percentage >= TISSUE_LOW_THRESHOLD_PERCENT) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
+  elif (tissue_percentage >= TISSUE_LOW_THRESH) and (tissue_percentage < TISSUE_HIGH_THRESH):
     border_color = FADED_BELOW_THRESH_COLOR
-  elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESHOLD_PERCENT):
+  elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESH):
     border_color = FADED_BELOW_LOWER_THRESH_COLOR
   else:
     border_color = FADED_NO_TISSUE_COLOR
@@ -404,12 +404,12 @@ def summary_stats(tile_summary):
            tile_summary.mask_percentage(), tile_summary.tissue_percentage) + \
          "Tiles: %dx%d = %d\n" % (tile_summary.num_col_tiles, tile_summary.num_row_tiles, tile_summary.count) + \
          " %5d (%5.2f%%) tiles >=%d%% tissue\n" % (
-           tile_summary.high, tile_summary.high / tile_summary.count * 100, TISSUE_THRESHOLD_PERCENT) + \
+           tile_summary.high, tile_summary.high / tile_summary.count * 100, TISSUE_HIGH_THRESH) + \
          " %5d (%5.2f%%) tiles >=%d%% and <%d%% tissue\n" % (
-           tile_summary.medium, tile_summary.medium / tile_summary.count * 100, TISSUE_LOW_THRESHOLD_PERCENT,
-           TISSUE_THRESHOLD_PERCENT) + \
+           tile_summary.medium, tile_summary.medium / tile_summary.count * 100, TISSUE_LOW_THRESH,
+           TISSUE_HIGH_THRESH) + \
          " %5d (%5.2f%%) tiles >0%% and <%d%% tissue\n" % (
-           tile_summary.low, tile_summary.low / tile_summary.count * 100, TISSUE_LOW_THRESHOLD_PERCENT) + \
+           tile_summary.low, tile_summary.low / tile_summary.count * 100, TISSUE_LOW_THRESH) + \
          " %5d (%5.2f%%) tiles =0%% tissue" % (tile_summary.none, tile_summary.none / tile_summary.count * 100)
 
 
@@ -772,11 +772,11 @@ def tissue_quantity(tissue_percentage):
   Returns:
     TissueQuantity enum member (HIGH, MEDIUM, LOW, or NONE).
   """
-  if tissue_percentage >= TISSUE_THRESHOLD_PERCENT:
+  if tissue_percentage >= TISSUE_HIGH_THRESH:
     return TissueQuantity.HIGH
-  elif (tissue_percentage >= TISSUE_LOW_THRESHOLD_PERCENT) and (tissue_percentage < TISSUE_THRESHOLD_PERCENT):
+  elif (tissue_percentage >= TISSUE_LOW_THRESH) and (tissue_percentage < TISSUE_HIGH_THRESH):
     return TissueQuantity.MEDIUM
-  elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESHOLD_PERCENT):
+  elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESH):
     return TissueQuantity.LOW
   else:
     return TissueQuantity.NONE
@@ -1685,7 +1685,7 @@ def hsv_purple_vs_pink_average_factor(rgb, tissue_percentage):
 
   factor = 1
   # only applies to slides with a high quantity of tissue
-  if tissue_percentage < TISSUE_THRESHOLD_PERCENT:
+  if tissue_percentage < TISSUE_HIGH_THRESH:
     return factor
 
   hues = rgb_to_hues(rgb)
