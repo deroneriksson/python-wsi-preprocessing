@@ -1984,37 +1984,33 @@ As an example, let's use a single process to apply our filters to images 1, 2, a
 the following:
 
 ```
-singleprocess_apply_filters_to_images(image_num_list=[1, 2, 3])
+filter.singleprocess_apply_filters_to_images(image_num_list=[1, 2, 3])
 ```
 
 In addition to saving the filtered images to the file system, this creates a `filters.html` file that displays all the
-filtered slide images. This file performs lazy image loading since so many images can potentially be loaded.
+filtered slide images.
 If we open the `filters.html` file in a browser, we can see 8 images displayed for each slide. Each separate slide
-is displayed as a separate row. Here, we see slides #1 and #2 displayed in a browser.
+is displayed as a separate row. Here, we see the filter results for slides #1, #2, and #3 displayed in a browser.
 
-| **Filters 001 through 004** | **Fitlers 005 through 008** |
-| -------------------- | --------------------------------- |
-| ![Filters 001 through 004](images/filters-001-004.png "Filters 001 through 004") | ![Fitlers 005 through 008](images/filters-005-008.png "Fitlers 005 through 008") |
+| **Filters 001 through 008 for Slides 1, 2, 3** |
+| -------------------- |
+| ![Filters 001 through 008 for Slides 1, 2, 3](images/filters-001-008.png "Filters 001 through 008 for Slides 1, 2, 3") |
 
 
 To apply all filters to all images in the training set using multiprocessing, we can utilize the
 `multiprocess_apply_filters_to_images()` function. Since there are 8 images per slide and 500 slides,
-this results in a total of 4000 images. Generating PNG images, this takes about 16 minutes on my Mac laptop.
-This can be sped up significantly if JPEG images are used as the format.
+this results in a total of 4000 images. Generating png images, this takes about 16 minutes on my Mac laptop.
 
 ```
-multiprocess_apply_filters_to_images()
+filter.multiprocess_apply_filters_to_images()
 ```
 
-If we display the `filters.html` file in a browser, we see that all filter results for all images are displayed.
+If we display the `filters.html` file in a browser, we see that the filter results for the first 50 slides are
+displayed. By default, results are paginated at 50 slides per page. Pagination can be turned on and off using the
+`FILTER_PAGINATE` constant. The pagination size can be adjusted using the `FILTER_PAGINATION_SIZE` constant.
 
-| **All Slides and Filter Results** |
-| -------------------- |
-| ![All Slides and Filter Results](images/slides-and-filters-browser.png "All Slides and Filter Results") |
-
-
-Using this page, one useful action we can take is to manually group similar slides into categories. For example,
-we could group slides into slides that have red, green, and blue pen marks on them. 
+One useful action we can take is to group similar slides into categories. For example,
+we could group slides into sets that have red, green, and blue pen marks on them.
 
 ```
 red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289, 336, 349, 357, 380, 450, 482]
@@ -2022,8 +2018,7 @@ green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
 blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
 ```
 
-If we would like to increase the effectiveness of red pen filters, we could make tweaks to our
-`apply_filters_to_image()` function and run these changes on the set of red pen slides:
+We could run our filters on the list of slides in the following manner:
 
 ```
 multiprocess_apply_filters_to_images(image_num_list=red_pen_slides)
