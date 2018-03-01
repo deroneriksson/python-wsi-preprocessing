@@ -1832,8 +1832,9 @@ parameter is `True`, the filter results will be displayed on the screen. The fun
 the resulting NumPy array image and a dictionary of information that is used elsewhere for generating an HTML page
 to view the various filter results for multiple slides, as we will see later.
 
-The `apply_filters_to_image()` function will create green channel, grays, red pen, green pen, and blue pen masks
-and combine these into a single mask using boolean ANDs. After this, small objects will be removed from the mask.
+The `apply_filters_to_image()` function calls the `apply_image_filters()` function, which creates green channel, grays,
+red pen, green pen, and blue pen masks and combines these into a single mask using boolean ANDs.
+After this, small objects are removed from the mask.
 
 ```
 mask_not_green = filter_green_channel(rgb)
@@ -1852,20 +1853,20 @@ Let's try this function out. In this example, we'll run `apply_filters_to_image(
 to the screen.
 
 ```
-apply_filters_to_image(337, display=True, save=False)
+filter.apply_filters_to_image(337, display=True, save=False)
 ```
 
 Here, we see the original slide #337 and the green channel filter applied to it. Notice that the green channel filter
 with a default threshold of 200 removes most of the white background but only a relatively small fraction of the green
-pen. The green channel filter masks 72.36% of the original slide.
+pen. The green channel filter masks 72.60% of the original slide.
 
 | **Slide 337, F001** | **Slide 337, F002** |
 | -------------------- | --------------------------------- |
 | ![Slide 337, F001](images/337-001.png "Slide 337, F001") | ![Slide 337, F002](images/337-002.png "Slide 337, F002") |
 
 
-Here, we see the results of the grays filter and the red pen filter. For this slide, the grays filter masks 67.66% of
-the slide, which is actually less than the green channel filter. The red pen filter masks only 0.03% of the slide,
+Here, we see the results of the grays filter and the red pen filter. For this slide, the grays filter masks 68.01% of
+the slide, which is actually less than the green channel filter. The red pen filter masks only 0.18% of the slide,
 which makes sense since there are no red pen marks on the slide.
 
 | **Slide 337, F003** | **Slide 337, F004** |
@@ -1873,43 +1874,44 @@ which makes sense since there are no red pen marks on the slide.
 | ![Slide 337, F003](images/337-003.png "Slide 337, F003") | ![Slide 337, F004](images/337-004.png "Slide 337, F004") |
 
 
-The green pen filter masks 3.71% of the slide. Visually, we see that it does a decent job of masking out the green
-pen marks on the slide. The blue pen filter masks 0% of the slide, which is perfect since there are no blue pen marks on
-the slide.
+The green pen filter masks 3.81% of the slide. Visually, we see that it does a decent job of masking out the green
+pen marks on the slide. The blue pen filter masks 0.12% of the slide, which is accurate since there are no blue pen
+marks on the slide.
 
 | **Slide 337, F005** | **Slide 337, F006** |
 | -------------------- | --------------------------------- |
 | ![Slide 337, F005](images/337-005.png "Slide 337, F005") | ![Slide 337, F006](images/337-006.png "Slide 337, F006") |
 
 
-Combining the above filters with a boolean AND results in 74.37% masking. Cleaning up these results by remove small
-objects results in a masking of 75.82%. This potentially gives a good tissue sample that we can use for deep learning.
+Combining the above filters with a boolean AND results in 74.57% masking. Cleaning up these results by remove small
+objects results in a masking of 76.11%. This potentially gives a good tissue segmentation that we can use for deep
+learning.
 
 | **Slide 337, F007** | **Slide 337, F008** |
 | -------------------- | --------------------------------- |
 | ![Slide 337, F007](images/337-007.png "Slide 337, F007") | ![Slide 337, F008](images/337-008.png "Slide 337, F008") |
 
 
-In the console, we see the slide #337 processing time takes ~5.5s in this example. The filtering is only a relatively
-small fraction of this time.
+In the console, we see the slide #337 processing time takes ~12.6s in this example. The filtering is only a relatively
+small fraction of this time. If we set `display` to `False`, processing only takes ~2.3s.
 
 ```
 Processing slide #337
-RGB                  | Time: 0:00:00.214366  Type: uint8   Shape: (1636, 2048, 3)
-Filter Green Channel | Time: 0:00:00.030129  Type: bool    Shape: (1636, 2048)
-Mask RGB             | Time: 0:00:00.013435  Type: uint8   Shape: (1636, 2048, 3)
-Filter Grays         | Time: 0:00:00.100411  Type: bool    Shape: (1636, 2048)
-Mask RGB             | Time: 0:00:00.012338  Type: uint8   Shape: (1636, 2048, 3)
-Filter Red Pen       | Time: 0:00:00.082352  Type: bool    Shape: (1636, 2048)
-Mask RGB             | Time: 0:00:00.012389  Type: uint8   Shape: (1636, 2048, 3)
-Filter Green Pen     | Time: 0:00:00.158260  Type: bool    Shape: (1636, 2048)
-Mask RGB             | Time: 0:00:00.012019  Type: uint8   Shape: (1636, 2048, 3)
-Filter Blue Pen      | Time: 0:00:00.106823  Type: bool    Shape: (1636, 2048)
-Mask RGB             | Time: 0:00:00.011877  Type: uint8   Shape: (1636, 2048, 3)
-Mask RGB             | Time: 0:00:00.015465  Type: uint8   Shape: (1636, 2048, 3)
-Remove Small Objs    | Time: 0:00:00.066158  Type: bool    Shape: (1636, 2048)
-Mask RGB             | Time: 0:00:00.013019  Type: uint8   Shape: (1636, 2048, 3)
-Slide #337 processing time: 0:00:05.485500
+RGB                  | Time: 0:00:00.568235  Type: uint8   Shape: (2515, 3149, 3)
+Filter Green Channel | Time: 0:00:00.017670  Type: bool    Shape: (2515, 3149)
+Mask RGB             | Time: 0:00:00.037547  Type: uint8   Shape: (2515, 3149, 3)
+Filter Grays         | Time: 0:00:00.323861  Type: bool    Shape: (2515, 3149)
+Mask RGB             | Time: 0:00:00.032874  Type: uint8   Shape: (2515, 3149, 3)
+Filter Red Pen       | Time: 0:00:00.253547  Type: bool    Shape: (2515, 3149)
+Mask RGB             | Time: 0:00:00.035073  Type: uint8   Shape: (2515, 3149, 3)
+Filter Green Pen     | Time: 0:00:00.395172  Type: bool    Shape: (2515, 3149)
+Mask RGB             | Time: 0:00:00.032597  Type: uint8   Shape: (2515, 3149, 3)
+Filter Blue Pen      | Time: 0:00:00.314914  Type: bool    Shape: (2515, 3149)
+Mask RGB             | Time: 0:00:00.034853  Type: uint8   Shape: (2515, 3149, 3)
+Mask RGB             | Time: 0:00:00.034556  Type: uint8   Shape: (2515, 3149, 3)
+Remove Small Objs    | Time: 0:00:00.160241  Type: bool    Shape: (2515, 3149)
+Mask RGB             | Time: 0:00:00.030854  Type: uint8   Shape: (2515, 3149, 3)
+Slide #337 processing time: 0:00:12.576835
 ```
 
 Since `apply_filters_to_image()` returns the resulting image as a NumPy array, we can perform further processing on
@@ -1921,17 +1923,16 @@ We'll compare the results by cropping two regions of the slide before and after 
 displaying all four of these regions together.
 
 ```
-rgb, _ = apply_filters_to_image(337, display=False, save=False)
+rgb, _ = filter.apply_filters_to_image(337, display=False, save=False)
 
-not_greenish = filter_green(rgb, red_upper_thresh=125, green_lower_thresh=30, blue_lower_thresh=30,
-                            display_np_info=True)
-not_grayish = filter_grays(rgb, tolerance=30)
-rgb_new = mask_rgb(rgb, not_greenish & not_grayish)
+not_greenish = filter.filter_green(rgb, red_upper_thresh=125, green_lower_thresh=30, blue_lower_thresh=30, display_np_info=True)
+not_grayish = filter.filter_grays(rgb, tolerance=30)
+rgb_new = util.mask_rgb(rgb, not_greenish & not_grayish)
 
-row1 = np.concatenate((rgb[800:1200, 100:500], rgb[750:1150, 1350:1750]), axis=1)
-row2 = np.concatenate((rgb_new[800:1200, 100:500], rgb_new[750:1150, 1350:1750]), axis=1)
+row1 = np.concatenate((rgb[1200:1800, 150:750], rgb[1150:1750, 2050:2650]), axis=1)
+row2 = np.concatenate((rgb_new[1200:1800, 150:750], rgb_new[1150:1750, 2050:2650]), axis=1)
 result = np.concatenate((row1, row2), axis=0)
-display_img(result)
+util.display_img(result)
 ```
 
 After the additional processing, we see that the pen marks in the displayed regions have been significantly reduced.
