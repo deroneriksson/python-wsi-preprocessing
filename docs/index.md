@@ -2010,7 +2010,7 @@ displayed. By default, results are paginated at 50 slides per page. Pagination c
 `FILTER_PAGINATE` constant. The pagination size can be adjusted using the `FILTER_PAGINATION_SIZE` constant.
 
 One useful action we can take is to group similar slides into categories. For example,
-we could group slides into sets that have red, green, and blue pen marks on them.
+we can group slides into sets that have red, green, and blue pen marks on them.
 
 ```
 red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289, 336, 349, 357, 380, 450, 482]
@@ -2018,10 +2018,10 @@ green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
 blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
 ```
 
-We could run our filters on the list of slides in the following manner:
+We can run our filters on the list of red pen slides in the following manner:
 
 ```
-multiprocess_apply_filters_to_images(image_num_list=red_pen_slides)
+filter.multiprocess_apply_filters_to_images(image_num_list=red_pen_slides)
 ```
 
 In this way, we can make tweaks to specific filters or combinations of specific filters and see how these changes apply
