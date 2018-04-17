@@ -34,8 +34,8 @@ import sys
 from wsi import util
 from wsi.util import Time
 
-# BASE_DIR = ".." + os.sep + "data"
-BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
+BASE_DIR = ".." + os.sep + "data"
+#BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
 TRAIN_PREFIX = "TUPAC-TR-"
 SRC_TRAIN_DIR = BASE_DIR + os.sep + "training_slides"
 SRC_TRAIN_EXT = "svs"
@@ -706,6 +706,16 @@ def slide_to_scaled_np_image(slide_number):
   return np_img, large_w, large_h, new_w, new_h
 
 
+def show_slide(slide_number):
+  """
+  Display a WSI slide on the screen, where the slide has been scaled down and converted to a PIL image.
+
+  Args:
+    slide_number: The slide number.
+  """
+  pil_img = slide_to_scaled_pil_image(slide_number)[0]
+  pil_img.show()
+
 def save_thumbnail(pil_img, size, path, display_path=False):
   """
   Save a thumbnail of a PIL image, specifying the maximum width or height of the thumbnail.
@@ -1002,9 +1012,8 @@ def slide_info(display_all_properties=False):
   t.elapsed_display()
 
 
-# if __name__ == "__main__":
-  # np_img = open_image_np("Deron.jpg")
-  # util.np_to_pil(np_img).show()
+if __name__ == "__main__":
+  show_slide(2)
   # training_slide_to_image(2)
   # slide_info(display_all_properties=True)
   # slide_stats()

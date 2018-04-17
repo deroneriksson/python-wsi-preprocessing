@@ -824,7 +824,7 @@ def image_range_to_tiles(start_ind, end_ind, display=False, save=True, save_data
 def singleprocess_filtered_images_to_tiles(display=False, save=True, save_data=True, save_top_tiles=True, html=True,
                                            image_num_list=None):
   """
-  Generate tile summaries and tiles for all training images using a single process.
+  Generate tile summaries and tiles for training images using a single process.
 
   Args:
     display: If True, display tile summary images to screen.
