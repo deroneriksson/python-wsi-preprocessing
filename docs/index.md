@@ -388,10 +388,10 @@ RGB                  | Time: 0:00:00.162484  Type: uint8   Shape: (1385, 1810, 3
 ```
 
 We see that the PIL-to-NumPy array conversion took 0.16s. The type of the NumPy array is `uint8`, which means
-that each pixel is represented by a red, green, and blue value from 0 to 255. The image has a height of 1385 pixels
-and a width of 1810 pixels.
+that each pixel is represented by a red, green, and blue unsigned integer value from 0 to 255. The image has a height of
+1385 pixels, a width of 1810 pixels, and three channels (representing red, green, and blue).
 
-We can obtain additional information about NumPy arrays by setting the `ADDITIONAL_NP_STATS` constant to `True`.
+We can obtain additional information about NumPy arrays by setting the `util.ADDITIONAL_NP_STATS` constant to `True`.
 If we rerun the above code with `ADDITIONAL_NP_STATS = True`, we see the following:
 
 ```
@@ -785,8 +785,8 @@ including:
 
 1. Filters need to be general enough to work across all slides in the dataset.
 2. Filters should handle issues such as variations in shadows and lighting.
-3. Amount of H&E (purple and pink) staining can vary greatly from slide to slide.
-4. Pen marks colors (red, green, and blue) vary due to issues such as lighting and pen marks over tissue.
+3. The amount of H&E (purple and pink) staining can vary greatly from slide to slide.
+4. Pen mark colors (red, green, and blue) vary due to issues such as lighting and pen marks over tissue.
 5. There can be color overlap between stained tissue and pen marks, so we need to balance how aggressively stain
 colors are inclusively filtered and how pen colors are exclusively filtered.
 
