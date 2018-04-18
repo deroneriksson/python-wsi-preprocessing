@@ -1282,7 +1282,7 @@ def generate_filter_html_result(html_page_info):
 
     html += "  </table>\n"
     html += html_footer()
-    text_file = open(slide.FILTER_HTML_DIR + os.sep + "filters.html", "w")
+    text_file = open(os.path.join(slide.FILTER_HTML_DIR, "filters.html"), "w")
     text_file.write(html)
     text_file.close()
   else:
@@ -1330,9 +1330,9 @@ def generate_filter_html_result(html_page_info):
 
       html += html_footer()
       if page_num == 1:
-        text_file = open(slide.FILTER_HTML_DIR + os.sep + "filters.html", "w")
+        text_file = open(os.path.join(slide.FILTER_HTML_DIR, "filters.html"), "w")
       else:
-        text_file = open(slide.FILTER_HTML_DIR + os.sep + "filters-%d.html" % page_num, "w")
+        text_file = open(os.path.join(slide.FILTER_HTML_DIR, "filters-%d.html" % page_num), "w")
       text_file.write(html)
       text_file.close()
 

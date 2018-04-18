@@ -34,50 +34,51 @@ import sys
 from wsi import util
 from wsi.util import Time
 
-BASE_DIR = ".." + os.sep + "data"
-#BASE_DIR = os.sep + "Volumes" + os.sep + "BigData" + os.sep + "TUPAC"
+BASE_DIR = os.path.join("..", "data")
+# BASE_DIR = os.path.join(os.sep, "Volumes", "BigData", "TUPAC")
 TRAIN_PREFIX = "TUPAC-TR-"
-SRC_TRAIN_DIR = BASE_DIR + os.sep + "training_slides"
+SRC_TRAIN_DIR = os.path.join(BASE_DIR, "training_slides")
 SRC_TRAIN_EXT = "svs"
 DEST_TRAIN_SUFFIX = ""  # Example: "train-"
 DEST_TRAIN_EXT = "png"
 SCALE_FACTOR = 32
-DEST_TRAIN_DIR = BASE_DIR + os.sep + "training_" + DEST_TRAIN_EXT
+DEST_TRAIN_DIR = os.path.join(BASE_DIR, "training_" + DEST_TRAIN_EXT)
 THUMBNAIL_SIZE = 300
 THUMBNAIL_EXT = "jpg"
 
-DEST_TRAIN_THUMBNAIL_DIR = BASE_DIR + os.sep + "training_thumbnail_" + THUMBNAIL_EXT
+DEST_TRAIN_THUMBNAIL_DIR = os.path.join(BASE_DIR, "training_thumbnail_" + THUMBNAIL_EXT)
 
 FILTER_SUFFIX = ""  # Example: "filter-"
 FILTER_RESULT_TEXT = "filtered"
-FILTER_DIR = BASE_DIR + os.sep + "filter_" + DEST_TRAIN_EXT
-FILTER_THUMBNAIL_DIR = BASE_DIR + os.sep + "filter_thumbnail_" + THUMBNAIL_EXT
+FILTER_DIR = os.path.join(BASE_DIR, "filter_" + DEST_TRAIN_EXT)
+FILTER_THUMBNAIL_DIR = os.path.join(BASE_DIR, "filter_thumbnail_" + THUMBNAIL_EXT)
 FILTER_PAGINATION_SIZE = 50
 FILTER_PAGINATE = True
 FILTER_HTML_DIR = BASE_DIR
 
-TILE_SUMMARY_DIR = BASE_DIR + os.sep + "tile_summary_" + DEST_TRAIN_EXT
-TILE_SUMMARY_ON_ORIGINAL_DIR = BASE_DIR + os.sep + "tile_summary_on_original_" + DEST_TRAIN_EXT
+TILE_SUMMARY_DIR = os.path.join(BASE_DIR, "tile_summary_" + DEST_TRAIN_EXT)
+TILE_SUMMARY_ON_ORIGINAL_DIR = os.path.join(BASE_DIR, "tile_summary_on_original_" + DEST_TRAIN_EXT)
 TILE_SUMMARY_SUFFIX = "tile_summary"
-TILE_SUMMARY_THUMBNAIL_DIR = BASE_DIR + os.sep + "tile_summary_thumbnail_" + THUMBNAIL_EXT
-TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR = BASE_DIR + os.sep + "tile_summary_on_original_thumbnail_" + THUMBNAIL_EXT
+TILE_SUMMARY_THUMBNAIL_DIR = os.path.join(BASE_DIR, "tile_summary_thumbnail_" + THUMBNAIL_EXT)
+TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR = os.path.join(BASE_DIR, "tile_summary_on_original_thumbnail_" + THUMBNAIL_EXT)
 TILE_SUMMARY_PAGINATION_SIZE = 50
 TILE_SUMMARY_PAGINATE = True
 TILE_SUMMARY_HTML_DIR = BASE_DIR
 
-TILE_DATA_DIR = BASE_DIR + os.sep + "tile_data"
+TILE_DATA_DIR = os.path.join(BASE_DIR, "tile_data")
 TILE_DATA_SUFFIX = "tile_data"
 
 TOP_TILES_SUFFIX = "top_tile_summary"
-TOP_TILES_DIR = BASE_DIR + os.sep + TOP_TILES_SUFFIX + "_" + DEST_TRAIN_EXT
-TOP_TILES_THUMBNAIL_DIR = BASE_DIR + os.sep + TOP_TILES_SUFFIX + "_thumbnail_" + THUMBNAIL_EXT
-TOP_TILES_ON_ORIGINAL_DIR = BASE_DIR + os.sep + TOP_TILES_SUFFIX + "_on_original_" + DEST_TRAIN_EXT
-TOP_TILES_ON_ORIGINAL_THUMBNAIL_DIR = BASE_DIR + os.sep + TOP_TILES_SUFFIX + "_on_original_thumbnail_" + THUMBNAIL_EXT
+TOP_TILES_DIR = os.path.join(BASE_DIR, TOP_TILES_SUFFIX + "_" + DEST_TRAIN_EXT)
+TOP_TILES_THUMBNAIL_DIR = os.path.join(BASE_DIR, TOP_TILES_SUFFIX + "_thumbnail_" + THUMBNAIL_EXT)
+TOP_TILES_ON_ORIGINAL_DIR = os.path.join(BASE_DIR, TOP_TILES_SUFFIX + "_on_original_" + DEST_TRAIN_EXT)
+TOP_TILES_ON_ORIGINAL_THUMBNAIL_DIR = os.path.join(BASE_DIR,
+                                                   TOP_TILES_SUFFIX + "_on_original_thumbnail_" + THUMBNAIL_EXT)
 
-TILE_DIR = BASE_DIR + os.sep + "tiles_" + DEST_TRAIN_EXT
+TILE_DIR = os.path.join(BASE_DIR, "tiles_" + DEST_TRAIN_EXT)
 TILE_SUFFIX = "tile"
 
-STATS_DIR = BASE_DIR + os.sep + "svs_stats"
+STATS_DIR = os.path.join(BASE_DIR, "svs_stats")
 
 
 def open_slide(filename):
@@ -142,7 +143,7 @@ def get_training_slide_path(slide_number):
     Path to the WSI training slide file.
   """
   padded_sl_num = str(slide_number).zfill(3)
-  slide_filepath = SRC_TRAIN_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "." + SRC_TRAIN_EXT
+  slide_filepath = os.path.join(SRC_TRAIN_DIR, TRAIN_PREFIX + padded_sl_num + "." + SRC_TRAIN_EXT)
   return slide_filepath
 
 
@@ -159,8 +160,9 @@ def get_tile_image_path(tile):
   """
   t = tile
   padded_sl_num = str(t.slide_num).zfill(3)
-  tile_path = TILE_DIR + os.sep + padded_sl_num + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + TILE_SUFFIX + "-r%d-c%d-x%d-y%d-w%d-h%d" % (
-    t.r, t.c, t.o_c_s, t.o_r_s, t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s) + "." + DEST_TRAIN_EXT
+  tile_path = os.path.join(TILE_DIR, padded_sl_num,
+                           TRAIN_PREFIX + padded_sl_num + "-" + TILE_SUFFIX + "-r%d-c%d-x%d-y%d-w%d-h%d" % (
+                             t.r, t.c, t.o_c_s, t.o_r_s, t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s) + "." + DEST_TRAIN_EXT)
   return tile_path
 
 
@@ -177,8 +179,9 @@ def get_tile_image_path_by_slide_row_col(slide_number, row, col):
     Path to image tile.
   """
   padded_sl_num = str(slide_number).zfill(3)
-  wilcard_path = TILE_DIR + os.sep + padded_sl_num + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + TILE_SUFFIX + "-r%d-c%d-*." % (
-    row, col) + DEST_TRAIN_EXT
+  wilcard_path = os.path.join(TILE_DIR, padded_sl_num,
+                              TRAIN_PREFIX + padded_sl_num + "-" + TILE_SUFFIX + "-r%d-c%d-*." % (
+                                row, col) + DEST_TRAIN_EXT)
   img_path = glob.glob(wilcard_path)[0]
   return img_path
 
@@ -203,12 +206,12 @@ def get_training_image_path(slide_number, large_w=None, large_h=None, small_w=No
   """
   padded_sl_num = str(slide_number).zfill(3)
   if large_w is None and large_h is None and small_w is None and small_h is None:
-    wildcard_path = DEST_TRAIN_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "*." + DEST_TRAIN_EXT
+    wildcard_path = os.path.join(DEST_TRAIN_DIR, TRAIN_PREFIX + padded_sl_num + "*." + DEST_TRAIN_EXT)
     img_path = glob.glob(wildcard_path)[0]
   else:
-    img_path = DEST_TRAIN_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
+    img_path = os.path.join(DEST_TRAIN_DIR, TRAIN_PREFIX + padded_sl_num + "-" + str(
       SCALE_FACTOR) + "x-" + DEST_TRAIN_SUFFIX + str(
-      large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(small_h) + "." + DEST_TRAIN_EXT
+      large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(small_h) + "." + DEST_TRAIN_EXT)
   return img_path
 
 
@@ -232,12 +235,12 @@ def get_training_thumbnail_path(slide_number, large_w=None, large_h=None, small_
   """
   padded_sl_num = str(slide_number).zfill(3)
   if large_w is None and large_h is None and small_w is None and small_h is None:
-    wilcard_path = DEST_TRAIN_THUMBNAIL_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "*." + THUMBNAIL_EXT
+    wilcard_path = os.path.join(DEST_TRAIN_THUMBNAIL_DIR, TRAIN_PREFIX + padded_sl_num + "*." + THUMBNAIL_EXT)
     img_path = glob.glob(wilcard_path)[0]
   else:
-    img_path = DEST_TRAIN_THUMBNAIL_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
+    img_path = os.path.join(DEST_TRAIN_THUMBNAIL_DIR, TRAIN_PREFIX + padded_sl_num + "-" + str(
       SCALE_FACTOR) + "x-" + DEST_TRAIN_SUFFIX + str(
-      large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(small_h) + "." + THUMBNAIL_EXT
+      large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(small_h) + "." + THUMBNAIL_EXT)
   return img_path
 
 
@@ -259,7 +262,7 @@ def get_filter_image_path(slide_number, filter_number, filter_name_info):
   dir = FILTER_DIR
   if not os.path.exists(dir):
     os.makedirs(dir)
-  img_path = dir + os.sep + get_filter_image_filename(slide_number, filter_number, filter_name_info)
+  img_path = os.path.join(dir, get_filter_image_filename(slide_number, filter_number, filter_name_info))
   return img_path
 
 
@@ -281,7 +284,7 @@ def get_filter_thumbnail_path(slide_number, filter_number, filter_name_info):
   dir = FILTER_THUMBNAIL_DIR
   if not os.path.exists(dir):
     os.makedirs(dir)
-  img_path = dir + os.sep + get_filter_image_filename(slide_number, filter_number, filter_name_info, thumbnail=True)
+  img_path = os.path.join(dir, get_filter_image_filename(slide_number, filter_number, filter_name_info, thumbnail=True))
   return img_path
 
 
@@ -327,7 +330,7 @@ def get_tile_summary_image_path(slide_number):
   """
   if not os.path.exists(TILE_SUMMARY_DIR):
     os.makedirs(TILE_SUMMARY_DIR)
-  img_path = TILE_SUMMARY_DIR + os.sep + get_tile_summary_image_filename(slide_number)
+  img_path = os.path.join(TILE_SUMMARY_DIR, get_tile_summary_image_filename(slide_number))
   return img_path
 
 
@@ -346,7 +349,7 @@ def get_tile_summary_thumbnail_path(slide_number):
   """
   if not os.path.exists(TILE_SUMMARY_THUMBNAIL_DIR):
     os.makedirs(TILE_SUMMARY_THUMBNAIL_DIR)
-  img_path = TILE_SUMMARY_THUMBNAIL_DIR + os.sep + get_tile_summary_image_filename(slide_number, thumbnail=True)
+  img_path = os.path.join(TILE_SUMMARY_THUMBNAIL_DIR, get_tile_summary_image_filename(slide_number, thumbnail=True))
   return img_path
 
 
@@ -365,7 +368,7 @@ def get_tile_summary_on_original_image_path(slide_number):
   """
   if not os.path.exists(TILE_SUMMARY_ON_ORIGINAL_DIR):
     os.makedirs(TILE_SUMMARY_ON_ORIGINAL_DIR)
-  img_path = TILE_SUMMARY_ON_ORIGINAL_DIR + os.sep + get_tile_summary_image_filename(slide_number)
+  img_path = os.path.join(TILE_SUMMARY_ON_ORIGINAL_DIR, get_tile_summary_image_filename(slide_number))
   return img_path
 
 
@@ -384,8 +387,8 @@ def get_tile_summary_on_original_thumbnail_path(slide_number):
   """
   if not os.path.exists(TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR):
     os.makedirs(TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR)
-  img_path = TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR + os.sep + get_tile_summary_image_filename(slide_number,
-                                                                                               thumbnail=True)
+  img_path = os.path.join(TILE_SUMMARY_ON_ORIGINAL_THUMBNAIL_DIR,
+                          get_tile_summary_image_filename(slide_number, thumbnail=True))
   return img_path
 
 
@@ -404,7 +407,7 @@ def get_top_tiles_on_original_image_path(slide_number):
   """
   if not os.path.exists(TOP_TILES_ON_ORIGINAL_DIR):
     os.makedirs(TOP_TILES_ON_ORIGINAL_DIR)
-  img_path = TOP_TILES_ON_ORIGINAL_DIR + os.sep + get_top_tiles_image_filename(slide_number)
+  img_path = os.path.join(TOP_TILES_ON_ORIGINAL_DIR, get_top_tiles_image_filename(slide_number))
   return img_path
 
 
@@ -423,7 +426,8 @@ def get_top_tiles_on_original_thumbnail_path(slide_number):
   """
   if not os.path.exists(TOP_TILES_ON_ORIGINAL_THUMBNAIL_DIR):
     os.makedirs(TOP_TILES_ON_ORIGINAL_THUMBNAIL_DIR)
-  img_path = TOP_TILES_ON_ORIGINAL_THUMBNAIL_DIR + os.sep + get_top_tiles_image_filename(slide_number, thumbnail=True)
+  img_path = os.path.join(TOP_TILES_ON_ORIGINAL_THUMBNAIL_DIR,
+                          get_top_tiles_image_filename(slide_number, thumbnail=True))
   return img_path
 
 
@@ -500,7 +504,7 @@ def get_top_tiles_image_path(slide_number):
   """
   if not os.path.exists(TOP_TILES_DIR):
     os.makedirs(TOP_TILES_DIR)
-  img_path = TOP_TILES_DIR + os.sep + get_top_tiles_image_filename(slide_number)
+  img_path = os.path.join(TOP_TILES_DIR, get_top_tiles_image_filename(slide_number))
   return img_path
 
 
@@ -518,7 +522,7 @@ def get_top_tiles_thumbnail_path(slide_number):
   """
   if not os.path.exists(TOP_TILES_THUMBNAIL_DIR):
     os.makedirs(TOP_TILES_THUMBNAIL_DIR)
-  img_path = TOP_TILES_THUMBNAIL_DIR + os.sep + get_top_tiles_image_filename(slide_number, thumbnail=True)
+  img_path = os.path.join(TOP_TILES_THUMBNAIL_DIR, get_top_tiles_image_filename(slide_number, thumbnail=True))
   return img_path
 
 
@@ -560,7 +564,7 @@ def get_tile_data_path(slide_number):
   """
   if not os.path.exists(TILE_DATA_DIR):
     os.makedirs(TILE_DATA_DIR)
-  file_path = TILE_DATA_DIR + os.sep + get_tile_data_filename(slide_number)
+  file_path = os.path.join(TILE_DATA_DIR, get_tile_data_filename(slide_number))
   return file_path
 
 
@@ -580,9 +584,9 @@ def get_filter_image_result(slide_number):
   padded_sl_num = str(slide_number).zfill(3)
   training_img_path = get_training_image_path(slide_number)
   large_w, large_h, small_w, small_h = parse_dimensions_from_image_filename(training_img_path)
-  img_path = FILTER_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
+  img_path = os.path.join(FILTER_DIR, TRAIN_PREFIX + padded_sl_num + "-" + str(
     SCALE_FACTOR) + "x-" + FILTER_SUFFIX + str(large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(
-    small_h) + "-" + FILTER_RESULT_TEXT + "." + DEST_TRAIN_EXT
+    small_h) + "-" + FILTER_RESULT_TEXT + "." + DEST_TRAIN_EXT)
   return img_path
 
 
@@ -602,9 +606,9 @@ def get_filter_thumbnail_result(slide_number):
   padded_sl_num = str(slide_number).zfill(3)
   training_img_path = get_training_image_path(slide_number)
   large_w, large_h, small_w, small_h = parse_dimensions_from_image_filename(training_img_path)
-  img_path = FILTER_THUMBNAIL_DIR + os.sep + TRAIN_PREFIX + padded_sl_num + "-" + str(
+  img_path = os.path.join(FILTER_THUMBNAIL_DIR, TRAIN_PREFIX + padded_sl_num + "-" + str(
     SCALE_FACTOR) + "x-" + FILTER_SUFFIX + str(large_w) + "x" + str(large_h) + "-" + str(small_w) + "x" + str(
-    small_h) + "-" + FILTER_RESULT_TEXT + "." + THUMBNAIL_EXT
+    small_h) + "-" + FILTER_RESULT_TEXT + "." + THUMBNAIL_EXT)
   return img_path
 
 
@@ -715,6 +719,7 @@ def show_slide(slide_number):
   """
   pil_img = slide_to_scaled_pil_image(slide_number)[0]
   pil_img.show()
+
 
 def save_thumbnail(pil_img, size, path, display_path=False):
   """
@@ -904,7 +909,7 @@ def slide_stats():
     stats_string += "\n%d,%d,%d" % (i + 1, width, height)
   stats_string += "\n"
 
-  stats_file = open(STATS_DIR + os.sep + "stats.txt", "w")
+  stats_file = open(os.path.join(STATS_DIR, "stats.txt"), "w")
   stats_file.write(stats_string)
   stats_file.close()
 
@@ -919,7 +924,7 @@ def slide_stats():
   plt.title("SVS Image Sizes")
   plt.set_cmap("prism")
   plt.tight_layout()
-  plt.savefig(STATS_DIR + os.sep + "svs-image-sizes.png")
+  plt.savefig(os.path.join(STATS_DIR, "svs-image-sizes.png"))
   plt.show()
 
   plt.clf()
@@ -932,7 +937,7 @@ def slide_stats():
     snum = i + 1
     plt.annotate(str(snum), (x[i], y[i]))
   plt.tight_layout()
-  plt.savefig(STATS_DIR + os.sep + "svs-image-sizes-slide-numbers.png")
+  plt.savefig(os.path.join(STATS_DIR, "svs-image-sizes-slide-numbers.png"))
   plt.show()
 
   plt.clf()
@@ -942,7 +947,7 @@ def slide_stats():
   plt.ylabel("# images")
   plt.title("Distribution of image sizes in millions of pixels")
   plt.tight_layout()
-  plt.savefig(STATS_DIR + os.sep + "distribution-of-svs-image-sizes.png")
+  plt.savefig(os.path.join(STATS_DIR, "distribution-of-svs-image-sizes.png"))
   plt.show()
 
   plt.clf()
@@ -952,7 +957,7 @@ def slide_stats():
   plt.ylabel("# images")
   plt.title("Image shapes (width to height)")
   plt.tight_layout()
-  plt.savefig(STATS_DIR + os.sep + "w-to-h.png")
+  plt.savefig(os.path.join(STATS_DIR, "w-to-h.png"))
   plt.show()
 
   plt.clf()
@@ -962,7 +967,7 @@ def slide_stats():
   plt.ylabel("# images")
   plt.title("Image shapes (height to width)")
   plt.tight_layout()
-  plt.savefig(STATS_DIR + os.sep + "h-to-w.png")
+  plt.savefig(os.path.join(STATS_DIR, "h-to-w.png"))
   plt.show()
 
 

@@ -1055,7 +1055,7 @@ def generate_tiled_html_result(slide_nums, tile_summaries_dict, data_link):
     html += "  </table>\n"
 
     html += filter.html_footer()
-    text_file = open(slide.TILE_SUMMARY_HTML_DIR + os.sep + "tiles.html", "w")
+    text_file = open(os.path.join(slide.TILE_SUMMARY_HTML_DIR, "tiles.html"), "w")
     text_file.write(html)
     text_file.close()
   else:
@@ -1089,9 +1089,9 @@ def generate_tiled_html_result(slide_nums, tile_summaries_dict, data_link):
 
       html += filter.html_footer()
       if page_num == 1:
-        text_file = open(slide.TILE_SUMMARY_HTML_DIR + os.sep + "tiles.html", "w")
+        text_file = open(os.path.join(slide.TILE_SUMMARY_HTML_DIR, "tiles.html"), "w")
       else:
-        text_file = open(slide.TILE_SUMMARY_HTML_DIR + os.sep + "tiles-%d.html" % page_num, "w")
+        text_file = open(os.path.join(slide.TILE_SUMMARY_HTML_DIR, "tiles-%d.html" % page_num), "w")
       text_file.write(html)
       text_file.close()
 
