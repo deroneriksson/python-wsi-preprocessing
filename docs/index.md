@@ -68,7 +68,7 @@ break the slides into tiles, score the tiles, and then retrieve the top tiles ba
 ## Setup
 
 This project makes heavy use of Python3 and various Python packages. A full
-description of Python is beyond the scope of this tutorial, but some quick setup steps on OS X
+description of Python is beyond the scope of this tutorial, but some quick setup steps on macOS
 follow.
 
 Install a package manager such as [Homebrew](https://brew.sh/).
@@ -195,29 +195,31 @@ the tile level. Zooming and scrolling operations make it relatively easy to visu
 
 To develop a set of filters that can be applied to an entire set of large whole-slide images, two of the first issues
 we are confronted with are the size of the data and the format of the data. As mentioned, for our training dataset,
-the average svs file size is over 1 GB and we have 500 total images. Additionally, the svs format is a fairly unusual
+the average `svs` file size is over 1 GB and we have 500 total images. Additionally, the `svs` format is a fairly unusual
 format which typically can't be visually displayed by common applications and operating systems. Therefore, we will
 develop some code to overcome these important issues. Using OpenSlide and Python, we'll convert the training dataset to
 smaller images in a common format.
 
-In the `wsi/slide.py` file, we have many functions that can be used in relation to the original svs images. Of
+In the `wsi/slide.py` file, we have many functions that can be used in relation to the original `svs` images. Of
 particular importance are the following functions:
 
     open_slide()
+    show_slide()
     slide_info(display_all_properties=True)
     slide_stats()
     training_slide_to_image()
     singleprocess_training_slides_to_images()
     multiprocess_training_slides_to_images()
 
-The `open_slide()` function uses OpenSlide to read in an svs file. The `slide_info()` function displays metadata
-associated with each svs file. The `slide_stats()` function looks at all images and summarizes pixel size information
+The `open_slide()` function uses OpenSlide to read in an `svs` file. The `show_slide()` function opens a WSI `svs` file
+and displays a scaled-down version of the slide to the screen. The `slide_info()` function displays metadata
+associated with all `svs` files. The `slide_stats()` function looks at all images and summarizes size information
 about the set of slides. It also generates a variety of charts for a visual representation of the slide statistics.
-The `training_slide_to_image()` function converts a single svs slide to a smaller image in a more common format such as
-jpg or png. The `singleprocess_training_slides_to_images()` function converts all svs slides to smaller images,
+The `training_slide_to_image()` function converts a single `svs` slide to a smaller image in a more common format such as
+`jpg` or `png`. The `singleprocess_training_slides_to_images()` function converts all `svs` slides to smaller images,
 and the `multiprocess_training_slides_to_images()` function uses multiple processes (1 process per core) to
 speed up the slide conversion process. For the last three functions, when an image is saved, a thumbnail image is also
-saved. By default, the thumbnail has a maximum height or width of 300 pixels and is jpg format.
+saved. By default, the thumbnail has a maximum height or width of 300 pixels and is `jpg` format.
 
 One of the first actions we can take to become more familiar with the training dataset is to have a look at the metadata
 associated with each image, which we can do with the `slide_info()` function. Here we can see a sample of this
@@ -280,7 +282,7 @@ The most important metadata for our purposes is that the slide has a width of 13
 we will be using NumPy arrays, where rows (height) are followed by columns (width).
 
 If we visually look over the metadata associated with other images in the training dataset, we see that the slides
-are not consistent in their various properties such as the number of levels contained in the svs files. The metadata
+are not consistent in their various properties such as the number of levels contained in the `svs` files. The metadata
 implies that the dataset comes from a variety of sources. The variability in the slides, especially regarding
 issues such as H&E staining and pen marks on the slides, needs to be considered during our filter development.
 
@@ -308,7 +310,7 @@ meaning that the height and width will be scaled down by a factor of 32. This me
 it will be performed on an image 1/1024th the size of the original high-resolution image.
 The `DEST_TRAIN_EXT` constant controls the output format. We will use `png`.
 
-Using OS X with an external hard drive containing the training set, the following conversion times using
+Using macOS with an external hard drive containing the training set, the following conversion times using
 `singleprocess_training_slides_to_images()` and `multiprocess_training_slides_to_images()`
 on the 500 image training set were obtained:
 
@@ -330,13 +332,18 @@ images in lossless `png` format that we will examine in greater detail in relati
 
 In order to load, save, and display images, we use the Python [Pillow](https://pillow.readthedocs.io/en/4.3.x/)
 package. In particular, we make use of the Image module, which contains an Image class used to represent an image.
-The `wsi/slide.py` file contains an `open_image()` method to open an image stored in the file system.
-The `get_training_image_path()` function takes a slide number and returns the path to the corresponding training slide
-file. These functions can be used to open a converted image file as a PIL Image.
+The `wsi/slide.py` file contains an `open_image()` function to open an image stored in the file system.
+The `get_training_image_path()` function takes a slide number and returns the path to the corresponding training image
+file, meaning the scaled-down `png` file that we created by calling `multiprocess_training_slides_to_images()`.
+
+If we want to convert a single `svs` WSI file to a scaled-down `png` (without converting all `svs` files),
+open that `png` image file as a PIL Image, and display the image to the screen, we can do the following.
 
 ```
+slide.training_slide_to_image(4)
 img_path = slide.get_training_image_path(4)
 img = slide.open_image(img_path)
+img.show()
 ```
 
 To mathematically manipulate the images, we use NumPy arrays. The `wsi/util.py` file contains a

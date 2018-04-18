@@ -1017,11 +1017,16 @@ def slide_info(display_all_properties=False):
   t.elapsed_display()
 
 
-if __name__ == "__main__":
-  show_slide(2)
-  # training_slide_to_image(2)
+# if __name__ == "__main__":
+  # show_slide(2)
   # slide_info(display_all_properties=True)
   # slide_stats()
+
+  # training_slide_to_image(4)
+  # img_path = get_training_image_path(4)
+  # img = open_image(img_path)
+  # img.show()
+
   # slide_to_scaled_pil_image(5)[0].show()
   # singleprocess_training_slides_to_images()
   # multiprocess_training_slides_to_images()
