@@ -1855,14 +1855,25 @@ mask_remove_small = filter_remove_small_objects(mask_gray_green_pens, min_size=5
 After each of the above masks is created, it is applied to the original image and the resulting image is saved
 to the file system, displayed to the screen, or both.
 
-Let's try this function out. In this example, we run `apply_filters_to_image()` on slide 337 and display the results
+Let's try this function out. In this example, we run `apply_filters_to_image()` on slide #337 and display the results
 to the screen.
 
 ```
 filter.apply_filters_to_image(337, display=True, save=False)
 ```
 
-Here, we see the original slide #337 and the green channel filter applied to it. Notice that the green channel filter
+Note that this function utilizes the scaled-down `png` image for slide #337. If we have not generated `png` images for
+all the slides (typically by calling `slide.multiprocess_training_slides_to_images()`), we can generate the individual
+scaled-down `png` image and then apply the filters to this image.
+
+```
+slide.training_slide_to_image(337)
+filter.apply_filters_to_image(337, display=True, save=False)
+```
+
+Here, we see the original slide #337 and the green channel filter applied to it. The original slide is marked as 0.12%
+masked because a small number of pixels in the original image are black (0 values for the red, green, and blue
+channels). Notice that the green channel filter
 with a default threshold of 200 removes most of the white background but only a relatively small fraction of the green
 pen. The green channel filter masks 72.60% of the original slide.
 
