@@ -876,9 +876,9 @@ Filter Green Channel | Time: 0:00:00.005618  Type: bool    Shape: (1385, 1810)
 
 Next, let's utilize a filter that can filter out the annoying shadow area at the top of slide #2. Notice that the
 shadow area consists of a gradient of dark-to-light grays. A gray pixel has red, green, and blue channel values that
-are close together. The `filter_grays()` function will filter out pixels that have red, blue, and green values that
-are within a certain tolerance of each other. The default tolerance for `filter_grays()` is 15. The grays filter will
-also filter out white and black pixels, since they have similar red, green, and blue values.
+are close together. The `filter_grays()` function filters out pixels that have red, blue, and green values that
+are within a certain tolerance of each other. The default tolerance for `filter_grays()` is 15. The grays filter
+also filters out white and black pixels, since they have similar red, green, and blue values.
 
 Here, we run the grays filter on the original RGB image.
 
@@ -921,9 +921,9 @@ the red channel threshold value and below the green and blue channel threshold v
 values is to display the slide image in a web browser and use a tool such as the Chrome ColorPick Eyedropper to
 click on a red pen pixel to determine the approximate red, green, and blue values.
 
-In this example with slide #4, we'll use a red threshold value of 150, a green threshold value of 80, and a blue
-threshold value of 90. In addition, to help us visualize the filter results, we will apply the red filter to the
-original RGB image as a mask, and we will also apply the inverse of the red filter to the original image as a mask.
+In this example with slide #4, we use a red threshold value of 150, a green threshold value of 80, and a blue
+threshold value of 90. In addition, to help us visualize the filter results, we apply the red filter to the
+original RGB image as a mask and also apply the inverse of the red filter to the original image as a mask.
 
 ```
 img_path = slide.get_training_image_path(4)
@@ -964,8 +964,8 @@ Mask RGB             | Time: 0:00:00.022750  Type: uint8   Shape: (2594, 2945, 3
 #### Red Pen Filter
 
 Next, let's turn our attention to a more inclusive red pen filter that handles more shades of red. Since the
-`filter_red()` function returns a boolean array result, we can easily combine multiple sets of `filter_red()` threshold
-values (`red_lower_thresh`, `green_upper_thresh`, `blue_upper_thresh`) using boolean operators such as &. We can
+`filter_red()` function returns a boolean array result, we can combine multiple sets of `filter_red()` threshold
+values (`red_lower_thresh`, `green_upper_thresh`, `blue_upper_thresh`) using boolean operators such as `&`. We can
 determine these values using a color picker tool such as the Chrome ColorPick Eyedropper, as mentioned previously.
 In addition to determining various shades of red pen on a single slide, shades of red pen from other slides should be
 identified and included. Note that we need to be careful with pinkish shades of red due to the similarity of these
@@ -1071,7 +1071,7 @@ Mask RGB             | Time: 0:00:00.021153  Type: uint8   Shape: (2058, 3240, 3
 
 #### Blue Pen Filter
 
-In `filter_blue_pen()`, we can AND together various blue shade ranges using `filter_blue()` with
+In `filter_blue_pen()`, we AND together various blue shade ranges using `filter_blue()` with
 sets of red, green, and blue threshold values to create a blue pen filter that filters out various shades of blue.
 
 ```
@@ -1089,7 +1089,7 @@ result = filter_blue(rgb, red_upper_thresh=60, green_upper_thresh=120, blue_lowe
          filter_blue(rgb, red_upper_thresh=110, green_upper_thresh=110, blue_lower_thresh=175)
 ```
 
-We'll apply the filter and its inverse to the original slide to help us visualize the results.
+We apply the filter and its inverse to the original slide to help us visualize the results.
 
 ```
 img_path = slide.get_training_image_path(241)
@@ -1123,7 +1123,7 @@ Mask RGB             | Time: 0:00:00.033348  Type: uint8   Shape: (2058, 3240, 3
 Mask RGB             | Time: 0:00:00.019622  Type: uint8   Shape: (2058, 3240, 3)
 ```
 
-As an aside, we can easily quantify the differences in filtering between the `filter_blue()` and `filter_blue_pen()`
+As an aside, we can quantify the differences in filtering between the `filter_blue()` and `filter_blue_pen()`
 results.
 
 ```
@@ -1143,11 +1143,10 @@ filter_blue_pen: 0.69%
 
 #### Green Filter
 
-To develop a filter for the green ink from the pen, we'll create a `filter_green()` function to handle the green
-color shades. Using a color picker tool, if we examine the green pen marks on the slides, the green and blue channel
-values for pixels appear to track together. As a result of this, this function will have a red channel upper
+We utilize the `filter_green()` function to filter green color shades. Using a color picker tool,
+if we examine the green pen marks on the slides, the green and blue channel
+values for pixels appear to track together. As a result of this, this function has a red channel upper
 threshold value, a green channel lower threshold value, and a blue channel lower threshold value.
-
 
 ```
 img_path = slide.get_training_image_path(51)
