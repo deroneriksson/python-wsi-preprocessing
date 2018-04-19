@@ -1693,9 +1693,9 @@ More information about Canny edge detection can be found at
 [https://en.wikipedia.org/wiki/Canny_edge_detector](https://en.wikipedia.org/wiki/Canny_edge_detector).
 
 The sci-kit image `canny()` function returns a binary edge map for the detected edges in an input image. In the
-example below, we'll call the canny edge filter on the grayscale image and display the resulting Canny edges.
-After this, we'll crop a 600x600 area of the original slide and display this. We'll then apply the inverse of the
-canny mask to the cropped original slide area and display this for comparison.
+example below, we call `filter_canny()` on the grayscale image and display the resulting Canny edges.
+After this, we crop a 600x600 area of the original slide and display it. We apply the inverse of the
+canny mask to the cropped original slide area and display it for comparison.
 
 ```
 img_path = slide.get_training_image_path(2)
@@ -1736,12 +1736,12 @@ Mask RGB             | Time: 0:00:00.001443  Type: uint8   Shape: (600, 600, 3)
 
 ## Combining Filters
 
-Since our image filter data utilizes NumPy arrays, it is straightforward to combine our filters. For example, when
-we have filters that return boolean images for masking, we can use standard boolean algebra on our arrays to do
+Since our image filters utilize NumPy arrays, it is straightforward to combine our filters. For example, when
+we have filters that return boolean images for masking, we can use standard boolean algebra on our arrays to perform
 operations such as AND, OR, XOR, and NOT. We can also run filters on the results of other filters.
 
 As an example, here we run our green pen and blue pen filters on the original RGB image to filter out the green and
-blue pen marks on the slides. We combine the resulting masks with a boolean AND (&) operation. We display the resulting
+blue pen marks on the slide. We combine the resulting masks with a boolean AND (&) operation. We display the resulting
 mask and this mask applied to the original image, masking out the green and blue pen marks from the image.
 
 ```
@@ -1830,8 +1830,8 @@ Mask RGB             | Time: 0:00:00.048710  Type: uint8   Shape: (2592, 3509, 3
 
 ---
 
-In the `wsi/filter.py` file, the `apply_filters_to_image(slide_num, save=True, display=False)` function will be the
-primary way we'll apply a set of filters to an image with the goal of identifying the tissue in the slide. This
+In the `wsi/filter.py` file, the `apply_filters_to_image(slide_num, save=True, display=False)` function is the
+primary way we apply a set of filters to an image with the goal of identifying the tissue in the slide. This
 function allows us to see the results of each filter and the combined results of different filters. If the
 `save` parameter is `True`, the various filter results will be saved to the file system. If the `display`
 parameter is `True`, the filter results will be displayed on the screen. The function returns a tuple consisting of
@@ -1855,7 +1855,7 @@ mask_remove_small = filter_remove_small_objects(mask_gray_green_pens, min_size=5
 After each of the above masks is created, it is applied to the original image and the resulting image is saved
 to the file system, displayed to the screen, or both.
 
-Let's try this function out. In this example, we'll run `apply_filters_to_image()` on slide 337 and display the results
+Let's try this function out. In this example, we run `apply_filters_to_image()` on slide 337 and display the results
 to the screen.
 
 ```
