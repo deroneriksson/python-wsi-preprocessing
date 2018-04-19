@@ -36,8 +36,6 @@ from wsi import slide
 from wsi import util
 from wsi.util import Time
 
-DISPLAY_MASK_PERCENTAGE = True
-
 
 def filter_rgb_to_grayscale(np_img, output_type="uint8"):
   """
@@ -1119,7 +1117,8 @@ def apply_filters_to_image(slide_num, save=True, display=False):
   return filtered_np_img, info
 
 
-def save_display(save, display, info, np_img, slide_num, filter_num, display_text, file_text):
+def save_display(save, display, info, np_img, slide_num, filter_num, display_text, file_text,
+                 display_mask_percentage=True):
   """
   Optionally save an image and/or display the image.
 
@@ -1132,9 +1131,10 @@ def save_display(save, display, info, np_img, slide_num, filter_num, display_tex
     filter_num: The filter number.
     display_text: Filter display name.
     file_text: Filter name for file.
+    display_mask_percentage: If True, display mask percentage on displayed slide.
   """
   mask_percentage = None
-  if DISPLAY_MASK_PERCENTAGE:
+  if display_mask_percentage:
     mask_percentage = mask_percent(np_img)
     display_text = display_text + "\n(" + mask_percentage_text(mask_percentage) + " masked)"
   if slide_num is None and filter_num is None:
