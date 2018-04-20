@@ -2129,7 +2129,11 @@ Let's have a look at how we reduce overmasking on slide 21, which is a slide tha
 | ![Slide 21](images/21-rgb.png "Slide 21") |
 
 
-We'll run our filters on slide #21 by calling `singleprocess_apply_filters_to_images(image_num_list=[21])`.
+We'll run our filters on slide #21.
+
+```
+filter.singleprocess_apply_filters_to_images(image_num_list=[21])
+```
 
 If we set the `filter_green_channel()` and `filter_remove_small_objects()` `avoid_overmask` parameters to False,
 97.69% of the original image is masked by the "green channel" filter and 99.92% of the original image is
