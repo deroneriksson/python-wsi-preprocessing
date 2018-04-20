@@ -77,9 +77,12 @@ break the slides into tiles, score the tiles, and then retrieve the top tiles ba
 
 ## Setup
 
-This project makes heavy use of Python3 and various Python packages. A full
-description of Python is beyond the scope of this tutorial, but some quick setup steps on macOS
-follow.
+This project makes heavy use of Python3. Python is an ideal language for image processing.
+OpenSlide is utilized for reading WSI files. Pillow is used for basic image manipulation in Python.
+NumPy is used for fast, concise, powerful processing of images as NumPy arrays. Scikit-image is heavily used for
+a wide variety of image functionality, such as morphology, thresholding, and edge detection.
+
+Some quick setup steps on macOS follow.
 
 Install a package manager such as [Homebrew](https://brew.sh/).
 
@@ -89,7 +92,7 @@ Install [Python3](https://www.python.org/).
 
     brew install python3
 
-Install [OpenSlide](http://openslide.org/). OpenSlide can be used to read whole slide images.
+Install [OpenSlide](http://openslide.org/).
 Note that OpenSlide is licensed under the [LGPL 2.1
 License](https://raw.githubusercontent.com/openslide/openslide/master/lgpl-2.1.txt).
 
@@ -103,14 +106,15 @@ package manager. These packages include:
 [numpy](https://pypi.python.org/pypi/numpy),
 [openslide-python](https://pypi.python.org/pypi/openslide-python),
 [pandas](https://pypi.python.org/pypi/pandas),
+[Pillow](https://pypi.org/project/Pillow/),
 [scikit-image](https://pypi.python.org/pypi/scikit-image),
 [scikit-learn](https://pypi.python.org/pypi/scikit-learn),
 and [scipy](https://pypi.python.org/pypi/scipy).
 
-    pip3 install -U ipython jupyter matplotlib numpy openslide-python pandas scikit-image scikit-learn scipy
+    pip3 install -U ipython jupyter matplotlib numpy openslide-python pandas Pillow scikit-image scikit-learn scipy
 
-We will utilize scikit-image filters in this tutorial that are not present in the
-latest released version of scikit-image at the time of this writing. We will install scikit-image
+We will utilize scikit-image filters (hysteresis thresholding) in this tutorial that are not present in the
+latest released version of scikit-image at the time of this writing (0.13.1). We will install scikit-image
 from source, as described in the README at [https://github.com/scikit-image/scikit-image](https://github.com/scikit-image/scikit-image).
 
     git clone https://github.com/scikit-image/scikit-image.git
