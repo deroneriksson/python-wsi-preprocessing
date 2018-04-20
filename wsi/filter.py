@@ -754,8 +754,8 @@ def filter_green_channel(np_img, green_thresh=200, avoid_overmask=True, overmask
   g = np_img[:, :, 1]
   gr_ch_mask = (g < green_thresh) & (g > 0)
   mask_percentage = mask_percent(gr_ch_mask)
-  if (mask_percentage >= overmask_thresh) and (avoid_overmask is True):
-    new_green_thresh = (255 - green_thresh) / 2 + green_thresh
+  if (mask_percentage >= overmask_thresh) and (green_thresh < 255) and (avoid_overmask is True):
+    new_green_thresh = math.ceil((255 - green_thresh) / 2 + green_thresh)
     print(
       "Mask percentage %3.2f%% >= overmask threshold %3.2f%% for Remove Green Channel green_thresh=%d, so try %d" % (
         mask_percentage, overmask_thresh, green_thresh, new_green_thresh))
