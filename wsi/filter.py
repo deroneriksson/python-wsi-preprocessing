@@ -1477,98 +1477,10 @@ def multiprocess_apply_filters_to_images(save=True, display=False, html=True, im
 
   print("Time to apply filters to all images (multiprocess): %s\n" % str(timer.elapsed()))
 
-# apply_filters_to_image(2)
-# rgb, _ = apply_filters_to_image(6, display=False, save=False)
-# display_img(rgb, "RGB")
-# not_greenish = filter_green(rgb, red_upper_thresh=125, green_lower_thresh=30, blue_lower_thresh=30,
-#                             display_np_info=True)
-# not_grayish = filter_grays(rgb, tolerance=30)
-# rgb_new = util.mask_rgb(rgb, not_greenish & not_grayish)
-# display_img(util.mask_rgb(rgb, not_greenish & not_grayish), "Not Greenish, Not Grayish")
-# row1 = np.concatenate((rgb[800:1200, 100:500], rgb[750:1150, 1350:1750]), axis=1)
-# row2 = np.concatenate((rgb_new[800:1200, 100:500], rgb_new[750:1150, 1350:1750]), axis=1)
-# result = np.concatenate((row1, row2), axis=0)
-# display_img(result)
-
-# singleprocess_apply_filters_to_images(image_num_list=[3,4])
-
-# multiprocess_apply_filters_to_images(save=False, display=False, html=True)
-# multiprocess_apply_filters_to_images()
-# multiprocess_apply_filters_to_images(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
-# multiprocess_apply_filters_to_images(image_num_list=[3, 4, 5, 6, 7, 8])
-# img, _ = apply_filters_to_image(4, display=True, save=False)
-# display_img(img, "RESULT", bg=True)
-# canny = filter_canny(filter_rgb_to_grayscale(img))
-# display_img(canny, "CANNY", bg=True)
-# singleprocess_apply_filters_to_images(save=True, display=False)
-# multiprocess_apply_filters_to_images(save=False, display=False, html=True)
-
-# red_pen_slides = [4, 15, 24, 48, 63, 67, 115, 117, 122, 130, 135, 165, 166, 185, 209, 237, 245, 249, 279, 281, 282, 289,
-#                   336, 349, 357, 380, 450, 482]
-# multiprocess_apply_filters_to_images(image_num_list=red_pen_slides)
-# green_pen_slides = [51, 74, 84, 86, 125, 180, 200, 337, 359, 360, 375, 382, 431]
-# multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=green_pen_slides)
-# blue_pen_slides = [7, 28, 74, 107, 130, 140, 157, 174, 200, 221, 241, 318, 340, 355, 394, 410, 414, 457, 499]
-# multiprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
-# singleprocess_apply_filters_to_images(save=True, display=False, image_num_list=blue_pen_slides)
-# overmasked_slides = [1, 21, 29, 37, 43, 88, 116, 126, 127, 142, 145, 173, 196, 220, 225, 234, 238, 284, 292, 294, 304,
-#                      316, 401, 403, 424, 448, 452, 472, 494]
-# multiprocess_apply_filters_to_images(image_num_list=overmasked_slides)
-# singleprocess_apply_filters_to_images(image_num_list=[21])
-
-# r = rgb[:, :, 0]
-# g = rgb[:, :, 1]
-# b = rgb[:, :, 2]
-#
-# r = filter_entropy(rgb[:, :, 0], output_type="bool")
-# display_img(r, "R Entropy")
-# g = filter_entropy(rgb[:, :, 1], output_type="bool")
-# display_img(g, "G Entropy")
-# b = filter_entropy(rgb[:, :, 2], output_type="bool")
-# display_img(b, "B Entropy")
-# rgb_entropy = r & g & b
-# display_img(rgb_entropy, "RGB Entropy")
-# display_img(util.mask_rgb(rgb, entropy), "Original with RGB Entropy Mask")
-
-# display_img(grayscale, "Grayscale")
-# complement = filter_complement(grayscale)
-# contrast_stretch = filter_contrast_stretch(complement, low=100, high=200)
-# display_img(contrast_stretch, "Contrast Stretch")
-# r_hist = filter_histogram_equalization(rgb[:, :, 0])
-# g_hist = filter_histogram_equalization(rgb[:, :, 1])
-# b_hist = filter_histogram_equalization(rgb[:, :, 2])
-# display_img(r_hist, "Histogram Equalization R")
-# display_img(g_hist, "Histogram Equalization G")
-# display_img(b_hist, "Histogram Equalization B")
-# hist_equ = np.dstack((r_hist, g_hist, b_hist))
-# np_info(hist_equ, "Histogram Equalization")
-# display_img(hist_equ, "Histogram Equalization Separate Channels")
-# np_info(hist_equ, "Histogram Equalization")
-# rgb_hist = filter_histogram_equalization(rgb)
-# display_img(rgb_hist, "RGB Histogram Equalization")
-
-# np_img = apply_filters_to_image(15, display=False, save=False, return_image=True)
-# display_img(np_img, "Filtered" + mask_percentage_text(mask_percent(np_img)))
-# np_info(np_img)
-# np_filt = filter_rgb_to_grayscale(np_img)
-# np_filt = filter_entropy(np_filt, neighborhood=5, threshold=4, output_type="bool")
-# np_img = util.mask_rgb(np_img, np_filt)
-# display_img(np_img, "Entropy" + mask_percentage_text(mask_percent(np_img)))
-
-# red_pen_mask_percentage = mask_percent(mask_no_red_pen)
-# if red_pen_mask_percentage >= 1.0:
-#   gray_no_red_pen = filter_rgb_to_grayscale(rgb_no_red_pen)
-#   mask_entropy = filter_entropy(gray_no_red_pen, neighborhood=5, threshold=4, output_type="bool")
-#   rgb_entropy = util.mask_rgb(rgb, mask_entropy)
-#   save_display(save, display, info, rgb_entropy, slide_num, 5, "Entropy", "rgb-entropy")
-
-# pil_img = slide.slide_to_scaled_pil_image(15)[0]
-# pil_img.show()
-# np_img = pil_to_np_rgb(pil_img)
-# filt_np_img = apply_image_filters(np_img)
-# filt_pil_img = np_to_pil(filt_np_img)
-# filt_pil_img.show()
 
 # if __name__ == "__main__":
-# multiprocess_apply_filters_to_images(image_num_list=[3, 4, 5, 6, 7, 8])
-# singleprocess_apply_filters_to_images(image_num_list=[3, 4])
+  # slide.training_slide_to_image(2)
+  # singleprocess_apply_filters_to_images(image_num_list=[2], display=True)
+
+  # singleprocess_apply_filters_to_images()
+  # multiprocess_apply_filters_to_images()
