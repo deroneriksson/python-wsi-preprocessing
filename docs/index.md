@@ -2103,12 +2103,13 @@ filter.filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=True, o
 ```
 
 For the `filter_green_channel()` function, if a `green_thresh` value of 200 results in masking over 90%, the
-function will try with a higher `green_thresh` value (227) and the masking level will be checked. This will continue
-until the masking doesn't exceed the overmask threshold of 90%.
+function will try with a higher `green_thresh` value (228) and the masking level will be checked. This will continue
+until the masking doesn't exceed the overmask threshold of 90% or the threshold is 255.
 
 For the `filter_remove_small_objects()` function, if a `min_size` value of 3000 results in a masking level over 95%,
 the function will try with a lower `min_size` value (1500) and the masking level will be checked. These `min_size`
-reductions will continue until the masking level isn't over 95%.
+reductions will continue until the masking level isn't over 95% or the minimum size is 0. For the image filtering
+specified in `apply_image_filters`, a starting `min_size` value of 500 for `filter_remove_small_objects()` is used.
 
 Examining our full set of images using `multiprocess_apply_filters_to_images()`, we can identify slides that are
 at risk for overmasking. We can create a list of these slide numbers and use `multiprocess_apply_filters_to_images()`
@@ -2172,47 +2173,47 @@ We can see the filter adjustments being made in the console output.
 
 ```
 Processing slide #21
-RGB                  | Time: 0:00:00.107057  Type: uint8   Shape: (1496, 1576, 3)
-Save Image           | Time: 0:00:00.612523  Name: /Volumes/BigData/TUPAC/filter_png/TUPAC-TR-021-001-rgb.png
-Save Thumbnail       | Time: 0:00:00.018348  Name: /Volumes/BigData/TUPAC/filter_thumbnail_jpg/TUPAC-TR-021-001-rgb.jpg
-Mask percentage 97.69% >= overmask threshold 90.00% for Remove Green Channel green_thresh=200, so try 227
-Filter Green Channel | Time: 0:00:00.005076  Type: bool    Shape: (1496, 1576)
-Filter Green Channel | Time: 0:00:00.010362  Type: bool    Shape: (1496, 1576)
-Mask RGB             | Time: 0:00:00.008531  Type: uint8   Shape: (1496, 1576, 3)
-Save Image           | Time: 0:00:00.325600  Name: /Volumes/BigData/TUPAC/filter_png/TUPAC-TR-021-002-rgb-not-green.png
-Save Thumbnail       | Time: 0:00:00.018255  Name: /Volumes/BigData/TUPAC/filter_thumbnail_jpg/TUPAC-TR-021-002-rgb-not-green.jpg
-Filter Grays         | Time: 0:00:00.078234  Type: bool    Shape: (1496, 1576)
-Mask RGB             | Time: 0:00:00.009263  Type: uint8   Shape: (1496, 1576, 3)
-Save Image           | Time: 0:00:00.316081  Name: /Volumes/BigData/TUPAC/filter_png/TUPAC-TR-021-003-rgb-not-gray.png
-Save Thumbnail       | Time: 0:00:00.017545  Name: /Volumes/BigData/TUPAC/filter_thumbnail_jpg/TUPAC-TR-021-003-rgb-not-gray.jpg
-Filter Red Pen       | Time: 0:00:00.062633  Type: bool    Shape: (1496, 1576)
-Mask RGB             | Time: 0:00:00.009025  Type: uint8   Shape: (1496, 1576, 3)
-Save Image           | Time: 0:00:00.618641  Name: /Volumes/BigData/TUPAC/filter_png/TUPAC-TR-021-004-rgb-no-red-pen.png
-Save Thumbnail       | Time: 0:00:00.016450  Name: /Volumes/BigData/TUPAC/filter_thumbnail_jpg/TUPAC-TR-021-004-rgb-no-red-pen.jpg
-Filter Green Pen     | Time: 0:00:00.093654  Type: bool    Shape: (1496, 1576)
-Mask RGB             | Time: 0:00:00.008186  Type: uint8   Shape: (1496, 1576, 3)
-Save Image           | Time: 0:00:00.615919  Name: /Volumes/BigData/TUPAC/filter_png/TUPAC-TR-021-005-rgb-no-green-pen.png
-Save Thumbnail       | Time: 0:00:00.016976  Name: /Volumes/BigData/TUPAC/filter_thumbnail_jpg/TUPAC-TR-021-005-rgb-no-green-pen.jpg
-Filter Blue Pen      | Time: 0:00:00.069574  Type: bool    Shape: (1496, 1576)
-Mask RGB             | Time: 0:00:00.008654  Type: uint8   Shape: (1496, 1576, 3)
-Save Image           | Time: 0:00:00.620468  Name: /Volumes/BigData/TUPAC/filter_png/TUPAC-TR-021-006-rgb-no-blue-pen.png
-Save Thumbnail       | Time: 0:00:00.018341  Name: /Volumes/BigData/TUPAC/filter_thumbnail_jpg/TUPAC-TR-021-006-rgb-no-blue-pen.jpg
-Mask RGB             | Time: 0:00:00.009056  Type: uint8   Shape: (1496, 1576, 3)
-Save Image           | Time: 0:00:00.308774  Name: /Volumes/BigData/TUPAC/filter_png/TUPAC-TR-021-007-rgb-no-gray-no-green-no-pens.png
-Save Thumbnail       | Time: 0:00:00.019130  Name: /Volumes/BigData/TUPAC/filter_thumbnail_jpg/TUPAC-TR-021-007-rgb-no-gray-no-green-no-pens.jpg
+RGB                  | Time: 0:00:00.095414  Type: uint8   Shape: (1496, 1576, 3)
+Save Image           | Time: 0:00:00.617039  Name: ../data/filter_png/TUPAC-TR-021-001-rgb.png
+Save Thumbnail       | Time: 0:00:00.019557  Name: ../data/filter_thumbnail_jpg/TUPAC-TR-021-001-rgb.jpg
+Mask percentage 97.69% >= overmask threshold 90.00% for Remove Green Channel green_thresh=200, so try 228
+Filter Green Channel | Time: 0:00:00.005335  Type: bool    Shape: (1496, 1576)
+Filter Green Channel | Time: 0:00:00.010499  Type: bool    Shape: (1496, 1576)
+Mask RGB             | Time: 0:00:00.009980  Type: uint8   Shape: (1496, 1576, 3)
+Save Image           | Time: 0:00:00.322629  Name: ../data/filter_png/TUPAC-TR-021-002-rgb-not-green.png
+Save Thumbnail       | Time: 0:00:00.018244  Name: ../data/filter_thumbnail_jpg/TUPAC-TR-021-002-rgb-not-green.jpg
+Filter Grays         | Time: 0:00:00.072200  Type: bool    Shape: (1496, 1576)
+Mask RGB             | Time: 0:00:00.010461  Type: uint8   Shape: (1496, 1576, 3)
+Save Image           | Time: 0:00:00.295995  Name: ../data/filter_png/TUPAC-TR-021-003-rgb-not-gray.png
+Save Thumbnail       | Time: 0:00:00.017668  Name: ../data/filter_thumbnail_jpg/TUPAC-TR-021-003-rgb-not-gray.jpg
+Filter Red Pen       | Time: 0:00:00.055296  Type: bool    Shape: (1496, 1576)
+Mask RGB             | Time: 0:00:00.008704  Type: uint8   Shape: (1496, 1576, 3)
+Save Image           | Time: 0:00:00.595753  Name: ../data/filter_png/TUPAC-TR-021-004-rgb-no-red-pen.png
+Save Thumbnail       | Time: 0:00:00.016758  Name: ../data/filter_thumbnail_jpg/TUPAC-TR-021-004-rgb-no-red-pen.jpg
+Filter Green Pen     | Time: 0:00:00.088633  Type: bool    Shape: (1496, 1576)
+Mask RGB             | Time: 0:00:00.008860  Type: uint8   Shape: (1496, 1576, 3)
+Save Image           | Time: 0:00:00.585474  Name: ../data/filter_png/TUPAC-TR-021-005-rgb-no-green-pen.png
+Save Thumbnail       | Time: 0:00:00.016964  Name: ../data/filter_thumbnail_jpg/TUPAC-TR-021-005-rgb-no-green-pen.jpg
+Filter Blue Pen      | Time: 0:00:00.069669  Type: bool    Shape: (1496, 1576)
+Mask RGB             | Time: 0:00:00.009665  Type: uint8   Shape: (1496, 1576, 3)
+Save Image           | Time: 0:00:00.589634  Name: ../data/filter_png/TUPAC-TR-021-006-rgb-no-blue-pen.png
+Save Thumbnail       | Time: 0:00:00.016736  Name: ../data/filter_thumbnail_jpg/TUPAC-TR-021-006-rgb-no-blue-pen.jpg
+Mask RGB             | Time: 0:00:00.009115  Type: uint8   Shape: (1496, 1576, 3)
+Save Image           | Time: 0:00:00.294103  Name: ../data/filter_png/TUPAC-TR-021-007-rgb-no-gray-no-green-no-pens.png
+Save Thumbnail       | Time: 0:00:00.017540  Name: ../data/filter_thumbnail_jpg/TUPAC-TR-021-007-rgb-no-gray-no-green-no-pens.jpg
 Mask percentage 97.40% >= overmask threshold 95.00% for Remove Small Objs size 500, so try 250
 Mask percentage 96.83% >= overmask threshold 95.00% for Remove Small Objs size 250, so try 125
 Mask percentage 95.87% >= overmask threshold 95.00% for Remove Small Objs size 125, so try 62
-Remove Small Objs    | Time: 0:00:00.034327  Type: bool    Shape: (1496, 1576)
-Remove Small Objs    | Time: 0:00:00.068586  Type: bool    Shape: (1496, 1576)
-Remove Small Objs    | Time: 0:00:00.104876  Type: bool    Shape: (1496, 1576)
-Remove Small Objs    | Time: 0:00:00.140102  Type: bool    Shape: (1496, 1576)
-Mask RGB             | Time: 0:00:00.007216  Type: uint8   Shape: (1496, 1576, 3)
-Save Image           | Time: 0:00:00.245963  Name: /Volumes/BigData/TUPAC/filter_png/TUPAC-TR-021-008-rgb-not-green-not-gray-no-pens-remove-small.png
-Save Thumbnail       | Time: 0:00:00.016763  Name: /Volumes/BigData/TUPAC/filter_thumbnail_jpg/TUPAC-TR-021-008-rgb-not-green-not-gray-no-pens-remove-small.jpg
-Save Image           | Time: 0:00:00.248853  Name: /Volumes/BigData/TUPAC/filter_png/TUPAC-TR-021-32x-50432x47872-1576x1496-filtered.png
-Save Thumbnail       | Time: 0:00:00.019088  Name: /Volumes/BigData/TUPAC/filter_thumbnail_jpg/TUPAC-TR-021-32x-50432x47872-1576x1496-filtered.jpg
-Slide #021 processing time: 0:00:04.787326
+Remove Small Objs    | Time: 0:00:00.031198  Type: bool    Shape: (1496, 1576)
+Remove Small Objs    | Time: 0:00:00.062300  Type: bool    Shape: (1496, 1576)
+Remove Small Objs    | Time: 0:00:00.095616  Type: bool    Shape: (1496, 1576)
+Remove Small Objs    | Time: 0:00:00.128008  Type: bool    Shape: (1496, 1576)
+Mask RGB             | Time: 0:00:00.007214  Type: uint8   Shape: (1496, 1576, 3)
+Save Image           | Time: 0:00:00.235025  Name: ../data/filter_png/TUPAC-TR-021-008-rgb-not-green-not-gray-no-pens-remove-small.png
+Save Thumbnail       | Time: 0:00:00.016905  Name: ../data/filter_thumbnail_jpg/TUPAC-TR-021-008-rgb-not-green-not-gray-no-pens-remove-small.jpg
+Save Image           | Time: 0:00:00.232206  Name: ../data/filter_png/TUPAC-TR-021-32x-50432x47872-1576x1496-filtered.png
+Save Thumbnail       | Time: 0:00:00.017285  Name: ../data/filter_thumbnail_jpg/TUPAC-TR-021-32x-50432x47872-1576x1496-filtered.jpg
+Slide #021 processing time: 0:00:04.596086
 
 ```
 
