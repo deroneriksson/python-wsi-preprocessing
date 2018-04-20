@@ -49,13 +49,23 @@ Histopathology](https://pdfs.semanticscholar.org/7d9b/ccac7a9a850cc84a980e5abeae
 identification of tissue regions in whole-slide images is done using Otsu thresholding, morphological operations, and
 binary dilation.
 
-Tissue identification in whole-slide images can be a very important precursor to deep learning, since accurate tissue
-identification can decrease the quantity of data and increase the quality of the data to be analyzed. This
+Tissue identification in whole-slide images can be an important precursor to deep learning. Deep learning is
+computationally expensive and medical whole-slide images are enormous. Typically, a large portion of a slide isn't
+useful, such as the background, shadows, water, smudges, and pen marks. We can use preprocessing to
+rapidly reduce the quantity and increase the quality of the image data to be analyzed. This
 can lead to faster, more accurate model training.
+
 In this tutorial, we will take a look at whole-slide image processing and will describe various filters
 that can be used to increase the accuracy of tissue identification.
 After determining a useful set of filters for tissue segmentation, we'll divide slides into tiles and determine sets
 of tiles that typically represent good tissue samples.
+
+The solution should demonstrate high performance, flexibility, and accuracy. Filters should be easy to combine,
+chain, and modify. Tile scoring should be easy to modify for accurate tile selection. The solution should offer
+the ability to view filter, tile, and score results across large, unique datasets. The solution should also have
+the ability to work in a batch mode, where all image files and intermediary files are written to the file system,
+and in a dynamic mode, where high-scoring tissue tiles can be retrieved from the original WSI files without requiring
+any intermediary files.
 
 In summary, we will scale down whole-slide images, apply filters to these scaled-down images for tissue segmentation,
 break the slides into tiles, score the tiles, and then retrieve the top tiles based on their scores.
