@@ -75,7 +75,7 @@ break the slides into tiles, score the tiles, and then retrieve the top tiles ba
 | ![5 Steps](images/5-steps.png "5 Steps") |
 
 
-## Setup
+### Setup
 
 This project makes heavy use of Python3. Python is an ideal language for image processing.
 OpenSlide is utilized for reading WSI files. Pillow is used for basic image manipulation in Python.
@@ -123,7 +123,7 @@ from source, as described in the README at [https://github.com/scikit-image/scik
     pip3 install .
 
 
-## Whole Slide Imaging Background
+### Whole Slide Imaging Background
 
 A whole-slide image is a digital representation of a microscopic slide, typically at a very high level of magnification
 such as 20x or 40x. As a result of this high magnification, whole slide images are typically very large in size.
@@ -205,14 +205,17 @@ the tile level. Zooming and scrolling operations make it relatively easy to visu
 | ![OpenSlide Whole Slide Image Zoomed](images/openslide-whole-slide-image-zoomed.png "OpenSlide Whole Slide Image Zoomed") |
 
 
-## WSI Format Conversion
+## Scale Down Images
 
 To develop a set of filters that can be applied to an entire set of large whole-slide images, two of the first issues
 we are confronted with are the size of the data and the format of the data. As mentioned, for our training dataset,
 the average `svs` file size is over 1 GB and we have 500 total images. Additionally, the `svs` format is a fairly unusual
 format which typically can't be visually displayed by common applications and operating systems. Therefore, we will
 develop some code to overcome these important issues. Using OpenSlide and Python, we'll convert the training dataset to
-smaller images in a common format.
+smaller images in a common format, thus reformulating a big data problem as a small data problem. Before filtering
+at the entire slide level, we will shrink the width and height down by a factor of 32x, which means we can perform
+filtering on 1/1024<sup>th</sup> the image data. Converting 500 `svs` files to `png` files at 1/32 scale takes
+approximately 12 minutes on a typical MacBook Pro using the code described below.
 
 In the `wsi/slide.py` file, we have many functions that can be used in relation to the original `svs` images. Of
 particular importance are the following functions:
@@ -342,7 +345,7 @@ After calling `multiprocess_training_slides_to_images()` using the `png` format,
 images in lossless `png` format that we will examine in greater detail in relation to our filters.
 
 
-## Image Saving, Displaying, and Conversions
+### Image Saving, Displaying, and Conversions
 
 In order to load, save, and display images, we use the Python [Pillow](https://pillow.readthedocs.io/en/4.3.x/)
 package. In particular, we make use of the Image module, which contains an Image class used to represent an image.
