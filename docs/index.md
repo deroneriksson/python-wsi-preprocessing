@@ -435,13 +435,15 @@ img.save(path)
 ```
 
 
-## Filters
+## Apply Filters for Tissue Segmentation
+
+### Filters
 
 Now, let's take a look at several ways that our images can be filtered. Filters are represented by functions
 in the `wsi/filter.py` file and have `filter_` prepended to the function names.
 
 
-### RGB to Grayscale
+#### RGB to Grayscale
 
 A very common task in image processing is to convert an RGB image to a grayscale image. In this process, the three
 color channels are replaced by a single grayscale channel. The grayscale pixel value is computed by combining the
@@ -483,7 +485,7 @@ Gray                 | Time: 0:00:00.101953  Type: uint8   Shape: (1385, 1810)
 ```
 
 
-### Complement
+#### Complement
 
 In our whole-slide image training set, the slide backgrounds are illuminated by white light, which means that a `uint8`
 pixel in the background of a grayscale image is usually close to or equal to 255. However, conceptually and
@@ -517,10 +519,10 @@ Complement           | Time: 0:00:00.001439  Type: uint8   Shape: (1385, 1810)
 ```
 
 
-### Thresholding
+#### Thresholding
 
 
-#### Basic Threshold
+##### Basic Threshold
 
 With basic thresholding, a binary image is generated, where each value in the resulting NumPy array indicates
 whether the corresponding pixel in the original image is above a particular threshold value. So, a
@@ -557,7 +559,7 @@ Threshold            | Time: 0:00:00.001456  Type: bool    Shape: (1385, 1810)
 ```
 
 
-#### Hysteresis Threshold
+##### Hysteresis Threshold
 
 Hysteresis thresholding is a two-level threshold. The top-level threshold is treated in a similar fashion as basic
 thresholding. The bottom-level threshold must be exceeded and must be connected to the top-level threshold. This
@@ -604,7 +606,7 @@ Hysteresis Threshold | Time: 0:00:00.079292  Type: uint8   Shape: (1385, 1810)
 ```
 
 
-#### Otsu Threshold
+##### Otsu Threshold
 
 Thresholding using Otsu's method is another popular thresholding technique. This technique was used in the image
 processing described in [A Unified Framework for Tumor Proliferation Score Prediction in Breast
@@ -647,7 +649,7 @@ Otsu Threshold       | Time: 0:00:00.014615  Type: uint8   Shape: (1385, 1810)
 ```
 
 
-### Contrast
+#### Contrast
 
 For an image, suppose we have a histogram of the number of pixels (intensity on y-axis) plotted against the range
 of possible pixel values (x-axis, 0 to 255). Contrast is a measure of the difference in intensities. An image with
@@ -656,7 +658,7 @@ sharp and details can clearly be discerned. Increasing the contrast in an image 
 in the image.
 
 
-#### Contrast Stretching
+##### Contrast Stretching
 
 One form of increasing the contrast in an image is contrast stretching. Suppose that all intensities in an image occur
 between 100 and 150 on a scale from 0 to 255. If we rescale the intensities so that 100 now corresponds to 0 and
@@ -695,7 +697,7 @@ Contrast Stretch     | Time: 0:00:00.058357  Type: uint8   Shape: (1385, 1810)
 ```
 
 
-#### Histogram Equalization
+##### Histogram Equalization
 
 Histogram equalization is another technique that can be used to increase contrast in an image. However, unlike
 contrast stretching, which has a linear distribution of the resulting intensities, the histogram equalization
@@ -732,7 +734,7 @@ Hist Equalization    | Time: 0:00:00.116568  Type: uint8   Shape: (1385, 1810)
 ```
 
 
-#### Adaptive Equalization
+##### Adaptive Equalization
 
 Rather than applying a single transformation to all pixels in an image, adaptive histogram equalization applies
 transformations to local regions in an image. As a result, adaptive equalization allows contrast to be enhanced to
@@ -769,7 +771,7 @@ Adapt Equalization   | Time: 0:00:00.223172  Type: uint8   Shape: (1385, 1810)
 ```
 
 
-### Color
+#### Color
 
 The WSI tissue samples in the training dataset have been H&E stained. Eosin stains basic structures such as
 most cytoplasm proteins with a pink tone. Hematoxylin stains acidic structures such as DNA and RNA with a purple
@@ -808,7 +810,7 @@ including:
 colors are inclusively filtered and how pen colors are exclusively filtered.
 
 
-#### RGB to HED
+##### RGB to HED
 
 The scikit-image `skimage.color` package features an `rgb2hed()` function that performs color deconvolution on the
 original RGB image to create HED (Hematoxylin, Eosin, Diaminobenzidine) channels. The `filter_rgb_to_hed()` function
@@ -852,7 +854,7 @@ HED to Eosin         | Time: 0:00:00.086537  Type: uint8   Shape: (2594, 2945)
 ```
 
 
-#### Green Channel Filter
+##### Green Channel Filter
 
 If we look at an RGB color wheel, we see that purple and pink are next to each other. On the other side of color wheel,
 we have yellow and green. Since green is one of our 3 NumPy array RGB color channels, filtering out pixels that have a
@@ -889,7 +891,7 @@ Filter Green Channel | Time: 0:00:00.005618  Type: bool    Shape: (1385, 1810)
 ```
 
 
-#### Grays Filter
+##### Grays Filter
 
 Next, let's utilize a filter that can filter out the annoying shadow area at the top of slide #2. Notice that the
 shadow area consists of a gradient of dark-to-light grays. A gray pixel has red, green, and blue channel values that
@@ -925,7 +927,7 @@ Filter Grays         | Time: 0:00:00.082075  Type: bool    Shape: (1385, 1810)
 ```
 
 
-#### Red Filter
+##### Red Filter
 
 Next, let's turn our attention to filtering out shades of red, which can be used to filter out a significant amount of
 the red pen color. The red pen consists of a wide variety of closely related red shades. Certain shades are
@@ -978,7 +980,7 @@ Mask RGB             | Time: 0:00:00.022750  Type: uint8   Shape: (2594, 2945, 3
 ```
 
 
-#### Red Pen Filter
+##### Red Pen Filter
 
 Next, let's turn our attention to a more inclusive red pen filter that handles more shades of red. Since the
 `filter_red()` function returns a boolean array result, we can combine multiple sets of `filter_red()` threshold
@@ -1038,7 +1040,7 @@ Mask RGB             | Time: 0:00:00.037256  Type: uint8   Shape: (2594, 2945, 3
 Mask RGB             | Time: 0:00:00.026589  Type: uint8   Shape: (2594, 2945, 3)
 ```
 
-#### Blue Filter
+##### Blue Filter
 
 If we visually examine the 500 slides in the training dataset, we see that several of the slides have been marked
 with blue pen. Rather than blue lines, many of the blue marks consist of blue dots surrounding particular areas of
@@ -1086,7 +1088,7 @@ Mask RGB             | Time: 0:00:00.021153  Type: uint8   Shape: (2058, 3240, 3
 ```
 
 
-#### Blue Pen Filter
+##### Blue Pen Filter
 
 In `filter_blue_pen()`, we AND together various blue shade ranges using `filter_blue()` with
 sets of red, green, and blue threshold values to create a blue pen filter that filters out various shades of blue.
@@ -1158,7 +1160,7 @@ filter_blue: 0.45%
 filter_blue_pen: 0.69%
 ```
 
-#### Green Filter
+##### Green Filter
 
 We utilize the `filter_green()` function to filter green color shades. Using a color picker tool,
 if we examine the green pen marks on the slides, the green and blue channel
@@ -1199,7 +1201,7 @@ Mask RGB             | Time: 0:00:00.049026  Type: uint8   Shape: (2291, 3839, 3
 Mask RGB             | Time: 0:00:00.027211  Type: uint8   Shape: (2291, 3839, 3)
 ```
 
-#### Green Pen Filter
+##### Green Pen Filter
 
 To handle the green pen shades, the `filter_green_pen()` function combines different shade results using sets of
 red, green, and blue threshold values passed to the `filter_green()` function.
@@ -1255,7 +1257,7 @@ Mask RGB             | Time: 0:00:00.022867  Type: uint8   Shape: (2291, 3839, 3
 ```
 
 
-#### K-Means Segmentation
+##### K-Means Segmentation
 
 The scikit-image library contains functionality that allows for image segmentation using k-means clustering based
 on location and color. This allows regions of similarly colored pixels to be grouped together. These regions are
@@ -1353,7 +1355,7 @@ RAG Threshold        | Time: 0:00:23.774296  Type: uint8   Shape: (1385, 1810, 3
 ```
 
 
-### Morphology
+#### Morphology
 
 Information about image morphology can be found at
 [https://en.wikipedia.org/wiki/Mathematical_morphology](https://en.wikipedia.org/wiki/Mathematical_morphology).
@@ -1365,7 +1367,7 @@ are typically performed on binary and grayscale images. In our examples, we will
 images (2-dimensional arrays of 2 values, such as True/False, 1.0/0.0, and 255/0).
 
 
-#### Erosion
+##### Erosion
 
 Let's have a look at an erosion example.
 We create a binary image by calling the `filter_grays()` function on the original RGB image. The
@@ -1405,7 +1407,7 @@ Binary Erosion       | Time: 0:00:00.765442  Type: uint8   Shape: (1385, 1810)
 ```
 
 
-#### Dilation
+##### Dilation
 
 The `filter_binary_dilation()` function utilizes a disk structuring element in a similar manner as the corresponding
 erosion function. We'll utilize the same "No Grays" binary image from the previous example and dilate the image
@@ -1441,7 +1443,7 @@ Binary Dilation      | Time: 0:00:00.538761  Type: uint8   Shape: (1385, 1810)
 ```
 
 
-#### Opening
+##### Opening
 
 As mentioned, opening is erosion followed by dilation. Opening can be used to remove small foreground objects.
 
@@ -1476,7 +1478,7 @@ Binary Opening       | Time: 0:00:02.452089  Type: uint8   Shape: (1385, 1810)
 ```
 
 
-#### Closing
+##### Closing
 
 Closing is a dilation followed by an erosion. Closing can be used to remove small background holes.
 
@@ -1510,7 +1512,7 @@ Binary Closing       | Time: 0:00:02.592515  Type: uint8   Shape: (1385, 1810)
 ```
 
 
-#### Remove Small Objects
+##### Remove Small Objects
 
 The scikit-image `remove_small_objects()` function removes objects less than a particular minimum size. The
 `filter_remove_small_objects()` function wraps this and adds additional functionality. This can be useful for
@@ -1556,7 +1558,7 @@ Remove Small Objs    | Time: 0:00:00.044924  Type: uint8   Shape: (1385, 1810)
 ```
 
 
-#### Remove Small Holes
+##### Remove Small Holes
 
 The scikit-image `remove_small_holes()` function is similar to the `remove_small_objects()` function except it removes
 holes rather than objects from binary images. Here we demonstrate this using the `filter_remove_small_holes()`
@@ -1592,7 +1594,7 @@ Remove Small Holes   | Time: 0:00:00.044550  Type: uint8   Shape: (1385, 1810)
 ```
 
 
-#### Fill Holes
+##### Fill Holes
 
 The scikit-image `binary_fill_holes()` function is similar to the `remove_small_holes()` function. Using its default
 settings, it generates results similar but typically not identical to `remove_small_holes()` with a high minimum
@@ -1643,7 +1645,7 @@ Remove Small Holes   | Time: 0:00:00.044539  Type: bool    Shape: (1385, 1810)
 ```
 
 
-### Entropy
+#### Entropy
 
 The scikit-image `entropy()` function allows us to filter images based on complexity. Since areas such as slide
 backgrounds are less complex than area of interest such as cell nuclei, filtering on entropy offers interesting
@@ -1701,7 +1703,7 @@ Mask RGB             | Time: 0:00:00.006140  Type: uint8   Shape: (1385, 1810, 3
 ```
 
 
-### Canny Edge Detection
+#### Canny Edge Detection
 
 Edges in images are areas where there is typically a significant, abrupt change in image brightness.
 The Canny edge detection algorithm is implemented in sci-kit image. More information about
@@ -1751,7 +1753,7 @@ Mask RGB             | Time: 0:00:00.001443  Type: uint8   Shape: (600, 600, 3)
 ```
 
 
-## Combining Filters
+### Combining Filters
 
 Since our image filters utilize NumPy arrays, it is straightforward to combine our filters. For example, when
 we have filters that return boolean images for masking, we can use standard boolean algebra on our arrays to perform
@@ -1976,7 +1978,7 @@ After the additional processing, we see that the pen marks in the displayed regi
 | ![Remove More Green and More Gray](images/remove-more-green-more-gray.png "Remove More Green and More Gray") |
 
 
-## Applying Filters to Multiple Images
+### Applying Filters to Multiple Images
 
 When designing our set of tissue-selecting filters, one very important requirement is the ability to visually inspect
 the filter results across multiple slides. Ideally we should easily be able to alternate between displaying the
@@ -2067,7 +2069,7 @@ to the subset of relevant training images without requiring reprocessing of the 
 | ![Red Pen Slides with Filter Results](images/red-pen-slides-filters.png "Red Pen Slides with Filter Results") |
 
 
-## Overmask Avoidance
+### Overmask Avoidance
 
 When developing filters and filter settings to perform tissue segmentation on the entire training
 set, we have to deal with a great amount of variation in the slide samples. To begin with, some slides have a large
