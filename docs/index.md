@@ -2058,9 +2058,10 @@ is displayed as a separate row. Here, we see the filter results for slides #1, #
 
 
 To apply all filters to all images in the training set using multiprocessing, we can utilize the
-`multiprocess_apply_filters_to_images()` function. Since there are 8 images per slide and 500 slides,
-this results in a total of 4000 images and 4000 thumbnails. Generating `png` images, this takes about 37 minutes on
-my Mac laptop.
+`multiprocess_apply_filters_to_images()` function. Since there are 9 generated images per slide
+(8 of which are shown in the HTML summary) and 500 slides, this results in a total of 4,500 images
+and 4,500 thumbnails. Generating `png` images and `jpg` thumbnails, this takes about 24 minutes on
+my MacBook Pro.
 
 ```
 filter.multiprocess_apply_filters_to_images()
