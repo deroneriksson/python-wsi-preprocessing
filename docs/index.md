@@ -1994,6 +1994,14 @@ After the additional processing, we see that the pen marks in the displayed regi
 | ![Remove More Green and More Gray](images/remove-more-green-more-gray.png "Remove More Green and More Gray") |
 
 
+As another example, here we can see a summary of filters applied to a slide by `apply_filters_to_image()` and the
+resulting masked image.
+
+| **Filter Example** |
+| ------------------ |
+| ![Filter Example](images/filter-example.png "Filter Example") |
+
+
 ### Applying Filters to Multiple Images
 
 When designing our set of tissue-selecting filters, one very important requirement is the ability to visually inspect
