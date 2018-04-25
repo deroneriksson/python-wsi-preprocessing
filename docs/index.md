@@ -437,9 +437,18 @@ img.save(path)
 
 ## Apply Filters for Tissue Segmentation
 
+Next, we will determine a set of filters that can be utilized for effective tissue segmentation with our dataset.
+We will mask out non-tissue by setting non-tissue pixels to 0 for their red, green, and blue channels. For our
+particular dataset, our mask will AND together a green channel mask, a grays mask, a red pen mask, a green pen mask,
+and a blue pen mask. Following this, we will mask out small objects from the images.
+
+To filter our 1/32x 500 `png` image training set and generate 4,500 `png` filter preview images and 4,500 `jpg` thumbnails
+takes about 23m30s on my MacBook Pro. Filtering the 500 image training set without saving files takes approximately
+6 minutes.
+
 ### Filters
 
-Now, let's take a look at several ways that our images can be filtered. Filters are represented by functions
+Let's take a look at several ways that our images can be filtered. Filters are represented by functions
 in the `wsi/filter.py` file and have `filter_` prepended to the function names.
 
 
