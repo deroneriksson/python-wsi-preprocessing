@@ -1,6 +1,7 @@
 
 .DS_Store
 .idea/
+.project
 docs/_site
 **/__pycache__
 **/filters*.html
