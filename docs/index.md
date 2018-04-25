@@ -2265,3 +2265,16 @@ Slide #021 processing time: 0:00:04.596086
 
 ```
 
+
+## Tiles
+
+Following our filtering, we should have fairly good tissue segmentation for our dataset,
+where non-tissue pixels have been masked out from our 1/32x scaled-down slide images. At this
+stage, we will break our images into tile regions. Tiling code is located in the `wsi/tiles.py`
+file.
+
+For visualization, the tissue percentage of each tile will be color-coded in a similar fashion
+to a heat map. Tiles with 80% or more tissue are green, tiles less than 80% tissue and greater
+or equal to 10% tissue are yellow, tiles less than 10% tissue and greater than 0% tissue are
+orange, and tiles with 0% tissue are red.
+
