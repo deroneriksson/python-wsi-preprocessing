@@ -157,13 +157,8 @@ def generate_tile_summaries(tile_sum, np_img, display=True, save_summary=False):
   Args:
     tile_sum: TileSummary object.
     np_img: Image as a NumPy array.
-    tile_indices: List of tuples consisting of starting row, ending row, starting column, ending column, row number,
-                  column number.
-    row_tile_size: Number of pixels in a tile row.
-    col_tile_size: Number of pixels in a tile column.
     display: If True, display tile summary to screen.
     save_summary: If True, save tile summary images.
-    text_size: Font size.
   """
   z = 300  # height of area at top of summary slide
   slide_num = tile_sum.slide_num
@@ -223,7 +218,6 @@ def generate_top_tile_summaries(tile_sum, np_img, display=True, save_summary=Fal
     np_img: Image as a NumPy array.
     display: If True, display top tiles to screen.
     save_summary: If True, save top tiles images.
-    text_size: Font size.
     show_top_stats: If True, append top tile score stats to image.
     label_all_tiles: If True, label all tiles. If False, label only top tiles.
   """
@@ -424,6 +418,7 @@ def tile_border(draw, r_s, r_e, c_s, c_e, color, border_size=TILE_BORDER_SIZE):
     c_s: Column starting pixel.
     c_e: Column ending pixel.
     color: Color of the border.
+    border_size: Width of tile border in pixels.
   """
   for x in range(0, border_size):
     draw.rectangle([(c_s + x, r_s + x), (c_e - 1 - x, r_e - 1 - x)], outline=color)
@@ -1262,6 +1257,7 @@ def display_image_with_hsv_hue_histogram(np_rgb, text=None, scale_up=False):
   Args:
     np_rgb: RGB image tile as a NumPy array
     text: Optional text to display above image
+    scale_up: If True, scale up image to display by slide.SCALE_FACTOR
   """
   hsv = filter.filter_rgb_to_hsv(np_rgb)
   h = filter.filter_hsv_to_h(hsv)
@@ -1302,6 +1298,7 @@ def display_image(np_rgb, text=None, scale_up=False):
   Args:
     np_rgb: RGB image tile as a NumPy array
     text: Optional text to display above image
+    scale_up: If True, scale up image to display by slide.SCALE_FACTOR
   """
   if scale_up:
     np_rgb = np.repeat(np_rgb, slide.SCALE_FACTOR, axis=1)
@@ -1330,6 +1327,7 @@ def display_image_with_hsv_histograms(np_rgb, text=None, scale_up=False):
   Args:
     np_rgb: RGB image tile as a NumPy array
     text: Optional text to display above image
+    scale_up: If True, scale up image to display by slide.SCALE_FACTOR
   """
   hsv = filter.filter_rgb_to_hsv(np_rgb)
   np_h = np_hsv_hue_histogram(filter.filter_hsv_to_h(hsv))
@@ -1381,6 +1379,7 @@ def display_image_with_rgb_histograms(np_rgb, text=None, scale_up=False):
   Args:
     np_rgb: RGB image tile as a NumPy array
     text: Optional text to display above image
+    scale_up: If True, scale up image to display by slide.SCALE_FACTOR
   """
   np_r = np_rgb_r_histogram(np_rgb)
   np_g = np_rgb_g_histogram(np_rgb)
