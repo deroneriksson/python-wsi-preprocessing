@@ -2283,11 +2283,23 @@ The heat map threshold values can be adjusted by modifying the `TISSUE_HIGH_THRE
 respectively. Heat map colors can be adjusted by modifying the `HIGH_COLOR`, `MEDIUM_COLOR`,
 `LOW_COLOR`, and `NONE_COLOR` constants. The heat map border size can be adjusted using the
 `TILE_BORDER_SIZE` constant, which has a default value of 2.
-
 Tile sizes are specified according to number of pixels in the original WSI files. The
 default `ROW_TILE_SIZE` and `COL_TILE_SIZE` values are 1,024 pixels.
 
 To generate and display tiles for a single slide, we can utilize the `summary_and_tiles` function,
 which generates tile summaries and returns the top scoring tiles for a slide. We will discuss
 tile scoring in a later section.
+
+Let's generate tile tissue heat map summaries for slide #2 and display the summaries to the screen.
+
+```
+tiles.summary_and_tiles(2, display=True, save_summary=True, save_data=False, save_top_tiles=False)
+```
+
+Here, we see the tile tissue segmentation heat map summaries that are generated. The heat maps are
+displayed on the masked image and the original image to allow for comparison.
+
+| **Tissue Heat Map** | **Tissue Heat Map on Original** |
+| ------------------------ | ------------------------------------ |
+| ![Tissue Heat Map](images/slide-2-tile-tissue-heatmap.png "Tissue Heat Map") | ![Tissue Heat Map on Original](images/slide-2-tile-tissue-heatmap-original.png "Tissue Heat Map on Original") |
 
