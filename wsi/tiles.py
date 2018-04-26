@@ -725,7 +725,7 @@ def score_tile(np_tile, tissue_percent, slide_num, row, col):
 
   Returns tuple consisting of score, color factor, saturation/value factor, and tissue quantity factor.
   """
-  color_factor = hsv_purple_pink_factor(np_tile, tissue_percent, slide_num, row, col)
+  color_factor = hsv_purple_pink_factor(np_tile)
   s_and_v_factor = hsv_saturation_and_value_factor(np_tile)
   amount = tissue_quantity(tissue_percent)
   quantity_factor = tissue_quantity_factor(amount)
@@ -1653,17 +1653,13 @@ def hsv_pink_deviation(hsv_hues):
   return pink_deviation
 
 
-def hsv_purple_pink_factor(rgb, tissue_percentage, slide_num, row, col):
+def hsv_purple_pink_factor(rgb):
   """
   Compute scoring factor based on purple and pink HSV hue deviations and degree to which a narrowed hue color range
   average is purple versus pink.
 
   Args:
     rgb: Image an NumPy array.
-    tissue_percentage: The tissue percentage for this tile.
-    slide_num: The slide number.
-    row: The row.
-    col: The column.
 
   Returns:
     Factor that favors purple (hematoxylin stained) tissue over pink (eosin stained) tissue.
