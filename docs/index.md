@@ -2273,8 +2273,21 @@ where non-tissue pixels have been masked out from our 1/32x scaled-down slide im
 stage, we will break our images into tile regions. Tiling code is located in the `wsi/tiles.py`
 file.
 
-For visualization, the tissue percentage of each tile will be color-coded in a similar fashion
+For visualization, the tissue percentage of each tile is color-coded in a similar fashion
 to a heat map. Tiles with 80% or more tissue are green, tiles less than 80% tissue and greater
 or equal to 10% tissue are yellow, tiles less than 10% tissue and greater than 0% tissue are
 orange, and tiles with 0% tissue are red.
+
+The heat map threshold values can be adjusted by modifying the `TISSUE_HIGH_THRESH` and
+`TISSUE_LOW_THRESH` constants in `wsi/tiles.py`, which have default values of 80 and 10
+respectively. Heat map colors can be adjusted by modifying the `HIGH_COLOR`, `MEDIUM_COLOR`,
+`LOW_COLOR`, and `NONE_COLOR` constants. The heat map border size can be adjusted using the
+`TILE_BORDER_SIZE` constant, which has a default value of 2.
+
+Tile sizes are specified according to number of pixels in the original WSI files. The
+default `ROW_TILE_SIZE` and `COL_TILE_SIZE` values are 1,024 pixels.
+
+To generate and display tiles for a single slide, we can utilize the `summary_and_tiles` function,
+which generates tile summaries and returns the top scoring tiles for a slide. We will discuss
+tile scoring in a later section.
 
