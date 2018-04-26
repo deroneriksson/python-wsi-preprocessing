@@ -51,15 +51,15 @@ BORDER_ALL_TILES_IN_TOP_TILE_SUMMARY = False
 
 TILE_BORDER_SIZE = 2  # The size of the colored rectangular border around summary tiles.
 
-THRESH_COLOR = (0, 255, 0)
-BELOW_THRESH_COLOR = (255, 255, 0)
-BELOW_LOWER_THRESH_COLOR = (255, 165, 0)
-NO_TISSUE_COLOR = (255, 0, 0)
+HIGH_COLOR = (0, 255, 0)
+MEDIUM_COLOR = (255, 255, 0)
+LOW_COLOR_COLOR = (255, 165, 0)
+NONE_COLOR = (255, 0, 0)
 
 FADED_THRESH_COLOR = (128, 255, 128)
-FADED_BELOW_THRESH_COLOR = (255, 255, 128)
-FADED_BELOW_LOWER_THRESH_COLOR = (255, 210, 128)
-FADED_NO_TISSUE_COLOR = (255, 128, 128)
+FADED_MEDIUM_COLOR = (255, 255, 128)
+FADED_LOW_COLOR_COLOR = (255, 210, 128)
+FADED_NONE_COLOR = (255, 128, 128)
 
 FONT_PATH = "/Library/Fonts/Arial Bold.ttf"
 SUMMARY_TITLE_FONT_PATH = "/Library/Fonts/Courier New Bold.ttf"
@@ -341,13 +341,13 @@ def tile_border_color(tissue_percentage):
     The tile border color corresponding to the tile tissue percentage.
   """
   if tissue_percentage >= TISSUE_HIGH_THRESH:
-    border_color = THRESH_COLOR
+    border_color = HIGH_COLOR
   elif (tissue_percentage >= TISSUE_LOW_THRESH) and (tissue_percentage < TISSUE_HIGH_THRESH):
-    border_color = BELOW_THRESH_COLOR
+    border_color = MEDIUM_COLOR
   elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESH):
-    border_color = BELOW_LOWER_THRESH_COLOR
+    border_color = LOW_COLOR_COLOR
   else:
-    border_color = NO_TISSUE_COLOR
+    border_color = NONE_COLOR
   return border_color
 
 
@@ -364,11 +364,11 @@ def faded_tile_border_color(tissue_percentage):
   if tissue_percentage >= TISSUE_HIGH_THRESH:
     border_color = FADED_THRESH_COLOR
   elif (tissue_percentage >= TISSUE_LOW_THRESH) and (tissue_percentage < TISSUE_HIGH_THRESH):
-    border_color = FADED_BELOW_THRESH_COLOR
+    border_color = FADED_MEDIUM_COLOR
   elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESH):
-    border_color = FADED_BELOW_LOWER_THRESH_COLOR
+    border_color = FADED_LOW_COLOR_COLOR
   else:
-    border_color = FADED_NO_TISSUE_COLOR
+    border_color = FADED_NONE_COLOR
   return border_color
 
 
