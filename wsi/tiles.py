@@ -53,12 +53,12 @@ TILE_BORDER_SIZE = 2  # The size of the colored rectangular border around summar
 
 HIGH_COLOR = (0, 255, 0)
 MEDIUM_COLOR = (255, 255, 0)
-LOW_COLOR_COLOR = (255, 165, 0)
+LOW_COLOR = (255, 165, 0)
 NONE_COLOR = (255, 0, 0)
 
 FADED_THRESH_COLOR = (128, 255, 128)
 FADED_MEDIUM_COLOR = (255, 255, 128)
-FADED_LOW_COLOR_COLOR = (255, 210, 128)
+FADED_LOW_COLOR = (255, 210, 128)
 FADED_NONE_COLOR = (255, 128, 128)
 
 FONT_PATH = "/Library/Fonts/Arial Bold.ttf"
@@ -345,7 +345,7 @@ def tile_border_color(tissue_percentage):
   elif (tissue_percentage >= TISSUE_LOW_THRESH) and (tissue_percentage < TISSUE_HIGH_THRESH):
     border_color = MEDIUM_COLOR
   elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESH):
-    border_color = LOW_COLOR_COLOR
+    border_color = LOW_COLOR
   else:
     border_color = NONE_COLOR
   return border_color
@@ -366,7 +366,7 @@ def faded_tile_border_color(tissue_percentage):
   elif (tissue_percentage >= TISSUE_LOW_THRESH) and (tissue_percentage < TISSUE_HIGH_THRESH):
     border_color = FADED_MEDIUM_COLOR
   elif (tissue_percentage > 0) and (tissue_percentage < TISSUE_LOW_THRESH):
-    border_color = FADED_LOW_COLOR_COLOR
+    border_color = FADED_LOW_COLOR
   else:
     border_color = FADED_NONE_COLOR
   return border_color
