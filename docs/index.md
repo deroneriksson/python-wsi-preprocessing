@@ -2306,7 +2306,8 @@ displayed on the masked image and the original image to allow for comparison.
 
 Often it can be useful to know the exact row and column of a particular tile or tiles. If the
 `DISPLAY_TILE_SUMMARY_LABELS` constant is set to True, the row and column of each tile will be
-output on the tile summaries.
+output on the tile summaries. Generating the tile labels is fairly time-consuming, so usually
+`DISPLAY_TILE_SUMMARY_LABELS` should be set to False for performance.
 
 | **Optional Tile Labels** |
 | -------------------- |
