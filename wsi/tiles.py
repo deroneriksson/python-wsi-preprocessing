@@ -1430,6 +1430,12 @@ def pil_text(text, w_border=TILE_TEXT_W_BORDER, h_border=TILE_TEXT_H_BORDER, fon
 
   Args:
     text: The text to convert to an image.
+    w_border: Tile text width border (left and right).
+    h_border: Tile text height border (top and bottom).
+    font_path: Path to font.
+    font_size: Size of font.
+    text_color: Tile text color.
+    background: Tile background color.
 
   Returns:
     PIL image representing the text.
@@ -1450,6 +1456,12 @@ def np_text(text, w_border=TILE_TEXT_W_BORDER, h_border=TILE_TEXT_H_BORDER, font
 
   Args:
     text: The text to convert to an image.
+    w_border: Tile text width border (left and right).
+    h_border: Tile text height border (top and bottom).
+    font_path: Path to font.
+    font_size: Size of font.
+    text_color: Tile text color.
+    background: Tile background color.
 
   Returns:
     NumPy array representing the text.
@@ -1466,6 +1478,8 @@ def display_tile(tile, rgb_histograms=True, hsv_histograms=True):
 
   Args:
     tile: The Tile object.
+    rgb_histograms: If True, display RGB histograms.
+    hsv_histograms: If True, display HSV histograms.
   """
 
   text = "S%03d R%03d C%03d\n" % (tile.slide_num, tile.r, tile.c)
