@@ -2270,7 +2270,7 @@ Slide #021 processing time: 0:00:04.596086
 
 Following our filtering, we should have fairly good tissue segmentation for our dataset,
 where non-tissue pixels have been masked out from our 1/32x scaled-down slide images. At this
-stage, we will break our images into tile regions. Tiling code is located in the `wsi/tiles.py`
+stage, we break our images into tile regions. Tiling code is located in the `wsi/tiles.py`
 file.
 
 For visualization, the tissue percentage of each tile is color-coded in a similar fashion
@@ -2303,3 +2303,11 @@ displayed on the masked image and the original image to allow for comparison.
 | ------------------------ | ------------------------------------ |
 | ![Tissue Heat Map](images/slide-2-tile-tissue-heatmap.png "Tissue Heat Map") | ![Tissue Heat Map on Original](images/slide-2-tile-tissue-heatmap-original.png "Tissue Heat Map on Original") |
 
+
+Often it can be useful to know the exact row and column of a particular tile or tiles. If the
+`DISPLAY_TILE_SUMMARY_LABELS` constant is set to True, the row and column of each tile will be
+output on the tile summaries.
+
+| **Optional Tile Labels** |
+| -------------------- |
+| ![Optional Tile Labels](images/optional-tile-labels.png "Optional Tile Labels") |
