@@ -2303,6 +2303,29 @@ displayed on the masked image and the original image to allow for comparison.
 | ------------------------ | ------------------------------------ |
 | ![Tissue Heat Map](images/slide-2-tile-tissue-heatmap.png "Tissue Heat Map") | ![Tissue Heat Map on Original](images/slide-2-tile-tissue-heatmap-original.png "Tissue Heat Map on Original") |
 
+We can see a variety of slide statistics displayed on the tile summaries. We can see that slide #2
+has dimensions of 57,922x44,329. After scaling down the slide width and height by 1/32x, we have a
+`png` image with dimensions 1,810x1,385. Breaking this image down into 32x32 tiles, we have 57 rows
+and 44 columns, making a total of 2,508 tiles. Using our tissue segmentation filtering algorithms,
+we have 1,283 tiles with high tissue percentages (>=80%), 397 tiles with medium tissue percentages
+(>=10% and <80%), 102 tiles with low tissue percentages (>0% and <10%), and 726 tiles with no tissue
+(0%).
+
+| Characteristic      | Result        |
+| ------------------- | ------------- |
+| Original Dimensions | 57,922x44,329 |
+| Original Tile Size  | 1,024x1,024   |
+| Scale Factor        | 1/32x         |
+| Scaled Dimensions   | 1,810x1,385   |
+| Scaled Tile Size    | 32x32         |
+| Total Mask          | 41.60%        |
+| Total Tissue        | 58.40%        |
+| Tiles               | 57x44 = 2508  |
+| | 1,283 (51.16%) tiles >=80% tissue          |
+| |   397 (15.83%) tiles >=10% and <80% tissue |
+| |   102 ( 4.07%) tiles >0% and <10% tissue   |
+| |   726 (28.95%) tiles =0% tissue            |
+
 
 Often it can be useful to know the exact row and column of a particular tile or tiles. If the
 `DISPLAY_TILE_SUMMARY_LABELS` constant is set to True, the row and column of each tile will be
