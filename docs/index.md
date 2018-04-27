@@ -2421,9 +2421,19 @@ tile.display_with_histograms();
 ```
 
 Here we see RGB and HSV histograms for the scaled-down tile at slide 2, row 29, column 16. We
-see its score and tissue percentage. We also see that this tile's score was ranked 734 out of
+see its score and tissue percentage. This tile's score was ranked 734 out of
 a total of 2,508 tiles on this slide.
 
 | **Small Tile Color Histograms** |
 | -------------------- |
 | ![Small Tile Color Histograms](images/color-histograms-small-tile.png "Small Tile Color Histograms") |
+
+
+Here we see RGB and HSV histograms for the full-sized 1,024x1,024 tile at slide 2, row 29,
+column 16. Notice that the small tile pixels offer a reasonable approximation of the colors
+present on the large tile. Also, notice that the masked-out pixels in the small tissue
+correspond fairly accurately with the non-tissue regions of the large tile.
+
+| **Large Tile Color Histograms** |
+| -------------------- |
+| ![Large Tile Color Histograms](images/color-histograms-large-tile.png "Large Tile Color Histograms") |
