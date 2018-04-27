@@ -2376,3 +2376,33 @@ degrees. We remove all hues less than 260 and greater than 340. Next, we compute
 purple (270) and the deviation from pink (330). We compute an average factor which is the squared
 difference of 340 and the hue average. The *colorfactor* is computed as the pink deviation times
 the average factor divided by the purple deviation.
+
+Let's have a closer look at a 32x32 tile and its accompanying HSV hue histogram. Note that in order
+to properly convert a matplotlib chart image (the histogram) to a NumPy image on macOS, we currently
+need to include a call to `matplotlib.use('Agg')`.
+One way we can obtain a particular tile for analysis is to call
+the `dynamic_tile()` function, which we will describe in more detail later. Here, we will obtain
+the tile at the 29th row and 16th column on slide #2. Setting the `small_tile_in_tile` parameter
+to `True` means that the scaled-down 32x32 tile will be included in the returned Tile object.
+The `display_image_with_hsv_hue_histogram()` function is used to display the small tile and its hue
+histogram.
+
+```
+# To get around renderer issue on macOS going from Matplotlib image to NumPy image.
+import matplotlib
+matplotlib.use('Agg')
+from wsi import tiles
+
+tile = tiles.dynamic_tile(2, 29, 16, True)
+tiles.display_image_with_hsv_hue_histogram(tile.get_np_scaled_tile(), scale_up=True)
+```
+
+Here we see the 32x32 slide with its accompanying hue histogram. For convenience, colors have
+been added to the histogram. Notice that purple is at 270 degrees and pink is at 330 degrees.
+Also, notice that the non-tissue masked-out pixels have a peak at 0 degrees.
+
+| **Tile HSV Hue Histogram** |
+| -------------------- |
+| ![Tile HSV Hue Histogram](images/hsv-hue-histogram.png "Tile HSV Hue Histogram") |
+
+

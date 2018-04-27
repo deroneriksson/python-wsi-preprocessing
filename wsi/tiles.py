@@ -19,7 +19,7 @@
 #
 # -------------------------------------------------------------
 
-# To get around renderer issue on OSX going from Matplotlib image to NumPy image.
+# To get around renderer issue on macOS going from Matplotlib image to NumPy image.
 import matplotlib
 
 matplotlib.use('Agg')
@@ -1950,9 +1950,10 @@ def dynamic_tile(slide_num, row, col, small_tile_in_tile=False):
   tile = tile_summary.get_tile(row, col)
   return tile
 
-if __name__ == "__main__":
-  tile = dynamic_tile(2, 29, 16, True)
-  tile.get_pil_scaled_tile().show()
+# if __name__ == "__main__":
+#   tile = dynamic_tile(2, 29, 16, True)
+#   display_image_with_hsv_hue_histogram(tile.get_np_scaled_tile(), scale_up=True)
+  # tile.get_pil_scaled_tile().show()
   # tile.display_with_histograms()
 #   singleprocess_filtered_images_to_tiles(image_num_list=[7, 8, 9])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
