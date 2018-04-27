@@ -2437,3 +2437,31 @@ correspond fairly accurately with the non-tissue regions of the large tile.
 | **Large Tile Color Histograms** |
 | -------------------- |
 | ![Large Tile Color Histograms](images/color-histograms-large-tile.png "Large Tile Color Histograms") |
+
+
+### Top Tiles
+
+In addition to the tile tissue heat map summaries, the `summary_and_tiles()` function generates
+top tile summaries. By default it highlights the top 50 scoring tiles. The number of top tiles can be
+controlled by the `NUM_TOP_TILES` constant.
+
+```
+tiles.summary_and_tiles(2, display=True, save_summary=True, save_data=False, save_top_tiles=False)
+```
+
+Here we see the top tile summary on the masked image for slide #2. Notice that tiles with high
+tissue percentages and hematoxylin-stained tissue are favored over tiles with low tissue
+percentages and eosin-stained tissue. Notice that statistics about the top 50 scoring tiles are
+displayed to the right of the image.
+
+| **Top Tiles** |
+| ------------- |
+| ![Top Tiles](images/slide-2-top-tiles.png "Top Tiles") |
+
+
+For visual inspection, the top tile summary is also generated over the original slide image, as
+we see here.
+
+| **Top Tiles on Original** |
+| ------------------------- |
+| ![Top Tiles on Original](images/slide-2-top-tiles-original.png "Top Tiles on Original") |
