@@ -2335,3 +2335,29 @@ output on the tile summaries. Generating the tile labels is fairly time-consumin
 | **Optional Tile Labels** |
 | -------------------- |
 | ![Optional Tile Labels](images/optional-tile-labels.png "Optional Tile Labels") |
+
+
+## Tile Scoring
+
+In order to selectively choose how "good" a tile is compared to other tiles, we assign scores to
+tiles based on tissue percentage and color characteristics. To determine the "best" tiles, we
+sort based on score and return the top scoring tiles. We generate top tile summaries based on the
+top scoring tiles, in a similar fashion as the tissue percentage summaries.
+
+The `score_tile()` function assigns a score to a tile based on the tissue percentage and various
+color characteristics of the tile. The scoring formula utilized by `score_tile()` can be summarized
+as follows.
+
+| **Scoring Formula** |
+| -------------------- |
+| ![Scoring Formula](images/scoring-formula.png "Scoring Formula") |
+
+The scoring formula generates good results for the images in the dataset and was developed through
+experimentation with the training dataset. The *tissuepercent* is emphasized by squaring its value.
+The *colorfactor* value is used to weigh hematoxylin staining heavier than eosin staining. Utilizing
+an HSV color model, broad saturation and value distributions are given more weight by the
+*saturationvaluefactor*. The *quantityfactor* value utilizes the tissue percentage to give more weight
+to tiles with more tissue. Note that if *colorfactor*, *saturationvaluefactor*, or
+*quantityfactor* evaluate to 0, the *score* will be 0. The *score* is scaled to a value from
+0.0 to 1.0.
+
