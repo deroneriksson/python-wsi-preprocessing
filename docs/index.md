@@ -2406,3 +2406,24 @@ Also, notice that the non-tissue masked-out pixels have a peak at 0 degrees.
 | ![Tile HSV Hue Histogram](images/hsv-hue-histogram.png "Tile HSV Hue Histogram") |
 
 
+For convenience, the `Tile` class has a `display_with_histograms()` function that can be used
+to display histograms for both the RGB and HSV color spaces. If the scaled-down small tile is
+included in the Tile object (using the `dynamic_tile()` `small_tile_in_tile` parameter with a
+value of `True`), histograms will be displayed for both the small tile and the large tile.
+
+```
+import matplotlib
+matplotlib.use('Agg')
+from wsi import tiles
+
+tile = tiles.dynamic_tile(2, 29, 16, True)
+tile.display_with_histograms();
+```
+
+Here we see RGB and HSV histograms for the scaled-down tile at slide 2, row 29, column 16. We
+see its score and tissue percentage. We also see that this tile's score was ranked 734 out of
+a total of 2,508 tiles on this slide.
+
+| **Small Tile Color Histograms** |
+| -------------------- |
+| ![Small Tile Color Histograms](images/color-histograms-small-tile.png "Small Tile Color Histograms") |
