@@ -2361,3 +2361,18 @@ to tiles with more tissue. Note that if *colorfactor*, *saturationvaluefactor*, 
 *quantityfactor* evaluate to 0, the *score* will be 0. The *score* is scaled to a value from
 0.0 to 1.0.
 
+During our discussion of color staining, we mentioned that tissue with hematoxylin staining is most
+likely preferable to eosin staining. Hematoxylin stains acidic structures such as DNA and RNA with
+a purple tone, while eosin stains basic structures such as cytoplasm proteins with a pink tone.
+Let's discuss how we can more heavily score tiles with hematoxylin staining over eosin staining.
+
+Differentiating purplish shades from pinkish shades can be difficult using the RGB color space
+(see [https://en.wikipedia.org/wiki/RGB_color_space](https://en.wikipedia.org/wiki/RGB_color_space)).
+Therefore, to compute our *colorfactor* value, we first convert our tile in RGB color space
+to HSV color space (see [https://en.wikipedia.org/wiki/HSL_and_HSV](https://en.wikipedia.org/wiki/HSL_and_HSV)).
+HSV stands for Hue-Saturation-Value. In this color model, the hue is represented as a degree value
+on a circle. Purple has a hue of 270 degrees and pink has a hue of 330
+degrees. We remove all hues less than 260 and greater than 340. Next, we compute the deviation from
+purple (270) and the deviation from pink (330). We compute an average factor which is the squared
+difference of 340 and the hue average. The *colorfactor* is computed as the pink deviation times
+the average factor divided by the purple deviation.
