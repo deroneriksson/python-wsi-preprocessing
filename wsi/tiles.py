@@ -1902,6 +1902,9 @@ class Tile:
   def get_np_scaled_tile(self):
     return self.np_scaled_tile
 
+  def get_pil_scaled_tile(self):
+    return util.np_to_pil(self.np_scaled_tile)
+
 
 class TissueQuantity(Enum):
   NONE = 0
@@ -1947,7 +1950,10 @@ def dynamic_tile(slide_num, row, col, small_tile_in_tile=False):
   tile = tile_summary.get_tile(row, col)
   return tile
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
+  tile = dynamic_tile(2, 29, 16, True)
+  tile.get_pil_scaled_tile().show()
+  # tile.display_with_histograms()
 #   singleprocess_filtered_images_to_tiles(image_num_list=[7, 8, 9])
 # multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], display=False)
 # singleprocess_filtered_images_to_tiles(image_num_list=[6, 7, 8])
