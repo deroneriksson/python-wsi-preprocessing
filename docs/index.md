@@ -2439,7 +2439,21 @@ correspond fairly accurately with the non-tissue regions of the large tile.
 | ![Large Tile Color Histograms](images/color-histograms-large-tile.png "Large Tile Color Histograms") |
 
 
-### Top Tiles
+If the `save_data` parameter of the `summary_and_tiles()` function is set to `True`, detailed data about
+the slide tiles are saved in `csv` format.
+
+```
+tiles.summary_and_tiles(2, display=True, save_summary=True, save_data=True, save_top_tiles=False)
+```
+
+For slide #2, this generates a `TUPAC-TR-002-32x-57922x44329-1810x1385-tile_data.csv` file.
+
+| **Tile Data** |
+| ------------- |
+| ![Tile Data](images/tile-data.png "Tile Data") |
+
+
+## Top Tile Retrieval
 
 In addition to the tile tissue heat map summaries, the `summary_and_tiles()` function generates
 top tile summaries. By default it highlights the top 50 scoring tiles. The number of top tiles can be
@@ -2465,3 +2479,5 @@ we see here.
 | **Top Tiles on Original** |
 | ------------------------- |
 | ![Top Tiles on Original](images/slide-2-top-tiles-original.png "Top Tiles on Original") |
+
+
