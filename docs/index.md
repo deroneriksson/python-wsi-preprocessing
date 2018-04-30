@@ -2381,9 +2381,9 @@ Let's have a closer look at a 32x32 tile and its accompanying HSV hue histogram.
 to properly convert a matplotlib chart image (the histogram) to a NumPy image on macOS, we currently
 need to include a call to `matplotlib.use('Agg')`.
 One way we can obtain a particular tile for analysis is to call
-the `dynamic_tile()` function, which we will describe in more detail later. Here, we will obtain
+the `dynamic_tile()` function, which we describe in more detail later. Here, we obtain
 the tile at the 29th row and 16th column on slide #2. Setting the `small_tile_in_tile` parameter
-to `True` means that the scaled-down 32x32 tile will be included in the returned Tile object.
+to `True` means that the scaled-down 32x32 tile is included in the returned Tile object.
 The `display_image_with_hsv_hue_histogram()` function is used to display the small tile and its hue
 histogram.
 
@@ -2453,8 +2453,6 @@ For slide #2, this generates a `TUPAC-TR-002-32x-57922x44329-1810x1385-tile_data
 | ![Tile Data](images/tile-data.png "Tile Data") |
 
 
-## Top Tile Retrieval
-
 In addition to the tile tissue heat map summaries, the `summary_and_tiles()` function generates
 top tile summaries. By default it highlights the top 50 scoring tiles. The number of top tiles can be
 controlled by the `NUM_TOP_TILES` constant.
@@ -2480,4 +2478,38 @@ we see here.
 | ------------------------- |
 | ![Top Tiles on Original](images/slide-2-top-tiles-original.png "Top Tiles on Original") |
 
+
+## Top Tile Retrieval
+
+Top tiles can be saved as files in batch mode or retrieved dynamically. In batch mode,
+tiling, scoring, and saving the 1,000 tissue percentage heat map summaries (2 per image),
+the 1,000 top tile summaries (2 per image), the 2,000 thumbnails, and 25,000 1Kx1K tiles
+(50 per image) takes approximately 2 hours.
+
+If the `save_top_tiles` parameter of the `summary_and_tiles()` function is set to `True`,
+the top-ranking tiles for the specified slide will be saved to the file system.
+
+```
+tiles.summary_and_tiles(2, display=True, save_summary=True, save_data=False, save_top_tiles=True)
+```
+
+In general, it is recommended that the user utilize the `singleprocess_filtered_images_to_tiles()`
+and `multiprocess_filtered_images_to_tiles()` functions in `wsi/tiles.py`. These functions
+generate convenient HTML pages for investigating the tiles generated for a slide set. The
+`multiprocess_filtered_images_to_tiles()` utilizes multiprocessing for added performance.
+
+Here, we generate the top 50 tiles for slides #1, #2, and #3.
+
+```
+tiles.multiprocess_filtered_images_to_tiles(image_num_list=[1, 2, 3])
+```
+
+On the generated `tiles.html` page, we see the original slide images, the images after filtering,
+the tissue percentage heat map summaries on the filtered images and the original images, tile summary
+data including links to the generated `csv` file for each slide, the top tile summaries on the
+filtered images and the original images, and links to the top 50 tile files for each slide.
+
+| **Tiles Page** |
+| ------------- |
+| ![Tiles Page](images/tiles-page.png "Tiles Page") |
 
