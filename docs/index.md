@@ -2525,7 +2525,8 @@ two top-scoring tiles on slide 2 at row 34, column 34 and row 35, column 37.
 
 Tiles can also be retrieved dynamically. In dynamic tile retrieval, slides are scaled down,
 filtered, tiled, and scored all in-memory. The top tiles can then be retrieved from the
-original WSI file and stored in-memory.
+original WSI file and stored in-memory. No intermediate files are written to the file system
+during dynamic tile retrieval.
 
 Here, we dynamically obtain a `TileSummary` object by calling `dynamic_tiles()` for
 slide #2. We obtain the top-scoring tiles from `tile_summary`, outputting status
@@ -2634,4 +2635,8 @@ top = tile_summary.top_tiles()[:2]
 for t in top:
   t.display_with_histograms()
 ```
+
+| **Slide #4, Top Tile #1** | **Slide #4, Top Tile #2** |
+| ------------------------ | ------------------------------------ |
+| ![Slide #4, Top Tile #1](images/slide-4-top-tile-1.png "Slide #4, Top Tile #1") | ![Slide #4, Top Tile #2](images/slide-4-top-tile-2.png "Slide #4, Top Tile #2") |
 
