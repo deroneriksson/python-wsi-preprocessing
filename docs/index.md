@@ -2521,3 +2521,117 @@ two top-scoring tiles on slide 2 at row 34, column 34 and row 35, column 37.
 | **Slide #1, Top Tile #1** | **Slide #1, Top Tile #2** |
 | ------------------------ | ------------------------------------ |
 | ![Slide #1, Top Tile #1](images/TUPAC-TR-002-tile-r34-c34-x33793-y33799-w1024-h1024.png "Slide #1, Top Tile #1") | ![Slide #1, Top Tile #2](images/TUPAC-TR-002-tile-r35-c37-x36865-y34823-w1024-h1024.png "Slide #1, Top Tile #2") |
+
+
+Tiles can also be retrieved dynamically. In dynamic tile retrieval, slides are scaled down,
+filtered, tiled, and scored all in-memory. The top tiles can then be retrieved from the
+original WSI file and stored in-memory.
+
+Here, we dynamically obtain a `TileSummary` object by calling `dynamic_tiles()` for
+slide #2. We obtain the top-scoring tiles from `tile_summary`, outputting status
+information about each tile. The status information includes the tile number, the row
+number, the column number, the tissue percentage, and the tile score.
+
+```
+tile_summary = tiles.dynamic_tiles(2)
+top_tiles = tile_summary.top_tiles()
+for t in top_tiles:
+  print(t)
+```
+
+In the console output, we see that the original `svs` file is opened, the slide is
+scaled down, and our series of filters is run on the scaled-down image. After that,
+the tiles are scored, and we see status information about the top 50 tiles for
+the slide.
+
+```
+Opening Slide #2: ../data/training_slides/TUPAC-TR-002.svs
+RGB                  | Time: 0:00:00.007339  Type: uint8   Shape: (1385, 1810, 3)
+Filter Green Channel | Time: 0:00:00.005135  Type: bool    Shape: (1385, 1810)
+Mask RGB             | Time: 0:00:00.007973  Type: uint8   Shape: (1385, 1810, 3)
+Filter Grays         | Time: 0:00:00.073780  Type: bool    Shape: (1385, 1810)
+Mask RGB             | Time: 0:00:00.008114  Type: uint8   Shape: (1385, 1810, 3)
+Filter Red Pen       | Time: 0:00:00.066007  Type: bool    Shape: (1385, 1810)
+Mask RGB             | Time: 0:00:00.007925  Type: uint8   Shape: (1385, 1810, 3)
+Filter Green Pen     | Time: 0:00:00.105854  Type: bool    Shape: (1385, 1810)
+Mask RGB             | Time: 0:00:00.008034  Type: uint8   Shape: (1385, 1810, 3)
+Filter Blue Pen      | Time: 0:00:00.087092  Type: bool    Shape: (1385, 1810)
+Mask RGB             | Time: 0:00:00.007963  Type: uint8   Shape: (1385, 1810, 3)
+Mask RGB             | Time: 0:00:00.007807  Type: uint8   Shape: (1385, 1810, 3)
+Remove Small Objs    | Time: 0:00:00.034308  Type: bool    Shape: (1385, 1810)
+Mask RGB             | Time: 0:00:00.007814  Type: uint8   Shape: (1385, 1810, 3)
+[Tile #1915, Row #34, Column #34, Tissue 100.00%, Score 0.8824]
+[Tile #1975, Row #35, Column #37, Tissue 100.00%, Score 0.8816]
+[Tile #1974, Row #35, Column #36, Tissue 99.90%, Score 0.8811]
+[Tile #500, Row #9, Column #44, Tissue 99.32%, Score 0.8797]
+[Tile #814, Row #15, Column #16, Tissue 99.22%, Score 0.8795]
+[Tile #1916, Row #34, Column #35, Tissue 100.00%, Score 0.8789]
+[Tile #1956, Row #35, Column #18, Tissue 99.51%, Score 0.8784]
+[Tile #1667, Row #30, Column #14, Tissue 98.63%, Score 0.8783]
+[Tile #1839, Row #33, Column #15, Tissue 99.51%, Score 0.8782]
+[Tile #1725, Row #31, Column #15, Tissue 99.61%, Score 0.8781]
+[Tile #2061, Row #37, Column #9, Tissue 98.54%, Score 0.8779]
+[Tile #724, Row #13, Column #40, Tissue 99.90%, Score 0.8778]
+[Tile #1840, Row #33, Column #16, Tissue 99.22%, Score 0.8777]
+[Tile #758, Row #14, Column #17, Tissue 99.41%, Score 0.8775]
+[Tile #1722, Row #31, Column #12, Tissue 98.24%, Score 0.8771]
+[Tile #722, Row #13, Column #38, Tissue 99.51%, Score 0.8769]
+[Tile #1803, Row #32, Column #36, Tissue 99.22%, Score 0.8769]
+[Tile #446, Row #8, Column #47, Tissue 100.00%, Score 0.8768]
+[Tile #988, Row #18, Column #19, Tissue 99.61%, Score 0.8767]
+[Tile #2135, Row #38, Column #26, Tissue 99.80%, Score 0.8767]
+[Tile #704, Row #13, Column #20, Tissue 99.61%, Score 0.8767]
+[Tile #816, Row #15, Column #18, Tissue 99.41%, Score 0.8766]
+[Tile #1180, Row #21, Column #40, Tissue 99.90%, Score 0.8765]
+[Tile #1178, Row #21, Column #38, Tissue 99.80%, Score 0.8765]
+[Tile #1042, Row #19, Column #16, Tissue 99.71%, Score 0.8764]
+[Tile #1783, Row #32, Column #16, Tissue 99.80%, Score 0.8764]
+[Tile #1978, Row #35, Column #40, Tissue 100.00%, Score 0.8763]
+[Tile #832, Row #15, Column #34, Tissue 99.61%, Score 0.8762]
+[Tile #1901, Row #34, Column #20, Tissue 99.90%, Score 0.8759]
+[Tile #701, Row #13, Column #17, Tissue 99.80%, Score 0.8758]
+[Tile #817, Row #15, Column #19, Tissue 99.32%, Score 0.8757]
+[Tile #2023, Row #36, Column #28, Tissue 100.00%, Score 0.8754]
+[Tile #775, Row #14, Column #34, Tissue 99.51%, Score 0.8754]
+[Tile #1592, Row #28, Column #53, Tissue 100.00%, Score 0.8753]
+[Tile #702, Row #13, Column #18, Tissue 99.22%, Score 0.8753]
+[Tile #759, Row #14, Column #18, Tissue 99.51%, Score 0.8752]
+[Tile #1117, Row #20, Column #34, Tissue 99.90%, Score 0.8751]
+[Tile #1907, Row #34, Column #26, Tissue 99.32%, Score 0.8750]
+[Tile #1781, Row #32, Column #14, Tissue 99.61%, Score 0.8749]
+[Tile #2250, Row #40, Column #27, Tissue 99.61%, Score 0.8749]
+[Tile #1902, Row #34, Column #21, Tissue 99.90%, Score 0.8749]
+[Tile #2014, Row #36, Column #19, Tissue 99.22%, Score 0.8749]
+[Tile #2013, Row #36, Column #18, Tissue 99.51%, Score 0.8747]
+[Tile #1175, Row #21, Column #35, Tissue 99.71%, Score 0.8746]
+[Tile #760, Row #14, Column #19, Tissue 99.22%, Score 0.8746]
+[Tile #779, Row #14, Column #38, Tissue 99.32%, Score 0.8745]
+[Tile #1863, Row #33, Column #39, Tissue 99.71%, Score 0.8745]
+[Tile #1899, Row #34, Column #18, Tissue 99.51%, Score 0.8745]
+[Tile #778, Row #14, Column #37, Tissue 99.90%, Score 0.8743]
+[Tile #1724, Row #31, Column #14, Tissue 99.51%, Score 0.8741]
+```
+
+If we'd like to obtain each tile as a NumPy array, we can do
+so by calling the `get_np_tile()` function on the `Tile`
+object.
+
+```
+tile_summary = tiles.dynamic_tiles(2)
+top_tiles = tile_summary.top_tiles()
+for t in top_tiles:
+  print(t)
+  np_tile = t.get_np_tile()
+```
+
+As a further example, here we dynamically retrieve the tiles
+for slide #4 and display the top 2 tiles along with their
+RGB and HSV histograms.
+
+```
+tile_summary = tiles.dynamic_tiles(4)
+top = tile_summary.top_tiles()[:2]
+for t in top:
+  t.display_with_histograms()
+```
+
