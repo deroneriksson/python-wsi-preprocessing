@@ -2496,7 +2496,8 @@ tiles.summary_and_tiles(2, display=True, save_summary=True, save_data=False, sav
 In general, it is recommended that the user utilize the `singleprocess_filtered_images_to_tiles()`
 and `multiprocess_filtered_images_to_tiles()` functions in `wsi/tiles.py`. These functions
 generate convenient HTML pages for investigating the tiles generated for a slide set. The
-`multiprocess_filtered_images_to_tiles()` utilizes multiprocessing for added performance.
+`multiprocess_filtered_images_to_tiles()` utilizes multiprocessing for added performance. If
+no `image_num_list` parameter is provided, all images in the dataset will be processed.
 
 Here, we generate the top 50 tiles for slides #1, #2, and #3.
 
@@ -2513,3 +2514,10 @@ filtered images and the original images, and links to the top 50 tile files for 
 | ------------- |
 | ![Tiles Page](images/tiles-page.png "Tiles Page") |
 
+
+The full-size 1,024x1,024 tiles can be investigated using the top tile links. Here we see the
+two top-scoring tiles on slide 2 at row 34, column 34 and row 35, column 37.
+
+| **Slide #1, Top Tile #1** | **Slide #1, Top Tile #2** |
+| ------------------------ | ------------------------------------ |
+| ![Slide #1, Top Tile #1](images/TUPAC-TR-002-tile-r34-c34-x33793-y33799-w1024-h1024.png "Slide #1, Top Tile #1") | ![Slide #1, Top Tile #2](images/TUPAC-TR-002-tile-r35-c37-x36865-y34823-w1024-h1024.png "Slide #1, Top Tile #2") |
