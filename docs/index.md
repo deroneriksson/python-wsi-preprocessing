@@ -2655,6 +2655,8 @@ ts[1499].display_with_histograms()
 ```
 
 Here we see the #1000 and #1500 tiles ordered by tissue percentage for slide #2.
+Note that the displayed tile rank information is based on score rather than
+tissue percentage alone.
 
 | **Slide #2, Tissue Percentage #1000** | **Slide #2, Tissue Percentage #1500** |
 | ------------------------ | ------------------------------------ |
