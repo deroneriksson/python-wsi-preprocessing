@@ -2667,10 +2667,23 @@ Tiles can be retrieved based on position. Here, we display the tiles at row 25, 
 
 ```
 tile_summary = tiles.dynamic_tiles(2)
-tile_summary.get_tile(25,30).display_tile()
-tile_summary.get_tile(25,31).display_tile()
+tile_summary.get_tile(25, 30).display_tile()
+tile_summary.get_tile(25, 31).display_tile()
 ```
 
 | **Slide #2, Row #25, Column #30** | **Slide #2, Row #25, Column #31** |
 | ------------------------ | ------------------------------------ |
 | ![Slide #2, Row #25, Column #30](images/slide-2-row-25-col-30.png "Slide #2, Row #25, Column #30") | ![Slide #2, Row #25, Column #31](images/slide-2-row-25-col-31.png "Slide #2, Row #25, Column #31") |
+
+If an individual tile is required, the `dynamic_tile()` function can be used.
+
+```
+tiles.dynamic_tile(2, 25, 32).display_tile()
+```
+
+| **Slide #2, Row #25, Column #32** |
+| --------------------------------- |
+| ![Slide #2, Row #25, Column #32](images/slide-2-row-25-col-32.png "Slide #2, Row #25, Column #32") |
+
+If multiple tiles need to be retrieved dynamically, for performance reasons `dynamic_tiles()` is
+preferable to `dynamic_tile()`.
