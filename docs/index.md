@@ -2640,3 +2640,23 @@ for t in top:
 | ------------------------ | ------------------------------------ |
 | ![Slide #4, Top Tile #1](images/slide-4-top-tile-1.png "Slide #4, Top Tile #1") | ![Slide #4, Top Tile #2](images/slide-4-top-tile-2.png "Slide #4, Top Tile #2") |
 
+
+Next, we dynamically retrieve the tiles for slide #2. We
+display the tile tissue heat map and top tile summaries and
+then obtain the tiles ordered by tissue percentage.
+We display the 1000th and 1500th tiles by tissue percentage.
+
+```
+tile_summary = tiles.dynamic_tiles(2)
+tile_summary.display_summaries()
+ts = tile_summary.tiles_by_tissue_percentage()
+ts[999].display_with_histograms()
+ts[1499].display_with_histograms()
+```
+
+Here we see the #1000 and #1500 tiles ordered by tissue percentage for slide #2.
+
+| **Slide #2, Tissue Percentage #1000** | **Slide #2, Tissue Percentage #1500** |
+| ------------------------ | ------------------------------------ |
+| ![Slide #2, Tissue Percentage #1000](images/slide-2-tissue-percentage-tile-1000.png "Slide #2, Tissue Percentage #1000") | ![Slide #2, Tissue Percentage #1500](images/slide-2-tissue-percentage-tile-1500.png "Slide #2, Tissue Percentage #1500") |
+
