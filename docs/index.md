@@ -2662,3 +2662,15 @@ tissue percentage alone.
 | ------------------------ | ------------------------------------ |
 | ![Slide #2, Tissue Percentage #1000](images/slide-2-tissue-percentage-tile-1000.png "Slide #2, Tissue Percentage #1000") | ![Slide #2, Tissue Percentage #1500](images/slide-2-tissue-percentage-tile-1500.png "Slide #2, Tissue Percentage #1500") |
 
+
+Tiles can be retrieved based on position. Here, we display the tiles at row 25, column 30 and row 25, column 31 on slide #2.
+
+```
+tile_summary = tiles.dynamic_tiles(2)
+tile_summary.get_tile(25,30).display_tile()
+tile_summary.get_tile(25,31).display_tile()
+```
+
+| **Slide #2, Row #25, Column #30** | **Slide #2, Row #25, Column #31** |
+| ------------------------ | ------------------------------------ |
+| ![Slide #2, Row #25, Column #30](images/slide-2-row-25-col-30.png "Slide #2, Row #25, Column #30") | ![Slide #2, Row #25, Column #31](images/slide-2-row-25-col-31.png "Slide #2, Row #25, Column #31") |
