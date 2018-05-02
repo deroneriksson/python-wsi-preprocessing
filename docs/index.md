@@ -2687,3 +2687,16 @@ tiles.dynamic_tile(2, 25, 32).display_tile()
 
 If multiple tiles need to be retrieved dynamically, for performance reasons `dynamic_tiles()` is
 preferable to `dynamic_tile()`.
+
+
+## Summary
+
+In this tutorial, we've taken a look at how Python, in particular with packages such as NumPy and
+scikit-image, can be used for tissue segmentation in whole-slide images. In order to efficiently process
+images in our dataset, we utilized OpenSlide to scale down the slides. Using NumPy arrays, we
+investigated a wide variety of image filters and settled on a combination and series of filters that
+demonstrated fast, acceptably accurate tissue segmentation for our dataset. Following this, we divided
+the filtered images into tiles and scored the tiles based on tissue percentage and color characteristics
+such as the degree of hematoxylin staining versus eosin staining. We then demonstrated how we can
+retrieve the top-scoring tiles which have high tissue percentages and preferred staining characteristics.
+We also saw how whole-slide images could be processed in batches or dynamically.
