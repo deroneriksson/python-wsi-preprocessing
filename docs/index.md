@@ -2711,3 +2711,8 @@ tiles.multiprocess_filtered_images_to_tiles()
 
 The above code generates HTML filter and tile pages which simplify visual
 inspection of the image processing and the final tile results.
+
+Since the average number of pixels per whole-slide image is 7,670,709,629 and we have reduced
+the data to the top 50 1,024x1,024 pixel tiles, we have reduced the raw image data down by a
+factor of 146x while identifying tiles that have significant potential for further useful
+analysis.
