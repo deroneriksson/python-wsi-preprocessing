@@ -434,7 +434,8 @@ img.save(path)
 
 ## Apply Filters for Tissue Segmentation
 
-Next, we will determine a set of filters that can be utilized for effective tissue segmentation with our dataset.
+Next, we will investigate image filters and will determine a set of filters that can be utilized for effective
+tissue segmentation with our dataset.
 We will mask out non-tissue by setting non-tissue pixels to 0 for their red, green, and blue channels. For our
 particular dataset, our mask will AND together a green channel mask, a grays mask, a red pen mask, a green pen mask,
 and a blue pen mask. Following this, we will mask out small objects from the images.
@@ -576,8 +577,8 @@ Threshold            | Time: 0:00:00.001456  Type: bool    Shape: (1385, 1810)
 
 Hysteresis thresholding is a two-level threshold. The top-level threshold is treated in a similar fashion as basic
 thresholding. The bottom-level threshold must be exceeded and must be connected to the top-level threshold. This
-processes typically results in much better thresholding than basic thresholding. The values of the top and bottom
-thresholds for images can be tested through experimentation.
+processes typically results in much better thresholding than basic thresholding. The reasonable values for the top
+and bottom thresholds for images can be determined through experimentation.
 
 The `filter_hysteresis_threshold()` function uses default bottom and top threshold values of 50 and 100. The
 default array output type from this function is `uint8`. Since the output of this function is a binary image, the
