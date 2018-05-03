@@ -1189,16 +1189,6 @@ def image_cell(slide_num, filter_num, display_text, file_text):
          "      </td>\n"
 
 
-def b64_img():
-  """
-  Obtain base-64 encoded image for display before lazy loading.
-
-  Returns:
-    Base-64 encoded GIF image to display before lazy loading.
-  """
-  return "data:image/gif;base64,R0lGODdhAQABAPAAAMPDwwAAACwAAAAAAQABAAACAkQBADs="
-
-
 def html_header(page_title):
   """
   Generate an HTML header for previewing images.
@@ -1216,8 +1206,7 @@ def html_header(page_title):
          "     td { border: 2px solid black; }\n" + \
          "    </style>\n" + \
          "  </head>\n" + \
-         "  <body>\n" + \
-         "  <script src=\"../js/lazyload.js\"></script>\n"
+         "  <body>\n"
   return html
 
 
@@ -1228,8 +1217,7 @@ def html_footer():
   Returns:
     HTML footer for viewing images.
   """
-  html = "<script>lazyload();</script>\n" + \
-         "</body>\n" + \
+  html = "</body>\n" + \
          "</html>\n"
   return html
 
