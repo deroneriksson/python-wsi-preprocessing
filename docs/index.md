@@ -2479,6 +2479,24 @@ we see here.
 | ![Top Tiles on Original](images/slide-2-top-tiles-original.png "Top Tiles on Original") |
 
 
+When analyzing top tile results, it can be useful to see the tissue percentage heat map
+of surrounding tiles. This can be accomplished by setting the `BORDER_ALL_TILES_IN_TOP_TILE_SUMMARY`
+constant to `True`. Likewise, it can useful to see the row and column coordinates of all tiles,
+which can be accomplished using the `LABEL_ALL_TILES_IN_TOP_TILE_SUMMARY` constant with a value of
+`True`.
+
+| **Top Tile Borders** | **Top Tile Labels** |
+| -------------------- | -------------------- |
+| ![Top Tile Borders](images/slide-2-top-tile-borders.png "Top Tile Borders") | ![Top Tile Labels](images/slide-2-top-tile-labels.png "Top Tile Labels") |
+
+
+Here we see a section of a top tile summary that features both the tile tissue heat map and the
+row and column labels.
+
+| **Top Tile Labels and Borders** |
+| ------------------------- |
+| ![Top Tile Labels and Borders](images/slide-2-top-tile-labels-borders.png "Top Tile Labels and Borders") |
+
 ## Top Tile Retrieval
 
 Top tiles can be saved as files in batch mode or retrieved dynamically. In batch mode,
