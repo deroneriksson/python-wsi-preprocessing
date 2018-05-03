@@ -100,21 +100,18 @@ License](https://raw.githubusercontent.com/openslide/openslide/master/lgpl-2.1.t
 
 Next, we can install a variety of useful Python packages using the [pip3](https://pip.pypa.io/en/stable/)
 package manager. These packages include:
-[ipython](https://pypi.python.org/pypi/ipython),
-[jupyter](https://pypi.python.org/pypi/jupyter),
 [matplotlib](https://pypi.python.org/pypi/matplotlib/),
 [numpy](https://pypi.python.org/pypi/numpy),
 [openslide-python](https://pypi.python.org/pypi/openslide-python),
-[pandas](https://pypi.python.org/pypi/pandas),
 [Pillow](https://pypi.org/project/Pillow/),
 [scikit-image](https://pypi.python.org/pypi/scikit-image),
 [scikit-learn](https://pypi.python.org/pypi/scikit-learn),
 and [scipy](https://pypi.python.org/pypi/scipy).
 
-    pip3 install -U ipython jupyter matplotlib numpy openslide-python pandas Pillow scikit-image scikit-learn scipy
+    pip3 install -U matplotlib numpy openslide-python Pillow scikit-image scikit-learn scipy
 
-We will utilize scikit-image filters (hysteresis thresholding) in this tutorial that are not present in the
-latest released version of scikit-image at the time of this writing (0.13.1). We will install scikit-image
+We utilize scikit-image filters (hysteresis thresholding) in this tutorial that are not present in the
+latest released version of scikit-image at the time of this writing (0.13.1). We can install scikit-image
 from source, as described in the README at [https://github.com/scikit-image/scikit-image](https://github.com/scikit-image/scikit-image).
 
     git clone https://github.com/scikit-image/scikit-image.git
@@ -145,7 +142,7 @@ visually discerned, as in the shaded area at the top of the slide seen below.
 
 
 A fairly unusual feature of whole-slide images is the very large image size.
-For our training data set of 500 images, the width varied from 19,920 pixels to 198,220 pixels,
+For our training dataset of 500 images, the width varied from 19,920 pixels to 198,220 pixels,
 with an average of 101,688 pixels. The height varied from 13,347 pixels to 256,256 pixels,
 with an average of 73,154 pixels. The image total pixel sizes varied from
 369,356,640 to 35,621,634,048 pixels, with an average of
@@ -210,7 +207,7 @@ the tile level. Zooming and scrolling operations make it relatively easy to visu
 To develop a set of filters that can be applied to an entire set of large whole-slide images, two of the first issues
 we are confronted with are the size of the data and the format of the data. As mentioned, for our training dataset,
 the average `svs` file size is over 1 GB and we have 500 total images. Additionally, the `svs` format is a fairly unusual
-format which typically can't be visually displayed by common applications and operating systems. Therefore, we will
+format which typically can't be visually displayed by default by common applications and operating systems. Therefore, we will
 develop some code to overcome these important issues. Using OpenSlide and Python, we'll convert the training dataset to
 smaller images in a common format, thus reformulating a big data problem as a small data problem. Before filtering
 at the entire slide level, we will shrink the width and height down by a factor of 32x, which means we can perform
@@ -324,10 +321,10 @@ below.
 The `wsi/slide.py` file contains constants that can be used to control various image conversion settings. For example,
 the `SCALE_FACTOR` constant controls the factor by which the slides will be scaled down. Its default value is 32,
 meaning that the height and width will be scaled down by a factor of 32. This means that when we perform filtering,
-it will be performed on an image 1/1024th the size of the original high-resolution image.
-The `DEST_TRAIN_EXT` constant controls the output format. We will use `png`.
+it will be performed on an image 1/1024<sup>th</sup> the size of the original high-resolution image.
+The `DEST_TRAIN_EXT` constant controls the output format. We will use the default format, `png`.
 
-Using macOS with an external hard drive containing the training set, the following conversion times using
+Using macOS, the following conversion times using
 `singleprocess_training_slides_to_images()` and `multiprocess_training_slides_to_images()`
 on the 500 image training set were obtained:
 
@@ -341,8 +338,8 @@ on the 500 image training set were obtained:
 | png    | multi process  | 11m58s  |
 
 
-After calling `multiprocess_training_slides_to_images()` using the `png` format, we have 500 whole-slide
-images in lossless `png` format that we will examine in greater detail in relation to our filters.
+After calling `multiprocess_training_slides_to_images()` using the `png` format, we have 500 scaled-down
+whole-slide images in lossless `png` format that we will examine in greater detail in relation to our filters.
 
 
 ### Image Saving, Displaying, and Conversions
@@ -449,7 +446,7 @@ is output to the console. Filter results can be easily viewed across the entire 
 Multiprocessing is used for increased performance. Additionally, filters can easily be combined, strung together,
 or otherwise modified.
 
-To filter our 1/32x 500 `png` image training set and generate 4,500 `png` filter preview images and 4,500 `jpg` thumbnails
+To filter our scaled-down 500 `png` image training set and generate 4,500 `png` filter preview images and 4,500 `jpg` thumbnails
 takes about 23m30s on my MacBook Pro. Filtering the 500 image training set without saving files takes approximately
 6 minutes.
 
