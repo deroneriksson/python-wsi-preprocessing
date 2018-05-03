@@ -2699,4 +2699,15 @@ demonstrated fast, acceptably accurate tissue segmentation for our dataset. Foll
 the filtered images into tiles and scored the tiles based on tissue percentage and color characteristics
 such as the degree of hematoxylin staining versus eosin staining. We then demonstrated how we can
 retrieve the top-scoring tiles which have high tissue percentages and preferred staining characteristics.
-We also saw how whole-slide images could be processed in batches or dynamically.
+We saw how whole-slide images could be processed in batches or dynamically. Scaling, filtering,
+tiling, scoring, and saving the top tiles can be accomplished in batch mode using multiprocessing in
+the following manner.
+
+```
+slide.multiprocess_training_slides_to_images()
+filter.multiprocess_apply_filters_to_images()
+tiles.multiprocess_filtered_images_to_tiles()
+```
+
+The above code generates HTML filter and tile pages which simplify visual
+inspection of the image processing and the final tile results.
