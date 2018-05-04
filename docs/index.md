@@ -577,7 +577,7 @@ Threshold            | Time: 0:00:00.001456  Type: bool    Shape: (1385, 1810)
 
 Hysteresis thresholding is a two-level threshold. The top-level threshold is treated in a similar fashion as basic
 thresholding. The bottom-level threshold must be exceeded and must be connected to the top-level threshold. This
-processes typically results in much better thresholding than basic thresholding. The reasonable values for the top
+processes typically results in much better thresholding than basic thresholding. Reasonable values for the top
 and bottom thresholds for images can be determined through experimentation.
 
 The `filter_hysteresis_threshold()` function uses default bottom and top threshold values of 50 and 100. The
