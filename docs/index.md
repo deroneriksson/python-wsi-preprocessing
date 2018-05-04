@@ -1369,6 +1369,46 @@ RAG Threshold        | Time: 0:00:23.774296  Type: uint8   Shape: (1385, 1810, 3
 ```
 
 
+##### RGB to HSV
+
+Comparing hematoxylin and eosin staining can be challenging in the RGB color space. One way to simplify
+this comparison is to convert to a different color space such as HSV (Hue-Saturation-Value).
+The scikit-image `skimage.color` package features an `rgb2hsv()` function that converts an RGB image
+to an HSV image. The `filter_rgb_to_hsv()` function wraps this scikit-image function.
+In the HSV color model, the hue is represented by 360 degrees. Purple has a hue of 270 and
+pink has a hue of 330. We discuss hematoxylin and eosin stain comparison in our later discussion
+of tile scoring, where we favor hematoxylin-stained tissue over eosin-stained tissue.
+
+As an example, in the `wsi/tiles.py` file, the `display_image_with_rgb_and_hsv_histograms()`
+function takes in an image as a NumPy array in RGB color space and displays the image
+along with its RGB and HSV histograms. Internally, this function utilizes the `filter_rgb_to_hsv()`
+function.
+
+
+```
+# To get around renderer issue on OSX going from Matplotlib image to NumPy image.
+import matplotlib
+matplotlib.use('Agg')
+
+from wsi import slide
+from wsi import tiles
+from wsi import util
+
+img_path = slide.get_training_image_path(2)
+img = slide.open_image(img_path)
+rgb = util.pil_to_np_rgb(img)
+tiles.display_image_with_rgb_and_hsv_histograms(rgb)
+```
+
+Here we see slide #2 along with its RGB and HSV histograms. Notice that the HSV hue histogram
+columns have additionally been colored based on their corresponding hue values to aid in
+visual inspection.
+
+| **Slide 2 RGB and HSV Histograms** |
+| -------------------- |
+| ![Slide 2 RGB and HSV Histograms](images/slide-2-rgb-hsv.png "Slide 2 RGB and HSV Histograms") |
+
+
 #### Morphology
 
 Information about image morphology can be found at
