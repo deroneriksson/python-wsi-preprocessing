@@ -1417,7 +1417,7 @@ The primary morphology operators are erosion, dilation, opening, and closing. Wi
 of an object are removed. With dilation, pixels along the edges of an object are added. Opening is erosion followed
 by dilation. Closing is dilation followed by erosion. With morphology operators, a structuring element (such as
 a square, circle, cross, etc) is passed along the edges of the objects to perform the operations. Morphology operators
-are typically performed on binary and grayscale images. In our examples, we will apply morphology operators to binary
+are typically performed on binary and grayscale images. In our examples, we apply morphology operators to binary
 images (2-dimensional arrays of 2 values, such as True/False, 1.0/0.0, and 255/0).
 
 
@@ -2063,7 +2063,7 @@ multiprocess_apply_filters_to_images(save=True, display=False, html=True, image_
 The `apply_filters_to_image_list()` function takes a list of image numbers for processing. It does not generate an
 HTML page but it does generate information that can be used by other functions to generate an HTML page.
 The `save` parameter if `True` will save the generated images to the file system. If the `display` parameter
-is `True`, the generated images will be displayed to the screen. If several images are being processed,
+is `True`, the generated images will be displayed to the screen. If several slides are being processed,
 `display` should be set to False.
 
 The `apply_filters_to_image_range()` function is similar to `apply_filters_to_image_list()` except than rather than
@@ -2076,7 +2076,7 @@ primary functions that should be called to apply filters to multiple images. Bot
 and `display` parameters. The additional `html` parameter if `True` generates an HTML page for displaying the filter
 results on the image set. The `singleprocess_apply_filters_to_images()` and `multiprocess_apply_filters_to_images()`
 functions also feature an `image_num_list` parameter which specifies a list of image numbers that should be
-processed. If `image_num_list` is not supplied, all training images will be processed.
+processed. If `image_num_list` is not supplied, all training images are processed.
 
 As an example, let's use a single process to apply our filters to images 1, 2, and 3. We can accomplish this with
 the following:
@@ -2090,9 +2090,9 @@ filtered slide images.
 If we open the `filters.html` file in a browser, we can see 8 images displayed for each slide. Each separate slide
 is displayed as a separate row. Here, we see the filter results for slides #1, #2, and #3 displayed in a browser.
 
-| **Filters 001 through 008 for Slides 1, 2, 3** |
+| **Filters for Slides 1, 2, 3** |
 | -------------------- |
-| ![Filters 001 through 008 for Slides 1, 2, 3](images/filters-001-008.png "Filters 001 through 008 for Slides 1, 2, 3") |
+| ![Filters for Slides 1, 2, 3](images/filters-001-008.png "Filters for Slides 1, 2, 3") |
 
 
 To apply all filters to all images in the training set using multiprocessing, we can utilize the
