@@ -2324,8 +2324,8 @@ respectively. Heat map colors can be adjusted by modifying the `HIGH_COLOR`, `ME
 Tile sizes are specified according to number of pixels in the original WSI files. The
 default `ROW_TILE_SIZE` and `COL_TILE_SIZE` values are 1,024 pixels.
 
-To generate and display tiles for a single slide, we can utilize the `summary_and_tiles` function,
-which generates tile summaries and returns the top scoring tiles for a slide. We will discuss
+To generate and display tiles for a single slide, we utilize the `summary_and_tiles()` function,
+which generates tile summaries and returns the top scoring tiles for a slide. We discuss
 tile scoring in a later section.
 
 Let's generate tile tissue heat map summaries for slide #2 and display the summaries to the screen.
@@ -2341,7 +2341,7 @@ displayed on the masked image and the original image to allow for comparison.
 | ------------------------ | ------------------------------------ |
 | ![Tissue Heat Map](images/slide-2-tile-tissue-heatmap.png "Tissue Heat Map") | ![Tissue Heat Map on Original](images/slide-2-tile-tissue-heatmap-original.png "Tissue Heat Map on Original") |
 
-We can see a variety of slide statistics displayed on the tile summaries. We can see that slide #2
+We see a variety of slide statistics displayed on the tile summaries. We see that slide #2
 has dimensions of 57,922x44,329. After scaling down the slide width and height by 1/32x, we have a
 `png` image with dimensions 1,810x1,385. Breaking this image down into 32x32 tiles, we have 57 rows
 and 44 columns, making a total of 2,508 tiles. Using our tissue segmentation filtering algorithms,
@@ -2358,7 +2358,7 @@ we have 1,283 tiles with high tissue percentages (>=80%), 397 tiles with medium 
 | Scaled Tile Size    | 32x32         |
 | Total Mask          | 41.60%        |
 | Total Tissue        | 58.40%        |
-| Tiles               | 57x44 = 2508  |
+| Tiles               | 57x44 = 2,508  |
 | | 1,283 (51.16%) tiles >=80% tissue          |
 | |   397 (15.83%) tiles >=10% and <80% tissue |
 | |   102 ( 4.07%) tiles >0% and <10% tissue   |
@@ -2366,7 +2366,7 @@ we have 1,283 tiles with high tissue percentages (>=80%), 397 tiles with medium 
 
 
 Often it can be useful to know the exact row and column of a particular tile or tiles. If the
-`DISPLAY_TILE_SUMMARY_LABELS` constant is set to True, the row and column of each tile will be
+`DISPLAY_TILE_SUMMARY_LABELS` constant is set to True, the row and column of each tile is
 output on the tile summaries. Generating the tile labels is fairly time-consuming, so usually
 `DISPLAY_TILE_SUMMARY_LABELS` should be set to False for performance.
 
@@ -2393,7 +2393,7 @@ as follows.
 The scoring formula generates good results for the images in the dataset and was developed through
 experimentation with the training dataset. The *tissuepercent* is emphasized by squaring its value.
 The *colorfactor* value is used to weigh hematoxylin staining heavier than eosin staining. Utilizing
-an HSV color model, broad saturation and value distributions are given more weight by the
+the HSV color model, broad saturation and value distributions are given more weight by the
 *saturationvaluefactor*. The *quantityfactor* value utilizes the tissue percentage to give more weight
 to tiles with more tissue. Note that if *colorfactor*, *saturationvaluefactor*, or
 *quantityfactor* evaluate to 0, the *score* will be 0. The *score* is scaled to a value from
@@ -2436,7 +2436,7 @@ tiles.display_image_with_hsv_hue_histogram(tile.get_np_scaled_tile(), scale_up=T
 ```
 
 Here we see the 32x32 slide with its accompanying hue histogram. For convenience, colors have
-been added to the histogram. Notice that purple is at 270 degrees and pink is at 330 degrees.
+been added to the histogram.
 Also, notice that the non-tissue masked-out pixels have a peak at 0 degrees.
 
 | **Tile HSV Hue Histogram** |
@@ -2698,9 +2698,9 @@ for t in top:
 
 
 Next, we dynamically retrieve the tiles for slide #2. We
-display the tile tissue heat map and top tile summaries and
+display (not shown) the tile tissue heat map and top tile summaries and
 then obtain the tiles ordered by tissue percentage.
-We display the 1000th and 1500th tiles by tissue percentage.
+We display the 1,000<sup>th</sup> and 1,500<sup>th</sup> tiles by tissue percentage.
 
 ```
 tile_summary = tiles.dynamic_tiles(2)
@@ -2710,7 +2710,7 @@ ts[999].display_with_histograms()
 ts[1499].display_with_histograms()
 ```
 
-Here we see the #1000 and #1500 tiles ordered by tissue percentage for slide #2.
+Here we see the 1,000<sup>th</sup> and 1,500<sup>th</sup> tiles ordered by tissue percentage for slide #2.
 Note that the displayed tile rank information is based on score rather than
 tissue percentage alone.
 
