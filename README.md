@@ -23,7 +23,7 @@ This project contains a variety of files for investigating image preprocessing u
 with the aim of using deep learning to perform histopathology image classification of
 whole slide images.
 
-See main tutorial [here](./docs/wsi-preprocessing-in-python).
+See main tutorial [here](./docs/wsi-preprocessing-in-python/index.md).
 
 See main project at [https://github.com/CODAIT/deep-histopath](https://github.com/CODAIT/deep-histopath)
 for more information.
