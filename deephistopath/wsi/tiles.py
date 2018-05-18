@@ -27,10 +27,10 @@ import numpy as np
 import os
 from PIL import Image, ImageDraw, ImageFont
 from enum import Enum
-from wsi import util
-from wsi import filter
-from wsi import slide
-from wsi.util import Time
+from deephistopath.wsi import util
+from deephistopath.wsi import filter
+from deephistopath.wsi import slide
+from deephistopath.wsi.util import Time
 
 TISSUE_HIGH_THRESH = 80
 TISSUE_LOW_THRESH = 10

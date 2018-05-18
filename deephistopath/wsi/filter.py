@@ -27,9 +27,9 @@ import skimage.future as sk_future
 import skimage.morphology as sk_morphology
 import skimage.segmentation as sk_segmentation
 
-from wsi import slide
-from wsi import util
-from wsi.util import Time
+from deephistopath.wsi import slide
+from deephistopath.wsi import util
+from deephistopath.wsi.util import Time
 
 
 def filter_rgb_to_grayscale(np_img, output_type="uint8"):

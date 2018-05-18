@@ -1391,9 +1391,9 @@ function.
 import matplotlib
 matplotlib.use('Agg')
 
-from wsi import slide
-from wsi import tiles
-from wsi import util
+from deephistopath.wsi import slide
+from deephistopath.wsi import tiles
+from deephistopath.wsi import util
 
 img_path = slide.get_training_image_path(2)
 img = slide.open_image(img_path)
@@ -2430,7 +2430,7 @@ histogram.
 # To get around renderer issue on macOS going from Matplotlib image to NumPy image.
 import matplotlib
 matplotlib.use('Agg')
-from wsi import tiles
+from deephistopath.wsi import tiles
 
 tile = tiles.dynamic_tile(2, 29, 16, True)
 tiles.display_image_with_hsv_hue_histogram(tile.get_np_scaled_tile(), scale_up=True)
@@ -2453,7 +2453,7 @@ value of `True`), histograms will be displayed for both the small tile and the l
 ```
 import matplotlib
 matplotlib.use('Agg')
-from wsi import tiles
+from deephistopath.wsi import tiles
 
 tile = tiles.dynamic_tile(2, 29, 16, True)
 tile.display_with_histograms();
