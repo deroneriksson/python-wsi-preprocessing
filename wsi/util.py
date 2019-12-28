@@ -27,15 +27,23 @@ ADDITIONAL_NP_STATS = False
 
 
 
-def show(np):
+def show_np(np):
     return util.np_to_pil(np)
 
-def show_multiple_images(path, rows = 3, figsize=(128, 64)):
-    imgs = [open_image(p) for p in path.ls()]
+def show_multiple_images(paths:list, rows = 3, figsize=(128, 64)):
+    """
+    Args:
+        paths: A list of paths to images.
+    """
+    imgs = [open_image(p) for p in paths]
     show_all(imgs=imgs, r=rows, figsize=figsize)
     
-def show_multiple_images_big(path:pathlib.Path):
-    for p in path.ls():
+def show_multiple_images_big(paths:list,):
+    """
+    Args:
+        paths: A list of paths to images.
+    """
+    for p in paths:
         plt.imshow(mpimg.imread(str(p)))
         plt.show()
 
