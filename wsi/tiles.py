@@ -274,8 +274,21 @@ class TissueQuantity(Enum):
 
 
 ############################# functions #########################################
-    
-def WsiToTiles(wsiPath:pathlib.Path, tilesFolderPath:pathlib.Path, tile_height, tile_width):
+
+
+def scoring_function_1(tissue_percent, combined_factor):
+    """
+    use this, if you want tissue with lots of cells
+    """
+    return tissue_percent * combined_factor / 1000.0
+def scoring_function_2(tissue_percent, combined_factor):
+    """
+    use this, if you only care that there is any tissue in the tile
+    """
+    return (tissue_percent ** 2) * np.log(1 + combined_factor) / 1000.0
+
+
+def WsiToTiles(wsiPath:pathlib.Path, tilesFolderPath:pathlib.Path, tile_height, tile_width, tile_scoring_function = scoring_function_1):
     """
     
     """
@@ -295,7 +308,8 @@ def WsiToTiles(wsiPath:pathlib.Path, tilesFolderPath:pathlib.Path, tile_height, 
                                      scaled_height, 
                                      tile_height, 
                                      tile_width, 
-                                     scale_factor)
+                                     scale_factor, 
+                                     tile_scoring_function)
     for tile in tilesummary.top_tiles():
         tile.save_tile()
 
@@ -332,7 +346,8 @@ def create_tilesummary(wsiPath,
                         wsi_scaled_height:int, 
                         tile_height:int, 
                         tile_width:int, 
-                        scale_factor:int)->TileSummary:
+                        scale_factor:int, 
+                        tile_scoring_function)->TileSummary:
     """
   
     Args:
@@ -351,7 +366,8 @@ def create_tilesummary(wsiPath,
                            wsi_original_width, 
                            wsi_original_height, 
                            wsi_scaled_width, 
-                           wsi_scaled_height)
+                           wsi_scaled_height, 
+                           tile_scoring_function)
 
     return tile_sum
 
@@ -491,7 +507,8 @@ def score_tiles(img_np:np.array,
                 wsi_original_width:int, 
                 wsi_original_height:int, 
                 wsi_scaled_width:int, 
-                wsi_scaled_height:int,) -> TileSummary:
+                wsi_scaled_height:int,
+                tile_scoring_function) -> TileSummary:
     """
     Score all tiles for a slide and return the results in a TileSummary object.
 
@@ -562,7 +579,7 @@ def score_tiles(img_np:np.array,
         if (o_r_e - o_r_s) > tile_height:
             o_r_e -= 1
 
-        score, color_factor, s_and_v_factor, quantity_factor = score_tile(np_tile, t_p, r, c)
+        score, color_factor, s_and_v_factor, quantity_factor = score_tile(np_tile, t_p, r, c, tile_scoring_function)
 
         np_tile #if small_tile_in_tile else None
         
@@ -583,18 +600,6 @@ def score_tiles(img_np:np.array,
         t.rank = rank
 
     return tile_sum
-
-
-def scoring_function_1(tissue_percent, combined_factor):
-    """
-    use this, if you want tissue with lots of cells
-    """
-    return tissue_percent * combined_factor / 1000.0
-def scoring_function_2(tissue_percent, combined_factor):
-    """
-    use this, if you only care that there is any tissue in the tile
-    """
-    return (tissue_percent ** 2) * np.log(1 + combined_factor) / 1000.0
 
 
 def score_tile(np_tile, tissue_percent, row, col, scoring_function = scoring_function_1):
