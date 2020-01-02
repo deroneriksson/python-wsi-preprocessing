@@ -34,6 +34,9 @@ from wsi import util, filter, slide
 from wsi import openslide_overwrite
 from wsi.util import Time
 import openslide
+import multiprocessing
+from typing import List
+from tqdm import tqdm_notebook as tqdm
 
 
 
@@ -65,6 +68,7 @@ class TileSummary:
     mask_percentage = None
     num_row_tiles = None
     num_col_tiles = None
+    tile_score_thresh = None
 
     count = 0
     high = 0
@@ -72,7 +76,8 @@ class TileSummary:
     low = 0
     none = 0
 
-    def __init__(self, wsi_path, 
+    def __init__(self, 
+                 wsi_path, 
                  tiles_folder_path, 
                  orig_w, 
                  orig_h, 
@@ -85,7 +90,8 @@ class TileSummary:
                  scaled_tile_h, 
                  tissue_percentage, 
                  num_col_tiles, 
-                 num_row_tiles):
+                 num_row_tiles, 
+                 tile_score_thresh):
         self.wsi_path = wsi_path
         self.tiles_folder_path = tiles_folder_path
         self.orig_w = orig_w
@@ -100,6 +106,7 @@ class TileSummary:
         self.tissue_percentage = tissue_percentage
         self.num_col_tiles = num_col_tiles
         self.num_row_tiles = num_row_tiles
+        self.tile_score_thresh = tile_score_thresh
         self.tiles = []
 
     def __str__(self):
@@ -168,13 +175,17 @@ class TileSummary:
         sorted_tiles = self.tiles_by_score()
         top_tiles = [tile for tile in sorted_tiles
                      if self.check_tile(tile)]
-        print(f'Number of saved tiles/all tiles: {len(top_tiles)}/{len(sorted_tiles)}')
+        print(f'{self.get_wsi_name()}: Number of tiles that will be saved/all possible tiles: {len(top_tiles)}/{len(sorted_tiles)}')
         return top_tiles
+    
+    def get_wsi_name(self):
+        split = self.wsi_path.stem.split('-')
+        return f'{split[0]}-{split[1]}-{split[2]}-{split[3]}'
 
     def check_tile(self, tile):
         width = tile.o_c_e - tile.o_c_s
         height = tile.o_r_e - tile.o_r_s
-        return tile.score > 0.55 and width >= 0.7*self.scale_factor*self.scaled_tile_w and height >= 0.7*self.scale_factor*self.scaled_tile_h
+        return tile.score > self.tile_score_thresh and width >= 0.7*self.scale_factor*self.scaled_tile_w and height >= 0.7*self.scale_factor*self.scaled_tile_h
 
 
 class Tile:
@@ -281,6 +292,7 @@ def scoring_function_1(tissue_percent, combined_factor):
     use this, if you want tissue with lots of cells
     """
     return tissue_percent * combined_factor / 1000.0
+
 def scoring_function_2(tissue_percent, combined_factor):
     """
     use this, if you only care that there is any tissue in the tile
@@ -288,11 +300,25 @@ def scoring_function_2(tissue_percent, combined_factor):
     return (tissue_percent ** 2) * np.log(1 + combined_factor) / 1000.0
 
 
-def WsiToTiles(wsiPath:pathlib.Path, tilesFolderPath:pathlib.Path, tile_height, tile_width, tile_scoring_function = scoring_function_1):
+def WsiToTiles(wsiPath:pathlib.Path, 
+               tilesFolderPath:pathlib.Path, 
+               tile_height:int, 
+               tile_width:int,
+               tile_score_thresh:float = 0.55,
+               tile_scoring_function = scoring_function_1):
     """
+    Extracts tiles from a WSI.
     
+    Arguments:
+    wsiPath: Path to a WSI
+    tilesFolderPath: The folder where the extracted tiles will be saved.
+    tileHeigth: Number of pixels tile height.
+    tileWidth: Number of pixels tile width.
+    tile_score_thresh: Tiles with a score higher than the number from "tileScoringFunction" will be saved.
+    tileScoringFunction: Function to score one tile to determine if it should be saved or not.
     """
-    
+        
+    print(f"Starting to process {str(wsiPath)}")
     scale_factor = 32    
     Image.MAX_IMAGE_PIXELS = 10000000000
     openslide.lowlevel._load_image = openslide_overwrite._load_image
@@ -308,12 +334,45 @@ def WsiToTiles(wsiPath:pathlib.Path, tilesFolderPath:pathlib.Path, tile_height, 
                                      scaled_height, 
                                      tile_height, 
                                      tile_width, 
-                                     scale_factor, 
+                                     scale_factor,
+                                     tile_score_thresh,
                                      tile_scoring_function)
     for tile in tilesummary.top_tiles():
         tile.save_tile()
 
-       
+        
+def WsisToTilesMultithreaded(wsiPaths:List[pathlib.Path], 
+                             tilesFolderPath:pathlib.Path, 
+                             tileHeight:int, 
+                             tileWidth:int,
+                             tile_score_thresh:float = 0.55,
+                             tileScoringFunction = scoring_function_1):
+    """
+    Extracts tiles from WSIs in parallel.
+    
+    Arguments:
+    wsiPaths: A list of paths to the WSIs
+    tilesFolderPath: The folder where the extracted tiles will be saved.
+    tileHeigth: Number of pixels tile height.
+    tileWidth: Number of pixels tile width.
+    tile_score_thresh: Tiles with a score higher than the number from "tileScoringFunction" will be saved.
+    tileScoringFunction: Function to score one tile to determine if it should be saved or not.
+    """
+    pbar = tqdm(total=len(wsiPaths))
+    
+    def update(*a):
+        pbar.update()
+     
+    results = []
+    with multiprocessing.Pool() as pool:
+        for p in wsiPaths:
+            pool.apply_async(WsiToTiles, 
+                             args=(p, tilesFolderPath, tileHeight, tileWidth, tile_score_thresh, tileScoringFunction), 
+                             callback=update)       
+        pool.close()
+        pool.join()
+        
+        
 def wsi_to_pil_image(wsi_filepath:pathlib.Path, scale_factor):
     """
     Convert a WSI training slide to a PIL image.
@@ -346,7 +405,8 @@ def create_tilesummary(wsiPath,
                         wsi_scaled_height:int, 
                         tile_height:int, 
                         tile_width:int, 
-                        scale_factor:int, 
+                        scale_factor:int,
+                        tile_score_thresh:float,
                         tile_scoring_function)->TileSummary:
     """
   
@@ -366,7 +426,8 @@ def create_tilesummary(wsiPath,
                            wsi_original_width, 
                            wsi_original_height, 
                            wsi_scaled_width, 
-                           wsi_scaled_height, 
+                           wsi_scaled_height,
+                           tile_score_thresh,
                            tile_scoring_function)
 
     return tile_sum
@@ -490,7 +551,7 @@ def save_display_tile(tile, save, display):
     if not os.path.exists(dir):
       os.makedirs(dir)
     tile_pil_img.save(img_path)
-    print("%-20s | Time: %-14s  Name: %s" % ("Save Tile", str(t.elapsed()), img_path))
+    #print("%-20s | Time: %-14s  Name: %s" % ("Save Tile", str(t.elapsed()), img_path))
 
   if display:
     tile_pil_img.show()
@@ -508,6 +569,7 @@ def score_tiles(img_np:np.array,
                 wsi_original_height:int, 
                 wsi_scaled_width:int, 
                 wsi_scaled_height:int,
+                tile_score_thresh:float,
                 tile_scoring_function) -> TileSummary:
     """
     Score all tiles for a slide and return the results in a TileSummary object.
@@ -542,7 +604,8 @@ def score_tiles(img_np:np.array,
                              scaled_tile_h=tile_height_scaled,
                              tissue_percentage=filter.tissue_percent(img_np_filtered),
                              num_col_tiles=num_col_tiles,
-                             num_row_tiles=num_row_tiles)   
+                             num_row_tiles=num_row_tiles,
+                             tile_score_thresh=tile_score_thresh)   
     
 
     count = 0

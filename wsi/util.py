@@ -60,9 +60,9 @@ def pil_to_np_rgb(pil_img):
   Returns:
     The PIL image converted to a NumPy array.
   """
-  t = Time()
+  #t = Time()
   rgb = np.asarray(pil_img)
-  np_info(rgb, "RGB", t.elapsed())
+  #np_info(rgb, "RGB", t.elapsed())
   return rgb
 
 
@@ -150,9 +150,9 @@ def mask_rgb(rgb, mask):
   Returns:
     NumPy array representing an RGB image with mask applied.
   """
-  t = Time()
+  #t = Time()
   result = rgb * np.dstack([mask, mask, mask])
-  np_info(result, "Mask RGB", t.elapsed())
+  #np_info(result, "Mask RGB", t.elapsed())
   return result
 
 
