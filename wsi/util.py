@@ -21,6 +21,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+import fastai
 
 # If True, display additional NumPy array stats (min, max, mean, is_binary).
 ADDITIONAL_NP_STATS = False
@@ -35,8 +36,8 @@ def show_multiple_images(paths:list, rows = 3, figsize=(128, 64)):
     Args:
         paths: A list of paths to images.
     """
-    imgs = [open_image(p) for p in paths]
-    show_all(imgs=imgs, r=rows, figsize=figsize)
+    imgs = [fastai.vision.open_image(p) for p in paths]
+    fastai.vision.show_all(imgs=imgs, r=rows, figsize=figsize)
     
 def show_multiple_images_big(paths:list,):
     """
