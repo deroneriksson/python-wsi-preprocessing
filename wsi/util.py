@@ -39,13 +39,15 @@ def show_multiple_images(paths:list, rows = 3, figsize=(128, 64)):
     imgs = [fastai.vision.open_image(p) for p in paths]
     fastai.vision.show_all(imgs=imgs, r=rows, figsize=figsize)
     
-def show_multiple_images_big(paths:list,):
+def show_multiple_images_big(paths:list, axis_off:bool = False):
     """
     Args:
         paths: A list of paths to images.
     """
     for p in paths:
         plt.imshow(mpimg.imread(str(p)))
+        if(axis_off):
+            plt.axis('off')
         plt.show()
 
 
