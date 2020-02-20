@@ -28,6 +28,7 @@ import matplotlib.pyplot as plt
 import multiprocessing
 import numpy as np
 import os
+import PIL
 from PIL import Image, ImageDraw, ImageFont
 from enum import Enum
 from wsi import util, filter, slide
@@ -35,7 +36,7 @@ from wsi import openslide_overwrite
 from wsi.util import Time
 import openslide
 import multiprocessing
-from typing import List, Callable
+from typing import List, Callable, Union
 from tqdm import tqdm_notebook as tqdm
 
 
@@ -70,6 +71,7 @@ class TileSummary:
     num_row_tiles = None
     num_col_tiles = None
     tile_score_thresh = None
+    level = None
 
     count = 0
     high = 0
@@ -93,7 +95,8 @@ class TileSummary:
                  tissue_percentage, 
                  num_col_tiles, 
                  num_row_tiles, 
-                 tile_score_thresh):
+                 tile_score_thresh, 
+                 level = 0):
         self.wsi_path = wsi_path
         self.is_wsi_path = is_wsi
         self.tiles_folder_path = tiles_folder_path
@@ -110,6 +113,7 @@ class TileSummary:
         self.num_col_tiles = num_col_tiles
         self.num_row_tiles = num_row_tiles
         self.tile_score_thresh = tile_score_thresh
+        self.level = level
         self.tiles = []
 
     def __str__(self):
@@ -213,9 +217,10 @@ class Tile:
     quantity_factor = None
     score = None
     tile_naming_func = None
+    level = None
                 
     def __init__(self, tile_summary, wsi_path, is_wsi, tiles_folder_path, np_scaled_tile, tile_num, r, c, r_s, r_e, c_s, c_e, o_r_s, o_r_e, o_c_s,
-                   o_c_e, t_p, color_factor, s_and_v_factor, quantity_factor, score, tile_naming_func):
+                   o_c_e, t_p, color_factor, s_and_v_factor, quantity_factor, score, tile_naming_func, level = 0):
         self.tile_summary = tile_summary
         self.wsi_path = wsi_path
         self.is_wsi = is_wsi
@@ -238,6 +243,7 @@ class Tile:
         self.quantity_factor = quantity_factor
         self.score = score
         self.tile_naming_func = tile_naming_func
+        self.level = level
 
     def __str__(self):
         return "[Tile #%d, Row #%d, Column #%d, Tissue %4.2f%%, Score %0.4f]" % (
@@ -284,6 +290,42 @@ class TissueQuantity(Enum):
 
 
 ############################# functions #########################################
+
+
+def ExtractTileFromWSI(path:Union[str, pathlib.Path], x:int, y:int, width:int, height:int, level:int)-> PIL.Image:
+    """
+    Args:
+        path: path to wsi
+        x: x-coordinate of the upper left pixel. The method assumes, that you know the dimensions of your specified level.
+        y: y-coordinate of the upper left pixel. The method assumes, that you know the dimensions of your specified level.
+        width: tile width
+        height: tile height
+        level: Level of the WSI you want to extract the tile from. 0 means highest resolution.
+        
+    Return:
+        tile as PIL.Image as RGB
+    """
+    s = slide.open_slide(str(path))
+    tile_region = s.read_region((x, y), level, (width, height))
+    # RGBA to RGB
+    pil_img = tile_region.convert("RGB")
+    return pil_img
+
+def ExtractTileFromPILImage(path:Union[str, pathlib.Path], x:int, y:int, width:int, height:int)-> PIL.Image:
+    """
+    Args:
+        path: path to PIL Image
+        x: x-coordinate of the upper left pixel
+        y: y-coordinate of the upper left pixel
+        width: tile width
+        height: tile height
+        
+    Return:
+        tile as PIL.Image as RGB
+    """
+    pil_img = PIL.Image.open(path)
+    pil_img = pil_img.crop((x, y, x+width, y+height))
+    return pil_img
 
 
 def scoring_function_1(tissue_percent, combined_factor):
@@ -784,7 +826,6 @@ def tissue_quantity(tissue_percentage):
     return TissueQuantity.LOW
   else:
     return TissueQuantity.NONE
-
 
 
 

@@ -30,24 +30,25 @@ import re
 import sys
 from wsi import util, tiles
 from wsi.util import Time
+from typing import List, Callable, Union
 
 
-def open_slide(filename):
+def open_slide(path:Union[str, pathlib.Path]):
   """
-  Open a whole-slide image (*.svs, etc).
+  Open a whole-slide image (*.svs,*.ndpi, etc).
 
   Args:
-    filename: Name of the slide file.
+    path: Path to the slide file.
 
   Returns:
     An OpenSlide object representing a whole-slide image.
   """
-  try:
-    slide = openslide.open_slide(filename)
-  except OpenSlideError:
-    slide = None
-  except FileNotFoundError:
-    slide = None
+  #try:
+  slide = openslide.open_slide(str(path))
+  #except OpenSlideError:
+  #  slide = None
+  #except FileNotFoundError:
+  #  slide = None
   return slide
 
 
