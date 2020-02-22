@@ -426,7 +426,7 @@ def WsiOrROIToTiles(wsiPath:pathlib.Path,
     
     Arguments:
     wsiPath: Path to a WSI or ROI
-    tilesFolderPath: The folder where the extracted tiles will be saved (if save_tiles=True).
+    tilesFolderPath: The folder where the extracted tiles will be saved (only needed if save_tiles=True).
     tileHeigth: Number of pixels tile height.
     tileWidth: Number of pixels tile width.
     tile_score_thresh: Tiles with a score higher than the number from "tileScoringFunction" will be saved.
@@ -511,7 +511,7 @@ def WsiOrROIToTilesMultithreaded(wsiPaths:List[pathlib.Path],
     
     Arguments:
     wsiPaths: A list of paths to the WSIs or ROIs
-    tilesFolderPath: The folder where the extracted tiles will be saved (if save_tiles=True).
+    tilesFolderPath: The folder where the extracted tiles will be saved (only needed if save_tiles=True).
     tileHeigth: Number of pixels tile height.
     tileWidth: Number of pixels tile width.
     tile_score_thresh: Tiles with a score higher than the number from "tileScoringFunction" will be saved.
@@ -736,8 +736,12 @@ def get_tile_image_path(tile:Tile):
     Path to image tile.
   """
   t = tile
-  return os.path.join(tile.tiles_folder_path, 
-                      tile.tile_naming_func(tile.wsi_path) + "-" + 'tile' + "-r%d-c%d-x%d-y%d-w%d-h%d" % (
+  if tile.tiles_folder_path in None:
+      return os.path.join(tile.tile_naming_func(tile.wsi_path) + "-" + 'tile' + "-r%d-c%d-x%d-y%d-w%d-h%d" % (
+                             t.r, t.c, t.o_c_s, t.o_r_s, t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s) + "." + 'png')
+  else:
+      return os.path.join(tile.tiles_folder_path, 
+                          tile.tile_naming_func(tile.wsi_path) + "-" + 'tile' + "-r%d-c%d-x%d-y%d-w%d-h%d" % (
                              t.r, t.c, t.o_c_s, t.o_r_s, t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s) + "." + 'png') 
 
 
