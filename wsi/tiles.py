@@ -443,6 +443,8 @@ def WsiOrROIToTiles(wsiPath:pathlib.Path,
     """
     if(not is_wsi and level != 0):
         raise ValueError("Specifiying a level only makes sense when extracting tiles from WSIs. Just leave the default value.")
+    if(tilesFolderPath is None and save_tiles == True):
+        raise ValueError("You should specify a {tilesFolderPath}")
         
     print(f"Starting to process {str(wsiPath)}")
     if(is_wsi):
@@ -457,6 +459,7 @@ def WsiOrROIToTiles(wsiPath:pathlib.Path,
         img_pil = Image.open(wsiPath)
         original_width = scaled_width = img_pil.width
         original_height = scaled_height = img_pil.height
+        best_level_for_downsample = 0
                 
     img_pil_filtered = filter.filter_img(img_pil)
     tilesummary = create_tilesummary(wsiPath,
@@ -555,9 +558,9 @@ def WsiOrROIToTilesMultithreaded(wsiPaths:List[pathlib.Path],
         if merged_df is None:
             merged_df = df
         else:
-            merged_df.append(df)
+            merged_df = merged_df.append(df, sort=False)
     
-    return merged_df
+    return merged_df.drop_duplicates(inplace=True)
         
         
 def wsi_to_scaled_pil_image(wsi_filepath:pathlib.Path, scale_factor = 32, level = 0):
