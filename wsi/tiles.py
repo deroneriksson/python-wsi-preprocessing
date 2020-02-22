@@ -489,10 +489,12 @@ def WsiOrROIToTiles(wsiPath:pathlib.Path,
             'pixels_width':tile.get_width(),
             'pixels_height':tile.get_height()}
         rows_list.append(row)
-          
-    return pd.DataFrame(rows_list).set_index('tile_name', inplace=False)
+    
+    if(len(rows_list) == 0):
+        return pd.DataFrame(columns=['tile_name','wsi_path','level','x_upper_left','y_upper_left','pixels_width','pixels_height'])
+    else:
+        return pd.DataFrame(rows_list).set_index('tile_name', inplace=False)
         
-
         
 def WsiOrROIToTilesMultithreaded(wsiPaths:List[pathlib.Path], 
                              tilesFolderPath:pathlib.Path,
