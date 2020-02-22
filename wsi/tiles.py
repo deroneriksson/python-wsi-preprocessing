@@ -736,7 +736,7 @@ def get_tile_image_path(tile:Tile):
     Path to image tile.
   """
   t = tile
-  if tile.tiles_folder_path in None:
+  if tile.tiles_folder_path is None:
       return os.path.join(tile.tile_naming_func(tile.wsi_path) + "-" + 'tile' + "-r%d-c%d-x%d-y%d-w%d-h%d" % (
                              t.r, t.c, t.o_c_s, t.o_r_s, t.o_c_e - t.o_c_s, t.o_r_e - t.o_r_s) + "." + 'png')
   else:
