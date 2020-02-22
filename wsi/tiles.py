@@ -530,13 +530,15 @@ def WsiOrROIToTilesMultithreaded(wsiPaths:List[pathlib.Path],
     pandas dataframe with coloumns: ['tile_name','wsi_path','level','x_upper_left','y_upper_left','pixels_width','pixels_height']
     """
     pbar = tqdm(total=len(wsiPaths))
-    def update(*a):
+    dfs = []
+    def update(df):
+        dfs.append(df)
         pbar.update()
      
-    dfs = []
+    
     with multiprocessing.Pool() as pool:
         for p in wsiPaths:
-            df = pool.apply_async(WsiOrROIToTiles, 
+            pool.apply_async(WsiOrROIToTiles, 
                              args=(p, 
                                    tilesFolderPath,
                                    tileHeight, 
@@ -547,12 +549,12 @@ def WsiOrROIToTilesMultithreaded(wsiPaths:List[pathlib.Path],
                                    is_wsi, 
                                    level, 
                                    save_tiles), 
-                                   callback=update).get()
-            dfs.append(df)
+                                   callback=update)
+            
                 
         pool.close()
         pool.join()
-    
+
     merged_df = None
     for df in tqdm(dfs):
         if merged_df is None:
@@ -560,7 +562,7 @@ def WsiOrROIToTilesMultithreaded(wsiPaths:List[pathlib.Path],
         else:
             merged_df = merged_df.append(df, sort=False)
     
-    return merged_df.drop_duplicates(inplace=True)
+    return merged_df.drop_duplicates(inplace=False)
         
         
 def wsi_to_scaled_pil_image(wsi_filepath:pathlib.Path, scale_factor = 32, level = 0):
