@@ -701,10 +701,10 @@ def tile_to_pil_tile(tile:Tile, is_wsi:bool):
       """
       #x, y = tile.o_c_s, tile.o_r_s
       #width, height = tile.o_c_e - tile.o_c_s, tile.o_r_e - tile.o_r_s
-      x = tile.get_x
-      y = tile.get_y
-      width = tile.get_width
-      height = tile.get_height
+      x = tile.get_x()
+      y = tile.get_y()
+      width = tile.get_width()
+      height = tile.get_height()
       if(is_wsi):
           pil_img = ExtractTileFromWSI(tile.wsi_path, x, y, width, height, tile.level)
       else:
