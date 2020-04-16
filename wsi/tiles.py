@@ -345,6 +345,68 @@ class TissueQuantity(Enum):
 
 ############################# functions #########################################
 
+def show_np_with_bboxes(img:numpy.ndarray, bboxes:List[numpy.ndarray], figsize:tuple=(10,10)):
+    """
+    Arguments:
+        img: img as numpy array
+        bboxes: List of bounding boxes where each bbox is a numpy array: 
+                array([ x-upper-left, y-upper-left,  width,  height]) 
+                e.g. array([ 50., 211.,  17.,  19.])
+    """    
+    # Create figure and axes
+    fig,ax = plt.subplots(1,1,figsize=figsize)    
+    # Display the image
+    ax.imshow(img)    
+    # Create a Rectangle patch for each bbox
+    for b in bboxes:
+        rect = matplotlib.patches.Rectangle((b[0],b[1]),b[2],b[3],linewidth=1,edgecolor='r',facecolor='none')    
+        # Add the patch to the Axes
+        ax.add_patch(rect)    
+    plt.show()  
+
+def show_wsi_with_marked_tiles(wsi_path:pathlib.Path, 
+                               df_tiles:pandas.DataFrame,
+                               figsize:Tuple[int] = (10,10),
+                               scaling_factor:int = 32, 
+                               level:int = 0):
+    """
+    Loads a whole slide image, scales it down, converts it into a numpy array and shows it with a grid overlay for all tiles
+    that passed scoring to visualize which tiles e.g. "tiles.WsiOrROIToTilesMultithreaded" calculated as worthy to keep.
+    Arguments:
+        wsi_path: Path to a whole-slide image
+        df_tiles: A pandas dataframe from e.g. "tiles.WsiOrROIToTilesMultithreaded" with spacial information about all tiles
+        figsize: Size of the plotted matplotlib figure containing the image.
+        scaling_factor: The larger, the faster this method works, but the plotted image has less resolution
+        level: The level that was specified in e.g. "tiles.WsiOrROIToTilesMultithreaded". 0 means highest magnification.
+    """
+    wsi_pil, large_w, large_h, new_w, new_h, best_level_for_downsample = tiles.wsi_to_scaled_pil_image(wsi_path,
+                                                                                                   scale_factor=scale_factor,
+                                                                                                   level=level)
+    wsi_np = util.pil_to_np_rgb(wsi_pil)
+    boxes =[]
+    for index, row in df_tiles.iterrows():
+        if row['wsi_path'] == wsi_path:
+            box = np.array([row['x_upper_left'], row['y_upper_left'], row['pixels_width'], row['pixels_height']])/scale_factor
+            boxes.append(box)
+            
+    show_np_with_bboxes(wsi_np, boxes, figsize)
+
+
+def scoring_function_1(tissue_percent, combined_factor):
+    """
+    use this, if you want tissue with lots of cells (lots of hematoxylin stained tissue)
+    """
+    return tissue_percent * combined_factor / 1000.0
+
+def scoring_function_2(tissue_percent, combined_factor):
+    """
+    use this, if you mostly care that there is any tissue in the tile
+    """
+    return (tissue_percent ** 2) * np.log(1 + combined_factor) / 1000.0
+
+
+
+
 
 def ExtractTileFromWSI(path:Union[str, pathlib.Path], x:int, y:int, width:int, height:int, level:int)-> PIL.Image:
     """
@@ -380,19 +442,6 @@ def ExtractTileFromPILImage(path:Union[str, pathlib.Path], x:int, y:int, width:i
     pil_img = PIL.Image.open(path)
     pil_img = pil_img.crop((x, y, x+width, y+height))
     return pil_img
-
-
-def scoring_function_1(tissue_percent, combined_factor):
-    """
-    use this, if you want tissue with lots of cells
-    """
-    return tissue_percent * combined_factor / 1000.0
-
-def scoring_function_2(tissue_percent, combined_factor):
-    """
-    use this, if you only care that there is any tissue in the tile
-    """
-    return (tissue_percent ** 2) * np.log(1 + combined_factor) / 1000.0
 
 def get_roi_name_from_path_pituitary_adenoma_entities(roi_path):
     path = Path(roi_path)
@@ -451,7 +500,8 @@ def WsiOrROIToTiles(wsiPath:pathlib.Path,
         scale_factor = 32
     else:
         scale_factor = 1
-    Image.MAX_IMAGE_PIXELS = 10000000000
+    ### against DecompressionBombWarning
+    #mage.MAX_IMAGE_PIXELS = 10000000000000
     openslide.lowlevel._load_image = openslide_overwrite._load_image
     if(is_wsi):
         img_pil, original_width, original_height, scaled_width, scaled_height, best_level_for_downsample = wsi_to_scaled_pil_image(wsiPath, scale_factor, level)
@@ -896,30 +946,37 @@ def score_tiles(img_np:np.array,
     return tile_sum
 
 
-def score_tile(np_tile, tissue_percent, row, col, scoring_function = scoring_function_1):
-      """
-      Score tile based on tissue percentage, color factor, saturation/value factor, and tissue quantity factor.
 
-      Args:
-        np_tile: Tile as NumPy array.
-        tissue_percent: The percentage of the tile judged to be tissue.
-        slide_num: Slide number.
-        row: Tile row.
-        col: Tile column.
-
-      Returns tuple consisting of score, color factor, saturation/value factor, and tissue quantity factor.
-      """
-      color_factor = hsv_purple_pink_factor(np_tile)
-      s_and_v_factor = hsv_saturation_and_value_factor(np_tile)
-      amount = tissue_quantity(tissue_percent)
-      quantity_factor = tissue_quantity_factor(amount)
-      combined_factor = color_factor * s_and_v_factor
-      score = scoring_function(tissue_percent, combined_factor)
-      # scale score to between 0 and 1
-      score = 1.0 - (10.0 / (10.0 + score))
-      return score, color_factor, s_and_v_factor, quantity_factor
-
-
+def score_tile(np_tile, tissue_percent, row, col, scoring_function):
+    """
+    Score tile based on tissue percentage, color factor, saturation/value factor, and tissue quantity factor.
+    
+    Args:
+    np_tile: Tile as NumPy array.
+    tissue_percent: The percentage of the tile judged to be tissue.
+    slide_num: Slide number.
+    row: Tile row.
+    col: Tile column.
+    
+    Returns tuple consisting of score, color factor, saturation/value factor, and tissue quantity factor.
+    """
+    color_factor = hsv_purple_pink_factor(np_tile)
+    s_and_v_factor = hsv_saturation_and_value_factor(np_tile)
+    amount = tissue_quantity(tissue_percent)
+    quantity_factor = tissue_quantity_factor(amount)
+    combined_factor = color_factor * s_and_v_factor   
+    score = scoring_function(tissue_percent, combined_factor)
+    
+    #if combined_factor != 0.0 or tissue_percent != 0.0:
+     #   print(f'before: {score}')            
+                
+    # scale score to between 0 and 1
+    score = 1.0 - (10.0 / (10.0 + score))
+    
+    #if combined_factor != 0.0 or tissue_percent != 0.0:
+      #  print(f'after: {score}') 
+                  
+    return score, color_factor, s_and_v_factor, quantity_factor
 
 def tissue_quantity_factor(amount):
   """
