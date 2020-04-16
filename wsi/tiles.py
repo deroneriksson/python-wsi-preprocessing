@@ -26,6 +26,7 @@ import colorsys
 import math
 import matplotlib.pyplot as plt
 import multiprocessing
+import numpy
 import numpy as np
 import os
 import PIL
@@ -36,7 +37,7 @@ from wsi import openslide_overwrite
 from wsi.util import Time
 import openslide
 import multiprocessing
-from typing import List, Callable, Union
+from typing import List, Callable, Union, Dict, Tuple
 from tqdm import tqdm_notebook as tqdm
 import pandas
 import pandas as pd
