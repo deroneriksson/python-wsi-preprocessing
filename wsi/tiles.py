@@ -368,7 +368,7 @@ def show_np_with_bboxes(img:numpy.ndarray, bboxes:List[numpy.ndarray], figsize:t
 def show_wsi_with_marked_tiles(wsi_path:pathlib.Path, 
                                df_tiles:pandas.DataFrame,
                                figsize:Tuple[int] = (10,10),
-                               scaling_factor:int = 32, 
+                               scale_factor:int = 32, 
                                level:int = 0):
     """
     Loads a whole slide image, scales it down, converts it into a numpy array and shows it with a grid overlay for all tiles
@@ -377,10 +377,10 @@ def show_wsi_with_marked_tiles(wsi_path:pathlib.Path,
         wsi_path: Path to a whole-slide image
         df_tiles: A pandas dataframe from e.g. "tiles.WsiOrROIToTilesMultithreaded" with spacial information about all tiles
         figsize: Size of the plotted matplotlib figure containing the image.
-        scaling_factor: The larger, the faster this method works, but the plotted image has less resolution
+        scale_factor: The larger, the faster this method works, but the plotted image has less resolution
         level: The level that was specified in e.g. "tiles.WsiOrROIToTilesMultithreaded". 0 means highest magnification.
     """
-    wsi_pil, large_w, large_h, new_w, new_h, best_level_for_downsample = tiles.wsi_to_scaled_pil_image(wsi_path,
+    wsi_pil, large_w, large_h, new_w, new_h, best_level_for_downsample = wsi_to_scaled_pil_image(wsi_path,
                                                                                                    scale_factor=scale_factor,
                                                                                                    level=level)
     wsi_np = util.pil_to_np_rgb(wsi_pil)
