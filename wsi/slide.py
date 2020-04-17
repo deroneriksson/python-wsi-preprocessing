@@ -97,3 +97,18 @@ def small_to_large_mapping(small_pixel, large_dimensions, scale_factor):
   large_x = round((large_w / scale_factor) / math.floor(large_w / scale_factor) * (scale_factor * small_x))
   large_y = round((large_h / scale_factor) / math.floor(large_h / scale_factor) * (scale_factor * small_y))
   return large_x, large_y
+
+
+def get_conversion_factor(wsi_path:pathlib.Path, level:int)->float:
+    """
+    Arguments:
+        wsi_path: path to a whole-slide image
+        level: level of the whole-slide image, 0 means highest resolution, with every level the resolution halves
+    Result:
+        returns a conversion factor, to convert pixel size into micrometer
+    """
+    sl = open_slide(wsi_path)
+    mpp_x = float(sl.properties.get('openslide.mpp-x'))
+    mpp_y = float(sl.properties.get('openslide.mpp-y'))
+    assert mpp_x==mpp_y
+    return mpp_x*2**level
