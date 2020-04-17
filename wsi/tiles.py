@@ -37,10 +37,11 @@ from wsi import openslide_overwrite
 from wsi.util import Time
 import openslide
 import multiprocessing
-from typing import List, Callable, Union, Dict, Tuple
+from typing import List, Callable, Union, Dict, Tuple, Union
 from tqdm import tqdm_notebook as tqdm
 import pandas
 import pandas as pd
+import warnings
 
 
 
@@ -183,7 +184,7 @@ class TileSummary:
     
     def top_tiles(self):
         """
-        Retrieve the top-scoring tiles.
+        Retrieve only the tiles that pass scoring.
 
         Returns:
            List of the top-scoring tiles.
@@ -323,9 +324,15 @@ class Tile:
         return self.o_r_e - self.o_r_s
     
     def get_x(self):
+        """
+        upper left x coordinate
+        """
         return self.o_c_s
     
     def get_y(self):
+        """
+        upper left x coordinate
+        """
         return self.o_r_s
     
     def get_path(self)->pathlib.Path:
@@ -365,32 +372,48 @@ def show_np_with_bboxes(img:numpy.ndarray, bboxes:List[numpy.ndarray], figsize:t
         ax.add_patch(rect)    
     plt.show()  
 
-def show_wsi_with_marked_tiles(wsi_path:pathlib.Path, 
-                               df_tiles:pandas.DataFrame,
-                               figsize:Tuple[int] = (10,10),
-                               scale_factor:int = 32, 
+def show_wsi_with_marked_tiles(figsize:Tuple[int] = (10,10),
+                               scale_factor:int = 32,
+                               tilesummary:TileSummary=None,
+                               wsi_path:pathlib.Path=None, 
+                               df_tiles:pandas.DataFrame=None,
                                level:int = 0):
     """
+    Either provide a TileSummary object or wsi_path, df_tiles and level.
+    
     Loads a whole slide image, scales it down, converts it into a numpy array and shows it with a grid overlay for all tiles
     that passed scoring to visualize which tiles e.g. "tiles.WsiOrROIToTilesMultithreaded" calculated as worthy to keep.
     Arguments:
-        wsi_path: Path to a whole-slide image
-        df_tiles: A pandas dataframe from e.g. "tiles.WsiOrROIToTilesMultithreaded" with spacial information about all tiles
         figsize: Size of the plotted matplotlib figure containing the image.
-        scale_factor: The larger, the faster this method works, but the plotted image has less resolution
+        scale_factor: The larger, the faster this method works, but the plotted image has less resolution.
+        tilesummary: a TileSummary object of one wsi
+        wsi_path: Path to a whole-slide image
+        df_tiles: A pandas dataframe from e.g. "tiles.WsiOrROIToTilesMultithreaded" with spacial information about all tiles           
         level: The level that was specified in e.g. "tiles.WsiOrROIToTilesMultithreaded". 0 means highest magnification.
     """
-    wsi_pil, large_w, large_h, new_w, new_h, best_level_for_downsample = wsi_to_scaled_pil_image(wsi_path,
-                                                                                                   scale_factor=scale_factor,
-                                                                                                   level=level)
-    wsi_np = util.pil_to_np_rgb(wsi_pil)
-    boxes =[]
-    for index, row in df_tiles.iterrows():
-        if row['wsi_path'] == wsi_path:
-            box = np.array([row['x_upper_left'], row['y_upper_left'], row['pixels_width'], row['pixels_height']])/scale_factor
+    if tilesummary != None:
+        wsi_pil, large_w, large_h, new_w, new_h, best_level_for_downsample = wsi_to_scaled_pil_image(tilesummary.wsi_path,
+                                                                                    scale_factor=tilesummary.scale_factor,
+                                                                                                    level=tilesummary.level)
+        wsi_np = util.pil_to_np_rgb(wsi_pil)
+        boxes =[]
+        for tile in tilesummary.top_tiles():
+            box = np.array([tile.get_x(), tile.get_y(), tile.get_width(), tile.get_height()])/scale_factor
             boxes.append(box)
+        show_np_with_bboxes(wsi_np, boxes, figsize)
             
-    show_np_with_bboxes(wsi_np, boxes, figsize)
+    else:
+        wsi_pil, large_w, large_h, new_w, new_h, best_level_for_downsample = wsi_to_scaled_pil_image(wsi_path,
+                                                                                    scale_factor=scale_factor,
+                                                                                                    level=level)
+        wsi_np = util.pil_to_np_rgb(wsi_pil)
+        boxes =[]
+        for index, row in df_tiles.iterrows():
+            if row['wsi_path'] == wsi_path:
+                box = np.array([row['x_upper_left'], row['y_upper_left'], row['pixels_width'], row['pixels_height']])/scale_factor
+                boxes.append(box)
+                
+        show_np_with_bboxes(wsi_np, boxes, figsize)
 
 
 def scoring_function_1(tissue_percent, combined_factor):
@@ -404,9 +427,6 @@ def scoring_function_2(tissue_percent, combined_factor):
     use this, if you mostly care that there is any tissue in the tile
     """
     return (tissue_percent ** 2) * np.log(1 + combined_factor) / 1000.0
-
-
-
 
 
 def ExtractTileFromWSI(path:Union[str, pathlib.Path], x:int, y:int, width:int, height:int, level:int)-> PIL.Image:
@@ -467,9 +487,10 @@ def WsiOrROIToTiles(wsiPath:pathlib.Path,
                tile_scoring_function = scoring_function_1,
                is_wsi:bool = True, 
                level = 0, 
-               save_tiles:bool = False)-> pandas.DataFrame:
+               save_tiles:bool = False, 
+               return_as_tilesummary_object = False)-> Union[TileSummary, pandas.DataFrame]:
     """
-    There is currently a bug with levels above 0. Tiles do not get scored correctly an empty tiles will pass scoring.
+    There is currently a bug with levels above 0. Tiles do not get scored correctly and empty tiles will pass scoring.
     
     Calculates tile coordinates and returns them in a pandas dataframe. If save_tiles == True the tiles will also be extracted
     and saved from the WSI or ROI (ROI is assumed to be a "normal" image format like .png).
@@ -487,10 +508,14 @@ def WsiOrROIToTiles(wsiPath:pathlib.Path,
                         the file format .png, whick is generated by this library).
     level: Level of the WSI you want to extract the tile from. 0 means highest resolution.
     save_tiles: if True the tiles will be extracted and saved to {tilesFolderPath}
-    
+    return_as_tilesummary_object: return_as_tilesummary_object: Set this to true, if you 
+                                    want the TileSummary object and not a pandas dataframe.
     Return:
-    pandas dataframe with coloumns: ['tile_name','wsi_path','level','x_upper_left','y_upper_left','pixels_width','pixels_height']
-    """
+    if return_as_tilesummary_object == True:
+       a TileSummary object will be returned
+    else:
+        pandas dataframe with coloumns: ['tile_name','wsi_path','level','x_upper_left','y_upper_left','pixels_width','pixels_height']
+    """    
     if(not is_wsi and level != 0):
         raise ValueError("Specifiying a level only makes sense when extracting tiles from WSIs. Just leave the default value.")
     if(tilesFolderPath is None and save_tiles == True):
@@ -530,24 +555,31 @@ def WsiOrROIToTiles(wsiPath:pathlib.Path,
                                      tile_naming_func, 
                                      level, 
                                      best_level_for_downsample)
-    rows_list = []
-    for tile in tilesummary.top_tiles():
-        if(save_tiles):
+    
+    if(save_tiles):
+        for tile in tilesummary.top_tiles():
             tile.save_tile()
             
-        row = {'tile_name':tile.get_name(),
-            'wsi_path':tile.wsi_path,
-            'level':tile.level,
-            'x_upper_left':tile.get_x(),
-            'y_upper_left':tile.get_y(),
-            'pixels_width':tile.get_width(),
-            'pixels_height':tile.get_height()}
-        rows_list.append(row)
+    if return_as_tilesummary_object:
+        return tilesummary
     
-    if(len(rows_list) == 0):
-        return pd.DataFrame(columns=['tile_name','wsi_path','level','x_upper_left','y_upper_left','pixels_width','pixels_height'])
-    else:
-        return pd.DataFrame(rows_list).set_index('tile_name', inplace=False)
+    else:    
+        rows_list = []
+        for tile in tilesummary.top_tiles():                                      
+            row = {'tile_name':tile.get_name(),
+                'wsi_path':tile.wsi_path,
+                'level':tile.level,
+                'x_upper_left':tile.get_x(),
+                'y_upper_left':tile.get_y(),
+                'pixels_width':tile.get_width(),
+                'pixels_height':tile.get_height()}
+            rows_list.append(row)
+        
+        if(len(rows_list) == 0):
+            return pd.DataFrame(columns=['tile_name','wsi_path', \
+                                         'level','x_upper_left','y_upper_left','pixels_width','pixels_height'])
+        else:
+            return pd.DataFrame(rows_list).set_index('tile_name', inplace=False)
         
         
 def WsiOrROIToTilesMultithreaded(wsiPaths:List[pathlib.Path], 
@@ -559,7 +591,8 @@ def WsiOrROIToTilesMultithreaded(wsiPaths:List[pathlib.Path],
                              tileScoringFunction = scoring_function_1, 
                              is_wsi = True, 
                              level = 0, 
-                             save_tiles:bool = False)-> pandas.DataFrame:
+                             save_tiles:bool = False, 
+                             return_as_tilesummary_object = False)-> Union[List[TileSummary], pandas.DataFrame]:
     """
     The method WsiOrROIToTiles for a list of WSIs/ROIs in parallel on multiple threads.
     
@@ -576,17 +609,20 @@ def WsiOrROIToTilesMultithreaded(wsiPaths:List[pathlib.Path],
                         the file format .png, whick is generated by this library).
     level: Level of the WSI you want to extract the tile from. 0 means highest resolution.
     save_tiles: if True the tiles will be extracted and saved to {tilesFolderPath}
-    
+    return_as_tilesummary_object: Set this to true, if you want the TileSummary object and not a pandas dataframe.
     Return:
-    pandas dataframe with coloumns: ['tile_name','wsi_path','level','x_upper_left','y_upper_left','pixels_width','pixels_height']
+    if return_as_tilesummary_object == True:
+       a List of TileSummary objects will be returned
+    else:
+        pandas dataframe with coloumns: ['tile_name','wsi_path','level','x_upper_left','y_upper_left','pixels_width','pixels_height']
     """
-    pbar = tqdm(total=len(wsiPaths))
-    dfs = []
-    def update(df):
-        dfs.append(df)
-        pbar.update()
-     
     
+    pbar = tqdm(total=len(wsiPaths))
+    results = []
+    def update(res):
+        results.append(res)
+        pbar.update()
+         
     with multiprocessing.Pool() as pool:
         for p in wsiPaths:
             pool.apply_async(WsiOrROIToTiles, 
@@ -599,21 +635,25 @@ def WsiOrROIToTilesMultithreaded(wsiPaths:List[pathlib.Path],
                                    tileScoringFunction, 
                                    is_wsi, 
                                    level, 
-                                   save_tiles), 
+                                   save_tiles, 
+                                   return_as_tilesummary_object), 
                                    callback=update)
             
                 
         pool.close()
         pool.join()
-
-    merged_df = None
-    for df in tqdm(dfs):
-        if merged_df is None:
-            merged_df = df
-        else:
-            merged_df = merged_df.append(df, sort=False)
     
-    return merged_df.drop_duplicates(inplace=False)
+    if return_as_tilesummary_object:
+        return results
+    else:
+        merged_df = None
+        for df in tqdm(dfs):
+            if merged_df is None:
+                merged_df = df
+            else:
+                merged_df = merged_df.append(df, sort=False)
+        
+        return merged_df.drop_duplicates(inplace=False)
         
         
 def wsi_to_scaled_pil_image(wsi_filepath:pathlib.Path, scale_factor = 32, level = 0):
