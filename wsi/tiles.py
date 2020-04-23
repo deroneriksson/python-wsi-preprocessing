@@ -647,11 +647,11 @@ def WsiOrROIToTilesMultithreaded(wsiPaths:List[pathlib.Path],
         return results
     else:
         merged_df = None
-        for df in tqdm(dfs):
+        for res in tqdm(results):
             if merged_df is None:
-                merged_df = df
+                merged_df = res
             else:
-                merged_df = merged_df.append(df, sort=False)
+                merged_df = merged_df.append(res, sort=False)
         
         return merged_df.drop_duplicates(inplace=False)
         
